@@ -3,7 +3,9 @@ import { ConfidenceBadge } from '@/components/ConfidenceBadge';
 import { StatCard } from '@/components/StatCard';
 import { notFound } from 'next/navigation';
 
-export default async function MatchDetail({ params }: { params: { id: string } }) {
+export default async function MatchDetail({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  
   const { data: match } = await supabase
     .from('matches')
     .select(`
@@ -14,14 +16,16 @@ export default async function MatchDetail({ params }: { params: { id: string } }
       stats_snapshots(*),
       market_snapshots(*)
     `)
-    .eq('id', params.id)
+    .eq('id', id)
     .single();
 
   if (!match) return notFound();
 
-  const pred = match.predictions?.[0];
-  const stats = match.stats_snapshots?.[0];
-  const markets = match.market_snapshots?.[0];
+  const pred = (match as any).predictions?.[0];
+  const stats = (match as any).stats_snapshots?.[0];
+  const markets = (match as any).market_snapshots?.[0];
+  const homeTeamName = (match as any).home_team?.name || 'Home Team';
+  const awayTeamName = (match as any).away_team?.name || 'Away Team';
 
   return (
     <main className="min-h-screen bg-slate-50 pb-20 pt-8">
@@ -31,9 +35,9 @@ export default async function MatchDetail({ params }: { params: { id: string } }
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 mb-8 text-center">
           <p className="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2">{match.league}</p>
           <div className="flex justify-between items-center px-12">
-            <h1 className="text-3xl font-black text-slate-900 w-2/5">{match.home_team.name}</h1>
+            <h1 className="text-3xl font-black text-slate-900 w-2/5">{homeTeamName}</h1>
             <span className="text-xl font-bold text-slate-300 w-1/5">VS</span>
-            <h1 className="text-3xl font-black text-slate-900 w-2/5">{match.away_team.name}</h1>
+            <h1 className="text-3xl font-black text-slate-900 w-2/5">{awayTeamName}</h1>
           </div>
           <p className="text-sm font-medium text-slate-400 mt-4">
             {new Date(match.match_date).toLocaleString()}
