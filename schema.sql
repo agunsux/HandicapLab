@@ -6,6 +6,7 @@ CREATE TABLE teams (
     id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
     name text NOT NULL,
     league text NOT NULL,
+    footystats_id integer UNIQUE,
     created_at timestamp with time zone DEFAULT now() NOT NULL
 );
 
@@ -16,6 +17,7 @@ CREATE TABLE matches (
     away_team_id uuid NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
     match_date timestamp with time zone NOT NULL,
     status text NOT NULL DEFAULT 'scheduled', -- scheduled / live / finished
+    footystats_id integer UNIQUE,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     CONSTRAINT check_teams_different CHECK (home_team_id != away_team_id)
 );
