@@ -94,11 +94,8 @@ export class ApiFootballClient {
     if (endpoint === 'fixtures') {
       const league = Number(params.league || 39);
       const season = Number(params.season || 2024);
-      const leagueName = league === 39 ? 'Premier League' : league === 140 ? 'La Liga' : 'Serie A';
-
-      // Generate 10 mock fixtures
-      const mockFixtures = [];
-      const teams = [
+      let leagueName = 'Premier League';
+      let teams = [
         { id: 1, name: 'Arsenal' },
         { id: 2, name: 'Chelsea' },
         { id: 3, name: 'Liverpool' },
@@ -111,6 +108,29 @@ export class ApiFootballClient {
         { id: 10, name: 'Everton' },
       ];
 
+      if (league === 1) {
+        leagueName = 'FIFA World Cup';
+        teams = [
+          { id: 501, name: 'Argentina' },
+          { id: 502, name: 'France' },
+          { id: 503, name: 'Brazil' },
+          { id: 504, name: 'Germany' },
+          { id: 505, name: 'Spain' },
+          { id: 506, name: 'England' },
+          { id: 507, name: 'Portugal' },
+          { id: 508, name: 'Netherlands' },
+          { id: 509, name: 'Belgium' },
+          { id: 510, name: 'Italy' },
+        ];
+      } else if (league === 140) {
+        leagueName = 'La Liga';
+      } else if (league === 848) {
+        leagueName = 'Ligue 2';
+      }
+
+      // Generate 10 mock fixtures
+      const mockFixtures = [];
+
       for (let i = 0; i < 10; i++) {
         const fixtureId = 200000 + i;
         const homeTeam = teams[i % teams.length];
@@ -122,26 +142,37 @@ export class ApiFootballClient {
         const shHome = Math.floor(Math.random() * 2);
         const shAway = Math.floor(Math.random() * 2);
 
+        const isFinished = league !== 1 && i < 7; // Keep some upcoming for World Cup
+
         mockFixtures.push({
           fixture: {
             id: fixtureId,
             referee: 'Michael Oliver',
             timezone: 'UTC',
-            date: new Date(Date.now() - (10 - i) * 86400 * 1000).toISOString(),
-            timestamp: Math.floor((Date.now() - (10 - i) * 86400 * 1000) / 1000),
+            date: isFinished 
+              ? new Date(Date.now() - (10 - i) * 86400 * 1000).toISOString()
+              : new Date(Date.now() + (i + 1) * 86400 * 1000).toISOString(),
+            timestamp: Math.floor((Date.now() + (isFinished ? -(10 - i) : (i + 1)) * 86400 * 1000) / 1000),
             periods: { first: null, second: null },
             venue: { id: 1, name: 'Emirates Stadium', city: 'London' },
-            status: { long: 'Match Finished', short: 'FT', elapsed: 90 }
+            status: isFinished 
+              ? { long: 'Match Finished', short: 'FT', elapsed: 90 }
+              : { long: 'Not Started', short: 'NS', elapsed: 0 }
           },
-          league: { id: league, name: leagueName, country: 'England', logo: '', flag: '', season: season, round: 'Regular Season - ' + (i + 1) },
+          league: { id: league, name: leagueName, country: league === 1 ? 'World' : 'England', logo: '', flag: '', season: season, round: league === 1 ? 'Group Stage' : 'Regular Season - ' + (i + 1) },
           teams: {
-            home: { id: homeTeam.id, name: homeTeam.name, logo: '', winner: htHome + shHome > htAway + shAway },
-            away: { id: awayTeam.id, name: awayTeam.name, logo: '', winner: htAway + shAway > htHome + shHome }
+            home: { id: homeTeam.id, name: homeTeam.name, logo: '', winner: isFinished ? htHome + shHome > htAway + shAway : null },
+            away: { id: awayTeam.id, name: awayTeam.name, logo: '', winner: isFinished ? htAway + shAway > htHome + shHome : null }
           },
-          goals: { home: htHome + shHome, away: htAway + shAway },
-          score: {
+          goals: isFinished ? { home: htHome + shHome, away: htAway + shAway } : { home: null, away: null },
+          score: isFinished ? {
             halftime: { home: htHome, away: htAway },
             fulltime: { home: htHome + shHome, away: htAway + shAway },
+            extratime: { home: null, away: null },
+            penalty: { home: null, away: null }
+          } : {
+            halftime: { home: null, away: null },
+            fulltime: { home: null, away: null },
             extratime: { home: null, away: null },
             penalty: { home: null, away: null }
           }

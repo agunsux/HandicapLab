@@ -51,21 +51,51 @@ export async function GET(request: Request) {
       const fixture = fixtures[i];
       const prediction = predictions[i];
       
-      // Insert or update match
-      const { data: matchData, error: matchError } = await supabase
+      // Check if match already exists
+      const { data: existingMatches, error: selectError } = await supabase
         .from('matches')
-        .upsert({
-          home_team: fixture.teams.home.name,
-          away_team: fixture.teams.away.name,
-          league: fixture.league.name,
-          kickoff: fixture.fixture.date,
-          status: 'upcoming',
-        }, {
-          onConflict: 'home_team,away_team,kickoff',
-        })
-        .select()
-        .single();
-      
+        .select('*')
+        .eq('home_team', fixture.teams.home.name)
+        .eq('away_team', fixture.teams.away.name)
+        .eq('kickoff', fixture.fixture.date);
+
+      let matchData = null;
+      let matchError = null;
+
+      if (selectError) {
+        matchError = selectError;
+      } else if (existingMatches && existingMatches.length > 0) {
+        // Update existing match
+        const { data: updatedMatch, error: updateError } = await supabase
+          .from('matches')
+          .update({
+            league: fixture.league.name,
+            status: 'upcoming'
+          })
+          .eq('id', existingMatches[0].id)
+          .select()
+          .single();
+        
+        matchData = updatedMatch;
+        matchError = updateError;
+      } else {
+        // Insert new match
+        const { data: insertedMatch, error: insertError } = await supabase
+          .from('matches')
+          .insert({
+            home_team: fixture.teams.home.name,
+            away_team: fixture.teams.away.name,
+            league: fixture.league.name,
+            kickoff: fixture.fixture.date,
+            status: 'upcoming',
+          })
+          .select()
+          .single();
+
+        matchData = insertedMatch;
+        matchError = insertError;
+      }
+
       if (matchError) {
         console.error('Error saving match:', matchError, 'for', fixture.teams.home.name, 'vs', fixture.teams.away.name);
         continue;

@@ -5,7 +5,10 @@ export class ApiCache {
   private cacheDir: string;
 
   constructor() {
-    this.cacheDir = path.join(process.cwd(), 'cache', 'api-football');
+    const isServerless = !!(process.env.VERCEL || process.env.LAMBDA_TASK_ROOT);
+    this.cacheDir = isServerless
+      ? path.join('/tmp', 'cache', 'api-football')
+      : path.join(process.cwd(), 'cache', 'api-football');
     this.ensureDirectoryExists();
   }
 
