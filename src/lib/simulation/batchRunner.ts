@@ -3,6 +3,7 @@ import { generatePrediction, PredictionOutput, MatchInput } from '@/services/pro
 import { generateDistributionReport, ReportMetrics } from '../validation/distributionReport';
 import { validatePredictionGuards, evaluateReportGuards } from '../validation/guards';
 import { calculateMarketEdge, EdgeReport } from '../validation/edgeReport';
+import { evaluateBaselines, BaselinesOutput } from '../validation/baseline';
 
 function mulberry32(a: number) {
   return function() {
@@ -17,6 +18,7 @@ export function runSimulation(batchSize: number = 10000, seed?: number): {
   metrics: ReportMetrics;
   edges: EdgeReport[];
   guardStatuses: string[];
+  baselines: BaselinesOutput;
 } {
   const prng = seed !== undefined ? mulberry32(seed) : Math.random;
   
@@ -59,6 +61,7 @@ export function runSimulation(batchSize: number = 10000, seed?: number): {
 
   const metrics = generateDistributionReport(results);
   const guardStatuses = evaluateReportGuards(metrics);
+  const baselines = evaluateBaselines(results);
 
-  return { metrics, edges, guardStatuses };
+  return { metrics, edges, guardStatuses, baselines };
 }

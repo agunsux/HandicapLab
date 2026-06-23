@@ -13,6 +13,10 @@ export interface MatchInput {
   shots_on_target_away: number;
   form_home: number;
   form_away: number;
+  last_5_avg_goals_home?: number;
+  last_5_avg_goals_away?: number;
+  sh_ou_line?: number;
+  sh_ou_odds_under?: number;
 }
 
 export interface PredictionOutput {
@@ -25,6 +29,8 @@ export interface PredictionOutput {
   ml_away_prob: number;
   btts_yes_prob: number;
   btts_no_prob: number;
+  sh_ou_over_prob: number;
+  sh_ou_under_prob: number;
   final_confidence: number;
   model_version: string;
 }
@@ -111,10 +117,16 @@ export function generatePrediction(input: MatchInput): PredictionOutput {
   const btts_no_prob = 1 - btts_yes_prob;
 
   // Final Confidence
-  // Simple heuristic: if market and xG models agree closely, high confidence.
   const diff_market_xg = Math.abs(prob_home - xg_home_prob);
   let final_confidence = 1 - diff_market_xg; // Max 1.0
   final_confidence = Math.max(0.1, Math.min(0.99, final_confidence));
+
+  // SH Under Probability
+  const sh_expected_goals = total_expected_goals * 0.55;
+  const sh_ou_line = input.sh_ou_line || 1.0;
+  const sh_ou_diff = sh_expected_goals - sh_ou_line;
+  const sh_ou_over_prob = 1 / (1 + Math.exp(-sh_ou_diff));
+  const sh_ou_under_prob = 1 - sh_ou_over_prob;
 
   return {
       ah_home_prob,
@@ -126,6 +138,8 @@ export function generatePrediction(input: MatchInput): PredictionOutput {
       ml_away_prob: final_ml_away,
       btts_yes_prob,
       btts_no_prob,
+      sh_ou_over_prob,
+      sh_ou_under_prob,
       final_confidence,
       model_version: 'v0.1'
   };
