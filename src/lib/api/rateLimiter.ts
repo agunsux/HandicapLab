@@ -7,7 +7,11 @@ export class RateLimiter {
   private requestDelayMs = 1500; // 1.5 seconds delay between requests
 
   constructor() {
-    this.limitFile = path.join(process.cwd(), 'cache', 'api-football', 'rate-limit.json');
+    const isServerless = !!(process.env.VERCEL || process.env.LAMBDA_TASK_ROOT);
+    const cacheDir = isServerless
+      ? path.join('/tmp', 'cache', 'api-football')
+      : path.join(process.cwd(), 'cache', 'api-football');
+    this.limitFile = path.join(cacheDir, 'rate-limit.json');
     this.ensureDirectoryExists();
   }
 
