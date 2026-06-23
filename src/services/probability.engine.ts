@@ -1,3 +1,7 @@
+import { Feature, calculateFeatureScore, sigmoid, extractExplainability } from '../lib/model/features';
+import { StateWeightResult } from '../lib/calibration/stateWeightLearner';
+import { calculatePoissonProbabilities } from '../lib/model/poisson';
+
 export interface MatchInput {
   odds_home: number;
   odds_draw: number;
@@ -26,6 +30,15 @@ export interface MatchInput {
   domain_pressure?: number;
   ht_home_goals?: number;
   ht_away_goals?: number;
+  preMatchFeatures?: {
+    homeTeamStrength: number;
+    awayTeamStrength: number;
+    homeForm: number;
+    awayForm: number;
+    h2hHomeWinRate: number;
+    h2hAwayWinRate: number;
+    h2hDrawRate: number;
+  };
 }
 
 export interface PredictionOutput {
@@ -44,7 +57,7 @@ export interface PredictionOutput {
   marketLogits: Record<string, number>;
   expected_goals_home: number;
   expected_goals_away: number;
-  final_confidence: number;
+  final_confidence: number; // 0.0 to 1.0 (or 0-100, we normalize to 0.0-1.0)
   model_version: string;
   topPositiveFactors: string[];
   topNegativeFactors: string[];
@@ -52,29 +65,41 @@ export interface PredictionOutput {
   htScoreState?: string;
 }
 
-import { Feature, calculateFeatureScore, sigmoid, extractExplainability } from '../lib/model/features';
-import { StateWeightResult } from '../lib/calibration/stateWeightLearner';
-
 export function generatePrediction(
   input: MatchInput,
   learnedStateWeights?: Record<string, StateWeightResult>
 ): PredictionOutput {
-  const homeXg = input.xg_home;
-  const awayXg = input.xg_away;
-  const mlFeatureScore = (input.form_home - input.form_away) * 0.2;
-  const ahFeatureScore = 0;
-  const ouFeatureScore = 0;
+  // 1. Calculate lambdas (expected goals) for Poisson model
+  let lambdaHome = input.xg_home || 1.35;
+  let lambdaAway = input.xg_away || 1.15;
 
-  // Parse HT score state
+  const pm = input.preMatchFeatures;
+  if (pm) {
+    // Adjust xG lambdas based on relative team strength and form
+    const strengthAdjustHome = Math.max(0.5, Math.min(2.0, pm.homeTeamStrength / (pm.awayTeamStrength || 1.0)));
+    const strengthAdjustAway = Math.max(0.5, Math.min(2.0, pm.awayTeamStrength / (pm.homeTeamStrength || 1.0)));
+    
+    const formAdjustHome = Math.max(0.6, Math.min(1.8, pm.homeForm / 1.5));
+    const formAdjustAway = Math.max(0.6, Math.min(1.8, pm.awayForm / 1.5));
+
+    lambdaHome = lambdaHome * strengthAdjustHome * formAdjustHome;
+    lambdaAway = lambdaAway * strengthAdjustAway * formAdjustAway;
+  }
+
+  // 2. Run Poisson probability aggregation
+  const ouLine = input.ou_line || 2.5;
+  const ahLine = input.ah_line || 0;
+  const poisson = calculatePoissonProbabilities(lambdaHome, lambdaAway, ouLine, ahLine);
+
+  // 3. Keep existing Second Half Under logic intact (backward compatibility)
   const htHome = input.ht_home_goals || 0;
   const htAway = input.ht_away_goals || 0;
   const htTotal = htHome + htAway;
   let htScoreState = '2+';
   if (htTotal === 0) htScoreState = '0-0';
-  else if (htTotal === 1) htScoreState = '1-0'; // Assuming '1-0' covers 1-0 and 0-1 for simplicity, or 1 total goal
+  else if (htTotal === 1) htScoreState = '1-0';
   else if (htHome === 1 && htAway === 1) htScoreState = '1-1';
 
-  // Feature Model for Second Half Under
   const shUnderFeatures: Feature[] = [
     { name: 'tempo', value: (input.domain_tempo || 0) * -1, weight: 1.5, description: 'low tempo' },
     { name: 'defShapeHome', value: input.domain_defensiveShapeHome || 0, weight: 1.2, description: 'home defensive shape' },
@@ -90,69 +115,63 @@ export function generatePrediction(
   ];
 
   let sh_ou_under_logit = 0;
-  
   if (learnedStateWeights && learnedStateWeights[htScoreState] && !learnedStateWeights[htScoreState].fallback && learnedStateWeights[htScoreState].weights) {
     const w = learnedStateWeights[htScoreState].weights!;
     const tempo = (input.domain_tempo || 0) * -1;
     const pressure = input.domain_pressure || 0;
     const defShape = (input.domain_defensiveShapeHome || 0) + (input.domain_defensiveShapeAway || 0);
-    
-    // State-dependent logit
     sh_ou_under_logit = w.bias + w.tempo_weight * tempo + w.pressure_weight * pressure + w.defShape_weight * defShape;
   } else {
-    // Global fallback
     const shFeatureScore = calculateFeatureScore(shUnderFeatures);
     sh_ou_under_logit = shFeatureScore - 0.2;
   }
-
-  const ouBaseLine = 2.5;
-  const ahBaseLine = 0;
-  
-  // Base raw logits
-  const ah_home_logit = (homeXg - awayXg - ahBaseLine) * 1.5 + ahFeatureScore;
-  const ou_over_logit = (homeXg + awayXg - ouBaseLine) * 0.8 + ouFeatureScore;
-  const ml_home_logit = (homeXg - awayXg) * 2.0 + mlFeatureScore;
-  
-  const sh_ou_under_prob_feature = sigmoid(sh_ou_under_logit);
-  const ah_home_prob_feature = sigmoid(ah_home_logit);
-  const ou_over_prob_feature = sigmoid(ou_over_logit);
-  const ml_home_prob_feature = sigmoid(ml_home_logit);
+  const sh_ou_under_prob = sigmoid(sh_ou_under_logit);
 
   const { positive, negative } = extractExplainability(shUnderFeatures);
 
-  let ml_home_prob_norm = ml_home_prob_feature;
-  let ml_draw_prob_norm = 0.24;
-  let ml_away_prob_norm = 1 - ml_home_prob_norm - ml_draw_prob_norm;
+  // 4. Calculate prediction confidence (0.0 to 1.0)
+  // Use highest probability from primary markets as a baseline confidence metric
+  const primaryMarkets = [poisson.homeProb, poisson.drawProb, poisson.awayProb, poisson.overProb, poisson.underProb];
+  const maxMarketProb = Math.max(...primaryMarkets);
   
-  if (ml_away_prob_norm < 0) {
-    ml_draw_prob_norm = Math.max(0, 1 - ml_home_prob_norm);
-    ml_away_prob_norm = 0;
+  let final_confidence = maxMarketProb;
+  if (pm) {
+    // Add H2H reliability factor (higher win/loss consistency in H2H increases confidence)
+    const h2hSkew = Math.abs(pm.h2hHomeWinRate - pm.h2hAwayWinRate);
+    final_confidence = Math.min(0.99, Math.max(0.35, final_confidence + h2hSkew * 0.1));
   }
+
+  // Base raw logits for legacy metrics
+  const ouBaseLine = 2.5;
+  const ahBaseLine = 0;
+  const ah_home_logit = (lambdaHome - lambdaAway - ahBaseLine) * 1.5;
+  const ou_over_logit = (lambdaHome + lambdaAway - ouBaseLine) * 0.8;
+  const ml_home_logit = (lambdaHome - lambdaAway) * 2.0;
 
   return {
     matchId: (input as any).matchId || 'sim_' + Math.random().toString(36).substring(7),
-    ml_home_prob: ml_home_prob_norm,
-    ml_draw_prob: ml_draw_prob_norm,
-    ml_away_prob: ml_away_prob_norm,
-    ou_over_prob: ou_over_prob_feature,
-    ou_under_prob: 1 - ou_over_prob_feature,
-    ah_home_prob: ah_home_prob_feature,
-    ah_away_prob: 1 - ah_home_prob_feature,
-    sh_ou_over_prob: 1 - sh_ou_under_prob_feature,
-    sh_ou_under_prob: sh_ou_under_prob_feature,
-    btts_yes_prob: 0.5,
-    btts_no_prob: 0.5,
+    ml_home_prob: poisson.homeProb,
+    ml_draw_prob: poisson.drawProb,
+    ml_away_prob: poisson.awayProb,
+    ou_over_prob: poisson.overProb,
+    ou_under_prob: poisson.underProb,
+    ah_home_prob: poisson.ahHomeProb,
+    ah_away_prob: poisson.ahAwayProb,
+    sh_ou_over_prob: 1 - sh_ou_under_prob,
+    sh_ou_under_prob: sh_ou_under_prob,
+    btts_yes_prob: poisson.bttsYesProb,
+    btts_no_prob: poisson.bttsNoProb,
     marketLogits: {
       SH_UNDER: sh_ou_under_logit,
       FT_OU: ou_over_logit,
       AH_HOME: ah_home_logit,
       ML_HOME: ml_home_logit
     },
-    expected_goals_home: homeXg,
-    expected_goals_away: awayXg,
-    final_confidence: 0.85,
-    model_version: 'v0.3',
-    topPositiveFactors: positive,
+    expected_goals_home: Number(lambdaHome.toFixed(2)),
+    expected_goals_away: Number(lambdaAway.toFixed(2)),
+    final_confidence,
+    model_version: 'v0.5-ai',
+    topPositiveFactors: pm ? ['Form & Strength Adjusted', ...positive] : positive,
     topNegativeFactors: negative,
     features: shUnderFeatures,
     htScoreState

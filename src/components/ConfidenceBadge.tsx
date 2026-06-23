@@ -5,19 +5,22 @@ interface ConfidenceBadgeProps {
 }
 
 export function ConfidenceBadge({ confidence }: ConfidenceBadgeProps) {
-  let colorClass = 'bg-red-100 text-red-800 border-red-200';
-  let label = 'Low';
+  let colorClass = 'bg-red-50 text-red-700 border-red-200';
+  let label = '🔴 Avoid';
 
   if (confidence >= 0.75) {
-    colorClass = 'bg-green-100 text-green-800 border-green-200';
-    label = 'High';
-  } else if (confidence >= 0.5) {
-    colorClass = 'bg-yellow-100 text-yellow-800 border-yellow-200';
-    label = 'Moderate';
+    colorClass = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+    label = '🟢 High';
+  } else if (confidence >= 0.55) {
+    colorClass = 'bg-amber-50 text-amber-700 border-amber-200';
+    label = '🟡 Medium';
+  } else if (confidence >= 0.40) {
+    colorClass = 'bg-slate-50 text-slate-700 border-slate-200';
+    label = '⚪ Low';
   }
 
   return (
-    <span className={`px-2 py-1 rounded-full border text-xs font-semibold ${colorClass}`}>
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-bold transition-all shadow-sm ${colorClass}`}>
       {label} {(confidence * 100).toFixed(0)}%
     </span>
   );
