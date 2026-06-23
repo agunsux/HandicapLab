@@ -4,6 +4,7 @@ import { generateDistributionReport, ReportMetrics } from '../validation/distrib
 import { validatePredictionGuards, evaluateReportGuards } from '../validation/guards';
 import { calculateMarketEdge, EdgeReport } from '../validation/edgeReport';
 import { evaluateBaselines, BaselinesOutput } from '../validation/baseline';
+import { performFeatureAblation, AblationResult } from '../model/featureAnalysis';
 
 function mulberry32(a: number) {
   return function() {
@@ -15,10 +16,13 @@ function mulberry32(a: number) {
 }
 
 export function runSimulation(batchSize: number = 10000, seed?: number): {
-  metrics: ReportMetrics;
+  trainMetrics: ReportMetrics;
+  valMetrics: ReportMetrics;
+  trainBaselines: BaselinesOutput;
+  valBaselines: BaselinesOutput;
   edges: EdgeReport[];
   guardStatuses: string[];
-  baselines: BaselinesOutput;
+  ablation: AblationResult[];
 } {
   const prng = seed !== undefined ? mulberry32(seed) : Math.random;
   
@@ -26,7 +30,6 @@ export function runSimulation(batchSize: number = 10000, seed?: number): {
   Math.random = prng;
 
   const results: { pred: PredictionOutput; outcome: MatchSimulationResult; input: MatchInput }[] = [];
-  const edges: EdgeReport[] = [];
   
   let guardFailures = 0;
 
@@ -45,11 +48,6 @@ export function runSimulation(batchSize: number = 10000, seed?: number): {
       }
     }
 
-    const mlEdge = calculateMarketEdge('Moneyline', 'Home Win', pred.ml_home_prob, 1 / input.odds_home, 1);
-    const ahEdge = calculateMarketEdge('Asian Handicap', 'Home', pred.ah_home_prob, 0.5, 1);
-    const ouEdge = calculateMarketEdge('Over/Under', 'Over', pred.ou_over_prob, 0.5, 1);
-
-    edges.push(mlEdge, ahEdge, ouEdge);
     results.push({ pred, outcome, input });
   }
 
@@ -59,9 +57,33 @@ export function runSimulation(batchSize: number = 10000, seed?: number): {
     console.warn(`Total prediction guard failures: ${guardFailures} out of ${batchSize}`);
   }
 
-  const metrics = generateDistributionReport(results);
-  const guardStatuses = evaluateReportGuards(metrics);
-  const baselines = evaluateBaselines(results);
+  // Train / Test split
+  const trainSize = Math.floor(batchSize * 0.7);
+  const trainResults = results.slice(0, trainSize);
+  const valResults = results.slice(trainSize);
 
-  return { metrics, edges, guardStatuses, baselines };
+  const trainMetrics = generateDistributionReport(trainResults);
+  const valMetrics = generateDistributionReport(valResults);
+  const trainBaselines = evaluateBaselines(trainResults);
+  const valBaselines = evaluateBaselines(valResults);
+  const guardStatuses = evaluateReportGuards(valMetrics);
+
+  const edges: EdgeReport[] = valResults.map(r => {
+    const mlEdge = calculateMarketEdge('Moneyline', 'Home Win', r.pred.ml_home_prob, 1 / r.input.odds_home, 1);
+    const ahEdge = calculateMarketEdge('Asian Handicap', 'Home', r.pred.ah_home_prob, 0.5, 1);
+    const ouEdge = calculateMarketEdge('Over/Under', 'Over', r.pred.ou_over_prob, 0.5, 1);
+    const shLine = r.input.sh_ou_line || 1.0;
+    const shImplied = 1 / (r.input.sh_ou_odds_under || 1.91);
+    const shEdge = calculateMarketEdge('Second Half Under', `Under ${shLine}`, r.pred.sh_ou_under_prob, shImplied, 1);
+    return [mlEdge, ahEdge, ouEdge, shEdge];
+  }).flat();
+
+  // Ablation on validation set
+  const ablationDataset = valResults.map(r => ({
+    features: r.pred.features || [],
+    outcome: r.outcome.shTotalGoals < (r.input.sh_ou_line || 1.0) ? 1 : 0
+  }));
+  const ablation = performFeatureAblation(ablationDataset);
+
+  return { trainMetrics, valMetrics, trainBaselines, valBaselines, edges, guardStatuses, ablation };
 }

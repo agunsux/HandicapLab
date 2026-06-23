@@ -44,8 +44,10 @@ export function generateDistributionReport(
     const actualWin = outcome.homeWin ? 'home' : outcome.awayWin ? 'away' : 'draw';
     if (predictedWin === actualWin) winCorrect++;
 
-    // Track Brier against ML Home Win predictions
-    brierPredictions.push({ prob: pred.ml_home_prob, outcome: outcome.homeWin ? 1 : 0 });
+    // Track Brier against SH Under predictions
+    const shLine = input.sh_ou_line || 1.0;
+    const shUnderActual = outcome.shTotalGoals < shLine;
+    brierPredictions.push({ prob: pred.sh_ou_under_prob, outcome: shUnderActual ? 1 : 0 });
 
     const homeAhScore = outcome.homeGoals + input.ah_line;
     const homeAhWin = homeAhScore > outcome.awayGoals;

@@ -17,6 +17,13 @@ export interface MatchInput {
   last_5_avg_goals_away?: number;
   sh_ou_line?: number;
   sh_ou_odds_under?: number;
+  domain_tempo?: number;
+  domain_defensiveShapeHome?: number;
+  domain_defensiveShapeAway?: number;
+  domain_fatigueHome?: number;
+  domain_fatigueAway?: number;
+  domain_weather?: number;
+  domain_pressure?: number;
 }
 
 export interface PredictionOutput {
@@ -33,7 +40,12 @@ export interface PredictionOutput {
   sh_ou_under_prob: number;
   final_confidence: number;
   model_version: string;
+  topPositiveFactors: string[];
+  topNegativeFactors: string[];
+  features?: Feature[];
 }
+
+import { Feature, calculateFeatureScore, sigmoid, extractExplainability } from '../lib/model/features';
 
 export function generatePrediction(input: MatchInput): PredictionOutput {
   // 1. Market Implied Probability
@@ -121,12 +133,23 @@ export function generatePrediction(input: MatchInput): PredictionOutput {
   let final_confidence = 1 - diff_market_xg; // Max 1.0
   final_confidence = Math.max(0.1, Math.min(0.99, final_confidence));
 
-  // SH Under Probability
-  const sh_expected_goals = total_expected_goals * 0.55;
-  const sh_ou_line = input.sh_ou_line || 1.0;
-  const sh_ou_diff = sh_expected_goals - sh_ou_line;
-  const sh_ou_over_prob = 1 / (1 + Math.exp(-sh_ou_diff));
-  const sh_ou_under_prob = 1 - sh_ou_over_prob;
+  // Feature Model for Second Half Under
+  const shUnderFeatures: Feature[] = [
+    { name: 'tempo', value: (input.domain_tempo || 0) * -1, weight: 1.5, description: 'low tempo' },
+    { name: 'defShapeHome', value: input.domain_defensiveShapeHome || 0, weight: 1.2, description: 'home defensive shape' },
+    { name: 'defShapeAway', value: input.domain_defensiveShapeAway || 0, weight: 1.2, description: 'away defensive shape' },
+    { name: 'fatigueHome', value: input.domain_fatigueHome || 0, weight: -0.8, description: 'home fatigue' },
+    { name: 'fatigueAway', value: input.domain_fatigueAway || 0, weight: -0.8, description: 'away fatigue' },
+    { name: 'weather', value: (input.domain_weather || 0) * -1, weight: 0.5, description: 'bad weather' },
+    { name: 'pressure', value: input.domain_pressure || 0, weight: 0.5, description: 'high pressure' }
+  ];
+
+  const shScore = calculateFeatureScore(shUnderFeatures);
+  const sh_ou_under_prob_feature = sigmoid(shScore - 0.2); // slight negative bias for under to calibrate
+  const sh_ou_over_prob = 1 - sh_ou_under_prob_feature;
+  const sh_ou_under_prob = sh_ou_under_prob_feature;
+
+  const { positive, negative } = extractExplainability(shUnderFeatures);
 
   return {
       ah_home_prob,
@@ -141,6 +164,9 @@ export function generatePrediction(input: MatchInput): PredictionOutput {
       sh_ou_over_prob,
       sh_ou_under_prob,
       final_confidence,
-      model_version: 'v0.1'
+      model_version: 'v0.2',
+      topPositiveFactors: positive,
+      topNegativeFactors: negative,
+      features: shUnderFeatures
   };
 }

@@ -15,7 +15,7 @@ async function main() {
     console.log(`Using fixed seed: ${seed}`);
   }
   
-  const { metrics, guardStatuses } = runSimulation(batchSize, seed);
+  const { guardStatuses } = runSimulation(batchSize, seed);
   
   console.log('Simulation complete');
   if (guardStatuses.length > 0) {

@@ -24,13 +24,42 @@ function poissonRandom(lambda: number): number {
   return k - 1;
 }
 
+export interface DomainState {
+  tempo: number;
+  defensiveShapeHome: number;
+  defensiveShapeAway: number;
+  fatigueHome: number;
+  fatigueAway: number;
+  weather: number;
+  pressure: number;
+}
+
 export function generateMockMatch(
   homeStrength: number = 1.5,
   awayStrength: number = 1.0,
   leagueProfile: { homeAdvantage: number; avgGoals: number } = { homeAdvantage: 0.3, avgGoals: 2.5 }
-): { input: MatchInput, outcome: MatchSimulationResult } {
-  const homeLambda = Math.max(0.1, homeStrength + leagueProfile.homeAdvantage);
-  const awayLambda = Math.max(0.1, awayStrength);
+): { input: MatchInput, outcome: MatchSimulationResult, domain: DomainState } {
+  // Generate random domain state variables between -1 and 1 (or 0 and 1)
+  const domain: DomainState = {
+    tempo: (Math.random() * 2) - 1, // -1 slow, 1 fast
+    defensiveShapeHome: (Math.random() * 2) - 1, // -1 open, 1 solid
+    defensiveShapeAway: (Math.random() * 2) - 1,
+    fatigueHome: Math.random(), // 0 fresh, 1 tired
+    fatigueAway: Math.random(),
+    weather: (Math.random() * 2) - 1, // -1 bad, 1 perfect
+    pressure: Math.random() // 0 low, 1 high stakes
+  };
+
+  const baseHomeLambda = Math.max(0.1, homeStrength + leagueProfile.homeAdvantage);
+  const baseAwayLambda = Math.max(0.1, awayStrength);
+
+  // Apply domain modifiers
+  // Fast tempo increases goals, solid defensive shape decreases opponent goals, fatigue increases opponent goals
+  const homeMod = (domain.tempo * 0.2) - (domain.defensiveShapeAway * 0.3) + (domain.fatigueAway * 0.2) + (domain.weather * 0.1);
+  const awayMod = (domain.tempo * 0.2) - (domain.defensiveShapeHome * 0.3) + (domain.fatigueHome * 0.2) + (domain.weather * 0.1);
+
+  const homeLambda = Math.max(0.1, baseHomeLambda + homeMod);
+  const awayLambda = Math.max(0.1, baseAwayLambda + awayMod);
 
   const shHomeLambda = homeLambda * 0.55;
   const shAwayLambda = awayLambda * 0.55;
@@ -56,29 +85,52 @@ export function generateMockMatch(
     awayWin: homeGoals < awayGoals,
   };
 
-  const xgHome = Math.max(0.1, homeLambda + (Math.random() * 0.4 - 0.2));
-  const xgAway = Math.max(0.1, awayLambda + (Math.random() * 0.4 - 0.2));
+  // True Probabilities (approximations based on lambdas to create market line)
+  const totalLambda = homeLambda + awayLambda;
+  const trueHomeProb = homeLambda / totalLambda;
+  const trueAwayProb = awayLambda / totalLambda;
+  const trueDrawProb = 1 - (trueHomeProb + trueAwayProb); // Simplification, poisson is more complex
+
+  // Market Generation (add 5% vig and noise)
+  const noise = () => (Math.random() - 0.5) * 0.1; 
+  
+  const marketHomeProb = Math.max(0.01, trueHomeProb + noise());
+  const marketAwayProb = Math.max(0.01, trueAwayProb + noise());
+  const marketDrawProb = Math.max(0.01, trueDrawProb + noise());
+  const sumMarket = marketHomeProb + marketAwayProb + marketDrawProb;
+  const normalizedSum = sumMarket / 1.05; // 5% margin
+  
+  const oddsHome = 1 / (marketHomeProb / normalizedSum);
+  const oddsDraw = 1 / (marketDrawProb / normalizedSum);
+  const oddsAway = 1 / (marketAwayProb / normalizedSum);
 
   const input: MatchInput = {
-    odds_home: Math.max(1.01, 1 / (homeLambda / (homeLambda + awayLambda)) + Math.random() * 0.2),
-    odds_draw: 3.5 + Math.random() * 1.0,
-    odds_away: Math.max(1.01, 1 / (awayLambda / (homeLambda + awayLambda)) + Math.random() * 0.2),
-    ah_line: Math.round((xgHome - xgAway) * 4) / 4,
+    odds_home: oddsHome,
+    odds_draw: oddsDraw,
+    odds_away: oddsAway,
+    ah_line: Math.round((homeLambda - awayLambda) * 4) / 4,
     ou_line: 2.5,
     btts_odds: 1.8 + Math.random() * 0.4,
-    xg_home: parseFloat(xgHome.toFixed(2)),
-    xg_away: parseFloat(xgAway.toFixed(2)),
-    shots_home: Math.round(xgHome * 8),
-    shots_away: Math.round(xgAway * 8),
-    shots_on_target_home: Math.round(xgHome * 3),
-    shots_on_target_away: Math.round(xgAway * 3),
+    xg_home: parseFloat(homeLambda.toFixed(2)),
+    xg_away: parseFloat(awayLambda.toFixed(2)),
+    shots_home: Math.round(homeLambda * 8),
+    shots_away: Math.round(awayLambda * 8),
+    shots_on_target_home: Math.round(homeLambda * 3),
+    shots_on_target_away: Math.round(awayLambda * 3),
     form_home: Math.floor(Math.random() * 6),
     form_away: Math.floor(Math.random() * 6),
-    last_5_avg_goals_home: Math.max(0.5, homeLambda + (Math.random() * 1.0 - 0.5)),
-    last_5_avg_goals_away: Math.max(0.5, awayLambda + (Math.random() * 1.0 - 0.5)),
+    last_5_avg_goals_home: Math.max(0.5, baseHomeLambda + (Math.random() * 1.0 - 0.5)),
+    last_5_avg_goals_away: Math.max(0.5, baseAwayLambda + (Math.random() * 1.0 - 0.5)),
     sh_ou_line: 1.0,
-    sh_ou_odds_under: 1.91 // ~4.5% vig
-  };
+    sh_ou_odds_under: 1.91,
+    domain_tempo: domain.tempo,
+    domain_defensiveShapeHome: domain.defensiveShapeHome,
+    domain_defensiveShapeAway: domain.defensiveShapeAway,
+    domain_fatigueHome: domain.fatigueHome,
+    domain_fatigueAway: domain.fatigueAway,
+    domain_weather: domain.weather,
+    domain_pressure: domain.pressure
+  } as any;
 
-  return { input, outcome };
+  return { input, outcome, domain };
 }
