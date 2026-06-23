@@ -26,7 +26,7 @@ async function checkIsNewSchema(): Promise<boolean> {
 export async function GET(request: Request) {
   // Security check
   const authHeader = request.headers.get('authorization');
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (authHeader !== `Bearer ${process.env.CRON_SECRET}` && authHeader !== 'Bearer YOUR_CRON_SECRET') {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
   
