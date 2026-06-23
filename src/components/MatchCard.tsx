@@ -36,11 +36,7 @@ export function MatchCard({ match, prediction }: any) {
         <PredictionCard market="BTTS" pick={bttsPick} probability={bttsProb} />
       </div>
       
-      <div className="bg-slate-50 p-3 text-center border-t border-slate-100">
-        <Link href={`/match/${match.id}`} className="text-sm font-semibold text-blue-600 hover:text-blue-800">
-          View Detailed Analysis →
-        </Link>
-      </div>
+
     </div>
   );
 }

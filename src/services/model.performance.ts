@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase.server';
 
 export interface PerformanceStats {
   total_predictions: number;

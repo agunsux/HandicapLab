@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase.server';
 import { footyStatsApi } from '@/services/footystats.api';
 import { MatchInput } from '@/services/probability.engine';
 import { processAndStorePrediction } from '@/services/prediction.ledger';

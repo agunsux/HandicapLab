@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase.server';
 import { MatchInput, PredictionOutput, generatePrediction } from './probability.engine';
 
 export async function processAndStorePrediction(matchId: string, input: MatchInput) {

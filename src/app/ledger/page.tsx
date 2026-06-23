@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase.server';
 import { getModelPerformance } from '@/services/model.performance';
 import { StatCard } from '@/components/StatCard';
 import { ConfidenceBadge } from '@/components/ConfidenceBadge';

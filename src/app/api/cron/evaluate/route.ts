@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase.server';
 import { footyStatsApi, FootyStatsMatch } from '@/services/footystats.api';
 
 // Utility to mock or fetch real result

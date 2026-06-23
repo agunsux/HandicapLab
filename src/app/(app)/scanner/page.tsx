@@ -252,13 +252,10 @@ export default function MatchScanner() {
                         <span className="font-semibold text-white">{m.pred.confidenceScore}/100</span>
                       </TableCell>
 
-                      {/* Action */}
                       <TableCell className="text-right py-4 pr-6">
-                        <Link href={`/match/${m.id}`}>
-                          <button className="px-3.5 py-1.5 rounded bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs tracking-tight transition-colors">
-                            Analyze
-                          </button>
-                        </Link>
+                        <button disabled className="px-3.5 py-1.5 rounded bg-slate-800 text-slate-500 font-bold text-xs tracking-tight cursor-not-allowed">
+                          Analyze
+                        </button>
                       </TableCell>
                     </TableRow>
                   );

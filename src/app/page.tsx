@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase.server';
 import { MatchCard } from '@/components/MatchCard';
 import { FilterBar } from '@/components/FilterBar';
 

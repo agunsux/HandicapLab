@@ -84,10 +84,9 @@ export default function Dashboard() {
                             {pred.confidenceScore}/100
                           </Badge>
                         </div>
-                        <Link href={`/match/${match.id}`} className="text-xs text-slate-400 hover:text-white flex items-center gap-1 font-mono">
-                          Details
-                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-chevron-right"><path d="m9 18 6-6-6-6"/></svg>
-                        </Link>
+                        <div className="text-xs text-slate-600 flex items-center gap-1 font-mono">
+                          Details Disabled
+                        </div>
                       </div>
                     )}
 
@@ -110,10 +109,9 @@ export default function Dashboard() {
                             {Math.round(pred.overProbability * 100)}%
                           </div>
                         </div>
-                        <Link href={`/match/${match.id}`} className="text-xs text-slate-400 hover:text-white flex items-center gap-1 font-mono">
-                          Details
-                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-chevron-right"><path d="m9 18 6-6-6-6"/></svg>
-                        </Link>
+                        <div className="text-xs text-slate-600 flex items-center gap-1 font-mono">
+                          Details Disabled
+                        </div>
                       </div>
                     )}
                   </CardContent>
@@ -196,11 +194,9 @@ export default function Dashboard() {
                           </div>
                         </TableCell>
                         <TableCell className="text-right py-4">
-                          <Link href={`/match/${match.id}`}>
-                            <button className="px-3 py-1.5 rounded bg-slate-800 hover:bg-slate-700 text-xs font-medium transition-colors text-white">
-                              Analyze
-                            </button>
-                          </Link>
+                          <button disabled className="px-3 py-1.5 rounded bg-slate-800 text-slate-600 text-xs font-medium cursor-not-allowed">
+                            Analyze
+                          </button>
                         </TableCell>
                       </TableRow>
                     );
