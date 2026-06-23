@@ -14,6 +14,6 @@ export function getCohortTag(leagueId: number, matchStage?: string): string {
     }
     return 'WORLD_CUP_GROUP';
   }
-  // Default general cohort
-  return 'GENERAL';
+  // Return the cohort defined for the league
+  return config.cohort;
 }
