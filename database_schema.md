@@ -80,3 +80,28 @@ Poisson engine predictions mapped to matches.
 | `expected_goals` | `decimal(3,2)` | `NULL` | Estimated combined match expected goals. |
 | `confidence` | `varchar(10)` | `NOT NULL` | Combined confidence indicator dot (`🟢 High`, `🟡 Medium`, `⚪ Low`, `🔴 Avoid`). |
 | `created_at` | `timestamp` | `DEFAULT now()` | Creation timestamp. |
+
+### 3. `prediction_results`
+Evaluated results of finished matches, tracking outcome hits and bet yields.
+
+| Column | Type | Constraints | Description |
+|---|---|---|---|
+| `id` | `uuid` | `PRIMARY KEY`, `DEFAULT gen_random_uuid()` | Unique result ID. |
+| `prediction_id` | `uuid` | `REFERENCES predictions(id) ON DELETE CASCADE` | Linked prediction. |
+| `match_id` | `uuid` | `REFERENCES matches(id) ON DELETE CASCADE` | Linked match. |
+| `actual_home_score` | `integer` | `NOT NULL` | Actual goals scored by home team. |
+| `actual_away_score` | `integer` | `NOT NULL` | Actual goals scored by away team. |
+| `predicted_outcome` | `varchar(10)` | `NOT NULL` | Predicted moneyline ('home', 'draw', 'away'). |
+| `actual_outcome` | `varchar(10)` | `NOT NULL` | Actual moneyline outcome ('home', 'draw', 'away'). |
+| `hit_1x2` | `boolean` | `NOT NULL` | True if moneyline prediction won. |
+| `predicted_ah` | `varchar(20)` | `NOT NULL` | Predicted Asian Handicap side ('home', 'away'). |
+| `actual_ah` | `varchar(20)` | `NOT NULL` | Actual Asian Handicap side covering the line. |
+| `hit_ah` | `boolean` | `NOT NULL` | True if Asian Handicap prediction won. |
+| `predicted_ou` | `varchar(10)` | `NOT NULL` | Predicted Over/Under ('over', 'under'). |
+| `actual_ou` | `varchar(10)` | `NOT NULL` | Actual Over/Under result. |
+| `hit_ou` | `boolean` | `NOT NULL` | True if Over/Under prediction won. |
+| `profit_1x2` | `decimal(5,2)` | `NULL` | Units profit/loss from 1X2 bet. |
+| `profit_ah` | `decimal(5,2)` | `NULL` | Units profit/loss from AH bet. |
+| `profit_ou` | `decimal(5,2)` | `NULL` | Units profit/loss from OU bet. |
+| `created_at` | `timestamp` | `DEFAULT now()` | Creation timestamp. |
+
