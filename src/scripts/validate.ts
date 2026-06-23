@@ -1,6 +1,6 @@
 import { runSimulation } from '../lib/simulation/batchRunner';
 import { generateCalibrationDiagnostic } from '../lib/validation/calibrationDiagnostic';
-import { generateDistributionReport, generateMarkdownReport } from '../lib/validation/distributionReport';
+import { generateDistributionReport } from '../lib/validation/distributionReport';
 import { evaluateReportGuards, validateOddsSanity } from '../lib/validation/guards';
 import { runHTDecomposition } from '../lib/validation/htDecomposition';
 import { runHTInteractionTest } from '../lib/validation/htInteractionTest';
