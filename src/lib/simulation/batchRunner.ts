@@ -28,7 +28,9 @@ export function runSimulation(batchSize: number = 10000, seed?: number): {
   guardStatuses: string[];
   ablation: AblationResult[];
   valResults: { pred: PredictionOutput; outcome: MatchSimulationResult; input: MatchInput }[];
+  trainResults: { pred: PredictionOutput; outcome: MatchSimulationResult; input: MatchInput }[];
   marketCalibrations: MarketCalibrationResult[];
+  stateWeights: Record<string, StateWeightResult>;
 } {
   const prng = seed !== undefined ? mulberry32(seed) : Math.random;
   
