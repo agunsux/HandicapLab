@@ -5,29 +5,53 @@ import { ConfidenceBadge } from './ConfidenceBadge';
 export function MatchCard({ match, prediction }: any) {
   if (!match || !prediction) return null;
 
-  // Formatting pick labels and probabilities
-  const ahPick = prediction.ah_home_prob > prediction.ah_away_prob 
-    ? `${match.home_team.name} (AH 0)` 
-    : `${match.away_team.name} (AH 0)`;
-  const ahProb = Math.max(prediction.ah_home_prob, prediction.ah_away_prob);
-  
-  const ouPick = prediction.ou_over_prob > prediction.ou_under_prob 
-    ? 'Over 2.5' 
-    : 'Under 2.5';
-  const ouProb = Math.max(prediction.ou_over_prob, prediction.ou_under_prob);
-  
-  const bttsPick = prediction.btts_yes_prob > prediction.btts_no_prob ? 'Yes' : 'No';
-  const bttsProb = Math.max(prediction.btts_yes_prob, prediction.btts_no_prob);
+  const homeTeam = match.home_team;
+  const awayTeam = match.away_team;
 
-  const mlPick = prediction.ml_home_prob > Math.max(prediction.ml_draw_prob, prediction.ml_away_prob) 
-    ? match.home_team.name 
-    : prediction.ml_away_prob > Math.max(prediction.ml_draw_prob, prediction.ml_home_prob) 
-      ? match.away_team.name 
-      : 'Draw';
-  const mlProb = Math.max(prediction.ml_home_prob, prediction.ml_draw_prob, prediction.ml_away_prob);
+  // 1. Moneyline Pick & Prob
+  let mlPick = 'Draw';
+  let mlProb = Number(prediction.draw_prob);
 
-  // Parse time
-  const matchTime = new Date(match.match_date).toLocaleTimeString([], {
+  if (Number(prediction.home_prob) > Math.max(Number(prediction.draw_prob), Number(prediction.away_prob))) {
+    mlPick = homeTeam;
+    mlProb = Number(prediction.home_prob);
+  } else if (Number(prediction.away_prob) > Math.max(Number(prediction.home_prob), Number(prediction.draw_prob))) {
+    mlPick = awayTeam;
+    mlProb = Number(prediction.away_prob);
+  }
+
+  // 2. Asian Handicap Pick & Prob
+  const ahLine = Number(prediction.ah_line);
+  const ahHomeProb = Number(prediction.ah_prob);
+  let ahPick = '';
+  let ahProb = 0;
+
+  if (ahHomeProb >= 0.50) {
+    ahPick = `${homeTeam} (${ahLine >= 0 ? '+' : ''}${ahLine})`;
+    ahProb = ahHomeProb;
+  } else {
+    // If we cover away, the line sign is inverted
+    const awayLine = -ahLine;
+    ahPick = `${awayTeam} (${awayLine >= 0 ? '+' : ''}${awayLine})`;
+    ahProb = 1 - ahHomeProb;
+  }
+
+  // 3. Over/Under Pick & Prob
+  const ouLine = Number(prediction.ou_line);
+  const overProb = Number(prediction.over_prob);
+  let ouPick = '';
+  let ouProb = 0;
+
+  if (overProb >= 0.50) {
+    ouPick = `Over ${ouLine}`;
+    ouProb = overProb;
+  } else {
+    ouPick = `Under ${ouLine}`;
+    ouProb = 1 - overProb;
+  }
+
+  // Parse kickoff time
+  const matchTime = new Date(match.kickoff).toLocaleTimeString([], {
     hour: '2-digit',
     minute: '2-digit',
     hour12: false
@@ -47,18 +71,17 @@ export function MatchCard({ match, prediction }: any) {
             </span>
           </div>
           <h3 className="text-base font-extrabold text-slate-800 tracking-tight">
-            {match.home_team.name} <span className="text-slate-400 font-medium">vs</span> {match.away_team.name}
+            {homeTeam} <span className="text-slate-400 font-medium font-sans">vs</span> {awayTeam}
           </h3>
         </div>
-        <ConfidenceBadge confidence={prediction.final_confidence} />
+        <ConfidenceBadge confidence={prediction.confidence} />
       </div>
       
-      {/* Card Predictions Grid */}
-      <div className="p-5 grid grid-cols-2 gap-4 bg-slate-50/30">
+      {/* Card Predictions Grid (3 markets) */}
+      <div className="p-5 grid grid-cols-1 md:grid-cols-3 gap-3 bg-slate-50/30">
         <PredictionCard market="Match Winner" pick={mlPick} probability={mlProb} />
         <PredictionCard market="Over/Under" pick={ouPick} probability={ouProb} />
         <PredictionCard market="Asian Handicap" pick={ahPick} probability={ahProb} />
-        <PredictionCard market="BTTS" pick={bttsPick} probability={bttsProb} />
       </div>
     </div>
   );

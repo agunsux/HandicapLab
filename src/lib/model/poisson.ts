@@ -101,3 +101,28 @@ export function calculatePoissonProbabilities(
     ahAwayProb: 1 - ahHomeProb
   };
 }
+
+export function calculateMatchOutcomeProbabilities(expectedGoals: { home: number; away: number }) {
+  const probs = calculatePoissonProbabilities(expectedGoals.home, expectedGoals.away);
+  return {
+    homeWin: probs.homeProb,
+    draw: probs.drawProb,
+    awayWin: probs.awayProb
+  };
+}
+
+export function calculateAsianHandicapProbabilities(expectedGoals: { home: number; away: number }, ahLine = -0.75) {
+  const probs = calculatePoissonProbabilities(expectedGoals.home, expectedGoals.away, 2.5, ahLine);
+  return {
+    homeCover: probs.ahHomeProb,
+    awayCover: probs.ahAwayProb
+  };
+}
+
+export function calculateOverUnderProbabilities(expectedGoals: { home: number; away: number }, ouLine = 2.5) {
+  const probs = calculatePoissonProbabilities(expectedGoals.home, expectedGoals.away, ouLine);
+  return {
+    over: probs.overProb,
+    under: probs.underProb
+  };
+}

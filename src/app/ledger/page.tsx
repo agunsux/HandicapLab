@@ -19,11 +19,11 @@ export default async function Ledger() {
       settled_at,
       match_id,
       matches(
-        home_team:teams!home_team_id(name),
-        away_team:teams!away_team_id(name),
+        home_team,
+        away_team,
         league
       ),
-      predictions(final_confidence)
+      predictions(confidence)
     `)
     .order('settled_at', { ascending: false })
     .limit(50);
@@ -72,10 +72,10 @@ export default async function Ledger() {
                       {new Date(o.settled_at).toLocaleDateString()}
                     </td>
                     <td className="px-4 py-3 font-medium">
-                      {match?.home_team.name} vs {match?.away_team.name}
+                      {match?.home_team} vs {match?.away_team}
                     </td>
                     <td className="px-4 py-3">
-                      <ConfidenceBadge confidence={pred?.final_confidence || 0} />
+                      <ConfidenceBadge confidence={pred?.confidence || '⚪ Low'} />
                     </td>
                     <td className="px-4 py-3">
                       <span className={`uppercase font-bold text-xs ${o.result_ah === 'win' ? 'text-emerald-500' : o.result_ah === 'loss' ? 'text-rose-500' : 'text-slate-400'}`}>

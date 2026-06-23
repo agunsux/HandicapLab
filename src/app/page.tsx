@@ -5,31 +5,29 @@ import { FilterBar } from '@/components/FilterBar';
 export const revalidate = 3600; // revalidate every hour
 
 export default async function Home() {
-  // Fetch today's scheduled matches with predictions
+  // Fetch today's upcoming matches with predictions
   const { data: matches } = await supabase
     .from('matches')
     .select(`
       id,
-      match_date,
+      home_team,
+      away_team,
       league,
+      kickoff,
       status,
-      home_team:teams!home_team_id(name),
-      away_team:teams!away_team_id(name),
       predictions(
-        ah_home_prob,
-        ah_away_prob,
-        ou_over_prob,
-        ou_under_prob,
-        ml_home_prob,
-        ml_draw_prob,
-        ml_away_prob,
-        btts_yes_prob,
-        btts_no_prob,
-        final_confidence
+        home_prob,
+        draw_prob,
+        away_prob,
+        ah_line,
+        ah_prob,
+        ou_line,
+        over_prob,
+        confidence
       )
     `)
-    .eq('status', 'scheduled')
-    .order('match_date', { ascending: true })
+    .eq('status', 'upcoming')
+    .order('kickoff', { ascending: true })
     .limit(20);
 
   return (
@@ -52,7 +50,7 @@ export default async function Home() {
       <div className="max-w-4xl mx-auto px-4">
         <div className="flex justify-between items-end mb-4">
           <h2 className="text-xl font-bold text-slate-800">Today's Predictions</h2>
-          <span className="text-sm text-slate-500 font-medium">Model v0.1</span>
+          <span className="text-sm text-slate-500 font-medium">Model v0.5-ai</span>
         </div>
         
         <FilterBar />

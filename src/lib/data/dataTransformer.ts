@@ -146,25 +146,49 @@ export function transformFixtureData(
 }
 
 export function calculatePreMatchFeatures(
-  homeTeam: string,
-  awayTeam: string,
-  matchDateStr: string,
-  historicalMatches: TransformedMatch[]
+  homeTeam: any,
+  awayTeam?: string,
+  matchDateStr?: string,
+  historicalMatches?: TransformedMatch[]
 ): PreMatchFeatures {
-  const matchDate = new Date(matchDateStr);
+  let hTeam = homeTeam;
+  let aTeam = awayTeam || '';
+  let mDateStr = matchDateStr || '';
+  let hist = historicalMatches || [];
+
+  if (typeof homeTeam === 'object' && homeTeam !== null) {
+    // Single fixture overload
+    hTeam = homeTeam.teams.home.name;
+    aTeam = homeTeam.teams.away.name;
+    mDateStr = homeTeam.fixture.date;
+    
+    // Attempt to load quick_sample.json synchronously
+    try {
+      const fs = require('fs');
+      const path = require('path');
+      const samplePath = path.join(process.cwd(), 'cache', 'api-football', 'quick_sample.json');
+      if (fs.existsSync(samplePath)) {
+        hist = JSON.parse(fs.readFileSync(samplePath, 'utf-8'));
+      }
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  const matchDate = new Date(mDateStr);
 
   // Filter historical matches to only those played before the target match date
-  const pastMatches = historicalMatches.filter(m => {
+  const pastMatches = hist.filter(m => {
     const mDate = new Date(m.date);
     return mDate < matchDate;
   });
 
   // 1. Calculate home team stats
-  const homePast = pastMatches.filter(m => m.homeTeam === homeTeam || m.awayTeam === homeTeam);
+  const homePast = pastMatches.filter(m => m.homeTeam === hTeam || m.awayTeam === hTeam);
   let homeGoalsScored = 0;
   let homeGoalsConceded = 0;
   for (const m of homePast) {
-    if (m.homeTeam === homeTeam) {
+    if (m.homeTeam === hTeam) {
       homeGoalsScored += m.outcome.ftHomeGoals;
       homeGoalsConceded += m.outcome.ftAwayGoals;
     } else {
@@ -175,11 +199,11 @@ export function calculatePreMatchFeatures(
   const homeTeamStrength = homeGoalsConceded > 0 ? homeGoalsScored / homeGoalsConceded : (homeGoalsScored > 0 ? 3.0 : 1.0);
 
   // 2. Calculate away team stats
-  const awayPast = pastMatches.filter(m => m.homeTeam === awayTeam || m.awayTeam === awayTeam);
+  const awayPast = pastMatches.filter(m => m.homeTeam === aTeam || m.awayTeam === aTeam);
   let awayGoalsScored = 0;
   let awayGoalsConceded = 0;
   for (const m of awayPast) {
-    if (m.homeTeam === awayTeam) {
+    if (m.homeTeam === aTeam) {
       awayGoalsScored += m.outcome.ftHomeGoals;
       awayGoalsConceded += m.outcome.ftAwayGoals;
     } else {
@@ -195,7 +219,7 @@ export function calculatePreMatchFeatures(
     .slice(0, 5);
   let homeFormPoints = 0;
   for (const m of homeLast5) {
-    if (m.homeTeam === homeTeam) {
+    if (m.homeTeam === hTeam) {
       if (m.outcome.ftHomeGoals > m.outcome.ftAwayGoals) homeFormPoints += 3;
       else if (m.outcome.ftHomeGoals === m.outcome.ftAwayGoals) homeFormPoints += 1;
     } else {
@@ -211,7 +235,7 @@ export function calculatePreMatchFeatures(
     .slice(0, 5);
   let awayFormPoints = 0;
   for (const m of awayLast5) {
-    if (m.homeTeam === awayTeam) {
+    if (m.homeTeam === aTeam) {
       if (m.outcome.ftHomeGoals > m.outcome.ftAwayGoals) awayFormPoints += 3;
       else if (m.outcome.ftHomeGoals === m.outcome.ftAwayGoals) awayFormPoints += 1;
     } else {
@@ -223,13 +247,13 @@ export function calculatePreMatchFeatures(
 
   // 5. Calculate H2H stats
   const h2hMatches = pastMatches.filter(
-    m => (m.homeTeam === homeTeam && m.awayTeam === awayTeam) || (m.homeTeam === awayTeam && m.awayTeam === homeTeam)
+    m => (m.homeTeam === hTeam && m.awayTeam === aTeam) || (m.homeTeam === aTeam && m.awayTeam === hTeam)
   );
   let h2hHomeWins = 0;
   let h2hAwayWins = 0;
   let h2hDraws = 0;
   for (const m of h2hMatches) {
-    if (m.homeTeam === homeTeam) {
+    if (m.homeTeam === hTeam) {
       if (m.outcome.ftHomeGoals > m.outcome.ftAwayGoals) h2hHomeWins++;
       else if (m.outcome.ftHomeGoals < m.outcome.ftAwayGoals) h2hAwayWins++;
       else h2hDraws++;
