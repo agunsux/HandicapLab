@@ -4,7 +4,11 @@ import { generateDistributionReport, ReportMetrics } from '../validation/distrib
 import { validatePredictionGuards, evaluateReportGuards } from '../validation/guards';
 import { calculateMarketEdge, EdgeReport } from '../validation/edgeReport';
 import { evaluateBaselines, BaselinesOutput } from '../validation/baseline';
-import { performFeatureAblation, AblationResult } from '../model/featureAnalysis';
+import { performFeatureAblation, AblationResult as OldAblationResult } from '../model/featureAnalysis';
+import { calibrateMarket, MarketCalibrationResult } from '../calibration/marketCalibrator';
+import { runSHUnderAblation, AblationResult } from '../validation/shUnderAblation';
+import { applyPlattScaling, PlattParams } from '../calibration/plattScaling';
+import { learnStateWeights, StateWeightResult } from '../calibration/stateWeightLearner';
 
 function mulberry32(a: number) {
   return function() {
@@ -23,6 +27,8 @@ export function runSimulation(batchSize: number = 10000, seed?: number): {
   edges: EdgeReport[];
   guardStatuses: string[];
   ablation: AblationResult[];
+  valResults: { pred: PredictionOutput; outcome: MatchSimulationResult; input: MatchInput }[];
+  marketCalibrations: MarketCalibrationResult[];
 } {
   const prng = seed !== undefined ? mulberry32(seed) : Math.random;
   
@@ -59,8 +65,72 @@ export function runSimulation(batchSize: number = 10000, seed?: number): {
 
   // Train / Test split
   const trainSize = Math.floor(batchSize * 0.7);
-  const trainResults = results.slice(0, trainSize);
-  const valResults = results.slice(trainSize);
+  let trainResults = results.slice(0, trainSize);
+  let valResults = results.slice(trainSize);
+
+  // === NEW: Level 2 - Learn State Weights ===
+  const stateWeights = learnStateWeights(trainResults);
+  
+  // Re-generate predictions using the state weights
+  trainResults = trainResults.map(r => ({
+    ...r,
+    pred: generatePrediction(r.input, stateWeights)
+  }));
+  
+  valResults = valResults.map(r => ({
+    ...r,
+    pred: generatePrediction(r.input, stateWeights)
+  }));
+
+  // === Level 3: Global Platt Calibration ===
+  // Market Segmentation & Calibration
+  const extractMarketPairs = (dataset: typeof results, market: string) => {
+    return dataset.map(d => {
+      let probability = 0;
+      let logit = 0;
+      let actual = 0;
+      if (market === 'SH_UNDER') { probability = d.pred.sh_ou_under_prob; logit = d.pred.marketLogits.SH_UNDER; actual = d.outcome.shTotalGoals < (d.input.sh_ou_line || 1.0) ? 1 : 0; }
+      if (market === 'FT_OU') { probability = d.pred.ou_over_prob; logit = d.pred.marketLogits.FT_OU; actual = d.outcome.totalGoals > d.input.ou_line ? 1 : 0; }
+      if (market === 'AH_HOME') { probability = d.pred.ah_home_prob; logit = d.pred.marketLogits.AH_HOME; actual = d.outcome.homeGoals + d.input.ah_line > d.outcome.awayGoals ? 1 : 0; }
+      if (market === 'ML_HOME') { probability = d.pred.ml_home_prob; logit = d.pred.marketLogits.ML_HOME; actual = d.outcome.homeWin ? 1 : 0; }
+      return { logit, probability, actual };
+    });
+  };
+
+  const markets = ['SH_UNDER', 'FT_OU', 'AH_HOME', 'ML_HOME'];
+  const marketCalibrations: MarketCalibrationResult[] = [];
+  const learnedParams: Record<string, PlattParams> = {};
+
+  for (const m of markets) {
+    const pairs = extractMarketPairs(trainResults, m);
+    const calResult = calibrateMarket(m, pairs);
+    marketCalibrations.push(calResult);
+    learnedParams[m] = calResult.params;
+  }
+
+  // Apply Calibration to Validation Set
+  valResults = valResults.map(r => {
+    const predCopy = { ...r.pred };
+    predCopy.sh_ou_under_prob = applyPlattScaling(predCopy.marketLogits.SH_UNDER, learnedParams['SH_UNDER']);
+    predCopy.sh_ou_over_prob = 1 - predCopy.sh_ou_under_prob;
+    
+    predCopy.ou_over_prob = applyPlattScaling(predCopy.marketLogits.FT_OU, learnedParams['FT_OU']);
+    predCopy.ou_under_prob = 1 - predCopy.ou_over_prob;
+
+    predCopy.ah_home_prob = applyPlattScaling(predCopy.marketLogits.AH_HOME, learnedParams['AH_HOME']);
+    predCopy.ah_away_prob = 1 - predCopy.ah_home_prob;
+
+    predCopy.ml_home_prob = applyPlattScaling(predCopy.marketLogits.ML_HOME, learnedParams['ML_HOME']);
+    predCopy.ml_away_prob = Math.max(0, 1 - predCopy.ml_home_prob - predCopy.ml_draw_prob);
+    
+    // Normalize if ml_home + ml_draw > 1
+    if (predCopy.ml_home_prob + predCopy.ml_draw_prob > 1) {
+       predCopy.ml_draw_prob = 1 - predCopy.ml_home_prob;
+       predCopy.ml_away_prob = 0;
+    }
+    
+    return { ...r, pred: predCopy };
+  });
 
   const trainMetrics = generateDistributionReport(trainResults);
   const valMetrics = generateDistributionReport(valResults);
@@ -78,12 +148,17 @@ export function runSimulation(batchSize: number = 10000, seed?: number): {
     return [mlEdge, ahEdge, ouEdge, shEdge];
   }).flat();
 
-  // Ablation on validation set
-  const ablationDataset = valResults.map(r => ({
-    features: r.pred.features || [],
-    outcome: r.outcome.shTotalGoals < (r.input.sh_ou_line || 1.0) ? 1 : 0
-  }));
-  const ablation = performFeatureAblation(ablationDataset);
+  // Post-Calibration Ablation for SH_UNDER
+  const shUnderBrier = marketCalibrations.find(m => m.market === 'SH_UNDER')?.brierScore || 0; // Wait, we need validation Brier score
+  const valShUnderPairs = extractMarketPairs(valResults, 'SH_UNDER');
+  const baselineBrier = valShUnderPairs.reduce((sum, p) => sum + Math.pow(p.probability - p.actual, 2), 0) / valShUnderPairs.length;
 
-  return { trainMetrics, valMetrics, trainBaselines, valBaselines, edges, guardStatuses, ablation };
+  const ablation = runSHUnderAblation(
+    trainResults, 
+    valResults, 
+    ['tempo', 'pressure', 'weather', 'defShapeHome', 'defShapeAway', 'fatigueHome', 'fatigueAway'],
+    baselineBrier
+  );
+
+  return { trainMetrics, valMetrics, trainBaselines, valBaselines, edges, guardStatuses, ablation, valResults, trainResults, marketCalibrations, stateWeights };
 }

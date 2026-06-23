@@ -129,7 +129,9 @@ export function generateMockMatch(
     domain_fatigueHome: domain.fatigueHome,
     domain_fatigueAway: domain.fatigueAway,
     domain_weather: domain.weather,
-    domain_pressure: domain.pressure
+    domain_pressure: domain.pressure,
+    ht_home_goals: fhHomeGoals,
+    ht_away_goals: fhAwayGoals
   } as any;
 
   return { input, outcome, domain };

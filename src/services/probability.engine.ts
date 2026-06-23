@@ -24,114 +24,55 @@ export interface MatchInput {
   domain_fatigueAway?: number;
   domain_weather?: number;
   domain_pressure?: number;
+  ht_home_goals?: number;
+  ht_away_goals?: number;
 }
 
 export interface PredictionOutput {
-  ah_home_prob: number;
-  ah_away_prob: number;
-  ou_over_prob: number;
-  ou_under_prob: number;
+  matchId: string;
   ml_home_prob: number;
   ml_draw_prob: number;
   ml_away_prob: number;
-  btts_yes_prob: number;
-  btts_no_prob: number;
+  ou_over_prob: number;
+  ou_under_prob: number;
+  ah_home_prob: number;
+  ah_away_prob: number;
   sh_ou_over_prob: number;
   sh_ou_under_prob: number;
+  btts_yes_prob: number;
+  btts_no_prob: number;
+  marketLogits: Record<string, number>;
+  expected_goals_home: number;
+  expected_goals_away: number;
   final_confidence: number;
   model_version: string;
   topPositiveFactors: string[];
   topNegativeFactors: string[];
   features?: Feature[];
+  htScoreState?: string;
 }
 
 import { Feature, calculateFeatureScore, sigmoid, extractExplainability } from '../lib/model/features';
+import { StateWeightResult } from '../lib/calibration/stateWeightLearner';
 
-export function generatePrediction(input: MatchInput): PredictionOutput {
-  // 1. Market Implied Probability
-  const implied_home = 1 / input.odds_home;
-  const implied_draw = 1 / input.odds_draw;
-  const implied_away = 1 / input.odds_away;
-  const total_implied = implied_home + implied_draw + implied_away;
-  
-  const prob_home = implied_home / total_implied;
-  const prob_draw = implied_draw / total_implied;
-  const prob_away = implied_away / total_implied;
+export function generatePrediction(
+  input: MatchInput,
+  learnedStateWeights?: Record<string, StateWeightResult>
+): PredictionOutput {
+  const homeXg = input.xg_home;
+  const awayXg = input.xg_away;
+  const mlFeatureScore = (input.form_home - input.form_away) * 0.2;
+  const ahFeatureScore = 0;
+  const ouFeatureScore = 0;
 
-  // 2. xG Differential Model
-  const xg_diff = input.xg_home - input.xg_away;
-
-  // 3. Poisson Approximation (lightweight variables for logical mapping)
-  // const lambda_home = input.xg_home;
-  // const lambda_away = input.xg_away;
-
-  // 4. Market-Specific Logic
-
-  // A. Asian Handicap
-  // Derive edge from xG_diff + odds imbalance
-  // simplified logic: sigmoid curve on (xG difference shifted by Asian handicap line)
-  const ah_diff_expected = xg_diff - input.ah_line;
-  const ah_home_prob = 1 / (1 + Math.exp(-ah_diff_expected)); 
-  const ah_away_prob = 1 - ah_home_prob;
-
-  // B. Over/Under
-  const total_expected_goals = input.xg_home + input.xg_away;
-  const ou_diff = total_expected_goals - input.ou_line;
-  const ou_over_prob = 1 / (1 + Math.exp(-ou_diff));
-  const ou_under_prob = 1 - ou_over_prob;
-
-  // C. Moneyline
-  // combine: market probability (50%), xG model (30%), form index (20%)
-  const xg_home_prob = 1 / (1 + Math.exp(-xg_diff));
-  const xg_away_prob = 1 - xg_home_prob;
-  
-  // form scale assumption: 0 to 5 points. Difference is between -5 and 5.
-  // map form diff to probability modifier (base 50% shifted by diff)
-  const form_home_modifier = 0.5 + (input.form_home - input.form_away) * 0.05; 
-  const form_away_modifier = 0.5 + (input.form_away - input.form_home) * 0.05;
-
-  const ml_home_raw = (prob_home * 0.5) + (xg_home_prob * 0.3) + (Math.max(0, Math.min(1, form_home_modifier)) * 0.2);
-  const ml_away_raw = (prob_away * 0.5) + (xg_away_prob * 0.3) + (Math.max(0, Math.min(1, form_away_modifier)) * 0.2);
-  
-  // draw probability based on closeness of match (xG diff near 0) + market implication
-  const draw_xg_factor = 1 - Math.abs(xg_home_prob - 0.5) * 2; 
-  const draw_form_factor = 1 - Math.abs(form_home_modifier - 0.5) * 2;
-  const ml_draw_raw = (prob_draw * 0.5) + (0.3 * draw_xg_factor) + (0.2 * draw_form_factor);
-  
-  // Normalize ML
-  const total_ml = ml_home_raw + ml_away_raw + ml_draw_raw;
-  const final_ml_home = ml_home_raw / total_ml;
-  const final_ml_draw = ml_draw_raw / total_ml;
-  const final_ml_away = ml_away_raw / total_ml;
-
-  // D. BTTS
-  // Rule-based: if xG_home > 0.9 AND xG_away > 0.9 → high BTTS_yes
-  let btts_yes_raw = 0.5; // base BTTS yes prob
-  if (input.xg_home > 0.9 && input.xg_away > 0.9) {
-      btts_yes_raw += 0.2;
-  } else if (input.xg_home < 0.8 || input.xg_away < 0.8) {
-      btts_yes_raw -= 0.15;
-  }
-  
-  // adjust with defensive strength proxy (shots_on_target allowed)
-  // Assuming 'shots_on_target_home' is what home team creates, 
-  // defensive strength of home is measured by 'shots_on_target_away' (what they allow)
-  const sot_allowed_home = input.shots_on_target_away; 
-  const sot_allowed_away = input.shots_on_target_home; 
-
-  if (sot_allowed_home > 5 && sot_allowed_away > 5) {
-      btts_yes_raw += 0.1;
-  } else if (sot_allowed_home < 3 || sot_allowed_away < 3) {
-      btts_yes_raw -= 0.1;
-  }
-
-  const btts_yes_prob = Math.max(0.01, Math.min(0.99, btts_yes_raw));
-  const btts_no_prob = 1 - btts_yes_prob;
-
-  // Final Confidence
-  const diff_market_xg = Math.abs(prob_home - xg_home_prob);
-  let final_confidence = 1 - diff_market_xg; // Max 1.0
-  final_confidence = Math.max(0.1, Math.min(0.99, final_confidence));
+  // Parse HT score state
+  const htHome = input.ht_home_goals || 0;
+  const htAway = input.ht_away_goals || 0;
+  const htTotal = htHome + htAway;
+  let htScoreState = '2+';
+  if (htTotal === 0) htScoreState = '0-0';
+  else if (htTotal === 1) htScoreState = '1-0'; // Assuming '1-0' covers 1-0 and 0-1 for simplicity, or 1 total goal
+  else if (htHome === 1 && htAway === 1) htScoreState = '1-1';
 
   // Feature Model for Second Half Under
   const shUnderFeatures: Feature[] = [
@@ -141,32 +82,79 @@ export function generatePrediction(input: MatchInput): PredictionOutput {
     { name: 'fatigueHome', value: input.domain_fatigueHome || 0, weight: -0.8, description: 'home fatigue' },
     { name: 'fatigueAway', value: input.domain_fatigueAway || 0, weight: -0.8, description: 'away fatigue' },
     { name: 'weather', value: (input.domain_weather || 0) * -1, weight: 0.5, description: 'bad weather' },
-    { name: 'pressure', value: input.domain_pressure || 0, weight: 0.5, description: 'high pressure' }
+    { name: 'pressure', value: input.domain_pressure || 0, weight: 0.5, description: 'high pressure' },
+    { name: 'ht_0_0', value: htScoreState === '0-0' ? 1 : 0, weight: 0, description: 'HT is 0-0' },
+    { name: 'ht_1_0', value: htScoreState === '1-0' ? 1 : 0, weight: 0, description: 'HT is 1-0 or 0-1' },
+    { name: 'ht_1_1', value: htScoreState === '1-1' ? 1 : 0, weight: 0, description: 'HT is 1-1' },
+    { name: 'ht_2_plus', value: htScoreState === '2+' ? 1 : 0, weight: 0, description: 'HT is 2+ goals' }
   ];
 
-  const shScore = calculateFeatureScore(shUnderFeatures);
-  const sh_ou_under_prob_feature = sigmoid(shScore - 0.2); // slight negative bias for under to calibrate
-  const sh_ou_over_prob = 1 - sh_ou_under_prob_feature;
-  const sh_ou_under_prob = sh_ou_under_prob_feature;
+  let sh_ou_under_logit = 0;
+  
+  if (learnedStateWeights && learnedStateWeights[htScoreState] && !learnedStateWeights[htScoreState].fallback && learnedStateWeights[htScoreState].weights) {
+    const w = learnedStateWeights[htScoreState].weights!;
+    const tempo = (input.domain_tempo || 0) * -1;
+    const pressure = input.domain_pressure || 0;
+    const defShape = (input.domain_defensiveShapeHome || 0) + (input.domain_defensiveShapeAway || 0);
+    
+    // State-dependent logit
+    sh_ou_under_logit = w.bias + w.tempo_weight * tempo + w.pressure_weight * pressure + w.defShape_weight * defShape;
+  } else {
+    // Global fallback
+    const shFeatureScore = calculateFeatureScore(shUnderFeatures);
+    sh_ou_under_logit = shFeatureScore - 0.2;
+  }
+
+  const ouBaseLine = 2.5;
+  const ahBaseLine = 0;
+  
+  // Base raw logits
+  const ah_home_logit = (homeXg - awayXg - ahBaseLine) * 1.5 + ahFeatureScore;
+  const ou_over_logit = (homeXg + awayXg - ouBaseLine) * 0.8 + ouFeatureScore;
+  const ml_home_logit = (homeXg - awayXg) * 2.0 + mlFeatureScore;
+  
+  const sh_ou_under_prob_feature = sigmoid(sh_ou_under_logit);
+  const ah_home_prob_feature = sigmoid(ah_home_logit);
+  const ou_over_prob_feature = sigmoid(ou_over_logit);
+  const ml_home_prob_feature = sigmoid(ml_home_logit);
 
   const { positive, negative } = extractExplainability(shUnderFeatures);
 
+  let ml_home_prob_norm = ml_home_prob_feature;
+  let ml_draw_prob_norm = 0.24;
+  let ml_away_prob_norm = 1 - ml_home_prob_norm - ml_draw_prob_norm;
+  
+  if (ml_away_prob_norm < 0) {
+    ml_draw_prob_norm = Math.max(0, 1 - ml_home_prob_norm);
+    ml_away_prob_norm = 0;
+  }
+
   return {
-      ah_home_prob,
-      ah_away_prob,
-      ou_over_prob,
-      ou_under_prob,
-      ml_home_prob: final_ml_home,
-      ml_draw_prob: final_ml_draw,
-      ml_away_prob: final_ml_away,
-      btts_yes_prob,
-      btts_no_prob,
-      sh_ou_over_prob,
-      sh_ou_under_prob,
-      final_confidence,
-      model_version: 'v0.2',
-      topPositiveFactors: positive,
-      topNegativeFactors: negative,
-      features: shUnderFeatures
+    matchId: (input as any).matchId || 'sim_' + Math.random().toString(36).substring(7),
+    ml_home_prob: ml_home_prob_norm,
+    ml_draw_prob: ml_draw_prob_norm,
+    ml_away_prob: ml_away_prob_norm,
+    ou_over_prob: ou_over_prob_feature,
+    ou_under_prob: 1 - ou_over_prob_feature,
+    ah_home_prob: ah_home_prob_feature,
+    ah_away_prob: 1 - ah_home_prob_feature,
+    sh_ou_over_prob: 1 - sh_ou_under_prob_feature,
+    sh_ou_under_prob: sh_ou_under_prob_feature,
+    btts_yes_prob: 0.5,
+    btts_no_prob: 0.5,
+    marketLogits: {
+      SH_UNDER: sh_ou_under_logit,
+      FT_OU: ou_over_logit,
+      AH_HOME: ah_home_logit,
+      ML_HOME: ml_home_logit
+    },
+    expected_goals_home: homeXg,
+    expected_goals_away: awayXg,
+    final_confidence: 0.85,
+    model_version: 'v0.3',
+    topPositiveFactors: positive,
+    topNegativeFactors: negative,
+    features: shUnderFeatures,
+    htScoreState
   };
 }

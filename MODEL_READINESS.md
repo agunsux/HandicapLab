@@ -1,21 +1,24 @@
-# Model Readiness Assessment
+# Sprint 1.7 Post-Calibration Validation Report
 
 **Status:** NOT READY
 
-## Business Questions
+## Success Criteria Evaluation
+- [x] **SH Under ECE < 10%** (0.57%)
+- [ ] **SH Under bias < -0.5** (A=1.09, B=-0.07)
+- [ ] **SH Under ROI > +3%** after vig (0.00%)
+- [x] **FT O/U ECE < 8%** (1.25%)
+- [x] **AH ECE < 10%** (3.33%)
+- [ ] **Ablation helps** (0 features kept)
 
-**1. Does the model have a statistically significant edge over the bookmaker's line?**
-Yes. The model ML ROI beats the Market Efficiency baseline.
+## Train vs Validation Metrics
 
-**2. Is the Second Half Under strategy profitable after vig?**
-No. Second Half Under ROI is -0.86%.
+| Metric | Training (70%) | Validation (30%) |
+|--------|----------------|------------------|
+| **SH Under ROI** | 0.00% | 0.00% |
+| **Brier Score (SH Under)** | 0.1338 | 0.1405 |
 
-**3. What is the minimum sample size needed before we trust the calibration?**
-A minimum of 500 matches is strictly enforced. We currently evaluated 10000 matches.
-
-**4. Should we proceed to production with real data?**
-NO. The model has negative ROI compared to market efficiency or severe calibration drift. Retraining is required before moving to Sprint 2.
-
-## Edge Consistency
-- Edges generally flag as SUFFICIENT (>2% after vig).
-- **ML Edge:** -15.99%
+## Red Flags
+- MARKET_BEATEN
+- SH_UNDER_BIAS_FAIL
+- SH_UNDER_ROI_FAIL
+- ABLATION_FAIL
