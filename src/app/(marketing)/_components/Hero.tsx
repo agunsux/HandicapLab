@@ -30,7 +30,15 @@ export default function Hero() {
           <Sparkles className="h-3 w-3" />
           CALIBRATED ENSEMBLE SYSTEM 1.2
         </motion.div>
-
+        {/* Live World Cup Badge */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-teal-400/30 bg-teal-400/10 px-3 py-1 text-xs font-medium text-teal-300 font-mono"
+        >
+          LIVE: WORLD CUP 2026
+        </motion.div>
         {/* Title */}
         <motion.h1
           initial={{ opacity: 0, y: 20 }}

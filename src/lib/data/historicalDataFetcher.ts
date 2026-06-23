@@ -13,7 +13,7 @@ export interface FetcherProgress {
 }
 
 export class HistoricalDataFetcher {
-  private leagues = [39, 140, 135]; // Premier League, La Liga, Serie A
+  private leagues = [1, 39, 140, 135]; // World Cup, Premier League, La Liga, Serie A
   private seasons = [2022, 2023, 2024];
   private matchesFile: string;
 

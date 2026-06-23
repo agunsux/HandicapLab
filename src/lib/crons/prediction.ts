@@ -3,6 +3,7 @@ import { FeatureEngine } from '../engines/feature-engine';
 import { ProbabilityEngine } from '../engines/probability-engine';
 import { EdgeScanner } from '../engines/edge-scanner';
 import { MarketOdds } from '../engines/edge-scanner/types';
+import { getCohortTag } from './cohortTag';
 
 export async function runPredictionCron(): Promise<any> {
   // 1. Fetch upcoming matches from our database
@@ -41,7 +42,7 @@ export async function runPredictionCron(): Promise<any> {
         // 6. Select the top pick (if any positive EV pick exists)
         const topPick = picks[0]; // Already sorted by EV descending
         
-        let cohortTag = 'GENERAL';
+        let cohortTag = getCohortTag(match.league_id ?? match.league, match.stage);
         // Cohort tagging logic based on user rules:
         // GENERAL, 2H_UNDER_EPL, 2H_UNDER_LIGUE2
         if (marketType === 'OU' && topPick && topPick.outcome === 'under') {
