@@ -56,6 +56,7 @@ export async function generatePredictions(fixtures: any[]) {
       ouLine: 2.5,
       overProb: ouProbs.over,
       underProb: ouProbs.under,
+      expectedGoals: Number((expectedGoals.home + expectedGoals.away).toFixed(2)),
       confidenceLevel: confidence,
     });
   }

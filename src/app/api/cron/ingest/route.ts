@@ -1,89 +1,97 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase.server';
-import { footyStatsApi } from '@/services/footystats.api';
-import { MatchInput } from '@/services/probability.engine';
-import { processAndStorePrediction } from '@/services/prediction.ledger';
+import { createClient } from '@supabase/supabase-js';
+import { generatePredictions } from '@/lib/services/predictionService';
+import { fetchUpcomingFixtures } from '@/lib/api/apiFootball';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY!
+);
 
 export async function GET(request: Request) {
-  // Cron Security
+  // Security check
   const authHeader = request.headers.get('authorization');
-  const cronSecret = process.env.CRON_SECRET;
-  
-  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
-
+  
   try {
-    const matches = await footyStatsApi.getMatchesForTomorrow();
-    let processedCount = 0;
-    let skippedCount = 0;
-
-    for (const match of matches) {
-      // 1. Idempotency Check
-      const kickoff = new Date(match.date_unix * 1000).toISOString();
-      const { data: existingMatch } = await supabase
+    console.log('🚀 Starting prediction ingest...');
+    
+    // Step 1: Fetch upcoming fixtures from API-Football
+    console.log('📡 Fetching upcoming fixtures...');
+    const fixtures = await fetchUpcomingFixtures();
+    console.log(`✅ Fetched ${fixtures.length} fixtures`);
+    
+    // Step 2: Generate predictions
+    console.log('🤖 Generating predictions...');
+    const predictions = await generatePredictions(fixtures);
+    console.log(`✅ Generated ${predictions.length} predictions`);
+    
+    // Step 3: Save to database
+    let savedCount = 0;
+    for (let i = 0; i < fixtures.length; i++) {
+      const fixture = fixtures[i];
+      const prediction = predictions[i];
+      
+      // Insert or update match
+      const { data: matchData, error: matchError } = await supabase
         .from('matches')
-        .select('id')
-        .eq('home_team', match.home_name)
-        .eq('away_team', match.away_name)
-        .eq('kickoff', kickoff)
-        .maybeSingle();
-
-      if (existingMatch) {
-        skippedCount++;
-        continue;
-      }
-
-      // 2. Insert Match directly
-      const { data: newMatch, error: matchErr } = await supabase
-        .from('matches')
-        .insert({
-          home_team: match.home_name,
-          away_team: match.away_name,
-          league: match.competition_name,
-          kickoff,
-          status: 'upcoming'
+        .upsert({
+          home_team: fixture.teams.home.name,
+          away_team: fixture.teams.away.name,
+          league: fixture.league.name,
+          kickoff: fixture.fixture.date,
+          status: 'upcoming',
+        }, {
+          onConflict: 'home_team,away_team,kickoff',
         })
-        .select('id')
+        .select()
         .single();
-
-      if (matchErr || !newMatch) {
-        console.error('Error inserting match:', match.home_name, 'vs', match.away_name, matchErr);
+      
+      if (matchError) {
+        console.error('Error saving match:', matchError, 'for', fixture.teams.home.name, 'vs', fixture.teams.away.name);
         continue;
       }
-
-      const matchId = newMatch.id;
-
-      // 3. Generate and Store Prediction
-      const engineInput: MatchInput = {
-        odds_home: match.odds_ft_1,
-        odds_draw: match.odds_ft_x,
-        odds_away: match.odds_ft_2,
-        ah_line: match.odds_asian_handicap || 0,
-        ou_line: match.odds_over_under_25 || 2.5,
-        btts_odds: match.odds_btts_yes,
-        xg_home: match.team_a_xg,
-        xg_away: match.team_b_xg,
-        shots_home: match.team_a_shots,
-        shots_away: match.team_b_shots,
-        shots_on_target_home: match.team_a_shotsOnTarget,
-        shots_on_target_away: match.team_b_shotsOnTarget,
-        form_home: match.team_a_form || 3,
-        form_away: match.team_b_form || 3
-      };
-
-      await processAndStorePrediction(matchId, engineInput);
-      processedCount++;
+      
+      // Insert prediction
+      const { error: predictionError } = await supabase
+        .from('predictions')
+        .insert({
+          match_id: matchData.id,
+          home_prob: prediction.homeWinProb,
+          draw_prob: prediction.drawProb,
+          away_prob: prediction.awayWinProb,
+          ah_line: prediction.ahLine,
+          ah_prob: prediction.ahHomeProb,
+          ah_confidence: prediction.confidenceLevel,
+          ou_line: prediction.ouLine,
+          over_prob: prediction.overProb,
+          ou_confidence: prediction.confidenceLevel,
+          expected_goals: prediction.expectedGoals,
+          confidence: prediction.confidenceLevel,
+        });
+      
+      if (predictionError) {
+        console.error('Error saving prediction:', predictionError);
+        continue;
+      }
+      
+      savedCount++;
     }
-
-    return NextResponse.json({ 
-      success: true, 
-      processed: processedCount,
-      skipped: skippedCount
+    
+    console.log(`✅ Successfully saved ${savedCount} predictions to database`);
+    
+    return NextResponse.json({
+      success: true,
+      fixturesCount: fixtures.length,
+      predictionsCount: savedCount,
     });
-
-  } catch (error) {
-    console.error('Cron Ingest Error:', error);
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  } catch (error: any) {
+    console.error('❌ Ingest error:', error);
+    return NextResponse.json(
+      { error: 'Ingest failed', details: error.message },
+      { status: 500 }
+    );
   }
 }
