@@ -24,6 +24,9 @@ export function calculateExpectedGoals(features: any) {
   return { home, away };
 }
 
+export const MODEL_VERSION = "prematch-v1";
+export const FEATURE_VERSION = "basic-v1";
+
 export async function generatePredictions(fixtures: any[]) {
   const predictions = [];
   
@@ -58,8 +61,19 @@ export async function generatePredictions(fixtures: any[]) {
       underProb: ouProbs.under,
       expectedGoals: Number((expectedGoals.home + expectedGoals.away).toFixed(2)),
       confidenceLevel: confidence,
+      modelVersion: MODEL_VERSION,
+      featureVersion: FEATURE_VERSION,
+      generatedAt: new Date().toISOString(),
+      predictionTimestamp: fixture.fixture.date,
+      oddsSnapshot: {
+        market: "AH",
+        line: -0.75,
+        homeOdds: 1.90,
+        awayOdds: 1.90
+      }
     });
   }
   
   return predictions;
 }
+

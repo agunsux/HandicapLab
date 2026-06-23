@@ -35,13 +35,28 @@ CREATE TABLE predictions (
   expected_goals DECIMAL(3,2),
   confidence VARCHAR(10) NOT NULL,
   
+  model_version VARCHAR(50) DEFAULT 'prematch-v1',
+  feature_version VARCHAR(50) DEFAULT 'basic-v1',
+  generated_at TIMESTAMP DEFAULT NOW(),
+  prediction_timestamp TIMESTAMP,
+  odds_snapshot JSONB,
+  
   created_at TIMESTAMP DEFAULT NOW()
 );
+
+-- Safe Incremental Migration Statements (if tables already exist)
+-- ALTER TABLE predictions ADD COLUMN IF NOT EXISTS model_version VARCHAR(50) DEFAULT 'prematch-v1';
+-- ALTER TABLE predictions ADD COLUMN IF NOT EXISTS feature_version VARCHAR(50) DEFAULT 'basic-v1';
+-- ALTER TABLE predictions ADD COLUMN IF NOT EXISTS generated_at TIMESTAMP DEFAULT NOW();
+-- ALTER TABLE predictions ADD COLUMN IF NOT EXISTS prediction_timestamp TIMESTAMP;
+-- ALTER TABLE predictions ADD COLUMN IF NOT EXISTS odds_snapshot JSONB;
 
 -- Index for faster queries
 CREATE INDEX idx_matches_kickoff ON matches(kickoff);
 CREATE INDEX idx_predictions_match_id ON predictions(match_id);
 CREATE INDEX idx_predictions_confidence ON predictions(confidence);
+CREATE INDEX IF NOT EXISTS idx_predictions_model_version ON predictions(model_version);
+
 
 -- Prediction Results table
 CREATE TABLE IF NOT EXISTS prediction_results (

@@ -79,6 +79,11 @@ Poisson engine predictions mapped to matches.
 | `ou_confidence` | `varchar(10)` | `NOT NULL` | Over/Under confidence indicator dot. |
 | `expected_goals` | `decimal(3,2)` | `NULL` | Estimated combined match expected goals. |
 | `confidence` | `varchar(10)` | `NOT NULL` | Combined confidence indicator dot (`🟢 High`, `🟡 Medium`, `⚪ Low`, `🔴 Avoid`). |
+| `model_version` | `varchar(50)` | `DEFAULT 'prematch-v1'` | Model version ID. |
+| `feature_version` | `varchar(50)` | `DEFAULT 'basic-v1'` | Feature engineer set ID. |
+| `generated_at` | `timestamp` | `DEFAULT now()` | Timestamp when predictions were computed. |
+| `prediction_timestamp` | `timestamp` | `NULL` | Projected kickoff timestamp of the match. |
+| `odds_snapshot` | `jsonb` | `NULL` | Market odds snapshot (contains AH line, homeOdds, awayOdds, etc.). |
 | `created_at` | `timestamp` | `DEFAULT now()` | Creation timestamp. |
 
 ### 3. `prediction_results`

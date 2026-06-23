@@ -70,6 +70,11 @@ export async function GET(request: Request) {
           ou_confidence: prediction.confidenceLevel,
           expected_goals: prediction.expectedGoals,
           confidence: prediction.confidenceLevel,
+          model_version: prediction.modelVersion,
+          feature_version: prediction.featureVersion,
+          generated_at: prediction.generatedAt,
+          prediction_timestamp: prediction.predictionTimestamp,
+          odds_snapshot: prediction.oddsSnapshot,
         });
       
       if (predictionError) {
