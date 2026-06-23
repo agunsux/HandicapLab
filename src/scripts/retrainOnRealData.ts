@@ -66,8 +66,8 @@ async function main() {
   });
 
   const realPlattParams = fitPlattScaling(
-    trainPredictions.map(x => x.logit),
-    trainPredictions.map(x => x.actual)
+    trainPredictions.map((x: { logit: number; actual: number }) => x.logit),
+    trainPredictions.map((x: { logit: number; actual: number }) => x.actual)
   );
 
   // 4. Run Validation for Real-Data Model
@@ -92,7 +92,7 @@ async function main() {
   const realECEs = runHTDecomposition(valPredictions as any);
 
   // Calculate real Brier score
-  const realBrierPairs = valPredictions.map(p => ({
+  const realBrierPairs = valPredictions.map((p: any) => ({
     prob: p.pred.sh_ou_under_prob,
     outcome: p.outcome.shTotalGoals < (p.input.sh_ou_line || 1.5) ? 1 : 0
   }));
@@ -123,7 +123,7 @@ async function main() {
     };
   });
 
-  const simBrierPairs = valPredictionsSim.map(p => ({
+  const simBrierPairs = valPredictionsSim.map((p: any) => ({
     prob: p.pred.sh_ou_under_prob,
     outcome: p.outcome.shTotalGoals < (p.input.sh_ou_line || 1.5) ? 1 : 0
   }));
