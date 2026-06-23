@@ -1,12 +1,7 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase.server';
 import { generatePredictions } from '@/lib/services/predictionService';
 import { fetchUpcomingFixtures } from '@/lib/api/apiFootball';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY!
-);
 
 // TODO: Sprint 6 Refactor - Ingestion layer should fully target structured FeatureEngine and ProbabilityEngine pipelines and store market-specific predictions
 
