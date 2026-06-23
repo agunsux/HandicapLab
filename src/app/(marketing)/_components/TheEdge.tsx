@@ -47,7 +47,7 @@ export default function TheEdge() {
             Where Machine Learning Meets Quant Finance
           </h2>
           <p className="text-zinc-400 text-sm md:text-base">
-            Shinerva rejects casual guesswork. We treat football outcomes as complex probability surfaces, modeling the edge using quant-grade methodologies.
+            HandicapLab rejects casual guesswork. We treat football outcomes as complex probability surfaces, modeling the edge using quant-grade methodologies.
           </p>
         </div>
 

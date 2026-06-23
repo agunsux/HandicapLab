@@ -8,7 +8,7 @@ import WaitlistForm from './_components/WaitlistForm';
 import Footer from './_components/Footer';
 
 export const metadata = {
-  title: 'Shinerva.id | Quant-Grade Football Analytics',
+  title: 'HandicapLab | Quant-Grade Football Analytics',
   description: 'Calibrate your betting strategy with advanced Dixon-Coles goal expectation models. Beating Pinnacle closing lines with programmatically verified Brier score calibration.',
 };
 

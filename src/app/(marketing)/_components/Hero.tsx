@@ -107,7 +107,7 @@ export default function Hero() {
                 <span className="h-3 w-3 rounded-full bg-rose-500/40" />
                 <span className="h-3 w-3 rounded-full bg-amber-500/40" />
                 <span className="h-3 w-3 rounded-full bg-emerald-500/40" />
-                <span className="ml-2 font-mono text-[10px] text-zinc-500 uppercase tracking-widest">SHINERVA.ID // CORE ENGINE</span>
+                <span className="ml-2 font-mono text-[10px] text-zinc-500 uppercase tracking-widest">HANDICAPLAB // CORE ENGINE</span>
               </div>
               <div className="rounded bg-zinc-900 border border-zinc-800 px-2 py-0.5 font-mono text-[9px] text-emerald-400 animate-pulse">
                 ● LIVE CALIBRATION FEED

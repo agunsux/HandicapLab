@@ -24,11 +24,11 @@ export default function Navbar() {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-400 to-teal-500 font-bold text-[#09090B] text-lg tracking-tight">
-            S
+            H
           </div>
           <div className="flex flex-col">
             <span className="font-bold tracking-tight text-zinc-100">
-              Shinerva<span className="bg-gradient-to-r from-emerald-400 to-teal-500 bg-clip-text text-transparent">.id</span>
+              Handicap<span className="bg-gradient-to-r from-emerald-400 to-teal-500 bg-clip-text text-transparent">Lab</span>
             </span>
             <span className="text-[9px] font-mono tracking-widest text-zinc-500 uppercase">Quant Intelligence</span>
           </div>
