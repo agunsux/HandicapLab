@@ -24,6 +24,7 @@ export function calculateExpectedGoals(features: any) {
   return { home, away };
 }
 
+// TODO: Sprint 6 Refactor - Update generatePredictions to yield multiple predictions per fixture mapping to market types and the JSONB model version structure
 export const MODEL_VERSION = "prematch-v1";
 export const FEATURE_VERSION = "basic-v1";
 

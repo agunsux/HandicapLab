@@ -38,3 +38,16 @@ We integrate with [API-Football](https://www.api-football.com/) to fetch real ma
 - **Persistent Cache**: Responses are cached locally in `./cache/api-football/` to ensure we never query the same endpoint with the same arguments twice.
 - **Estimated Fetch Timeline**: Complete historical statistics for the Premier League, La Liga, and Serie A for seasons 2022-2024 require ~726 distinct endpoint statistic calls. Because of the daily limit, a full cache generation will take **~8 days** to complete incrementally. Runs should be made daily to populate the cache.
 
+---
+
+## 🛡️ Data Integrity & Leakage Prevention
+
+To ensure institutional investor confidence and scientific prediction rigor, HandicapLab implements strict **Edge Leakage Prevention** measures. Preventing future-data bias (look-ahead bias) is crucial for backtesting authenticity and real-money profitability.
+
+- **The Hard Gate**: Every feature extractor and prediction pipeline is guarded by a runtime checkpoint via `LeakageGuard.assertNoFutureData(matchId, cutoffDate)`.
+- **Frozen Snapshots**: Market opening odds are frozen at prediction time and never mutated. Closing odds are populated only during settlement.
+- **Outcomes Separation**: Actual outcomes, Brier scores, CLV, and profit/loss calculations are kept in separate settlement tables to preserve predictions.
+
+For full developer guidelines and compliance checklists, read the comprehensive [docs/LEAKAGE_PREVENTION.md](file:///c:/Users/RYZEN/.antigravity-ide/HandicapLab/docs/LEAKAGE_PREVENTION.md) guide.
+
+

@@ -9,15 +9,22 @@
     "lint": "eslint",
     "simulate": "tsx src/scripts/simulate.ts",
     "validate": "tsx src/scripts/validate.ts",
-    "stability": "tsx src/scripts/stabilityTest.ts"
+    "stability": "tsx src/scripts/stabilityTest.ts",
+    "verify:schema": "tsx src/scripts/verify-schema.ts",
+    "migrate:sprint5": "tsx src/scripts/migrate-sprint5.ts",
+    "migrate:monetization": "tsx src/scripts/migrate-monetization.ts",
+    "ablation:report": "tsx src/lib/ablation/run-report.ts",
+    "test": "vitest run"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
     "@supabase/supabase-js": "^2.108.2",
+    "@types/pg": "^8.20.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^1.21.0",
     "next": "16.2.9",
+    "pg": "^8.22.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "shadcn": "^4.11.0",
@@ -33,6 +40,7 @@
     "eslint-config-next": "16.2.9",
     "tailwindcss": "^4",
     "tsx": "^4.22.4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^2.0.0"
   }
 }

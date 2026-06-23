@@ -16,17 +16,9 @@ export default async function Home() {
       kickoff,
       status,
       predictions(
-        home_prob,
-        draw_prob,
-        away_prob,
-        ah_line,
-        ah_prob,
-        ah_confidence,
-        ou_line,
-        over_prob,
-        ou_confidence,
-        expected_goals,
-        confidence
+        market_type,
+        prediction,
+        odds_snapshot
       )
     `)
     .eq('status', 'upcoming')
@@ -68,7 +60,7 @@ export default async function Home() {
               <MatchCard 
                 key={match.id} 
                 match={match} 
-                prediction={match.predictions?.[0]} 
+                prediction={match.predictions} 
               />
             ))}
           </div>

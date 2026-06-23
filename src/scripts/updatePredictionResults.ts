@@ -125,7 +125,15 @@ async function updatePredictionResults() {
         continue;
       }
 
-      const prediction = predictions[0];
+            const prediction = predictions[0];
+      const predObj = typeof prediction.prediction === 'object' && prediction.prediction ? (prediction.prediction as any) : {};
+      const pHome = parseFloat(predObj.home_prob || predObj.homeWinProb || '0');
+      const pDraw = parseFloat(predObj.draw_prob || predObj.drawProb || '0');
+      const pAway = parseFloat(predObj.away_prob || predObj.awayWinProb || '0');
+      const ahProb = parseFloat(predObj.ah_prob || '0');
+      const ahLine = parseFloat(predObj.ah_line || '0');
+      const overProb = parseFloat(predObj.over_prob || '0');
+      const ouLine = parseFloat(predObj.ou_line || '2.5');
 
       // --- Evaluate 1X2 ---
       let actualOutcome: 'home' | 'draw' | 'away' = 'draw';
@@ -133,9 +141,9 @@ async function updatePredictionResults() {
       else if (awayGoals > homeGoals) actualOutcome = 'away';
 
       let predictedOutcome: 'home' | 'draw' | 'away' = 'home';
-      if (prediction.draw_prob > prediction.home_prob && prediction.draw_prob > prediction.away_prob) {
+      if (pDraw > pHome && pDraw > pAway) {
         predictedOutcome = 'draw';
-      } else if (prediction.away_prob > prediction.home_prob && prediction.away_prob > prediction.draw_prob) {
+      } else if (pAway > pHome && pAway > pDraw) {
         predictedOutcome = 'away';
       }
 
@@ -144,22 +152,22 @@ async function updatePredictionResults() {
 
       // --- Evaluate Asian Handicap ---
       // Determine predicted side for AH (backed home if home_prob > 0.50, else away)
-      const predictedAhSide = prediction.ah_prob > 0.5 ? 'home' : 'away';
+      const predictedAhSide = ahProb > 0.5 ? 'home' : 'away';
       const ahEvaluation = evaluateAH(
         homeGoals,
         awayGoals,
-        Number(prediction.ah_line),
+        Number(ahLine),
         predictedAhSide === 'home'
       );
 
       // --- Evaluate Over/Under ---
       const totalGoals = homeGoals + awayGoals;
-      const predictedOu = prediction.over_prob > 0.5 ? 'over' : 'under';
+      const predictedOu = overProb > 0.5 ? 'over' : 'under';
       
       let actualOu: 'over' | 'under' | 'push' = 'push';
-      const ouLine = Number(prediction.ou_line);
-      if (totalGoals > ouLine) actualOu = 'over';
-      else if (totalGoals < ouLine) actualOu = 'under';
+      const ouLineVal = Number(ouLine);
+      if (totalGoals > ouLineVal) actualOu = 'over';
+      else if (totalGoals < ouLineVal) actualOu = 'under';
 
       const hitOu = predictedOu === actualOu;
       let profitOu = -1.0;
@@ -214,10 +222,10 @@ async function updatePredictionResults() {
         continue;
       }
 
-      console.log(`✅ Evaluated: ${match.home_team} ${homeGoals}-${awayGoals} ${match.away_team}`);
+      console.log(`` + `✅ Evaluated: ${match.home_team} ${homeGoals}-${awayGoals} ${match.away_team}`);
       console.log(`   - 1X2: Predicted ${predictedOutcome}, Actual ${actualOutcome} (${hit1x2 ? 'HIT' : 'MISS'})`);
-      console.log(`   - AH: Predicted ${predictedAhSide} (${prediction.ah_line}), Actual ${ahEvaluation.actualAh} (${ahEvaluation.hit ? 'HIT' : 'MISS'})`);
-      console.log(`   - O/U: Predicted ${predictedOu} (${prediction.ou_line}), Actual ${actualOu} (${hitOu ? 'HIT' : 'MISS'})`);
+      console.log(`   - AH: Predicted ${predictedAhSide} (${ahLine}), Actual ${ahEvaluation.actualAh} (${ahEvaluation.hit ? 'HIT' : 'MISS'})`);
+      console.log(`   - O/U: Predicted ${predictedOu} (${ouLine}), Actual ${actualOu} (${hitOu ? 'HIT' : 'MISS'})`);
       
       evaluatedCount++;
     }

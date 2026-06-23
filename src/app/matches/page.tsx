@@ -23,17 +23,9 @@ export default async function MatchesPage() {
         predictions(
           id,
           match_id,
-          home_prob,
-          draw_prob,
-          away_prob,
-          ah_line,
-          ah_prob,
-          ah_confidence,
-          ou_line,
-          over_prob,
-          ou_confidence,
-          expected_goals,
-          confidence
+          market_type,
+          prediction,
+          odds_snapshot
         )
       `)
       .eq('status', 'upcoming')
@@ -55,21 +47,7 @@ export default async function MatchesPage() {
             kickoff: m.kickoff,
             status: m.status,
           },
-          prediction: m.predictions?.[0] ? {
-            id: m.predictions[0].id,
-            match_id: m.predictions[0].match_id,
-            home_prob: Number(m.predictions[0].home_prob),
-            draw_prob: Number(m.predictions[0].draw_prob),
-            away_prob: Number(m.predictions[0].away_prob),
-            ah_line: Number(m.predictions[0].ah_line),
-            ah_prob: Number(m.predictions[0].ah_prob),
-            ah_confidence: m.predictions[0].ah_confidence,
-            ou_line: Number(m.predictions[0].ou_line),
-            over_prob: Number(m.predictions[0].over_prob),
-            ou_confidence: m.predictions[0].ou_confidence,
-            expected_goals: Number(m.predictions[0].expected_goals),
-            confidence: m.predictions[0].confidence,
-          } : null,
+          prediction: m.predictions && m.predictions.length > 0 ? m.predictions : null,
         }))
         .filter((item) => item.prediction !== null);
 

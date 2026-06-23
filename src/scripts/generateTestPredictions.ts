@@ -4,6 +4,8 @@ import { calculatePreMatchFeatures, TransformedMatch } from '../lib/data/dataTra
 import * as fs from 'fs';
 import * as path from 'path';
 
+// TODO: Sprint 6 Refactor - Update generateTestPredictions to produce predictions aligning with Sprint 5 market-specific outputs and model JSONB schema
+
 async function main() {
   console.log('=========================================');
   console.log('      Generating Test Predictions        ');

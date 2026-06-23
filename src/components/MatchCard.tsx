@@ -8,46 +8,88 @@ export function MatchCard({ match, prediction }: any) {
   const homeTeam = match.home_team;
   const awayTeam = match.away_team;
 
+  let mlHome = 0, mlDraw = 0, mlAway = 0;
+  let ahLineVal = 0, ahHome = 0;
+  let ouLineVal = 0, overVal = 0;
+  let confidenceVal = 'Low';
+
+  if (Array.isArray(prediction)) {
+    // New Sprints 5 schema (array of predictions)
+    const mlPred = prediction.find((p: any) => p.market_type === 'ML');
+    const ahPred = prediction.find((p: any) => p.market_type === 'AH');
+    const ouPred = prediction.find((p: any) => p.market_type === 'OU');
+
+    if (mlPred) {
+      const predData = typeof mlPred.prediction === 'object' && mlPred.prediction ? mlPred.prediction : {};
+      mlHome = Number(predData.home_prob || predData.homeWinProb || 0);
+      mlDraw = Number(predData.draw_prob || predData.drawProb || 0);
+      mlAway = Number(predData.away_prob || predData.awayWinProb || 0);
+      confidenceVal = predData.confidence || mlPred.confidence || 'Low';
+    }
+    if (ahPred) {
+      const predData = typeof ahPred.prediction === 'object' && ahPred.prediction ? ahPred.prediction : {};
+      ahLineVal = Number(predData.ah_line || ahPred.ah_line || 0);
+      ahHome = Number(predData.ah_prob || ahPred.ah_prob || 0);
+      if (!mlPred) {
+        confidenceVal = predData.confidence || ahPred.confidence || 'Low';
+      }
+    }
+    if (ouPred) {
+      const predData = typeof ouPred.prediction === 'object' && ouPred.prediction ? ouPred.prediction : {};
+      ouLineVal = Number(predData.ou_line || ouPred.ou_line || 0);
+      overVal = Number(predData.over_prob || ouPred.over_prob || 0);
+      if (!mlPred && !ahPred) {
+        confidenceVal = predData.confidence || ouPred.confidence || 'Low';
+      }
+    }
+  } else {
+    // Legacy schema (flat object)
+    mlHome = Number(prediction.home_prob || 0);
+    mlDraw = Number(prediction.draw_prob || 0);
+    mlAway = Number(prediction.away_prob || 0);
+    ahLineVal = Number(prediction.ah_line || 0);
+    ahHome = Number(prediction.ah_prob || 0);
+    ouLineVal = Number(prediction.ou_line || 0);
+    overVal = Number(prediction.over_prob || 0);
+    confidenceVal = prediction.confidence || 'Low';
+  }
+
   // 1. Moneyline Pick & Prob
   let mlPick = 'Draw';
-  let mlProb = Number(prediction.draw_prob);
+  let mlProb = mlDraw;
 
-  if (Number(prediction.home_prob) > Math.max(Number(prediction.draw_prob), Number(prediction.away_prob))) {
+  if (mlHome > Math.max(mlDraw, mlAway)) {
     mlPick = homeTeam;
-    mlProb = Number(prediction.home_prob);
-  } else if (Number(prediction.away_prob) > Math.max(Number(prediction.home_prob), Number(prediction.draw_prob))) {
+    mlProb = mlHome;
+  } else if (mlAway > Math.max(mlHome, mlDraw)) {
     mlPick = awayTeam;
-    mlProb = Number(prediction.away_prob);
+    mlProb = mlAway;
   }
 
   // 2. Asian Handicap Pick & Prob
-  const ahLine = Number(prediction.ah_line);
-  const ahHomeProb = Number(prediction.ah_prob);
   let ahPick = '';
   let ahProb = 0;
 
-  if (ahHomeProb >= 0.50) {
-    ahPick = `${homeTeam} (${ahLine >= 0 ? '+' : ''}${ahLine})`;
-    ahProb = ahHomeProb;
+  if (ahHome >= 0.50) {
+    ahPick = `${homeTeam} (${ahLineVal >= 0 ? '+' : ''}${ahLineVal})`;
+    ahProb = ahHome;
   } else {
     // If we cover away, the line sign is inverted
-    const awayLine = -ahLine;
+    const awayLine = -ahLineVal;
     ahPick = `${awayTeam} (${awayLine >= 0 ? '+' : ''}${awayLine})`;
-    ahProb = 1 - ahHomeProb;
+    ahProb = 1 - ahHome;
   }
 
   // 3. Over/Under Pick & Prob
-  const ouLine = Number(prediction.ou_line);
-  const overProb = Number(prediction.over_prob);
   let ouPick = '';
   let ouProb = 0;
 
-  if (overProb >= 0.50) {
-    ouPick = `Over ${ouLine}`;
-    ouProb = overProb;
+  if (overVal >= 0.50) {
+    ouPick = `Over ${ouLineVal}`;
+    ouProb = overVal;
   } else {
-    ouPick = `Under ${ouLine}`;
-    ouProb = 1 - overProb;
+    ouPick = `Under ${ouLineVal}`;
+    ouProb = 1 - overVal;
   }
 
   // Parse kickoff time
@@ -74,7 +116,7 @@ export function MatchCard({ match, prediction }: any) {
             {homeTeam} <span className="text-slate-400 font-medium font-sans">vs</span> {awayTeam}
           </h3>
         </div>
-        <ConfidenceBadge confidence={prediction.confidence} />
+        <ConfidenceBadge confidence={confidenceVal} />
       </div>
       
       {/* Card Predictions Grid (3 markets) */}

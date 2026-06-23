@@ -8,6 +8,21 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY!
 );
 
+// TODO: Sprint 6 Refactor - Ingestion layer should fully target structured FeatureEngine and ProbabilityEngine pipelines and store market-specific predictions
+
+let cachedIsNewSchema: boolean | null = null;
+
+async function checkIsNewSchema(): Promise<boolean> {
+  if (cachedIsNewSchema !== null) return cachedIsNewSchema;
+  try {
+    const { error } = await supabase.from('predictions').select('prediction').limit(1);
+    cachedIsNewSchema = !error || error.code !== '42703';
+  } catch {
+    cachedIsNewSchema = false;
+  }
+  return cachedIsNewSchema;
+}
+
 export async function GET(request: Request) {
   // Security check
   const authHeader = request.headers.get('authorization');
@@ -27,6 +42,8 @@ export async function GET(request: Request) {
     console.log('🤖 Generating predictions...');
     const predictions = await generatePredictions(fixtures);
     console.log(`✅ Generated ${predictions.length} predictions`);
+    
+    const isNew = await checkIsNewSchema();
     
     // Step 3: Save to database
     let savedCount = 0;
@@ -54,32 +71,102 @@ export async function GET(request: Request) {
         continue;
       }
       
-      // Insert prediction
-      const { error: predictionError } = await supabase
-        .from('predictions')
-        .insert({
-          match_id: matchData.id,
-          home_prob: prediction.homeWinProb,
-          draw_prob: prediction.drawProb,
-          away_prob: prediction.awayWinProb,
-          ah_line: prediction.ahLine,
-          ah_prob: prediction.ahHomeProb,
-          ah_confidence: prediction.confidenceLevel,
-          ou_line: prediction.ouLine,
-          over_prob: prediction.overProb,
-          ou_confidence: prediction.confidenceLevel,
-          expected_goals: prediction.expectedGoals,
-          confidence: prediction.confidenceLevel,
-          model_version: prediction.modelVersion,
-          feature_version: prediction.featureVersion,
-          generated_at: prediction.generatedAt,
-          prediction_timestamp: prediction.predictionTimestamp,
-          odds_snapshot: prediction.oddsSnapshot,
-        });
-      
-      if (predictionError) {
-        console.error('Error saving prediction:', predictionError);
-        continue;
+      // Insert prediction(s) based on schema version
+      if (isNew) {
+        // Insert ML, AH, and OU as separate rows
+        const records = [
+          {
+            match_id: String(matchData.id),
+            market_type: 'ML',
+            home_team: fixture.teams.home.name,
+            away_team: fixture.teams.away.name,
+            prediction: {
+              home_prob: prediction.homeWinProb,
+              draw_prob: prediction.drawProb,
+              away_prob: prediction.awayWinProb,
+              expected_goals: prediction.expectedGoals,
+              confidence: prediction.confidenceLevel,
+            },
+            model_version: prediction.modelVersion,
+            feature_version: prediction.featureVersion,
+            generated_at: prediction.generatedAt,
+            prediction_timestamp: prediction.predictionTimestamp,
+            odds_snapshot: prediction.oddsSnapshot,
+          },
+          {
+            match_id: String(matchData.id),
+            market_type: 'AH',
+            home_team: fixture.teams.home.name,
+            away_team: fixture.teams.away.name,
+            prediction: {
+              ah_line: prediction.ahLine,
+              ah_prob: prediction.ahHomeProb,
+              ah_confidence: prediction.confidenceLevel,
+              expected_goals: prediction.expectedGoals,
+              confidence: prediction.confidenceLevel,
+            },
+            model_version: prediction.modelVersion,
+            feature_version: prediction.featureVersion,
+            generated_at: prediction.generatedAt,
+            prediction_timestamp: prediction.predictionTimestamp,
+            odds_snapshot: prediction.oddsSnapshot,
+          },
+          {
+            match_id: String(matchData.id),
+            market_type: 'OU',
+            home_team: fixture.teams.home.name,
+            away_team: fixture.teams.away.name,
+            prediction: {
+              ou_line: prediction.ouLine,
+              over_prob: prediction.overProb,
+              ou_confidence: prediction.confidenceLevel,
+              expected_goals: prediction.expectedGoals,
+              confidence: prediction.confidenceLevel,
+            },
+            model_version: prediction.modelVersion,
+            feature_version: prediction.featureVersion,
+            generated_at: prediction.generatedAt,
+            prediction_timestamp: prediction.predictionTimestamp,
+            odds_snapshot: prediction.oddsSnapshot,
+          }
+        ];
+
+        const { error: predictionError } = await supabase
+          .from('predictions')
+          .insert(records);
+        
+        if (predictionError) {
+          console.error('Error saving market predictions:', predictionError);
+          continue;
+        }
+      } else {
+        // Insert single row the old way
+        const { error: predictionError } = await supabase
+          .from('predictions')
+          .insert({
+            match_id: matchData.id,
+            home_prob: prediction.homeWinProb,
+            draw_prob: prediction.drawProb,
+            away_prob: prediction.awayWinProb,
+            ah_line: prediction.ahLine,
+            ah_prob: prediction.ahHomeProb,
+            ah_confidence: prediction.confidenceLevel,
+            ou_line: prediction.ouLine,
+            over_prob: prediction.overProb,
+            ou_confidence: prediction.confidenceLevel,
+            expected_goals: prediction.expectedGoals,
+            confidence: prediction.confidenceLevel,
+            model_version: prediction.modelVersion,
+            feature_version: prediction.featureVersion,
+            generated_at: prediction.generatedAt,
+            prediction_timestamp: prediction.predictionTimestamp,
+            odds_snapshot: prediction.oddsSnapshot,
+          });
+        
+        if (predictionError) {
+          console.error('Error saving legacy prediction:', predictionError);
+          continue;
+        }
       }
       
       savedCount++;
