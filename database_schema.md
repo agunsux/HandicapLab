@@ -15,7 +15,10 @@ erDiagram
         varchar status
         integer home_goals
         integer away_goals
+        integer ht_home_goals
+        integer ht_away_goals
         timestamp created_at
+        timestamp updated_at
     }
 
     predictions {
@@ -26,8 +29,11 @@ erDiagram
         decimal away_prob
         decimal ah_line
         decimal ah_prob
+        varchar ah_confidence
         decimal ou_line
         decimal over_prob
+        varchar ou_confidence
+        decimal expected_goals
         varchar confidence
         timestamp created_at
     }
@@ -50,7 +56,10 @@ Scheduled or completed fixtures.
 | `status` | `varchar(20)` | `DEFAULT 'upcoming'` | Match status (`upcoming`, `live`, `finished`). |
 | `home_goals` | `integer` | `NULL` | Home team goals scored (after match ends). |
 | `away_goals` | `integer` | `NULL` | Away team goals scored (after match ends). |
+| `ht_home_goals` | `integer` | `NULL` | Halftime home goals. |
+| `ht_away_goals` | `integer` | `NULL` | Halftime away goals. |
 | `created_at` | `timestamp` | `DEFAULT now()` | Ingest timestamp. |
+| `updated_at` | `timestamp` | `DEFAULT now()` | Last update timestamp. |
 
 ### 2. `predictions`
 Poisson engine predictions mapped to matches.
@@ -64,7 +73,10 @@ Poisson engine predictions mapped to matches.
 | `away_prob` | `decimal(5,4)` | `NOT NULL` | Moneyline away win probability. |
 | `ah_line` | `decimal(3,2)` | `NOT NULL` | Asian Handicap line (e.g. `-0.75`). |
 | `ah_prob` | `decimal(5,4)` | `NOT NULL` | Asian Handicap cover probability. |
+| `ah_confidence` | `varchar(10)` | `NOT NULL` | Asian Handicap confidence indicator dot. |
 | `ou_line` | `decimal(3,1)` | `NOT NULL` | Over/Under Goals line (e.g. `2.5`). |
 | `over_prob` | `decimal(5,4)` | `NOT NULL` | Over goals probability. |
-| `confidence` | `varchar(10)` | `NOT NULL` | Confidence indicator dot (`🟢 High`, `🟡 Medium`, `⚪ Low`, `🔴 Avoid`). |
+| `ou_confidence` | `varchar(10)` | `NOT NULL` | Over/Under confidence indicator dot. |
+| `expected_goals` | `decimal(3,2)` | `NULL` | Estimated combined match expected goals. |
+| `confidence` | `varchar(10)` | `NOT NULL` | Combined confidence indicator dot (`🟢 High`, `🟡 Medium`, `⚪ Low`, `🔴 Avoid`). |
 | `created_at` | `timestamp` | `DEFAULT now()` | Creation timestamp. |

@@ -21,8 +21,11 @@ export default async function Home() {
         away_prob,
         ah_line,
         ah_prob,
+        ah_confidence,
         ou_line,
         over_prob,
+        ou_confidence,
+        expected_goals,
         confidence
       )
     `)
