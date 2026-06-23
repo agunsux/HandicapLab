@@ -31,14 +31,15 @@ export function getHTState(input: MatchInput): string {
 }
 
 export function learnStateWeights(
-  trainData: Array<{ input: MatchInput, outcome: MatchSimulationResult }>
+  trainData: Array<{ input: MatchInput, outcome: MatchSimulationResult }>,
+  minSamples: number = 50
 ): Record<string, StateWeightResult> {
   const states = ['0-0', '1-0', '0-1', '1-1', '2+'];
   const results: Record<string, StateWeightResult> = {};
 
   for (const state of states) {
     const data = trainData.filter(d => getHTState(d.input) === state);
-    if (data.length < 50) {
+    if (data.length < minSamples) {
       console.log(`WARNING: State ${state} has ${data.length} samples, falling back to global model`);
       results[state] = { state, weights: null, sampleSize: data.length, fallback: true };
       continue;
