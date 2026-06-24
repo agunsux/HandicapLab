@@ -36,24 +36,15 @@ export default function Navbar() {
 
         {/* Navigation Links */}
         <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-400">
-          <button
-            onClick={() => scrollToSection('the-edge')}
-            className="hover:text-zinc-100 transition-colors"
-          >
-            The Edge
-          </button>
-          <button
-            onClick={() => scrollToSection('live-stats')}
-            className="hover:text-zinc-100 transition-colors"
-          >
-            Live Performance
-          </button>
-          <button
-            onClick={() => scrollToSection('pricing')}
-            className="hover:text-zinc-100 transition-colors"
-          >
+          <Link href="/scanner" className="hover:text-zinc-100 transition-colors">
+            Edge Scanner
+          </Link>
+          <Link href="/performance" className="hover:text-zinc-100 transition-colors">
+            Performance
+          </Link>
+          <Link href="/pricing" className="hover:text-zinc-100 transition-colors">
             Pricing
-          </button>
+          </Link>
           <Link
             href="/dashboard"
             className="hover:text-zinc-100 transition-colors flex items-center gap-1 font-mono text-xs bg-zinc-900 border border-zinc-800 px-2.5 py-1 rounded"

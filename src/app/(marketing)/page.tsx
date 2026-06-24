@@ -2,6 +2,7 @@ import React from 'react';
 import Navbar from './_components/Navbar';
 import Hero from './_components/Hero';
 import LiveStats from './_components/LiveStats';
+import CompetitorPositioning from './_components/CompetitorPositioning';
 import TheEdge from './_components/TheEdge';
 import Pricing from './_components/Pricing';
 import WaitlistForm from './_components/WaitlistForm';
@@ -9,7 +10,7 @@ import Footer from './_components/Footer';
 
 export const metadata = {
   title: 'HandicapLab | Quant-Grade Football Analytics',
-  description: 'Calibrate your betting strategy with advanced Dixon-Coles goal expectation models. Beating Pinnacle closing lines with programmatically verified Brier score calibration.',
+  description: 'Calibrate your betting strategy with ensembled goal expectation models. Beating Pinnacle closing lines with programmatically verified Brier score calibration.',
 };
 
 export default function MarketingPage() {
@@ -26,6 +27,9 @@ export default function MarketingPage() {
 
       {/* Live Verification / Settlement Stats section */}
       <LiveStats />
+
+      {/* Competitor Positioning grid */}
+      <CompetitorPositioning />
 
       {/* Pricing options section */}
       <Pricing />
