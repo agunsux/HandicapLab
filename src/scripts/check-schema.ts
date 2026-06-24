@@ -23,7 +23,10 @@ async function check() {
   }
 
   // To check columns, we can try selecting them and catching errors
-  const matchCols = ['competition_type', 'fifa_ranking_home', 'fifa_ranking_away', 'squad_strength_home', 'squad_strength_away'];
+  const matchCols = [
+    'competition_type', 'fifa_ranking_home', 'fifa_ranking_away', 
+    'squad_strength_home', 'squad_strength_away', 'tournament_stage'
+  ];
   for (const col of matchCols) {
     const { error } = await supabase.from('matches').select(col).limit(1);
     if (error) {
@@ -33,13 +36,33 @@ async function check() {
     }
   }
 
-  const predCols = ['confidence', 'model_confidence', 'data_confidence', 'market_confidence', 'clv', 'league_id', 'cohort_tag'];
+  const predCols = [
+    'confidence', 'model_confidence', 'data_confidence', 'market_confidence', 
+    'clv', 'league_id', 'cohort_tag', 'market_subtype', 'selection', 
+    'model_probability', 'fair_odds', 'entry_odds',
+    'market_confidence_score', 'predicted_odds', 'closing_line_value'
+  ];
   for (const col of predCols) {
     const { error } = await supabase.from('predictions').select(col).limit(1);
     if (error) {
       console.log(`Column predictions.${col}: MISSING (${error.message})`);
     } else {
       console.log(`Column predictions.${col}: EXISTS`);
+    }
+  }
+
+  const tradeCols = [
+    'user_id', 'prediction_id', 'match_id', 'competition_id', 'market_type',
+    'market_subtype', 'selection', 'entry_odds', 'opening_odds', 'stake',
+    'cohort_tag', 'status', 'profit', 'is_win', 'clv', 'brier_score'
+  ];
+  console.log('\n🔍 Checking columns in paper_trades table...');
+  for (const col of tradeCols) {
+    const { error } = await supabase.from('paper_trades').select(col).limit(1);
+    if (error) {
+      console.log(`Column paper_trades.${col}: MISSING (${error.message})`);
+    } else {
+      console.log(`Column paper_trades.${col}: EXISTS`);
     }
   }
 }

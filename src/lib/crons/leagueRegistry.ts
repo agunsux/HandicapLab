@@ -25,6 +25,7 @@ export interface LeagueConfig {
     ML: boolean;
   };
   apiFootballId: number;
+  footballDataId?: number;
   oddsApiSportKey?: string;
   status: CompetitionStatus;
   cohort: 'WORLD_CUP' | 'EPL' | 'LIGUE2' | 'EUROPA' | 'OTHER';
@@ -48,6 +49,7 @@ export const LEAGUE_REGISTRY: LeagueConfig[] = [
     },
     marketSuitability: { AH: true, OU: true, ML: true },
     apiFootballId: 39,
+    footballDataId: 2021,
     status: 'ACTIVE',
     cohort: 'EPL',
     minimumHistoricalMatches: 10
@@ -68,6 +70,7 @@ export const LEAGUE_REGISTRY: LeagueConfig[] = [
     },
     marketSuitability: { AH: true, OU: true, ML: true },
     apiFootballId: 2,
+    footballDataId: 2001,
     status: 'ACTIVE',
     cohort: 'EUROPA',
     minimumHistoricalMatches: 5
@@ -88,6 +91,7 @@ export const LEAGUE_REGISTRY: LeagueConfig[] = [
     },
     marketSuitability: { AH: true, OU: true, ML: true },
     apiFootballId: 140,
+    footballDataId: 2014,
     status: 'ACTIVE',
     cohort: 'OTHER',
     minimumHistoricalMatches: 10
@@ -108,6 +112,7 @@ export const LEAGUE_REGISTRY: LeagueConfig[] = [
     },
     marketSuitability: { AH: true, OU: true, ML: true },
     apiFootballId: 135,
+    footballDataId: 2019,
     status: 'ACTIVE',
     cohort: 'OTHER',
     minimumHistoricalMatches: 10
@@ -128,6 +133,7 @@ export const LEAGUE_REGISTRY: LeagueConfig[] = [
     },
     marketSuitability: { AH: true, OU: true, ML: true },
     apiFootballId: 78,
+    footballDataId: 2002,
     status: 'ACTIVE',
     cohort: 'OTHER',
     minimumHistoricalMatches: 10
@@ -148,6 +154,7 @@ export const LEAGUE_REGISTRY: LeagueConfig[] = [
     },
     marketSuitability: { AH: true, OU: true, ML: true },
     apiFootballId: 61,
+    footballDataId: 2015,
     status: 'ACTIVE',
     cohort: 'OTHER',
     minimumHistoricalMatches: 10
@@ -168,6 +175,7 @@ export const LEAGUE_REGISTRY: LeagueConfig[] = [
     },
     marketSuitability: { AH: true, OU: true, ML: true },
     apiFootballId: 1,
+    footballDataId: 2000,
     oddsApiSportKey: 'soccer_fifa_world_cup',
     status: 'ACTIVE',
     cohort: 'WORLD_CUP',
