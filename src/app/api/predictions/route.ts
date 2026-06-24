@@ -1,41 +1,70 @@
 import { NextResponse } from 'next/server';
-import { generatePredictions } from '../../../lib/services/predictionService';
-import { fetchUpcomingFixtures } from '../../../lib/api/apiFootball';
+import { supabase } from '@/lib/supabase.server';
 
 export async function GET() {
   try {
-    // Fetch upcoming fixtures from API-Football
-    const fixtures = await fetchUpcomingFixtures();
-    
-    // Generate predictions using Poisson engine
-    const predictions = await generatePredictions(fixtures);
-    
-    // Format response
-    const response = predictions.map(pred => ({
-      match: `${pred.homeTeam} vs ${pred.awayTeam}`,
-      kickoff: pred.kickoffTime,
-      league: pred.league,
-      
-      prediction: {
-        home: Math.round(pred.homeWinProb * 100),
-        draw: Math.round(pred.drawProb * 100),
-        away: Math.round(pred.awayWinProb * 100),
-      },
-      
-      asianHandicap: {
-        line: `${pred.homeTeam} ${pred.ahLine > 0 ? '+' : ''}${pred.ahLine}`,
-        confidence: Math.round(pred.ahHomeProb * 100),
-      },
-      
-      overUnder: {
-        line: `O/U ${pred.ouLine}`,
-        over: Math.round(pred.overProb * 100),
-        under: Math.round(pred.underProb * 100),
-      },
-      
-      confidence: pred.confidenceLevel,
-    }));
+    // Query ensembled predictions from the database
+    const { data: predictions, error } = await supabase
+      .from('predictions')
+      .select('*')
+      .order('prediction_timestamp', { ascending: true })
+      .limit(60);
 
+    if (error) {
+      throw error;
+    }
+
+    // Format response grouped by match to match original layout
+    const grouped: Record<string, any> = {};
+
+    for (const pred of predictions || []) {
+      const matchKey = `${pred.home_team} vs ${pred.away_team}`;
+      if (!grouped[matchKey]) {
+        grouped[matchKey] = {
+          match: matchKey,
+          kickoff: pred.prediction_timestamp,
+          league: pred.cohort_tag || 'EPL',
+          prediction: { home: 0, draw: 0, away: 0 },
+          asianHandicap: { line: '', confidence: 0 },
+          overUnder: { line: '', over: 0, under: 0 },
+          confidence: '⚪ Low'
+        };
+      }
+
+      const predObj = typeof pred.prediction === 'object' && pred.prediction ? (pred.prediction as any) : {};
+
+      if (pred.market_type === 'ML') {
+        grouped[matchKey].prediction = {
+          home: Math.round((predObj.pHome || predObj.home_prob || 0.4) * 100),
+          draw: Math.round((predObj.pDraw || predObj.draw_prob || 0.25) * 100),
+          away: Math.round((predObj.pAway || predObj.away_prob || 0.35) * 100),
+        };
+        
+        // Map confidence object to color dot
+        const finalConf = predObj.confidence?.finalConfidence;
+        if (finalConf !== undefined) {
+          grouped[matchKey].confidence = finalConf >= 0.75 ? '🟢 High' : finalConf >= 0.60 ? '🟡 Medium' : '⚪ Low';
+        }
+      } else if (pred.market_type === 'AH') {
+        const line = predObj.ah_line !== undefined ? predObj.ah_line : -0.75;
+        const lineStr = line > 0 ? `+${line}` : `${line}`;
+        const ahProb = predObj.ah_prob ?? (predObj.pAhHome?.[String(line)] || 0.5);
+        grouped[matchKey].asianHandicap = {
+          line: `${pred.home_team} ${lineStr}`,
+          confidence: Math.round(ahProb * 100),
+        };
+      } else if (pred.market_type === 'OU') {
+        const line = predObj.ou_line !== undefined ? predObj.ou_line : 2.5;
+        const overProb = predObj.over_prob ?? (predObj.pOver?.[String(line)] || 0.5);
+        grouped[matchKey].overUnder = {
+          line: `O/U ${line}`,
+          over: Math.round(overProb * 100),
+          under: Math.round((1 - overProb) * 100),
+        };
+      }
+    }
+
+    const response = Object.values(grouped);
     return NextResponse.json({ success: true, predictions: response });
   } catch (error: any) {
     console.error('Predictions API Route Error:', error);

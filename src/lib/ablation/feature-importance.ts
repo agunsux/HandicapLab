@@ -6,14 +6,14 @@ export class FeatureImportance {
   /**
    * Evaluates dataset-wide Brier score.
    */
-  private static calculateDatasetBrier(
+  private static async calculateDatasetBrier(
     dataset: Array<{ features: MatchFeatures; outcome: 'home' | 'draw' | 'away' }>
-  ): number {
+  ): Promise<number> {
     if (dataset.length === 0) return 0.25;
     let sumError = 0;
     
     for (const item of dataset) {
-      const pred = ProbabilityEngine.predict(item.features);
+      const pred = await ProbabilityEngine.predict(item.features);
       const yHome = item.outcome === 'home' ? 1 : 0;
       const yDraw = item.outcome === 'draw' ? 1 : 0;
       const yAway = item.outcome === 'away' ? 1 : 0;
@@ -60,10 +60,10 @@ export class FeatureImportance {
    * 
    * @param dataset Matches with features and true outcome labels
    */
-  public static analyze(
+  public static async analyze(
     dataset: Array<{ features: MatchFeatures; outcome: 'home' | 'draw' | 'away' }>
-  ): FeatureImportanceResult[] {
-    const baselineBrier = this.calculateDatasetBrier(dataset);
+  ): Promise<FeatureImportanceResult[]> {
+    const baselineBrier = await this.calculateDatasetBrier(dataset);
     const featuresToAblate = ['form', 'fatigue', 'strength', 'xg'];
     const results: FeatureImportanceResult[] = [];
 
@@ -73,7 +73,7 @@ export class FeatureImportance {
         outcome: item.outcome
       }));
 
-      const ablatedBrier = this.calculateDatasetBrier(ablatedDataset);
+      const ablatedBrier = await this.calculateDatasetBrier(ablatedDataset);
 
       // Brier score: lower is better. If score increases when feature is missing,
       // it means the feature has a positive contribution.
@@ -98,3 +98,4 @@ export class FeatureImportance {
     return results.sort((a, b) => b.importance - a.importance);
   }
 }
+

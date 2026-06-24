@@ -21,4 +21,14 @@ export interface MatchFeatures {
   leagueId: string;
   season: string;
   generatedAt: Date; // MUST be <= kickoffAt
+  competitionType?: 'club' | 'international';
+  squadFamiliarity?: number;
+  tournamentStage?: string;
+  fifaRankingHome?: number;
+  fifaRankingAway?: number;
+  squadContinuityHome?: number;
+  squadContinuityAway?: number;
+  knockoutPressure?: number;
+  internationalAdjustmentScore?: number;
+  historicalMatchesCount?: number;
 }

@@ -47,7 +47,11 @@ class MockBuilder {
     if (resolvedData !== null && !this.isMatchQuery) {
       resolvedData = this.isSingle ? null : [];
     }
-    resolve({ data: resolvedData, error: this.mockError });
+    resolve({
+      data: resolvedData,
+      error: this.mockError,
+      count: Array.isArray(resolvedData) ? resolvedData.length : (resolvedData ? 1 : 0)
+    });
   }
 }
 
@@ -84,7 +88,7 @@ describe('FeatureEngine', () => {
           id: matchId,
           home_team: 'Arsenal',
           away_team: 'Chelsea',
-          league: 'Premier League',
+          league: 'Unknown League',
           kickoff: kickoff.toISOString(),
           status: 'upcoming',
           home_goals: null,

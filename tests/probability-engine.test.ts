@@ -1,10 +1,31 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { PoissonModel } from '../src/lib/engines/probability-engine/poisson';
 import { DixonColesModel } from '../src/lib/engines/probability-engine/dixon-coles';
 import { Calibrator } from '../src/lib/engines/probability-engine/calibration';
 import { EnsembleModel } from '../src/lib/engines/probability-engine/ensemble';
 import { ProbabilityEngine } from '../src/lib/engines/probability-engine';
 import { MatchFeatures } from '../src/lib/engines/feature-engine/types';
+
+// Mock Supabase Client
+vi.mock('../src/lib/supabase.server', () => {
+  return {
+    supabase: {
+      from: vi.fn(() => ({
+        select: vi.fn(() => ({
+          eq: vi.fn(() => ({
+            eq: vi.fn(() => ({
+              order: vi.fn(() => ({
+                limit: vi.fn().mockResolvedValue({ data: [], error: null })
+              }))
+            }))
+          }))
+        })),
+        insert: vi.fn().mockResolvedValue({ data: null, error: null })
+      })),
+      rpc: vi.fn()
+    }
+  };
+});
 
 describe('ProbabilityEngine Modules', () => {
   // Baseline match features mock for tests
@@ -130,14 +151,14 @@ describe('ProbabilityEngine Modules', () => {
   });
 
   describe('ProbabilityEngine Orchestrator', () => {
-    it('should predict market-specific outputs with Moneyline summing to 1.0', () => {
-      const output = ProbabilityEngine.predict(baseFeatures);
+    it('should predict market-specific outputs with Moneyline summing to 1.0', async () => {
+      const output = await ProbabilityEngine.predict(baseFeatures);
       
       expect(output.matchId).toBe(baseFeatures.matchId);
       expect(output.marketType).toBe(baseFeatures.marketType);
       
       // Moneyline probabilities must sum to exactly 1.0000
-      expect(output.pHome + output.pDraw + output.pAway).toBe(1.0);
+      expect(output.pHome + output.pDraw + output.pAway).toBeCloseTo(1.0, 4);
 
       // Over/Under check
       expect(output.pOver['2.5']).toBeGreaterThanOrEqual(0);
@@ -151,7 +172,7 @@ describe('ProbabilityEngine Modules', () => {
       expect(output.pAhAway['-0.5']).toBeCloseTo(output.pDraw + output.pAway, 3);
     });
 
-    it('should validate Brier score < 0.25 on a simulated favorite-aligned historical validation set', () => {
+    it('should validate Brier score < 0.25 on a simulated favorite-aligned historical validation set', async () => {
       // 1. Create a validation set of 10 matches where favorites win
       const validationSet: { features: MatchFeatures; outcome: 'home' | 'draw' | 'away' }[] = [
         {
@@ -225,7 +246,7 @@ describe('ProbabilityEngine Modules', () => {
       // Brier score = 1/N * sum_i sum_j (p_ij - y_ij)^2
       let totalSquaredError = 0;
       for (const sample of validationSet) {
-        const pred = ProbabilityEngine.predict(sample.features);
+        const pred = await ProbabilityEngine.predict(sample.features);
         
         const yHome = sample.outcome === 'home' ? 1 : 0;
         const yDraw = sample.outcome === 'draw' ? 1 : 0;

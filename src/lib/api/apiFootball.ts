@@ -122,8 +122,18 @@ export class ApiFootballClient {
           { id: 509, name: 'Belgium' },
           { id: 510, name: 'Italy' },
         ];
+      } else if (league === 39) {
+        leagueName = 'Premier League';
+      } else if (league === 2) {
+        leagueName = 'UEFA Champions League';
       } else if (league === 140) {
         leagueName = 'La Liga';
+      } else if (league === 135) {
+        leagueName = 'Serie A';
+      } else if (league === 78) {
+        leagueName = 'Bundesliga';
+      } else if (league === 61) {
+        leagueName = 'Ligue 1';
       } else if (league === 848) {
         leagueName = 'Ligue 2';
       }

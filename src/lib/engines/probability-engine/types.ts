@@ -11,6 +11,7 @@ export interface ModelVersion {
 export interface ProbabilityOutput {
   matchId: string;
   marketType: 'AH' | 'OU' | 'ML';
+  leagueId?: string;
   
   // Moneyline (1X2)
   pHome: number;
@@ -28,6 +29,12 @@ export interface ProbabilityOutput {
   // Metadata
   modelVersion: ModelVersion;
   calibrationApplied: boolean;
+  confidence?: {
+    modelConfidence: number;
+    dataConfidence: number;
+    marketConfidence: number;
+    finalConfidence: number;
+  };
 }
 
 export interface RawProbabilities {

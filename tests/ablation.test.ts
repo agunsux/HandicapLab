@@ -8,11 +8,19 @@ import { supabase } from '../src/lib/supabase.server';
 
 // Mock Supabase Client
 vi.mock('../src/lib/supabase.server', () => {
-  const mockSelect = vi.fn();
   return {
     supabase: {
       from: vi.fn(() => ({
-        select: mockSelect
+        select: vi.fn(() => ({
+          eq: vi.fn(() => ({
+            eq: vi.fn(() => ({
+              order: vi.fn(() => ({
+                limit: vi.fn().mockResolvedValue({ data: [], error: null })
+              }))
+            }))
+          }))
+        })),
+        insert: vi.fn().mockResolvedValue({ data: null, error: null })
       })),
       rpc: vi.fn()
     }
@@ -21,11 +29,11 @@ vi.mock('../src/lib/supabase.server', () => {
 
 describe('Ablation Framework', () => {
   beforeEach(() => {
-    vi.resetAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('FeatureImportance', () => {
-    it('should rank features based on importance and assign impacts', () => {
+    it('should rank features based on importance and assign impacts', async () => {
       const mockFeatures: MatchFeatures = {
         matchId: 'm-1',
         marketType: 'ML',
@@ -57,7 +65,7 @@ describe('Ablation Framework', () => {
         { features: { ...mockFeatures, homeElo: 1200, awayElo: 1800, outcome: 'away' }, outcome: 'away' as const }
       ];
 
-      const report = FeatureImportance.analyze(dataset);
+      const report = await FeatureImportance.analyze(dataset);
       expect(report.length).toBe(4);
       expect(report[0].feature).toBeDefined();
       expect(report[0].importance).toBeGreaterThanOrEqual(0);
@@ -151,7 +159,19 @@ describe('Ablation Framework', () => {
             }))
           } as any;
         }
-        return {} as any;
+        // Fallback for predictions table and others
+        return {
+          select: vi.fn(() => ({
+            eq: vi.fn(() => ({
+              eq: vi.fn(() => ({
+                order: vi.fn(() => ({
+                  limit: vi.fn().mockResolvedValue({ data: [], error: null })
+                }))
+              }))
+            }))
+          })),
+          insert: vi.fn().mockResolvedValue({ data: null, error: null })
+        } as any;
       });
 
       const report = await AblationRunner.runExperiment(config);

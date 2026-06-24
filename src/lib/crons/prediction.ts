@@ -4,6 +4,7 @@ import { ProbabilityEngine } from '../engines/probability-engine';
 import { EdgeScanner } from '../engines/edge-scanner';
 import { MarketOdds } from '../engines/edge-scanner/types';
 import { getCohortTag } from './cohortTag';
+import { LEAGUE_REGISTRY } from './leagueRegistry';
 
 export async function runPredictionCron(): Promise<any> {
   // 1. Fetch upcoming matches from our database
@@ -25,13 +26,24 @@ export async function runPredictionCron(): Promise<any> {
   for (const match of matches) {
     const kickoffDate = new Date(match.kickoff);
 
+    // Resolve league config using our helper to verify status & enabled
+    const leagueConfig = LEAGUE_REGISTRY.find(
+      l => String(l.apiFootballId) === String(match.league_id) ||
+           l.name.toLowerCase() === (match.league || '').toLowerCase() ||
+           l.id.toLowerCase() === (match.league_id || '').toString().toLowerCase()
+    );
+
+    if (!leagueConfig || !leagueConfig.enabled || (leagueConfig.status !== 'ACTIVE' && leagueConfig.status !== 'BETA')) {
+      continue;
+    }
+
     for (const marketType of ['ML', 'AH', 'OU'] as const) {
       try {
         // 2. Run feature engine
         const features = await FeatureEngine.build(match.id, kickoffDate, marketType);
 
         // 3. Run probability engine
-        const probOutput = ProbabilityEngine.predict(features);
+        const probOutput = await ProbabilityEngine.predict(features);
 
         // 4. Generate current odds snapshot
         const marketOdds = generateOddsSnapshot(marketType, probOutput);
@@ -70,7 +82,7 @@ export async function runPredictionCron(): Promise<any> {
           pOver: probOutput.pOver,
           pUnder: probOutput.pUnder,
           expected_goals: 2.5,
-          confidence: topPick ? topPick.confidence : 'MEDIUM',
+          confidence: probOutput.confidence, // Sprint 6 structured Confidence object
         };
 
         const predictionPayload = {
@@ -92,35 +104,72 @@ export async function runPredictionCron(): Promise<any> {
           fair_odds: topPick ? Number((1 / topPick.modelProbability).toFixed(4)) : null,
           edge_pct: topPick ? topPick.expectedValue : null,
           entry_odds: topPick ? topPick.marketOdds : null,
+          // Sprint 6 new columns:
+          market_confidence_score: probOutput.confidence ? Math.round(probOutput.confidence.marketConfidence * 100) : null,
+          predicted_odds: topPick ? topPick.marketOdds : null,
         };
 
-        // 7. Store prediction in DB
-        const { data: storedPred, error: insertErr } = await supabase
+        // 7. Store prediction in DB (Idempotently)
+        const { data: existingPred } = await supabase
           .from('predictions')
-          .insert(predictionPayload)
-          .select()
-          .single();
+          .select('id')
+          .eq('match_id', String(match.id))
+          .eq('market_type', marketType)
+          .maybeSingle();
 
-        if (insertErr) {
-          console.error(`Error inserting prediction for match ${match.id} ${marketType}:`, insertErr);
+        let storedPred = null;
+        let dbErr = null;
+
+        if (existingPred) {
+          const { data, error } = await supabase
+            .from('predictions')
+            .update(predictionPayload)
+            .eq('id', existingPred.id)
+            .select()
+            .single();
+          storedPred = data;
+          dbErr = error;
+        } else {
+          const { data, error } = await supabase
+            .from('predictions')
+            .insert(predictionPayload)
+            .select()
+            .single();
+          storedPred = data;
+          dbErr = error;
+        }
+
+        if (dbErr || !storedPred) {
+          console.error(`Error saving prediction for match ${match.id} ${marketType}:`, dbErr);
           continue;
         }
 
-        // 8. Auto-populate a paper trade for a default user to help with testing and dashboard metrics
+        // 8. Auto-populate a paper trade for a default user to help with testing and dashboard metrics (Idempotently)
         if (topPick) {
           const testUserId = '00000000-0000-0000-0000-000000000000';
-          await supabase.from('paper_trades').insert({
-            user_id: testUserId,
-            prediction_id: storedPred.id,
-            match_id: String(match.id),
-            market_type: marketType,
-            market_subtype: predictionPayload.market_subtype,
-            selection: topPick.outcome,
-            entry_odds: topPick.marketOdds,
-            stake: topPick.kellyStake > 0 ? topPick.kellyStake : 0.05,
-            cohort_tag: cohortTag,
-            status: 'pending'
-          });
+          const { data: existingTrade } = await supabase
+            .from('paper_trades')
+            .select('id')
+            .eq('prediction_id', storedPred.id)
+            .eq('user_id', testUserId)
+            .maybeSingle();
+
+          if (!existingTrade) {
+            await supabase.from('paper_trades').insert({
+              user_id: testUserId,
+              prediction_id: storedPred.id,
+              match_id: String(match.id),
+              competition_id: leagueConfig.id,
+              market_type: marketType,
+              market_subtype: predictionPayload.market_subtype,
+              selection: topPick.outcome,
+              entry_odds: topPick.marketOdds,
+              opening_odds: topPick.marketOdds, // Sprint 6: Store opening odds
+              stake: topPick.kellyStake > 0 ? topPick.kellyStake : 0.05,
+              cohort_tag: cohortTag,
+              status: 'pending'
+            });
+          }
         }
 
         // 9. Store odds snapshot in odds_history (Task 11)

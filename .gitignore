@@ -44,3 +44,7 @@ next-env.d.ts
 /cache
 /test_predictions.json
 
+# IDE / Agent configs
+.gemini/
+response.txt
+

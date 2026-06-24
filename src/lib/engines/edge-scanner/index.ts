@@ -4,6 +4,7 @@ import { ValueDetector } from './value-detector';
 import { Kelly } from './kelly';
 import { ClvTracker } from './clv-tracker';
 import { ConfidenceScanner } from './confidence';
+import { getLeagueConfig, getLeagueConfigById } from '../../crons/leagueRegistry';
 
 export class EdgeScanner {
   /**
@@ -42,6 +43,21 @@ export class EdgeScanner {
     closingOdds?: MarketOdds,
     minEV: number = 0.0
   ): EdgePick[] {
+    // Check market suitability for this league configuration (Requirement 3)
+    let isSuitable = true;
+    if (modelOutput.leagueId) {
+      const config = getLeagueConfigById(modelOutput.leagueId) || getLeagueConfig(Number(modelOutput.leagueId));
+      if (config && config.marketSuitability) {
+        if (config.marketSuitability[marketType] === false) {
+          isSuitable = false;
+        }
+      }
+    }
+
+    if (!isSuitable) {
+      return [];
+    }
+
     const picks: EdgePick[] = [];
 
     // Helper to evaluate a specific outcome
