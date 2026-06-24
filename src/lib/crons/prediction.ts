@@ -155,7 +155,7 @@ export async function runPredictionCron(): Promise<any> {
             .maybeSingle();
 
           if (!existingTrade) {
-            await supabase.from('paper_trades').insert({
+            const { error: tradeInsertErr } = await supabase.from('paper_trades').insert({
               user_id: testUserId,
               prediction_id: storedPred.id,
               match_id: String(match.id),
@@ -167,8 +167,11 @@ export async function runPredictionCron(): Promise<any> {
               opening_odds: topPick.marketOdds, // Sprint 6: Store opening odds
               stake: topPick.kellyStake > 0 ? topPick.kellyStake : 0.05,
               cohort_tag: cohortTag,
-              status: 'pending'
+              status: 'PENDING'
             });
+            if (tradeInsertErr) {
+              console.error('Error inserting paper trade:', tradeInsertErr);
+            }
           }
         }
 
