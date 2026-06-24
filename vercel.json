@@ -7,11 +7,11 @@
   "crons": [
     {
       "path": "/api/cron/ingest",
-      "schedule": "0 */12 * * *"
+      "schedule": "0 23 * * *"
     },
     {
       "path": "/api/cron/predict",
-      "schedule": "30 */12 * * *"
+      "schedule": "30 23 * * *"
     },
     {
       "path": "/api/cron/snapshot",
