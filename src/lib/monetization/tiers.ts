@@ -1,4 +1,4 @@
-export type SubscriptionTier = 'FREE' | 'PRO' | 'ELITE' | 'LIFETIME';
+export type SubscriptionTier = 'FREE' | 'STARTER' | 'PRO' | 'QUANT' | 'ELITE' | 'LIFETIME';
 
 export interface TierDetails {
   name: SubscriptionTier;
@@ -16,12 +16,26 @@ export const TIER_DEFINITIONS: Record<SubscriptionTier, TierDetails> = {
     priceMonthly: 0,
     description: 'Access basic predictions and free-tier edge picks.'
   },
+  STARTER: {
+    name: 'STARTER',
+    displayName: 'Starter Membership',
+    allowedPicks: ['FREE'],
+    priceMonthly: 9,
+    description: 'Unlimited predictions, delayed data, basic filters, watchlist.'
+  },
   PRO: {
     name: 'PRO',
     displayName: 'Pro Membership',
     allowedPicks: ['FREE', 'PRO'],
-    priceMonthly: 29.99,
+    priceMonthly: 29,
     description: 'Unlock professional predictions, value bets, and mid-tier EV edge picks.'
+  },
+  QUANT: {
+    name: 'QUANT',
+    displayName: 'Quant Membership',
+    allowedPicks: ['FREE', 'PRO', 'ELITE'],
+    priceMonthly: 99,
+    description: 'Full Edge Scanner, CLV expectation, ledger, custom filters, advanced analytics, REST API keys.'
   },
   ELITE: {
     name: 'ELITE',
@@ -32,8 +46,9 @@ export const TIER_DEFINITIONS: Record<SubscriptionTier, TierDetails> = {
   },
   LIFETIME: {
     name: 'LIFETIME',
-    displayName: 'Lifetime Legacy',
+    displayName: 'Founder Lifetime',
     allowedPicks: ['FREE', 'PRO', 'ELITE'],
+    priceMonthly: 199,
     description: 'Lifetime access to all current and future predictions with no recurring subscription fees.'
   }
 };

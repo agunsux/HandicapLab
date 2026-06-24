@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { UserSessionPanel } from '@/components/UserSessionPanel';
 
 export default function AppLayout({
   children,
@@ -70,20 +71,7 @@ export default function AppLayout({
         </nav>
 
         {/* Bottom Panel */}
-        <div className="p-4 border-t border-slate-800 bg-slate-900/60">
-          <div className="flex items-center justify-between text-xs text-slate-400 mb-2">
-            <span>Free Plan</span>
-            <span className="font-mono text-emerald-400 font-semibold">10 Credits</span>
-          </div>
-          <div className="w-full bg-slate-800 rounded-full h-1.5 mb-4">
-            <div className="bg-emerald-500 h-1.5 rounded-full" style={{ width: '40%' }}></div>
-          </div>
-          <Link href="/pricing">
-            <button className="w-full py-2 px-3 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-semibold text-xs tracking-tight transition-colors">
-              Upgrade to Premium
-            </button>
-          </Link>
-        </div>
+        <UserSessionPanel />
       </aside>
 
       {/* Main Content Area */}
