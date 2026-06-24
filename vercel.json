@@ -6,16 +6,20 @@
   },
   "crons": [
     {
+      "path": "/api/cron/ingest",
+      "schedule": "0 */12 * * *"
+    },
+    {
       "path": "/api/cron/predict",
-      "schedule": "0 1 * * *"
+      "schedule": "30 */12 * * *"
     },
     {
       "path": "/api/cron/snapshot",
-      "schedule": "0 2 * * *"
+      "schedule": "0 0 * * *"
     },
     {
       "path": "/api/cron/settle",
-      "schedule": "0 3 * * *"
+      "schedule": "0 1 * * *"
     }
   ]
 }
