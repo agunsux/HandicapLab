@@ -39,6 +39,12 @@ export default function Navbar() {
           <Link href="/scanner" className="hover:text-zinc-100 transition-colors">
             Edge Scanner
           </Link>
+          <Link href="/leagues" className="hover:text-zinc-100 transition-colors">
+            Leagues
+          </Link>
+          <Link href="/teams" className="hover:text-zinc-100 transition-colors">
+            Teams
+          </Link>
           <Link href="/performance" className="hover:text-zinc-100 transition-colors">
             Performance
           </Link>

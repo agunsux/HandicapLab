@@ -49,6 +49,22 @@ export default function AppLayout({
             <span>User Watchlist</span>
           </Link>
 
+          <Link
+            href="/leagues"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-slate-400 hover:bg-slate-850 hover:text-white"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-trophy"><path d="m6 9 6 6 6-6"/><path d="M12 3v12"/><path d="M4 21h16"/></svg>
+            <span>Leagues Coverage</span>
+          </Link>
+
+          <Link
+            href="/teams"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-slate-400 hover:bg-slate-850 hover:text-white"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-users"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span>Teams Coverage</span>
+          </Link>
+
           <div className="text-[10px] font-mono text-slate-500 uppercase tracking-widest px-2 pt-6 mb-2">Trust & Audits</div>
 
           <Link
