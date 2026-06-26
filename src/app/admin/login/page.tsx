@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function AdminLoginPage() {
+function AdminLoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [secret, setSecret] = useState('');
@@ -59,6 +59,45 @@ export default function AdminLoginPage() {
   };
 
   return (
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div>
+        <label htmlFor="secret" className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
+          Passcode Secret
+        </label>
+        <input
+          id="secret"
+          type="password"
+          value={secret}
+          onChange={(e) => setSecret(e.target.value)}
+          placeholder="••••••••••••••••"
+          className="w-full bg-slate-950/80 border border-slate-800 rounded-lg px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all text-center tracking-widest font-mono"
+          autoFocus
+        />
+      </div>
+
+      {error && (
+        <div className="text-rose-400 text-xs bg-rose-500/10 border border-rose-500/20 rounded-lg p-3 text-center animate-shake">
+          ⚠️ {error}
+        </div>
+      )}
+
+      <button
+        type="submit"
+        disabled={loading}
+        className="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-indigo-500 to-emerald-500 hover:from-indigo-600 hover:to-emerald-600 text-white font-medium text-sm transition-all duration-300 shadow-md shadow-indigo-500/10 hover:shadow-indigo-500/25 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center"
+      >
+        {loading ? (
+          <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+        ) : (
+          'Authenticate Access'
+        )}
+      </button>
+    </form>
+  );
+}
+
+export default function AdminLoginPage() {
+  return (
     <main className="min-h-screen flex items-center justify-center bg-radial from-slate-900 to-black text-slate-100 p-6 font-sans">
       <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1508847154043-be12a62861c1?q=80&w=1920')] bg-cover bg-center opacity-10 pointer-events-none" />
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" />
@@ -75,40 +114,13 @@ export default function AdminLoginPage() {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label htmlFor="secret" className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
-              Passcode Secret
-            </label>
-            <input
-              id="secret"
-              type="password"
-              value={secret}
-              onChange={(e) => setSecret(e.target.value)}
-              placeholder="••••••••••••••••"
-              className="w-full bg-slate-950/80 border border-slate-800 rounded-lg px-4 py-3 text-white placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all text-center tracking-widest font-mono"
-              autoFocus
-            />
+        <Suspense fallback={
+          <div className="flex items-center justify-center py-6">
+            <span className="w-6 h-6 border-2 border-white/30 border-t-indigo-500 rounded-full animate-spin" />
           </div>
-
-          {error && (
-            <div className="text-rose-400 text-xs bg-rose-500/10 border border-rose-500/20 rounded-lg p-3 text-center animate-shake">
-              ⚠️ {error}
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-indigo-500 to-emerald-500 hover:from-indigo-600 hover:to-emerald-600 text-white font-medium text-sm transition-all duration-300 shadow-md shadow-indigo-500/10 hover:shadow-indigo-500/25 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none flex items-center justify-center"
-          >
-            {loading ? (
-              <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-            ) : (
-              'Authenticate Access'
-            )}
-          </button>
-        </form>
+        }>
+          <AdminLoginForm />
+        </Suspense>
       </div>
     </main>
   );
