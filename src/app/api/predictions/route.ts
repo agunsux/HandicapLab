@@ -1,8 +1,22 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase.server';
+import { getUserEntitlements } from '@/lib/pricing/entitlement';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const authHeader = request.headers.get('authorization');
+    const token = authHeader?.split(' ')[1];
+    let userId: string | undefined;
+
+    if (token) {
+      const { data: { user } } = await supabase.auth.getUser(token);
+      if (user) {
+        userId = user.id;
+      }
+    }
+
+    const entitlements = await getUserEntitlements(userId);
+
     // Query ensembled predictions from the database
     const { data: predictions, error } = await supabase
       .from('predictions')
@@ -64,7 +78,24 @@ export async function GET() {
       }
     }
 
-    const response = Object.values(grouped);
+    let response = Object.values(grouped);
+
+    // Enforce entitlements server-side
+    if (!entitlements.hasFullEdgeData) {
+      // FREE / STARTER (limited scanner):
+      // 1. Limit the returned matches to a maximum of 3 (3 signals/day)
+      response = response.slice(0, entitlements.maxSignalsPerDay);
+
+      // 2. Hide / truncate detailed probabilities or exact edge data
+      for (const res of response) {
+        // Redact exact market probabilities & lines
+        res.prediction = { home: 0, draw: 0, away: 0 };
+        res.asianHandicap = { line: 'Locked', confidence: 0 };
+        res.overUnder = { line: 'Locked', over: 0, under: 0 };
+        res.confidence = '🔒 Locked';
+      }
+    }
+
     return NextResponse.json({ success: true, predictions: response });
   } catch (error: any) {
     console.error('Predictions API Route Error:', error);

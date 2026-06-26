@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase.server';
+import { getUserEntitlements } from '@/lib/pricing/entitlement';
 
 /**
  * GET handler for retrieving intelligence signals.
@@ -10,6 +11,25 @@ import { supabase } from '@/lib/supabase.server';
  */
 export async function GET(request: Request) {
   try {
+    const authHeader = request.headers.get('authorization');
+    const token = authHeader?.split(' ')[1];
+    let userId: string | undefined;
+
+    if (token) {
+      const { data: { user } } = await supabase.auth.getUser(token);
+      if (user) {
+        userId = user.id;
+      }
+    }
+
+    const entitlements = await getUserEntitlements(userId);
+    if (!entitlements.hasApiAccess) {
+      return NextResponse.json({
+        success: false,
+        error: 'Forbidden. API access is restricted to the QUANT subscription tier.'
+      }, { status: 403 });
+    }
+
     const { searchParams } = new URL(request.url);
     const market = searchParams.get('market');
     const minEdge = searchParams.get('minEdge');
