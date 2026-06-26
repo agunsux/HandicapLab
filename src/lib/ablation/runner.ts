@@ -52,7 +52,7 @@ export class AblationRunner {
         const winRateDelta = variantStats.overall.winRate - baselineResult.metrics.winRate;
         const roiDelta = variantStats.overall.roi - baselineResult.metrics.roi;
         const brierDelta = variantStats.overall.avgBrierScore - baselineResult.metrics.avgBrierScore;
-        const clvDelta = variantStats.overall.avgCLV - baselineResult.metrics.avgCLV;
+        const clvDelta = (variantStats.overall.avgCLV ?? 0) - (baselineResult.metrics.avgCLV ?? 0);
 
         variants.push({
           variant: variant.name,
@@ -84,14 +84,14 @@ export class AblationRunner {
             winRate: 0,
             roi: 0,
             avgBrierScore: 0.25,
-            avgCLV: 0,
+            avgCLV: null,
             totalProfit: 0
           },
           vsBaseline: {
             winRateDelta: -baselineResult.metrics.winRate,
             roiDelta: -baselineResult.metrics.roi,
             brierDelta: 0.25 - baselineResult.metrics.avgBrierScore,
-            clvDelta: -baselineResult.metrics.avgCLV
+            clvDelta: -(baselineResult.metrics.avgCLV ?? 0)
           }
         });
       }

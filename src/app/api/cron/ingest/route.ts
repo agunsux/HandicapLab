@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase.server';
 import { getFootballProvider } from '@/lib/api/providers';
 import { runPredictionCron } from '@/lib/crons/prediction';
+import { CronLogger } from '@/lib/services/cronLogger';
+import { runHealthCheck } from '@/lib/services/healthChecker';
 
 export async function GET(request: Request) {
   // Security check
@@ -9,6 +11,8 @@ export async function GET(request: Request) {
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
+
+  const logId = await CronLogger.start('ingest');
   
   try {
     console.log('🚀 Starting upcoming match ingestion...');
@@ -109,6 +113,13 @@ export async function GET(request: Request) {
         const statusMatch = providerError.message?.match(/Status:\s*(\d+)/i);
         const statusCode = statusMatch ? parseInt(statusMatch[1], 10) : (providerError.status || 500);
         
+        await CronLogger.end(logId, totalSavedMatches, providerError);
+        try {
+          await runHealthCheck();
+        } catch (hcErr) {
+          console.error('[Ingest Cron] Health check audit failed:', hcErr);
+        }
+
         return NextResponse.json({
           error: 'Provider error',
           provider: process.env.DATA_PROVIDER || 'api-football',
@@ -126,6 +137,13 @@ export async function GET(request: Request) {
     const predResult = await runPredictionCron();
     console.log('🎉 Prediction pipeline execution complete:', predResult);
     
+    await CronLogger.end(logId, totalSavedMatches, null);
+    try {
+      await runHealthCheck();
+    } catch (hcErr) {
+      console.error('[Ingest Cron] Health check audit failed:', hcErr);
+    }
+
     return NextResponse.json({
       success: true,
       fixturesCount: totalFixturesCount,
@@ -135,6 +153,12 @@ export async function GET(request: Request) {
 
   } catch (error: any) {
     console.error('❌ Ingest error:', error);
+    await CronLogger.end(logId, 0, error);
+    try {
+      await runHealthCheck();
+    } catch (hcErr) {
+      console.error('[Ingest Cron] Health check audit failed:', hcErr);
+    }
     return NextResponse.json(
       { error: 'Ingest failed', details: error.message },
       { status: 500 }

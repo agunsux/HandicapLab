@@ -26,7 +26,7 @@ export interface ComparisonResult {
     winRate: number;
     roi: number;
     avgBrierScore: number;
-    avgCLV: number;
+    avgCLV: number | null;
     totalProfit: number;
   };
   vsBaseline: {

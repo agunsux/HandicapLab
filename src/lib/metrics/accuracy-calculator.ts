@@ -9,8 +9,11 @@ export interface MarketMetrics {
   winRate: number;
   roi: number;
   avgBrierScore: number;
-  avgCLV: number;
+  avgCLV: number | null;
   totalProfit: number;
+  insufficient_sample?: boolean;
+  status?: 'sufficient' | 'insufficient_sample';
+  requiredForClv?: number;
 }
 
 export interface AccuracyMetricsResult {
@@ -19,9 +22,12 @@ export interface AccuracyMetricsResult {
     winRate: number;
     roi: number;
     avgBrierScore: number;
-    avgCLV: number;
+    avgCLV: number | null;
     totalProfit: number;
     totalStakes: number;
+    insufficient_sample?: boolean;
+    status?: 'sufficient' | 'insufficient_sample';
+    requiredForClv?: number;
   };
   reliability: ReliabilityResult;
   calibration: {
@@ -57,8 +63,11 @@ export class AccuracyCalculator {
       winRate: 0,
       roi: 0,
       avgBrierScore: 0,
-      avgCLV: 0,
-      totalProfit: 0
+      avgCLV: null,
+      totalProfit: 0,
+      insufficient_sample: true,
+      status: 'insufficient_sample',
+      requiredForClv: 50
     };
   }
 
@@ -102,15 +111,19 @@ export class AccuracyCalculator {
     const winRate = wins / totalPredictions;
     const roi = totalStakes > 0 ? (totalProfit / totalStakes) * 100 : 0;
     const avgBrierScore = brierCount > 0 ? brierSum / brierCount : 0.25;
-    const avgCLV = clvCount > 0 ? (clvSum / clvCount) * 100 : 0; // expressed as percentage
+    const insufficientSample = totalPredictions < 50;
+    const avgCLV = (insufficientSample || clvCount === 0) ? null : (clvSum / clvCount) * 100;
 
     return {
       totalPredictions,
       winRate: Number(winRate.toFixed(4)),
       roi: Number(roi.toFixed(2)),
       avgBrierScore: Number(avgBrierScore.toFixed(4)),
-      avgCLV: Number(avgCLV.toFixed(2)),
-      totalProfit: Number(totalProfit.toFixed(4))
+      avgCLV: avgCLV !== null ? Number(avgCLV.toFixed(2)) : null,
+      totalProfit: Number(totalProfit.toFixed(4)),
+      insufficient_sample: insufficientSample,
+      status: insufficientSample ? 'insufficient_sample' : 'sufficient',
+      requiredForClv: 50
     };
   }
 
@@ -324,7 +337,10 @@ export class AccuracyCalculator {
         avgBrierScore: overallAgg.avgBrierScore,
         avgCLV: overallAgg.avgCLV,
         totalProfit: overallAgg.totalProfit,
-        totalStakes: Number(totalStakes.toFixed(4))
+        totalStakes: Number(totalStakes.toFixed(4)),
+        insufficient_sample: overallAgg.insufficient_sample,
+        status: overallAgg.status,
+        requiredForClv: overallAgg.requiredForClv
       },
       reliability,
       calibration,

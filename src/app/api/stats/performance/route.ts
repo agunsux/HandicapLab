@@ -17,22 +17,14 @@ export async function GET() {
 
     const settledCount = signals?.length || 0;
 
-    // 2. Safeguard: if less than 30 settled signals, return calibration flag
-    if (settledCount < 30) {
-      return NextResponse.json({
-        success: true,
-        calibrationInProgress: true,
-        settledCount,
-        signals: signals || []
-      });
-    }
-
     let profitUnits = 0;
     let winCount = 0;
     let binaryBrierSum = 0;
     let binaryCount = 0;
+    let clvSum = 0;
+    let clvCount = 0;
 
-    signals.forEach((sig) => {
+    (signals || []).forEach((sig) => {
       const odds = Number(sig.odds || 1.0);
       const prob = Number(sig.probability || 0.5);
       const status = (sig.status || 'pending').toLowerCase();
@@ -66,7 +58,30 @@ export async function GET() {
         binaryBrierSum += Math.pow(prob - outcomeValue, 2);
         binaryCount++;
       }
+
+      // CLV Percentage aggregation
+      if (sig.clv_percentage !== null && sig.clv_percentage !== undefined) {
+        clvSum += Number(sig.clv_percentage);
+        clvCount++;
+      }
     });
+
+    const insufficientSample = settledCount < 50;
+    const averageClv = (insufficientSample || clvCount === 0) ? null : Number((clvSum / clvCount).toFixed(2));
+
+    // 2. Safeguard: if less than 30 settled signals, return calibration flag
+    if (settledCount < 30) {
+      return NextResponse.json({
+        success: true,
+        calibrationInProgress: true,
+        insufficient_sample: insufficientSample,
+        status: insufficientSample ? 'insufficient_sample' : 'sufficient',
+        requiredForClv: 50,
+        settledCount,
+        averageClv,
+        signals: signals || []
+      });
+    }
 
     // ROI calculation: profit_units / settled_signals_count * 100
     const roi = (profitUnits / settledCount) * 100;
@@ -77,12 +92,16 @@ export async function GET() {
     return NextResponse.json({
       success: true,
       calibrationInProgress: false,
+      insufficient_sample: insufficientSample,
+      status: insufficientSample ? 'insufficient_sample' : 'sufficient',
+      requiredForClv: 50,
       settledCount,
       roi: Number(roi.toFixed(2)),
       winRate: Number(winRate.toFixed(2)),
       brierScore: Number(brierScore.toFixed(4)),
       calibrationScore,
       profitUnits: Number(profitUnits.toFixed(4)),
+      averageClv,
       signals
     });
   } catch (error: any) {

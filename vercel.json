@@ -20,6 +20,18 @@
     {
       "path": "/api/cron/settle",
       "schedule": "0 1 * * *"
+    },
+    {
+      "path": "/api/cron/generate-signals",
+      "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cron/capture-closing",
+      "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/api/cron/update-ratings",
+      "schedule": "30 6 * * *"
     }
   ]
 }

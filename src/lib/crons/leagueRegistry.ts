@@ -30,135 +30,15 @@ export interface LeagueConfig {
   status: CompetitionStatus;
   cohort: 'WORLD_CUP' | 'EPL' | 'LIGUE2' | 'EUROPA' | 'OTHER';
   minimumHistoricalMatches?: number;
+  priority: number; // Ingestion / calculation priority: 1 (highest) to 3 (lowest)
+  competition_type: 'league' | 'cup' | 'international_tournament';
+  activation?: {
+    start: string;
+    end?: string;
+  };
 }
 
 export const LEAGUE_REGISTRY: LeagueConfig[] = [
-  {
-    id: 'eng_premier_league',
-    name: 'Premier League',
-    country: 'England',
-    type: 'club',
-    enabled: true,
-    marketPriority: ['AH', 'OU', 'ML'],
-    profile: {
-      goalEnvironment: 'medium-high',
-      homeAdvantage: 1.12,
-      variance: 'medium',
-      fatigueSensitivity: 1.0,
-      marketLiquidity: 'high'
-    },
-    marketSuitability: { AH: true, OU: true, ML: true },
-    apiFootballId: 39,
-    footballDataId: 2021,
-    status: 'ACTIVE',
-    cohort: 'EPL',
-    minimumHistoricalMatches: 10
-  },
-  {
-    id: 'uefa_champions_league',
-    name: 'UEFA Champions League',
-    country: 'Europe',
-    type: 'club',
-    enabled: true,
-    marketPriority: ['AH', 'OU', 'ML'],
-    profile: {
-      goalEnvironment: 'medium',
-      homeAdvantage: 1.08, // low-medium Home Advantage
-      variance: 'high',
-      fatigueSensitivity: 1.2,
-      marketLiquidity: 'high'
-    },
-    marketSuitability: { AH: true, OU: true, ML: true },
-    apiFootballId: 2,
-    footballDataId: 2001,
-    status: 'ACTIVE',
-    cohort: 'EUROPA',
-    minimumHistoricalMatches: 5
-  },
-  {
-    id: 'esp_la_liga',
-    name: 'La Liga',
-    country: 'Spain',
-    type: 'club',
-    enabled: true,
-    marketPriority: ['AH', 'OU', 'ML'],
-    profile: {
-      goalEnvironment: 'medium',
-      homeAdvantage: 1.12,
-      variance: 'medium',
-      fatigueSensitivity: 1.0,
-      marketLiquidity: 'high'
-    },
-    marketSuitability: { AH: true, OU: true, ML: true },
-    apiFootballId: 140,
-    footballDataId: 2014,
-    status: 'ACTIVE',
-    cohort: 'OTHER',
-    minimumHistoricalMatches: 10
-  },
-  {
-    id: 'ita_serie_a',
-    name: 'Serie A',
-    country: 'Italy',
-    type: 'club',
-    enabled: true,
-    marketPriority: ['AH', 'OU', 'ML'],
-    profile: {
-      goalEnvironment: 'medium-low',
-      homeAdvantage: 1.12,
-      variance: 'medium',
-      fatigueSensitivity: 1.0,
-      marketLiquidity: 'medium'
-    },
-    marketSuitability: { AH: true, OU: true, ML: true },
-    apiFootballId: 135,
-    footballDataId: 2019,
-    status: 'ACTIVE',
-    cohort: 'OTHER',
-    minimumHistoricalMatches: 10
-  },
-  {
-    id: 'ger_bundesliga',
-    name: 'Bundesliga',
-    country: 'Germany',
-    type: 'club',
-    enabled: true,
-    marketPriority: ['AH', 'OU', 'ML'],
-    profile: {
-      goalEnvironment: 'high',
-      homeAdvantage: 1.12,
-      variance: 'medium-high',
-      fatigueSensitivity: 1.0,
-      marketLiquidity: 'high'
-    },
-    marketSuitability: { AH: true, OU: true, ML: true },
-    apiFootballId: 78,
-    footballDataId: 2002,
-    status: 'ACTIVE',
-    cohort: 'OTHER',
-    minimumHistoricalMatches: 10
-  },
-  {
-    id: 'fra_ligue_1',
-    name: 'Ligue 1',
-    country: 'France',
-    type: 'club',
-    enabled: true,
-    marketPriority: ['AH', 'OU', 'ML'],
-    profile: {
-      goalEnvironment: 'medium',
-      homeAdvantage: 1.12,
-      variance: 'medium',
-      fatigueSensitivity: 1.0,
-      marketLiquidity: 'medium'
-    },
-    marketSuitability: { AH: true, OU: true, ML: true },
-    apiFootballId: 61,
-    footballDataId: 2015,
-    status: 'ACTIVE',
-    cohort: 'OTHER',
-    minimumHistoricalMatches: 10
-  },
   {
     id: 'world_cup_2026',
     name: 'FIFA World Cup',
@@ -179,7 +59,195 @@ export const LEAGUE_REGISTRY: LeagueConfig[] = [
     oddsApiSportKey: 'soccer_fifa_world_cup',
     status: 'ACTIVE',
     cohort: 'WORLD_CUP',
-    minimumHistoricalMatches: 3
+    minimumHistoricalMatches: 3,
+    priority: 1,
+    competition_type: 'international_tournament',
+    activation: {
+      start: '2026-06-11',
+      end: '2026-07-19'
+    }
+  },
+  {
+    id: 'uefa_champions_league',
+    name: 'UEFA Champions League',
+    country: 'Europe',
+    type: 'club',
+    enabled: true,
+    marketPriority: ['AH', 'OU', 'ML'],
+    profile: {
+      goalEnvironment: 'medium',
+      homeAdvantage: 1.08,
+      variance: 'high',
+      fatigueSensitivity: 1.2,
+      marketLiquidity: 'high'
+    },
+    marketSuitability: { AH: true, OU: true, ML: true },
+    apiFootballId: 2,
+    footballDataId: 2001,
+    status: 'ACTIVE',
+    cohort: 'EUROPA',
+    minimumHistoricalMatches: 5,
+    priority: 1,
+    competition_type: 'cup'
+  },
+  {
+    id: 'uefa_europa_league',
+    name: 'UEFA Europa League',
+    country: 'Europe',
+    type: 'club',
+    enabled: true,
+    marketPriority: ['AH', 'OU', 'ML'],
+    profile: {
+      goalEnvironment: 'medium',
+      homeAdvantage: 1.08,
+      variance: 'medium-high',
+      fatigueSensitivity: 1.1,
+      marketLiquidity: 'high'
+    },
+    marketSuitability: { AH: true, OU: true, ML: true },
+    apiFootballId: 3,
+    status: 'ACTIVE',
+    cohort: 'EUROPA',
+    minimumHistoricalMatches: 5,
+    priority: 1,
+    competition_type: 'cup'
+  },
+  {
+    id: 'eng_premier_league',
+    name: 'Premier League',
+    country: 'England',
+    type: 'club',
+    enabled: true,
+    marketPriority: ['AH', 'OU', 'ML'],
+    profile: {
+      goalEnvironment: 'medium-high',
+      homeAdvantage: 1.12,
+      variance: 'medium',
+      fatigueSensitivity: 1.0,
+      marketLiquidity: 'high'
+    },
+    marketSuitability: { AH: true, OU: true, ML: true },
+    apiFootballId: 39,
+    footballDataId: 2021,
+    status: 'ACTIVE',
+    cohort: 'EPL',
+    minimumHistoricalMatches: 10,
+    priority: 2,
+    competition_type: 'league'
+  },
+  {
+    id: 'esp_la_liga',
+    name: 'La Liga',
+    country: 'Spain',
+    type: 'club',
+    enabled: true,
+    marketPriority: ['AH', 'OU', 'ML'],
+    profile: {
+      goalEnvironment: 'medium',
+      homeAdvantage: 1.12,
+      variance: 'medium',
+      fatigueSensitivity: 1.0,
+      marketLiquidity: 'high'
+    },
+    marketSuitability: { AH: true, OU: true, ML: true },
+    apiFootballId: 140,
+    footballDataId: 2014,
+    status: 'ACTIVE',
+    cohort: 'OTHER',
+    minimumHistoricalMatches: 10,
+    priority: 2,
+    competition_type: 'league'
+  },
+  {
+    id: 'ita_serie_a',
+    name: 'Serie A',
+    country: 'Italy',
+    type: 'club',
+    enabled: true,
+    marketPriority: ['AH', 'OU', 'ML'],
+    profile: {
+      goalEnvironment: 'medium-low',
+      homeAdvantage: 1.12,
+      variance: 'medium',
+      fatigueSensitivity: 1.0,
+      marketLiquidity: 'medium'
+    },
+    marketSuitability: { AH: true, OU: true, ML: true },
+    apiFootballId: 135,
+    footballDataId: 2019,
+    status: 'ACTIVE',
+    cohort: 'OTHER',
+    minimumHistoricalMatches: 10,
+    priority: 2,
+    competition_type: 'league'
+  },
+  {
+    id: 'ger_bundesliga',
+    name: 'Bundesliga',
+    country: 'Germany',
+    type: 'club',
+    enabled: true,
+    marketPriority: ['AH', 'OU', 'ML'],
+    profile: {
+      goalEnvironment: 'high',
+      homeAdvantage: 1.12,
+      variance: 'medium-high',
+      fatigueSensitivity: 1.0,
+      marketLiquidity: 'high'
+    },
+    marketSuitability: { AH: true, OU: true, ML: true },
+    apiFootballId: 78,
+    footballDataId: 2002,
+    status: 'ACTIVE',
+    cohort: 'OTHER',
+    minimumHistoricalMatches: 10,
+    priority: 2,
+    competition_type: 'league'
+  },
+  {
+    id: 'fra_ligue_1',
+    name: 'Ligue 1',
+    country: 'France',
+    type: 'club',
+    enabled: true,
+    marketPriority: ['AH', 'OU', 'ML'],
+    profile: {
+      goalEnvironment: 'medium',
+      homeAdvantage: 1.12,
+      variance: 'medium',
+      fatigueSensitivity: 1.0,
+      marketLiquidity: 'medium'
+    },
+    marketSuitability: { AH: true, OU: true, ML: true },
+    apiFootballId: 61,
+    footballDataId: 2015,
+    status: 'ACTIVE',
+    cohort: 'OTHER',
+    minimumHistoricalMatches: 10,
+    priority: 2,
+    competition_type: 'league'
+  },
+  {
+    id: 'uefa_conference_league',
+    name: 'UEFA Conference League',
+    country: 'Europe',
+    type: 'club',
+    enabled: true,
+    marketPriority: ['AH', 'OU', 'ML'],
+    profile: {
+      goalEnvironment: 'medium',
+      homeAdvantage: 1.08,
+      variance: 'medium',
+      fatigueSensitivity: 1.0,
+      marketLiquidity: 'medium'
+    },
+    marketSuitability: { AH: true, OU: true, ML: true },
+    apiFootballId: 844,
+    status: 'ACTIVE',
+    cohort: 'OTHER',
+    minimumHistoricalMatches: 5,
+    priority: 3,
+    competition_type: 'cup'
   },
   {
     id: 'fra_ligue_2',
@@ -199,7 +267,9 @@ export const LEAGUE_REGISTRY: LeagueConfig[] = [
     apiFootballId: 848,
     status: 'DISABLED',
     cohort: 'LIGUE2',
-    minimumHistoricalMatches: 10
+    minimumHistoricalMatches: 10,
+    priority: 3,
+    competition_type: 'league'
   }
 ];
 

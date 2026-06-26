@@ -24,7 +24,7 @@ export class ComparisonMatrix {
         if (r.metrics.winRate > bestWinRate) bestWinRate = r.metrics.winRate;
         if (r.metrics.roi > bestRoi) bestRoi = r.metrics.roi;
         if (r.metrics.avgBrierScore < bestBrier) bestBrier = r.metrics.avgBrierScore;
-        if (r.metrics.avgCLV > bestClv) bestClv = r.metrics.avgCLV;
+        if (r.metrics.avgCLV !== null && r.metrics.avgCLV > bestClv) bestClv = r.metrics.avgCLV;
       }
     }
 
@@ -33,10 +33,10 @@ export class ComparisonMatrix {
       const isBestWin = total > 0 && r.metrics.winRate === bestWinRate;
       const isBestRoi = total > 0 && r.metrics.roi === bestRoi;
       const isBestBrier = total > 0 && r.metrics.avgBrierScore === bestBrier;
-      const isBestClv = total > 0 && r.metrics.avgCLV === bestClv;
+      const isBestClv = total > 0 && r.metrics.avgCLV !== null && r.metrics.avgCLV === bestClv;
 
-      const renderVal = (val: number, isBest: boolean, isPct: boolean = false, isBrier: boolean = false) => {
-        if (total === 0) return 'N/A';
+      const renderVal = (val: number | null, isBest: boolean, isPct: boolean = false, isBrier: boolean = false) => {
+        if (total === 0 || val === null) return 'N/A';
         const str = isPct 
           ? `${val.toFixed(2)}%`
           : isBrier
