@@ -1,4 +1,4 @@
-export type SubscriptionTier = 'free' | 'starter' | 'pro' | 'quant';
+export type SubscriptionTier = 'free' | 'starter' | 'pro' | 'quant' | 'founder';
 
 export interface PlanDetails {
   tier: SubscriptionTier;
@@ -52,5 +52,16 @@ export const PLANS: Record<SubscriptionTier, PlanDetails> = {
     hasScanner: true,
     hasFullEdgeData: true,
     hasApiAccess: true
+  },
+  founder: {
+    tier: 'founder',
+    name: 'Founder',
+    priceUSD: 199,
+    features: ['Lifetime access', 'Unlimited signals', 'Full edge data', 'Unlimited scanner', 'API access'],
+    maxSignalsPerDay: Infinity,
+    hasScanner: true,
+    hasFullEdgeData: true,
+    hasApiAccess: true
   }
 };
+

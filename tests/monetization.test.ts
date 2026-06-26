@@ -14,13 +14,46 @@ import { EdgePick } from '../src/lib/engines/edge-scanner/types';
 // Mock Supabase client
 vi.mock('../src/lib/supabase.server', () => {
   const mockSingle = vi.fn();
-  const mockMaybeSingle = vi.fn();
-  const mockEq = vi.fn(() => ({ single: mockSingle, maybeSingle: mockMaybeSingle }));
-  const mockSelect = vi.fn(() => ({ eq: mockEq }));
+  const mockMaybeSingle = vi.fn().mockResolvedValue({
+    data: { tier: 'PRO', status: 'active', expires_at: null },
+    error: null
+  });
+  const mockEq = vi.fn(() => ({
+    single: mockSingle,
+    maybeSingle: mockMaybeSingle,
+    gte: vi.fn().mockResolvedValue({
+      count: 5,
+      data: [{ signal_id: 'sig-1' }, { signal_id: 'sig-2' }],
+      error: null
+    }),
+    lt: vi.fn().mockReturnThis(),
+    then: vi.fn((cb) => {
+      cb({ error: null });
+      return { catch: vi.fn() };
+    })
+  }));
+  const mockSelect = vi.fn(() => ({
+    eq: mockEq,
+    order: vi.fn(() => ({
+      limit: vi.fn().mockResolvedValue({ data: [], error: null })
+    }))
+  }));
+
+  const mockDelete = vi.fn(() => ({
+    lt: vi.fn(() => ({
+      then: vi.fn((cb) => {
+        cb({ error: null });
+        return { catch: vi.fn() };
+      })
+    }))
+  }));
+
   return {
     supabase: {
       from: vi.fn(() => ({
-        select: mockSelect
+        select: mockSelect,
+        delete: mockDelete,
+        insert: vi.fn().mockResolvedValue({ error: null })
       })),
       rpc: vi.fn()
     }

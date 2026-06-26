@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase.server';
 import { getUserEntitlements } from '@/lib/pricing/entitlement';
+import { isRateLimited } from '@/lib/pricing/rate-limit';
+import { getUserDailyReveals, hashString } from '@/lib/pricing/access-logs';
 
 export async function GET(request: Request) {
   try {
@@ -17,6 +19,18 @@ export async function GET(request: Request) {
 
     const entitlements = await getUserEntitlements(userId);
 
+    // 1. Enforce distributed rate limiting
+    const ip = request.headers.get('x-forwarded-for') || '127.0.0.1';
+    const limitIdentifier = userId ? `user:${userId}` : `ip:${hashString(ip)}`;
+    const rateLimitLimit = (entitlements.tier === 'free' || entitlements.tier === 'starter') ? 60 : 300;
+
+    if (await isRateLimited(limitIdentifier, rateLimitLimit)) {
+      return NextResponse.json(
+        { success: false, error: 'Rate limit exceeded. Try again in a minute.' },
+        { status: 429 }
+      );
+    }
+
     // Query ensembled predictions from the database
     const { data: predictions, error } = await supabase
       .from('predictions')
@@ -28,30 +42,51 @@ export async function GET(request: Request) {
       throw error;
     }
 
+    // Resolve daily reveals for FREE tier users
+    let revealedMatches: string[] = [];
+    if (userId && !entitlements.hasFullEdgeData) {
+      revealedMatches = await getUserDailyReveals(userId);
+    }
+
     // Format response grouped by match to match original layout
     const grouped: Record<string, any> = {};
 
     for (const pred of predictions || []) {
+      const matchId = pred.match_id || pred.id; // Fallback to prediction ID if match_id is null
       const matchKey = `${pred.home_team} vs ${pred.away_team}`;
       if (!grouped[matchKey]) {
         grouped[matchKey] = {
+          matchId,
           match: matchKey,
           kickoff: pred.prediction_timestamp,
           league: pred.cohort_tag || 'EPL',
           prediction: { home: 0, draw: 0, away: 0 },
-          asianHandicap: { line: '', confidence: 0 },
-          overUnder: { line: '', over: 0, under: 0 },
-          confidence: '⚪ Low'
+          asianHandicap: { line: '', confidence: 0, odds: 0 },
+          overUnder: { line: '', over: 0, under: 0, odds: 0 },
+          confidence: '⚪ Low',
+          isLocked: false
         };
       }
 
       const predObj = typeof pred.prediction === 'object' && pred.prediction ? (pred.prediction as any) : {};
 
+      // Check if this match is locked for FREE user
+      const isMatchLocked = !entitlements.hasFullEdgeData && !revealedMatches.includes(matchId);
+      grouped[matchKey].isLocked = isMatchLocked;
+
       if (pred.market_type === 'ML') {
+        const homeProb = predObj.pHome || predObj.home_prob || 0.4;
+        const drawProb = predObj.pDraw || predObj.draw_prob || 0.25;
+        const awayProb = predObj.pAway || predObj.away_prob || 0.35;
+
+        // Keep odds calculation public, but mask probability
         grouped[matchKey].prediction = {
-          home: Math.round((predObj.pHome || predObj.home_prob || 0.4) * 100),
-          draw: Math.round((predObj.pDraw || predObj.draw_prob || 0.25) * 100),
-          away: Math.round((predObj.pAway || predObj.away_prob || 0.35) * 100),
+          home: isMatchLocked ? null : Math.round(homeProb * 100),
+          draw: isMatchLocked ? null : Math.round(drawProb * 100),
+          away: isMatchLocked ? null : Math.round(awayProb * 100),
+          homeOdds: Number((1.1 / homeProb).toFixed(2)),
+          drawOdds: Number((1.15 / drawProb).toFixed(2)),
+          awayOdds: Number((1.1 / awayProb).toFixed(2))
         };
         
         // Map confidence object to color dot
@@ -63,40 +98,39 @@ export async function GET(request: Request) {
         const line = predObj.ah_line !== undefined ? predObj.ah_line : -0.75;
         const lineStr = line > 0 ? `+${line}` : `${line}`;
         const ahProb = predObj.ah_prob ?? (predObj.pAhHome?.[String(line)] || 0.5);
+        const ahOdds = predObj.ah_odds || 1.95;
+
         grouped[matchKey].asianHandicap = {
           line: `${pred.home_team} ${lineStr}`,
-          confidence: Math.round(ahProb * 100),
+          confidence: isMatchLocked ? null : Math.round(ahProb * 100),
+          odds: ahOdds,
+          fairOdds: isMatchLocked ? null : Number((1 / ahProb).toFixed(2)),
+          edge: isMatchLocked ? null : Number(((ahOdds * ahProb - 1) * 100).toFixed(1))
         };
       } else if (pred.market_type === 'OU') {
         const line = predObj.ou_line !== undefined ? predObj.ou_line : 2.5;
         const overProb = predObj.over_prob ?? (predObj.pOver?.[String(line)] || 0.5);
+        const ouOdds = predObj.ou_odds || 1.91;
+
         grouped[matchKey].overUnder = {
           line: `O/U ${line}`,
-          over: Math.round(overProb * 100),
-          under: Math.round((1 - overProb) * 100),
+          over: isMatchLocked ? null : Math.round(overProb * 100),
+          under: isMatchLocked ? null : Math.round((1 - overProb) * 100),
+          odds: ouOdds,
+          fairOdds: isMatchLocked ? null : Number((1 / overProb).toFixed(2)),
+          edge: isMatchLocked ? null : Number(((ouOdds * overProb - 1) * 100).toFixed(1))
         };
       }
     }
 
-    let response = Object.values(grouped);
+    const response = Object.values(grouped);
 
-    // Enforce entitlements server-side
-    if (!entitlements.hasFullEdgeData) {
-      // FREE / STARTER (limited scanner):
-      // 1. Limit the returned matches to a maximum of 3 (3 signals/day)
-      response = response.slice(0, entitlements.maxSignalsPerDay);
-
-      // 2. Hide / truncate detailed probabilities or exact edge data
-      for (const res of response) {
-        // Redact exact market probabilities & lines
-        res.prediction = { home: 0, draw: 0, away: 0 };
-        res.asianHandicap = { line: 'Locked', confidence: 0 };
-        res.overUnder = { line: 'Locked', over: 0, under: 0 };
-        res.confidence = '🔒 Locked';
-      }
-    }
-
-    return NextResponse.json({ success: true, predictions: response });
+    return NextResponse.json({
+      success: true,
+      predictions: response,
+      revealedCount: revealedMatches.length,
+      maxReveals: 3
+    });
   } catch (error: any) {
     console.error('Predictions API Route Error:', error);
     return NextResponse.json(

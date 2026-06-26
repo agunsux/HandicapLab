@@ -12,16 +12,31 @@ export default function PricingPage() {
   useEffect(() => {
     const savedTier = localStorage.getItem('handicaplab_user_tier') || 'FREE';
     setActiveTier(savedTier);
+
+    // Track pricing page view
+    fetch('/api/analytics', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ eventName: 'pricing_view', metadata: { source: 'pricing_page' } })
+    }).catch(err => console.error(err));
   }, []);
 
   const handleSelectTier = (tierKey: string, tierName: string) => {
     setPurchasing(tierName);
+
+    // Track upgrade click event
+    fetch('/api/analytics', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ eventName: 'upgrade_clicked', metadata: { tier: tierKey } })
+    }).catch(err => console.error(err));
+
     localStorage.setItem('handicaplab_user_tier', tierKey);
     window.dispatchEvent(new Event('handicaplab_tier_changed'));
     
     setTimeout(() => {
       setPurchasing(null);
-      router.push('/dashboard');
+      router.push('/scanner');
     }, 1000);
   };
 
@@ -41,8 +56,8 @@ export default function PricingPage() {
           </Link>
         </div>
         <div className="flex items-center gap-6">
-          <Link href="/dashboard" className="text-xs font-mono text-slate-400 hover:text-white transition-colors">
-            App Dashboard
+          <Link href="/scanner" className="text-xs font-mono text-slate-400 hover:text-white transition-colors">
+            Edge Scanner Terminal
           </Link>
         </div>
       </header>
@@ -71,8 +86,8 @@ export default function PricingPage() {
           </p>
         </div>
 
-        {/* 5 Plans Layout Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+        {/* 4 Plans Layout Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
           {/* Free Card */}
           <div className={`bg-slate-900/40 border p-6 rounded-xl flex flex-col justify-between space-y-6 hover:border-slate-800 transition-colors ${activeTier === 'FREE' ? 'border-emerald-500/20' : 'border-slate-900'}`}>
             <div className="space-y-4">
@@ -85,9 +100,9 @@ export default function PricingPage() {
               </p>
               <div className="text-2xl font-extrabold text-white">$0 <span className="text-xs text-slate-500 font-normal">/ forever</span></div>
               <ul className="text-xs text-slate-400 space-y-2 pt-4 border-t border-slate-900 font-mono">
-                <li className="flex items-center gap-1.5 text-slate-300">✔ 3 daily matches</li>
-                <li className="flex items-center gap-1.5 text-amber-500">⚠ 60m delayed data</li>
-                <li className="flex items-center gap-1.5 text-slate-500">✘ No Edge Scanner</li>
+                <li className="flex items-center gap-1.5 text-slate-350">✔ 3 daily reveals</li>
+                <li className="flex items-center gap-1.5 text-slate-350">✔ Limited scanner feed</li>
+                <li className="flex items-center gap-1.5 text-amber-500">⚠ Basic match details</li>
                 <li className="flex items-center gap-1.5 text-slate-500">✘ No CLV expectation</li>
                 <li className="flex items-center gap-1.5 text-slate-500">✘ No Kelly stakes</li>
               </ul>
@@ -101,37 +116,6 @@ export default function PricingPage() {
               }`}
             >
               {activeTier === 'FREE' ? 'Active Plan' : 'Select Free'}
-            </button>
-          </div>
-
-          {/* Starter Card */}
-          <div className={`bg-slate-900/40 border p-6 rounded-xl flex flex-col justify-between space-y-6 hover:border-slate-800 transition-colors ${activeTier === 'STARTER' ? 'border-emerald-500/30' : 'border-slate-900'}`}>
-            <div className="space-y-4">
-              <div>
-                <span className="text-[10px] font-mono text-slate-500 uppercase tracking-widest">Serious Casuals</span>
-                <h3 className="text-lg font-bold text-white mt-1">Starter</h3>
-              </div>
-              <p className="text-slate-450 text-xs leading-relaxed">
-                Track and monitor matches with unlimited list coverage and watchlists.
-              </p>
-              <div className="text-2xl font-extrabold text-white">$9 <span className="text-xs text-slate-500 font-normal">/ month</span></div>
-              <ul className="text-xs text-slate-400 space-y-2 pt-4 border-t border-slate-900 font-mono">
-                <li className="flex items-center gap-1.5 text-slate-300">✔ Unlimited matches</li>
-                <li className="flex items-center gap-1.5 text-slate-300">✔ Match watchlist</li>
-                <li className="flex items-center gap-1.5 text-amber-500">⚠ 60m delayed data</li>
-                <li className="flex items-center gap-1.5 text-slate-500">✘ No Edge Scanner</li>
-                <li className="flex items-center gap-1.5 text-slate-500">✘ No CLV expectation</li>
-              </ul>
-            </div>
-            <button
-              onClick={() => handleSelectTier('STARTER', 'Starter Membership')}
-              className={`w-full py-2.5 rounded-lg text-xs font-semibold transition-all ${
-                activeTier === 'STARTER'
-                  ? 'bg-slate-850 text-emerald-400 border border-emerald-500/20 cursor-default'
-                  : 'bg-slate-800 hover:bg-slate-700 text-white'
-              }`}
-            >
-              {activeTier === 'STARTER' ? 'Active Plan' : 'Select Starter'}
             </button>
           </div>
 
@@ -201,32 +185,32 @@ export default function PricingPage() {
           </div>
 
           {/* Founder Lifetime Card */}
-          <div className={`bg-slate-900/40 border p-6 rounded-xl flex flex-col justify-between space-y-6 hover:border-slate-800 transition-colors ${activeTier === 'LIFETIME' ? 'border-emerald-500/30' : 'border-slate-900'}`}>
+          <div className={`bg-slate-900/40 border p-6 rounded-xl flex flex-col justify-between space-y-6 hover:border-slate-800 transition-colors ${activeTier === 'FOUNDER' ? 'border-emerald-500/30' : 'border-slate-900'}`}>
             <div className="space-y-4">
               <div>
-                <span className="text-[10px] font-mono text-slate-500 uppercase tracking-widest">Perpetual License</span>
+                <span className="text-[10px] font-mono text-slate-500 uppercase tracking-widest">Founding Member</span>
                 <h3 className="text-lg font-bold text-white mt-1">Founder Lifetime</h3>
               </div>
               <p className="text-slate-450 text-xs leading-relaxed">
-                Pay once. Lifetime access to all Quant & Pro metrics with zero future subscription bills.
+                Pay once. Lifetime access to current plan features with zero future subscription bills.
               </p>
               <div className="text-2xl font-extrabold text-white">$199 <span className="text-xs text-slate-500 font-normal">/ one-time</span></div>
               <ul className="text-xs text-slate-400 space-y-2 pt-4 border-t border-slate-900 font-mono">
-                <li className="flex items-center gap-1.5 text-slate-350">✔ Perpetual Pro features</li>
-                <li className="flex items-center gap-1.5 text-slate-350">✔ Personal API Token</li>
-                <li className="flex items-center gap-1.5 text-slate-350">✔ 1-on-1 model consultations</li>
+                <li className="flex items-center gap-1.5 text-emerald-400">✔ Limited lifetime access</li>
+                <li className="flex items-center gap-1.5 text-slate-350">✔ Perpetual Pro scanner</li>
+                <li className="flex items-center gap-1.5 text-slate-350">✔ Price locked forever</li>
                 <li className="flex items-center gap-1.5 text-slate-350">✔ No monthly bills ever</li>
               </ul>
             </div>
             <button
-              onClick={() => handleSelectTier('LIFETIME', 'Founder Lifetime License')}
+              onClick={() => handleSelectTier('FOUNDER', 'Founder Lifetime License')}
               className={`w-full py-2.5 rounded-lg text-xs font-semibold transition-all ${
-                activeTier === 'LIFETIME'
+                activeTier === 'FOUNDER'
                   ? 'bg-slate-850 text-emerald-400 border border-emerald-500/20 cursor-default'
                   : 'bg-slate-800 hover:bg-slate-700 text-white'
               }`}
             >
-              {activeTier === 'LIFETIME' ? 'Active Plan' : 'Select Founder'}
+              {activeTier === 'FOUNDER' ? 'Active Plan' : 'Select Founder'}
             </button>
           </div>
         </div>
@@ -246,7 +230,7 @@ export default function PricingPage() {
           <div className="flex items-center gap-4 text-xs font-mono text-slate-500">
             <Link href="/" className="hover:text-slate-350">Home</Link>
             <span>•</span>
-            <Link href="/dashboard" className="hover:text-slate-350">App Dashboard</Link>
+            <Link href="/scanner" className="hover:text-slate-350">Edge Scanner Terminal</Link>
           </div>
         </div>
       </footer>
