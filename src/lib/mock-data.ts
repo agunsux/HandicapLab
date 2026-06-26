@@ -291,16 +291,25 @@ function populateMatch(match: Match): Match {
 }
 
 export function getMatches(): Match[] {
+  if (process.env.NODE_ENV === 'production') {
+    return [];
+  }
   return MOCK_MATCHES.map(populateMatch);
 }
 
 export function getMatchById(id: string): Match | undefined {
+  if (process.env.NODE_ENV === 'production') {
+    return undefined;
+  }
   const match = MOCK_MATCHES.find((m) => m.id === id);
   if (!match) return undefined;
   return populateMatch(match);
 }
 
 export function getTodayMatches(): Match[] {
+  if (process.env.NODE_ENV === 'production') {
+    return [];
+  }
   const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
   return MOCK_MATCHES.filter(
@@ -309,17 +318,29 @@ export function getTodayMatches(): Match[] {
 }
 
 export function getTeams(): Team[] {
+  if (process.env.NODE_ENV === 'production') {
+    return [];
+  }
   return MOCK_TEAMS;
 }
 
 export function getTeamStats(teamId: string): TeamStats | undefined {
+  if (process.env.NODE_ENV === 'production') {
+    return undefined;
+  }
   return MOCK_STATS[teamId];
 }
 
 export function getPredictionsForMatch(matchId: string): Prediction | undefined {
+  if (process.env.NODE_ENV === 'production') {
+    return undefined;
+  }
   return MOCK_PREDICTIONS[matchId];
 }
 
 export function getBacktestHistory(): BacktestSummary[] {
+  if (process.env.NODE_ENV === 'production') {
+    return [];
+  }
   return MOCK_BACKTEST_HISTORY;
 }

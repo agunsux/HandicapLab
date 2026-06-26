@@ -20,19 +20,8 @@ export class BrierCalculator {
     const predObj = typeof prediction === 'object' && prediction ? prediction : {};
 
     if (marketType === 'ML') {
-      // Extract Moneyline probabilities
-      const pHome = parseFloat(predObj.pHome || predObj.home_prob || predObj.homeWinProb || '0');
-      const pDraw = parseFloat(predObj.pDraw || predObj.draw_prob || predObj.drawProb || '0');
-      const pAway = parseFloat(predObj.pAway || predObj.away_prob || predObj.awayWinProb || '0');
-
-      // One-hot outcomes
-      const yHome = actualHome > actualAway ? 1 : 0;
-      const yDraw = actualHome === actualAway ? 1 : 0;
-      const yAway = actualAway > actualHome ? 1 : 0;
-
-      // Mean squared error over the 3 classes
-      const brier = (Math.pow(pHome - yHome, 2) + Math.pow(pDraw - yDraw, 2) + Math.pow(pAway - yAway, 2)) / 3;
-      return Number(brier.toFixed(4));
+      // Brier score is restricted to binary markets (AH cover and OU only)
+      return 0.0;
     } else if (marketType === 'AH') {
       // Extract Asian Handicap line and probability
       const line = parseFloat(predObj.ah_line || predObj.line || '0');

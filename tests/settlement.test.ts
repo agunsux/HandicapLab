@@ -38,18 +38,14 @@ describe('Settlement Modules', () => {
   });
 
   describe('BrierCalculator', () => {
-    it('should calculate Brier score for Moneyline (ML)', () => {
-      // p = [0.60, 0.25, 0.15]
-      // actual result = home win [1, 0, 0]
-      // expected = ((0.6-1)^2 + (0.25-0)^2 + (0.15-0)^2) / 3
-      // = (0.16 + 0.0625 + 0.0225) / 3 = 0.245 / 3 = 0.08167 -> 0.0817
+    it('should calculate Brier score for Moneyline (ML) to be 0.0 (non-binary market excluded)', () => {
       const score = BrierCalculator.calculate(
         'ML',
         { pHome: 0.60, pDraw: 0.25, pAway: 0.15 },
         2,
         0
       );
-      expect(score).toBe(0.0817);
+      expect(score).toBe(0.0);
     });
 
     it('should calculate Brier score for Asian Handicap (AH)', () => {
