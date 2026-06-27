@@ -5,6 +5,7 @@ import { EdgeScanner } from '../engines/edge-scanner';
 import { MarketOdds } from '../engines/edge-scanner/types';
 import { getCohortTag } from './cohortTag';
 import { LEAGUE_REGISTRY } from './leagueRegistry';
+import crypto from 'crypto';
 
 export async function runPredictionCron(): Promise<any> {
   // 1. Fetch upcoming matches from our database
@@ -144,10 +145,13 @@ export async function runPredictionCron(): Promise<any> {
           continue;
         }
 
+        const snapshotId = crypto.randomUUID();
+
         // Store prediction snapshot (insert only)
         const { error: snapshotErr } = await supabase
           .from('prediction_snapshots')
           .insert({
+            id: snapshotId,
             match_id: String(match.id),
             model_version: predictionPayload.model_version || 'prematch-v1',
             prediction: predictionJson,
@@ -157,6 +161,37 @@ export async function runPredictionCron(): Promise<any> {
 
         if (snapshotErr) {
           console.error(`Error saving prediction_snapshot for match ${match.id}:`, snapshotErr);
+        }
+
+        // Store in prediction_ledger (never updates once published)
+        const ledgerMarket = marketType === 'AH' ? 'asian_handicap' : marketType === 'OU' ? 'over_under' : 'moneyline';
+        const { data: existingLedger } = await supabase
+          .from('prediction_ledger')
+          .select('id')
+          .eq('match_id', String(match.id))
+          .eq('market', ledgerMarket)
+          .maybeSingle();
+
+        if (!existingLedger) {
+          const { error: ledgerErr } = await supabase
+            .from('prediction_ledger')
+            .insert({
+              prediction_snapshot_id: snapshotId,
+              match_id: String(match.id),
+              competition_id: leagueConfig.apiFootballId,
+              published_at: new Date().toISOString(),
+              market: ledgerMarket,
+              selection: topPick ? topPick.outcome : null,
+              odds_at_prediction: topPick ? topPick.marketOdds : null,
+              confidence: probOutput.confidence ? Math.round(probOutput.confidence.finalConfidence * 100) : null,
+              model_version: 'prematch-v1',
+              result_status: 'pending',
+              verified: false
+            });
+
+          if (ledgerErr) {
+            console.error('Error logging to prediction_ledger:', ledgerErr);
+          }
         }
 
         // 8. Auto-populate a paper trade for a default user to help with testing and dashboard metrics (Idempotently)

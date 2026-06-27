@@ -320,6 +320,20 @@ async function runSignalsSettlement(logId: string | null) {
             })
             .eq('id', signal.id);
 
+          // Settle public prediction ledger (Settlement only updates result fields)
+          const ledgerStatus = status === 'win' ? 'won' : status === 'half_win' ? 'won' : status === 'half_loss' ? 'lost' : status;
+          await supabase
+            .from('prediction_ledger')
+            .update({
+              result_status: ledgerStatus,
+              settled_at: new Date().toISOString(),
+              roi: Number((profit_loss * 100).toFixed(2)),
+              verified: true,
+              updated_at: new Date().toISOString()
+            })
+            .eq('match_id', String(signal.match_id))
+            .eq('market', signal.market);
+
           // Settle paper trade
           const { data: trade } = await supabase
             .from('paper_trades')
