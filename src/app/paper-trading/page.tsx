@@ -25,9 +25,21 @@ export default async function PaperTradingPage() {
     matches = matchesData || [];
   }
 
+  // Fetch competitions cache corresponding to the paper trades
+  const compIds = Array.from(new Set((trades || []).map(t => t.competition_id).filter(Boolean)));
+  let competitions: any[] = [];
+  if (compIds.length > 0) {
+    const { data: compData } = await supabase
+      .from('leagues_cache')
+      .select('*')
+      .in('api_id', compIds.map(Number));
+    competitions = compData || [];
+  }
+
   // 3. Map items in memory
   const items = (trades || []).map(trade => {
     const match = matches.find(m => String(m.id) === String(trade.match_id) || String(m.external_match_id) === String(trade.match_id));
+    const comp = competitions.find(c => String(c.api_id) === String(trade.competition_id));
     return {
       id: trade.id,
       prediction_ledger_id: trade.prediction_ledger_id,
@@ -47,7 +59,9 @@ export default async function PaperTradingPage() {
       settled_at: trade.settled_at,
       home_team: match?.home_team || 'Unknown Home',
       away_team: match?.away_team || 'Unknown Away',
-      kickoff: match?.kickoff || trade.created_at
+      kickoff: match?.kickoff || trade.created_at,
+      competition_name: comp?.name || 'Global Cup',
+      competition_logo: comp?.logo_url || ''
     };
   });
 

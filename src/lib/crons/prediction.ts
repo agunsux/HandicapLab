@@ -24,10 +24,11 @@ export async function runPredictionCron(): Promise<any> {
 
   const { data: ptConfig } = await supabase
     .from('paper_trading_config')
-    .select('min_edge_threshold')
+    .select('min_edge_threshold, min_confidence_threshold')
     .limit(1)
     .maybeSingle();
   const minEdgeThreshold = ptConfig?.min_edge_threshold ? Number(ptConfig.min_edge_threshold) : 2.0;
+  const minConfidenceThreshold = ptConfig?.min_confidence_threshold ? Number(ptConfig.min_confidence_threshold) : 70.0;
 
   const results: any[] = [];
 
@@ -171,6 +172,26 @@ export async function runPredictionCron(): Promise<any> {
         }
 
         // Store in prediction_ledger (never updates once published)
+        const confidenceScore = probOutput.confidence ? Math.round(probOutput.confidence.finalConfidence * 100) : 0;
+        const expectedValue = topPick ? Number(topPick.expectedValue || 0) : 0;
+        const edgeScore = expectedValue * 100;
+
+        let decision: 'BET' | 'SKIP' = 'SKIP';
+        let decisionReason = '';
+
+        if (!topPick) {
+          decisionReason = 'No ensembled positive EV selection generated';
+        } else if (confidenceScore < minConfidenceThreshold) {
+          decisionReason = `Confidence score (${confidenceScore}%) is below config threshold (${minConfidenceThreshold}%)`;
+        } else if (edgeScore < minEdgeThreshold) {
+          decisionReason = `Model edge (${edgeScore.toFixed(1)}%) is below config threshold (${minEdgeThreshold}%)`;
+        } else if (expectedValue <= 0) {
+          decisionReason = `Expected value (${expectedValue.toFixed(4)}) is not positive`;
+        } else {
+          decision = 'BET';
+          decisionReason = 'Passes confidence, edge, and EV criteria';
+        }
+
         const ledgerMarket = marketType === 'AH' ? 'asian_handicap' : marketType === 'OU' ? 'over_under' : 'moneyline';
         const { data: existingLedger } = await supabase
           .from('prediction_ledger')
@@ -196,10 +217,12 @@ export async function runPredictionCron(): Promise<any> {
               market: ledgerMarket,
               selection: topPick ? topPick.outcome : null,
               odds_at_prediction: topPick ? topPick.marketOdds : null,
-              confidence: probOutput.confidence ? Math.round(probOutput.confidence.finalConfidence * 100) : null,
+              confidence: confidenceScore,
               model_version: 'prematch-v1',
               result_status: 'pending',
-              verified: false
+              verified: false,
+              decision: decision,
+              decision_reason: decisionReason
             });
 
           if (ledgerErr) {
@@ -209,11 +232,8 @@ export async function runPredictionCron(): Promise<any> {
           }
         }
 
-        // 8. Auto-populate a paper trade if qualifiers are met (confidence >= 70, expected_value > 0, edge >= threshold)
-        const confidenceScore = probOutput.confidence ? Math.round(probOutput.confidence.finalConfidence * 100) : 0;
-        const expectedValue = topPick ? Number(topPick.expectedValue || 0) : 0;
-        const edgeScore = expectedValue * 100;
-        const qualifiesForTrade = confidenceScore >= 70 && edgeScore >= minEdgeThreshold && expectedValue > 0;
+        // 8. Auto-populate a paper trade if qualifiesForTrade is met
+        const qualifiesForTrade = decision === 'BET';
 
         if (qualifiesForTrade && topPick && ledgerId) {
           const testUserId = '00000000-0000-0000-0000-000000000000';
