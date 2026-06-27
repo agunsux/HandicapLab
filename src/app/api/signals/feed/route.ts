@@ -12,6 +12,8 @@ export async function GET(request: Request) {
     // Determine user access
     const { isPremium, dailyLimit } = await determineUserAccess(userId);
 
+    const statusParam = searchParams.get('status') || 'active';
+
     // Map market code to DB category name
     let dbMarketCategory = 'asian_handicap';
     if (marketParam === 'OU') {
@@ -20,12 +22,19 @@ export async function GET(request: Request) {
       dbMarketCategory = 'moneyline';
     }
 
-    // Query OPEN and LOCKED published signals
-    const { data: signals, error } = await supabase
+    // Query OPEN/LOCKED or SETTLED signals
+    let query = supabase
       .from('signals')
       .select('*, signal_metrics(*)')
-      .in('status', ['OPEN', 'LOCKED'])
-      .eq('market_category', dbMarketCategory)
+      .eq('market_category', dbMarketCategory);
+
+    if (statusParam === 'SETTLED') {
+      query = query.not('status', 'in', '("OPEN", "LOCKED", "DRAFT", "pending", "settling", "LIVE")');
+    } else {
+      query = query.in('status', ['OPEN', 'LOCKED']);
+    }
+
+    const { data: signals, error } = await query
       .order('published_at', { ascending: false, nullsFirst: false })
       .order('confidence', { ascending: false });
 
@@ -56,6 +65,7 @@ export async function GET(request: Request) {
         odds: Number(sig.odds || 1.00),
         opening_odds: Number(sig.opening_odds || sig.odds || 1.00),
         current_odds: Number(sig.closing_odds || sig.odds || 1.00),
+        clv_percentage: sig.clv_percentage !== null ? Number(sig.clv_percentage) : (sig.clv !== null ? Number(sig.clv) * 100 : null),
         edge_percentage: Number(sig.edge_pct || 0.0),
         confidence_score: confidence,
         confidence_label: confidenceLabel,

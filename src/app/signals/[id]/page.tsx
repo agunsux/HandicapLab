@@ -6,6 +6,7 @@ import { SignalBadge } from '../../../components/signals/SignalBadge';
 import { MarketTag } from '../../../components/signals/MarketTag';
 import { OddsMovement } from '../../../components/signals/OddsMovement';
 import { ConfidenceBadge } from '../../../components/ConfidenceBadge';
+import { SignalLifecycle } from '../../../components/signals/SignalLifecycle';
 
 export default function SignalDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = React.use(params);
@@ -94,6 +95,11 @@ export default function SignalDetailPage({ params }: { params: Promise<{ id: str
           <p className="text-slate-450 text-xs font-mono">
             KICKOFF (UTC): {new Date(signal.match.kickoff_time).toUTCString()}
           </p>
+        </div>
+
+        {/* Lifecycle Visual Timeline */}
+        <div className="mb-8">
+          <SignalLifecycle auditEvents={signal.audit_events} status={signal.status} />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

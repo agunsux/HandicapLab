@@ -34,6 +34,13 @@ export async function GET(
       return NextResponse.json({ success: false, error: 'Signal not found' }, { status: 404 });
     }
 
+    // Fetch non-sensitive audit events to display in the lifecycle visual timeline
+    const { data: auditEvents } = await supabase
+      .from('signal_audit_events')
+      .select('event_type, created_at')
+      .eq('signal_id', id)
+      .order('created_at', { ascending: true });
+
     // Trace correlation ID
     const activeCorrId = signal.correlation_id || crypto.randomUUID();
 
@@ -99,6 +106,10 @@ export async function GET(
         locked_at: signal.locked_at,
         settled_at: signal.settled_at
       },
+      audit_events: (auditEvents || []).map(ev => ({
+        event_type: ev.event_type,
+        created_at: ev.created_at
+      })),
       status: signal.status,
       metrics: {
         quality_score: metricsObj?.quality_score || 75,
