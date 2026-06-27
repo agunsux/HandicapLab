@@ -1,5 +1,7 @@
+import crypto from 'crypto';
 import { supabase } from '../../supabase.server';
 import { EdgePick } from './types';
+import { calculateQualityMetrics } from '../../analytics/data-quality';
 
 // Ensure this module is only imported/run on the server side
 if (typeof window !== 'undefined') {
@@ -47,6 +49,11 @@ export class SignalScanner {
       // Parse handicap line
       const lineNum = pick.line && pick.line !== '1X2' ? parseFloat(pick.line) : 0.0;
 
+      let marketSelection = pick.outcome;
+      if (pick.marketType === 'AH' || pick.marketType === 'OU') {
+        marketSelection = `${pick.outcome}_${pick.line}`;
+      }
+
       return {
         match_id: pick.matchId,
         league: meta.league || null,
@@ -54,6 +61,8 @@ export class SignalScanner {
         away_team: meta.away_team,
         kickoff_utc: meta.kickoff_utc,
         market: dbMarket,
+        market_category: dbMarket,
+        market_selection: marketSelection,
         handicap_line: lineNum,
         selection: pick.outcome,
         odds: pick.marketOdds,
@@ -62,6 +71,7 @@ export class SignalScanner {
         edge_pct: pick.expectedValue * 100, // represent edge as percentage (e.g. 10.5%)
         confidence: Number(derivedConfidence.toFixed(4)),
         status: 'pending',
+        model_version: 'rule_v1',
         updated_at: new Date().toISOString()
       };
     });
@@ -69,12 +79,13 @@ export class SignalScanner {
     console.log(`[SignalScanner] Saving batch of ${payloads.length} signals for match ${meta.home_team} vs ${meta.away_team}...`);
 
     // Perform batch upsert on the UNIQUE constraint (match_id, market, handicap_line)
-    const { error } = await supabase
+    const { data: savedRows, error } = await supabase
       .from('signals')
       .upsert(payloads, {
         onConflict: 'match_id,market,handicap_line',
         ignoreDuplicates: false // overwrite with latest odds/edge if already exists
-      });
+      })
+      .select('id, match_id, market, handicap_line, selection, odds, confidence, market_category, market_selection');
 
     if (error) {
       console.error('[SignalScanner] Error saving signals to database:', error);
@@ -82,5 +93,59 @@ export class SignalScanner {
     }
 
     console.log(`[SignalScanner] Successfully batch inserted ${payloads.length} signals.`);
+
+    // Immutable audit events logging (with transaction safety)
+    if (savedRows && savedRows.length > 0) {
+      const correlationId = crypto.randomUUID();
+      for (const row of savedRows) {
+        try {
+          await supabase
+            .from('signal_audit_events')
+            .insert({
+              signal_id: row.id,
+              event_type: 'SIGNAL_CREATED',
+              source: 'signal_scanner',
+              correlation_id: correlationId,
+              payload: {
+                match_id: row.match_id,
+                market: row.market,
+                handicap_line: row.handicap_line,
+                selection: row.selection,
+                odds: row.odds
+              }
+            });
+        } catch (auditErr) {
+          console.error(`[SignalScanner] Failed to write SIGNAL_CREATED audit event for signal ${row.id}:`, auditErr);
+        }
+
+        // Insert initial quality score to signal_metrics as append-only history record
+        try {
+          const metrics = calculateQualityMetrics({
+            provider: 'pinnacle',
+            opening_odds: row.odds,
+            closing_odds: null,
+            opening_line: row.handicap_line,
+            closing_line: null,
+            confidence: row.confidence,
+            league: meta.league || null
+          }, null);
+
+          await supabase
+            .from('signal_metrics')
+            .insert({
+              signal_id: row.id,
+              quality_score: metrics.quality_score,
+              sharp_score: metrics.sharp_score,
+              clv_score: metrics.clv_score,
+              liquidity_score: metrics.liquidity_score,
+              confidence_score: metrics.confidence_score,
+              model_version: 'rule_v1',
+              calculated_at: new Date().toISOString()
+            });
+        } catch (metricsErr) {
+          console.error(`[SignalScanner] Failed to write initial quality metrics for signal ${row.id}:`, metricsErr);
+        }
+      }
+    }
   }
 }

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase.server';
 import crypto from 'crypto';
 import { PPP_TIERS } from '@/lib/monetization/gating';
+import { ProductService } from '@/lib/payments/productService';
 
 export async function POST(req: Request) {
   try {
@@ -13,9 +14,28 @@ export async function POST(req: Request) {
     // Fallback user if not logged in (to support local sandbox test flow)
     const userId = user?.id || '00000000-0000-0000-0000-000000000000';
 
-    // Validate product type
+    // Validate product type and load from database
     if (product_type !== 'LIFETIME' && product_type !== 'CREDITS') {
       return NextResponse.json({ error: 'Invalid product type' }, { status: 400 });
+    }
+
+    const slug = product_type === 'LIFETIME' ? 'lifetime_pro' : 'credit_pack_10';
+    const product = await ProductService.getProductBySlug(slug);
+    if (!product) {
+      return NextResponse.json({ error: 'Product not found in database' }, { status: 404 });
+    }
+
+    // Check founder slots availability if lifetime product is requested
+    if (slug === 'lifetime_pro') {
+      const { data: campaign } = await supabase
+        .from('founder_campaigns')
+        .select('*')
+        .eq('active', true)
+        .maybeSingle();
+
+      if (campaign && campaign.claimed_slots >= campaign.max_slots) {
+        return NextResponse.json({ error: 'Founder slots are full' }, { status: 400 });
+      }
     }
 
     // Generate/Validate idempotency key (prevent duplicate fulfillment)
@@ -50,6 +70,10 @@ export async function POST(req: Request) {
       .from('transactions')
       .insert({
         user_id: userId === '00000000-0000-0000-0000-000000000000' ? null : userId,
+        product_id: product.id,
+        amount: amount,
+        currency: 'USD',
+        provider: 'STRIPE',
         amount_usd: amount,
         ppp_tier: ppp_tier || 'TIER_1',
         payment_gateway: 'STRIPE',
@@ -90,3 +114,4 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
+

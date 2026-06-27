@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase.server';
+import crypto from 'crypto';
+import { supabase } from '../../../../lib/supabase.server';
 import { oddsApiClient } from '@/lib/apis/oddspapi';
 import { CronLogger } from '@/lib/services/cronLogger';
 import { runHealthCheck } from '@/lib/services/healthChecker';
+import { calculateQualityMetrics } from '@/lib/analytics/data-quality';
 
 const SPORT_MAP: Record<number, string> = {
   39: 'soccer_epl',
@@ -208,6 +210,118 @@ async function handleCaptureOdds(request: Request) {
 
             if (snapshotErr) {
               console.error(`[CaptureOdds Cron] Failed to insert odds_snapshot for signal ${signal.id}:`, snapshotErr);
+            }
+
+            // Calculate final quality score and insert in signal_metrics
+            try {
+              const metrics = calculateQualityMetrics({
+                provider: 'pinnacle',
+                opening_odds: openingOdds,
+                closing_odds: closingOdds,
+                opening_line: openingLine,
+                closing_line: closingLine,
+                confidence: signal.confidence,
+                league: signal.league
+              }, clvRaw);
+
+              await supabase
+                .from('signal_metrics')
+                .insert({
+                  signal_id: signal.id,
+                  quality_score: metrics.quality_score,
+                  sharp_score: metrics.sharp_score,
+                  clv_score: metrics.clv_score,
+                  liquidity_score: metrics.liquidity_score,
+                  confidence_score: metrics.confidence_score,
+                  model_version: signal.model_version || 'rule_v1',
+                  calculated_at: new Date().toISOString()
+                });
+            } catch (metricsErr) {
+              console.error(`[CaptureOdds Cron] Failed to write final quality metrics for signal ${signal.id}:`, metricsErr);
+            }
+
+            // Trace correlation ID from SIGNAL_CREATED
+            let correlationId = null;
+            try {
+              const { data: auditEvent } = await supabase
+                .from('signal_audit_events')
+                .select('correlation_id')
+                .eq('signal_id', signal.id)
+                .eq('event_type', 'SIGNAL_CREATED')
+                .maybeSingle();
+              correlationId = auditEvent?.correlation_id || null;
+            } catch (err) {
+              console.error(`[CaptureOdds Cron] Failed to fetch correlation ID for signal ${signal.id}:`, err);
+            }
+            const activeCorrId = correlationId || crypto.randomUUID();
+
+            // Reuse and write to existing odds_history table with new properties
+            try {
+              await supabase
+                .from('odds_history')
+                .insert({
+                  match_id: String(signal.match_id),
+                  signal_id: signal.id,
+                  correlation_id: activeCorrId,
+                  market_type: signal.market,
+                  home_odds: signal.selection === 'home' ? closingOdds : undefined,
+                  draw_odds: signal.selection === 'draw' ? closingOdds : undefined,
+                  away_odds: signal.selection === 'away' ? closingOdds : undefined,
+                  odds: closingOdds,
+                  line: closingLine,
+                  provider: 'pinnacle',
+                  recorded_at: new Date().toISOString(),
+                  captured_at: new Date().toISOString(),
+                  provider_timestamp: new Date().toISOString(),
+                  api_request_id: activeCorrId,
+                  source_version: 'v4'
+                });
+            } catch (historyErr) {
+              console.error(`[CaptureOdds Cron] Failed to insert odds_history for signal ${signal.id}:`, historyErr);
+            }
+
+            // Create ODDS_CAPTURED audit event (with transaction safety)
+            try {
+              await supabase
+                .from('signal_audit_events')
+                .insert({
+                  signal_id: signal.id,
+                  event_type: 'ODDS_CAPTURED',
+                  source: 'capture_odds_cron',
+                  correlation_id: activeCorrId,
+                  payload: {
+                    old_line: openingLine,
+                    new_line: closingLine,
+                    old_odds: openingOdds,
+                    new_odds: closingOdds,
+                    provider: 'pinnacle'
+                  }
+                });
+            } catch (auditErr) {
+              console.error(`[CaptureOdds Cron] Failed to write ODDS_CAPTURED audit event for signal ${signal.id}:`, auditErr);
+            }
+
+            // If the line moved, log LINE_MOVED audit event
+            if (openingLine !== closingLine) {
+              try {
+                await supabase
+                  .from('signal_audit_events')
+                  .insert({
+                    signal_id: signal.id,
+                    event_type: 'LINE_MOVED',
+                    source: 'capture_odds_cron',
+                    correlation_id: activeCorrId,
+                    payload: {
+                      old_line: openingLine,
+                      new_line: closingLine,
+                      old_odds: openingOdds,
+                      new_odds: closingOdds,
+                      provider: 'pinnacle'
+                    }
+                  });
+              } catch (auditErr) {
+                console.error(`[CaptureOdds Cron] Failed to write LINE_MOVED audit event for signal ${signal.id}:`, auditErr);
+              }
             }
             
             capturedCount++;

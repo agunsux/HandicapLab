@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase.server';
+import crypto from 'crypto';
+import { supabase } from '../../../../lib/supabase.server';
 import { settleAsianHandicap } from '@/lib/engine/settlement';
 import { CronLogger } from '@/lib/services/cronLogger';
 import { runHealthCheck } from '@/lib/services/healthChecker';
@@ -319,6 +320,41 @@ async function runSignalsSettlement(logId: string | null) {
               updated_at: new Date().toISOString()
             })
             .eq('id', signal.id);
+
+          // Log SIGNAL_SETTLED audit event (with transaction safety)
+          try {
+            let correlationId = null;
+            try {
+              const { data: auditEvent } = await supabase
+                .from('signal_audit_events')
+                .select('correlation_id')
+                .eq('signal_id', signal.id)
+                .eq('event_type', 'SIGNAL_CREATED')
+                .maybeSingle();
+              correlationId = auditEvent?.correlation_id || null;
+            } catch (err) {
+              console.error(`[Settle Route] Failed to fetch correlation ID for signal ${signal.id}:`, err);
+            }
+            const activeCorrId = correlationId || crypto.randomUUID();
+
+            await supabase
+              .from('signal_audit_events')
+              .insert({
+                signal_id: signal.id,
+                event_type: 'SIGNAL_SETTLED',
+                source: 'settlement_cron',
+                correlation_id: activeCorrId,
+                payload: {
+                  result: status,
+                  pnl: profit_loss,
+                  roi: Number((profit_loss * 100).toFixed(2)),
+                  closing_line: signal.closing_line || signal.handicap_line || 0.0,
+                  clv: clvPercentage
+                }
+              });
+          } catch (auditErr) {
+            console.error(`[Settle Route] Failed to write SIGNAL_SETTLED audit event for signal ${signal.id}:`, auditErr);
+          }
 
           // Settle public prediction ledger (Settlement only updates result fields)
           const ledgerStatus = status === 'win' ? 'won' : status === 'half_win' ? 'won' : status === 'half_loss' ? 'lost' : status;

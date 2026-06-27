@@ -11,10 +11,15 @@ vi.mock('../src/lib/supabase.server', () => {
   const mockMaybeSingle = vi.fn();
   const mockUpdate = vi.fn(() => ({ eq: vi.fn() }));
   const mockInsert = vi.fn();
-  const mockEq = vi.fn(() => ({
+  
+  const mockEq = vi.fn();
+  const mockEqResult: any = {
+    eq: mockEq,
     maybeSingle: mockMaybeSingle,
     is: vi.fn(() => ({ error: null, data: [] }))
-  }));
+  };
+  mockEq.mockReturnValue(mockEqResult);
+
   const mockSelect = vi.fn(() => ({
     eq: mockEq,
     is: vi.fn(() => ({ error: null, data: [] }))
@@ -84,11 +89,11 @@ describe('Settlement Modules', () => {
   });
 
   describe('CLVCalculator', () => {
-    it('should calculate CLV using formula (closingOdds / predictionOdds) - 1', () => {
+    it('should calculate CLV using formula ((1.0 / closingOdds) - (1.0 / predictionOdds)) * 100', () => {
       // predOdds = 2.0, closingOdds = 2.20
-      // clv = (2.20 / 2.0) - 1 = 0.10
+      // clv = ((1.0 / 2.20) - (1.0 / 2.0)) * 100 = -4.5455
       const clv = CLVCalculator.calculate(2.0, 2.20);
-      expect(clv).toBe(0.10);
+      expect(clv).toBe(-4.5455);
     });
 
     it('should return null if closing odds are invalid', () => {

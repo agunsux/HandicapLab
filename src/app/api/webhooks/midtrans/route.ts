@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { StripePaymentProvider } from '@/lib/payments/stripe/handler';
+import { MidtransPaymentProvider } from '@/lib/payments/midtrans/handler';
 import { paymentEventProcessor } from '@/lib/payments/core/paymentEvent';
 
 export async function POST(req: Request) {
@@ -7,12 +7,12 @@ export async function POST(req: Request) {
     const rawBody = await req.text();
     const headersList = Object.fromEntries(req.headers.entries());
 
-    const provider = new StripePaymentProvider();
+    const provider = new MidtransPaymentProvider();
 
     // 1. Verify signature
     const isValid = await provider.verifyWebhook(rawBody, headersList);
     if (!isValid) {
-      console.warn('[Stripe Webhook] Invalid webhook signature detected');
+      console.warn('[Midtrans Webhook] Invalid signature key detected');
       return NextResponse.json({ error: 'Invalid webhook signature' }, { status: 400 });
     }
 
@@ -24,7 +24,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true, ...result });
   } catch (err: any) {
-    console.error('[Stripe Webhook Endpoint Error]:', err);
+    console.error('[Midtrans Webhook Endpoint Error]:', err);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }

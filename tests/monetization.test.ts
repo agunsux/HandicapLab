@@ -18,7 +18,8 @@ vi.mock('../src/lib/supabase.server', () => {
     data: { tier: 'PRO', status: 'active', expires_at: null },
     error: null
   });
-  const mockEq = vi.fn(() => ({
+
+  const chainObj: any = {
     single: mockSingle,
     maybeSingle: mockMaybeSingle,
     gte: vi.fn().mockResolvedValue({
@@ -27,17 +28,21 @@ vi.mock('../src/lib/supabase.server', () => {
       error: null
     }),
     lt: vi.fn().mockReturnThis(),
+    eq: vi.fn().mockImplementation(() => chainObj),
+    order: vi.fn().mockImplementation(() => chainObj),
+    limit: vi.fn().mockResolvedValue({ data: [], error: null }),
     then: vi.fn((cb) => {
-      cb({ error: null });
+      cb({ 
+        data: [
+          { status: 'ACTIVE', expires_at: null, access_type: 'LIFETIME_PRO', products: { slug: 'lifetime_pro' } }
+        ], 
+        error: null 
+      });
       return { catch: vi.fn() };
     })
-  }));
-  const mockSelect = vi.fn(() => ({
-    eq: mockEq,
-    order: vi.fn(() => ({
-      limit: vi.fn().mockResolvedValue({ data: [], error: null })
-    }))
-  }));
+  };
+
+  const mockSelect = vi.fn(() => chainObj);
 
   const mockDelete = vi.fn(() => ({
     lt: vi.fn(() => ({
@@ -100,13 +105,19 @@ describe('Monetization Modules', () => {
     });
 
     it('should query DB and cache the user tier when cache is empty', async () => {
-      // Mock DB return value
-      const mockMaybeSingle = vi.fn().mockResolvedValue({
-        data: { tier: 'PRO', status: 'active', expires_at: null },
-        error: null
+      // Mock DB return value matching refactored query
+      const mockEq2 = vi.fn().mockImplementation(() => {
+        const promise: any = Promise.resolve({
+          data: [
+            { status: 'ACTIVE', expires_at: null, access_type: 'LIFETIME_PRO', products: { slug: 'lifetime_pro' } }
+          ],
+          error: null
+        });
+        promise.eq = () => promise;
+        return promise;
       });
-      const mockEq = vi.fn(() => ({ maybeSingle: mockMaybeSingle }));
-      const mockSelect = vi.fn(() => ({ eq: mockEq }));
+      const mockEq1 = vi.fn(() => ({ eq: mockEq2 }));
+      const mockSelect = vi.fn(() => ({ eq: mockEq1 }));
       vi.mocked(supabase.from).mockReturnValue({ select: mockSelect } as any);
 
       // First check (triggers DB lookup)
@@ -122,12 +133,19 @@ describe('Monetization Modules', () => {
 
     it('should handle expired subscriptions by falling back to FREE', async () => {
       const pastDate = new Date(Date.now() - 10000).toISOString();
-      const mockMaybeSingle = vi.fn().mockResolvedValue({
-        data: { tier: 'PRO', status: 'active', expires_at: pastDate },
-        error: null
+      // Mock DB return value for expired subscription matching refactored query
+      const mockEq2 = vi.fn().mockImplementation(() => {
+        const promise: any = Promise.resolve({
+          data: [
+            { status: 'ACTIVE', expires_at: pastDate, access_type: 'LIFETIME_PRO', products: { slug: 'lifetime_pro' } }
+          ],
+          error: null
+        });
+        promise.eq = () => promise;
+        return promise;
       });
-      const mockEq = vi.fn(() => ({ maybeSingle: mockMaybeSingle }));
-      const mockSelect = vi.fn(() => ({ eq: mockEq }));
+      const mockEq1 = vi.fn(() => ({ eq: mockEq2 }));
+      const mockSelect = vi.fn(() => ({ eq: mockEq1 }));
       vi.mocked(supabase.from).mockReturnValue({ select: mockSelect } as any);
 
       const allowed = await checkEntitlement(userId, 'PRO');

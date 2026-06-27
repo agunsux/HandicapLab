@@ -74,22 +74,28 @@ export async function checkEntitlement(
       .from('user_entitlements')
       .select('*')
       .eq('user_id', userId)
-      .eq('is_active', true);
+      .eq('status', 'ACTIVE');
 
     if (error || !entitlements) {
       console.error('[Gating Engine] Failed to fetch entitlements:', error);
       return false;
     }
 
+    // Filter by active calculation: status = ACTIVE and (expires_at is null or expires_at > now())
+    const now = new Date();
+    const activeEntitlements = entitlements.filter(e => {
+      return !e.expires_at || new Date(e.expires_at) > now;
+    });
+
     // 2. Lifetime Pro access bypasses all gating
-    const hasLifetime = entitlements.some(e => e.access_type === 'LIFETIME_PRO');
+    const hasLifetime = activeEntitlements.some(e => e.access_type === 'LIFETIME_PRO');
     if (hasLifetime) {
       return true;
     }
 
     // 3. Deduct credit if feature is FORENSIC_POPOVER and credits exist
     if (feature === 'FORENSIC_POPOVER') {
-      const creditsEnt = entitlements.find(e => e.access_type === 'CREDITS' && (e.credits_balance || 0) > 0);
+      const creditsEnt = activeEntitlements.find(e => e.access_type === 'CREDITS' && (e.credits_balance || 0) > 0);
       if (creditsEnt) {
         const newBalance = (creditsEnt.credits_balance || 0) - 1;
 
@@ -120,3 +126,4 @@ export async function checkEntitlement(
 
   return false;
 }
+

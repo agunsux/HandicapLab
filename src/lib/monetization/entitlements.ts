@@ -55,19 +55,31 @@ export async function checkEntitlement(
     userTier = cached as SubscriptionTier;
   } else {
     try {
-      // Lookup in Supabase database
+      // Lookup in Supabase database joining products
       const { data, error } = await supabase
-        .from('user_subscriptions')
-        .select('tier, status, expires_at')
+        .from('user_entitlements')
+        .select('status, expires_at, access_type, products(slug)')
         .eq('user_id', userId)
-        .maybeSingle();
+        .eq('status', 'ACTIVE');
 
       if (!error && data) {
-        const isNotExpired = !data.expires_at || new Date(data.expires_at).getTime() > Date.now();
-        const isActive = data.status === 'active' && isNotExpired;
+        const now = new Date();
+        const activeEntitlements = data.filter((ent: any) => {
+          return !ent.expires_at || new Date(ent.expires_at) > now;
+        });
 
-        if (isActive) {
-          userTier = data.tier as SubscriptionTier;
+        // Resolve user tier from active entitlements
+        const hasLifetime = activeEntitlements.some((ent: any) => 
+          ent.products?.slug === 'lifetime_pro' || ent.access_type === 'LIFETIME_PRO'
+        );
+        const hasTournamentPass = activeEntitlements.some((ent: any) => 
+          ent.products?.slug === 'tournament_pass' || ent.access_type === 'TOURNAMENT_PASS'
+        );
+
+        if (hasLifetime) {
+          userTier = 'LIFETIME';
+        } else if (hasTournamentPass) {
+          userTier = 'ELITE';
         }
       }
     } catch (e) {
@@ -92,3 +104,4 @@ export async function setCachedUserTier(
   const cacheKey = `user:${userId}:tier`;
   await redisMock.set(cacheKey, tier, ttlSeconds);
 }
+

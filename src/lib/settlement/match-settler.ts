@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import { supabase } from '../supabase.server';
 import { BrierCalculator } from './brier-calculator';
 import { CLVCalculator } from './clv-calculator';
@@ -171,12 +172,28 @@ export class MatchSettler {
           })
           .eq('id', pred.id);
 
+        // Trace correlation ID from SIGNAL_CREATED
+        let correlationId = null;
+        try {
+          const { data: auditEvent } = await supabase
+            .from('signal_audit_events')
+            .select('correlation_id')
+            .eq('signal_id', pred.id)
+            .eq('event_type', 'SIGNAL_CREATED')
+            .maybeSingle();
+          correlationId = auditEvent?.correlation_id || null;
+        } catch (err) {
+          console.error(`[MatchSettler] Failed to fetch correlation ID for prediction ${pred.id}:`, err);
+        }
+        const activeCorrId = correlationId || crypto.randomUUID();
+
         // 6. Insert compatible outcomes to prediction_results
         await supabase
           .from('prediction_results')
           .insert({
             prediction_id: pred.id,
             match_id: match.id,
+            correlation_id: activeCorrId,
             actual_home_score: homeGoals,
             actual_away_score: awayGoals,
             predicted_outcome: pred.market_type === 'ML' ? chosenOutcome : (homeGoals >= awayGoals ? 'home' : 'away'),
@@ -192,6 +209,27 @@ export class MatchSettler {
             profit_ah: pred.market_type === 'AH' ? profit : 0,
             profit_ou: pred.market_type === 'OU' ? profit : 0
           });
+
+        // 7. Log SIGNAL_SETTLED audit event (with transaction safety)
+        try {
+          await supabase
+            .from('signal_audit_events')
+            .insert({
+              signal_id: pred.id,
+              event_type: 'SIGNAL_SETTLED',
+              source: 'settlement_cron',
+              correlation_id: activeCorrId,
+              payload: {
+                result: pred.market_type === 'ML' ? (homeGoals > awayGoals ? 'home' : homeGoals === awayGoals ? 'draw' : 'away') : (goalDiff > 0 ? 'home' : 'away'),
+                pnl: profit,
+                roi: Number((profit * 100).toFixed(2)),
+                closing_line: chosenLine,
+                clv: clv
+              }
+            });
+        } catch (auditErr) {
+          console.error(`[MatchSettler] Failed to write SIGNAL_SETTLED audit event for prediction ${pred.id}:`, auditErr);
+        }
 
         summary.predictionsSettled++;
         summary.settledPredictionIds.push(pred.id);
