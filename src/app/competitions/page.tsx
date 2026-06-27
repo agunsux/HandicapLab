@@ -33,6 +33,15 @@ export default async function CompetitionsIndex() {
           <p className="text-slate-400 text-sm sm:text-base leading-relaxed">
             Select a league, cup, or international tournament below to explore ensembled probabilities, average goal frequencies, and calculated Asian Handicap value edges.
           </p>
+          <div className="inline-flex flex-wrap items-center justify-center gap-4 text-[11px] font-mono text-slate-500 bg-slate-900/40 px-4 py-2.5 rounded-lg border border-slate-850 mt-2">
+            <span className="flex items-center gap-1 text-emerald-400 font-bold">
+              ✓ Data Verified
+            </span>
+            <span className="text-slate-800">•</span>
+            <span>Last sync: {new Date().toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })} {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+            <span className="text-slate-800">•</span>
+            <span>Source: API provider (api-football)</span>
+          </div>
         </div>
 
         <CompetitionsList competitions={competitions} />

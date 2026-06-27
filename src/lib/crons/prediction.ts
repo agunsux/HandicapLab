@@ -144,6 +144,21 @@ export async function runPredictionCron(): Promise<any> {
           continue;
         }
 
+        // Store prediction snapshot (insert only)
+        const { error: snapshotErr } = await supabase
+          .from('prediction_snapshots')
+          .insert({
+            match_id: String(match.id),
+            model_version: predictionPayload.model_version || 'prematch-v1',
+            prediction: predictionJson,
+            confidence: probOutput.confidence ? Math.round(probOutput.confidence.finalConfidence * 100) : null,
+            created_at: new Date().toISOString()
+          });
+
+        if (snapshotErr) {
+          console.error(`Error saving prediction_snapshot for match ${match.id}:`, snapshotErr);
+        }
+
         // 8. Auto-populate a paper trade for a default user to help with testing and dashboard metrics (Idempotently)
         if (topPick) {
           const testUserId = '00000000-0000-0000-0000-000000000000';

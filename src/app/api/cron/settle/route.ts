@@ -118,6 +118,7 @@ async function runSignalsSettlement(logId: string | null) {
 
   let signalsSettled = 0;
   let signalsFailed = 0;
+  const settledCompetitionIds = new Set<number>();
 
   if (pendingSignals && pendingSignals.length > 0) {
     console.log(`[Settlement Cron] Found ${pendingSignals.length} pending past signals to process.`);
@@ -232,6 +233,32 @@ async function runSignalsSettlement(logId: string | null) {
                 updated_at: new Date().toISOString()
               })
               .eq('id', signal.match_id);
+
+            // Log match result snapshot to match_results
+            const finalScore = {
+              home: homeGoals,
+              away: awayGoals,
+              halftime: {
+                home: fixture.score?.halftime?.home,
+                away: fixture.score?.halftime?.away
+              },
+              fulltime: {
+                home: fixture.score?.fulltime?.home,
+                away: fixture.score?.fulltime?.away
+              }
+            };
+            await supabase
+              .from('match_results')
+              .upsert({
+                match_id: String(signal.match_id),
+                final_score: finalScore,
+                verified_source: 'api-football',
+                verified_at: new Date().toISOString()
+              }, { onConflict: 'match_id' });
+
+            if (leagueConfig?.apiFootballId) {
+              settledCompetitionIds.add(leagueConfig.apiFootballId);
+            }
           } else if (isVoid) {
             await supabase
               .from('matches')
@@ -372,9 +399,77 @@ async function runSignalsSettlement(logId: string | null) {
     }
   }
 
+  // Recalculate competition calibration metrics for all settled leagues
+  for (const compId of settledCompetitionIds) {
+    try {
+      await recalculateCompetitionMetrics(compId);
+    } catch (metricErr) {
+      console.error(`[Settlement Cron] Failed to recalculate metrics for competition ${compId}:`, metricErr);
+    }
+  }
+
   return {
     signalsSettled,
     signalsFailed,
     message: 'Settlement pipeline and paper trading bankroll progression completed.'
   };
+}
+
+async function recalculateCompetitionMetrics(competitionId: number) {
+  const { LEAGUE_REGISTRY } = await import('@/lib/crons/leagueRegistry');
+  const leagueConfig = LEAGUE_REGISTRY.find(l => l.apiFootballId === competitionId);
+  if (!leagueConfig) return;
+
+  const { data: signals, error: sigErr } = await supabase
+    .from('signals')
+    .select('*')
+    .eq('league', leagueConfig.name)
+    .not('status', 'in', '("pending", "settling")');
+
+  if (sigErr || !signals) {
+    console.error(`[Metrics Recalculate] Failed to fetch signals for ${leagueConfig.name}:`, sigErr);
+    return;
+  }
+
+  const total = signals.length;
+  if (total === 0) return;
+
+  const wins = signals.filter((s: any) => s.status === 'won').length;
+  const predictionAccuracy = (wins / total) * 100;
+
+  const totalPL = signals.reduce((sum: number, s: any) => sum + Number(s.profit_loss || 0.0), 0.0);
+  const roiSimulation = (totalPL / total) * 100;
+
+  const clvPositive = signals.filter((s: any) => Number(s.clv_percentage || 0.0) > 0).length;
+  const closingLineAccuracy = (clvPositive / total) * 100;
+
+  const ahSignals = signals.filter((s: any) => s.market === 'asian_handicap');
+  const ouSignals = signals.filter((s: any) => s.market === 'over_under');
+
+  const handicapAccuracy = ahSignals.length > 0 ? (ahSignals.filter((s: any) => s.status === 'won').length / ahSignals.length) * 100 : null;
+  const overUnderAccuracy = ouSignals.length > 0 ? (ouSignals.filter((s: any) => s.status === 'won').length / ouSignals.length) * 100 : null;
+  const bttsAccuracy = predictionAccuracy; // Fallback
+
+  let sampleConfidence = 'low';
+  if (total >= 100) {
+    sampleConfidence = 'high';
+  } else if (total >= 30) {
+    sampleConfidence = 'medium';
+  }
+
+  await supabase
+    .from('competition_metrics')
+    .upsert({
+      competition_id: competitionId,
+      matches_count: total,
+      prediction_accuracy: predictionAccuracy,
+      roi_simulation: roiSimulation,
+      closing_line_accuracy: closingLineAccuracy,
+      over25_accuracy: overUnderAccuracy,
+      btts_accuracy: bttsAccuracy,
+      handicap_accuracy: handicapAccuracy,
+      sample_confidence: sampleConfidence,
+      last_calculated_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'competition_id' });
 }

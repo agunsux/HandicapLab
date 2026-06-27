@@ -75,7 +75,12 @@ export async function GET(request: Request) {
                 league: fixture.competitionName,
                 status: fixture.status,
                 competition_type: isIntMatch ? 'international' : 'club',
-                tournament_stage: fixture.tournamentStage || null
+                tournament_stage: fixture.tournamentStage || null,
+                competition_id: leagueConfig.apiFootballId,
+                external_match_id: String(fixture.id),
+                source: process.env.DATA_PROVIDER || 'api-football',
+                fetched_at: new Date().toISOString(),
+                kickoff_time: fixture.matchDate
               })
               .eq('id', existingMatches[0].id);
             
@@ -91,7 +96,12 @@ export async function GET(request: Request) {
                 kickoff: fixture.matchDate,
                 status: fixture.status,
                 competition_type: isIntMatch ? 'international' : 'club',
-                tournament_stage: fixture.tournamentStage || null
+                tournament_stage: fixture.tournamentStage || null,
+                competition_id: leagueConfig.apiFootballId,
+                external_match_id: String(fixture.id),
+                source: process.env.DATA_PROVIDER || 'api-football',
+                fetched_at: new Date().toISOString(),
+                kickoff_time: fixture.matchDate
               });
 
             matchError = insertError;
