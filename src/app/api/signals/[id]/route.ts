@@ -5,10 +5,10 @@ import { determineUserAccess, maskSignalData } from '../../../../lib/signals/vis
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = params.id;
+    const { id } = await context.params;
     if (!id || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
       return NextResponse.json({ success: false, error: 'Invalid UUID format' }, { status: 400 });
     }

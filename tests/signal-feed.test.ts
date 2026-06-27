@@ -275,7 +275,7 @@ describe('Signal Delivery Layer (Phase 32)', () => {
   describe('GET /api/signals/[id]', () => {
     it('should return bad request for invalid UUID', async () => {
       const request = new Request('http://localhost/api/signals/invalid-id');
-      const response = await detailGET(request, { params: { id: 'invalid-id' } });
+      const response = await detailGET(request, { params: Promise.resolve({ id: 'invalid-id' }) });
       expect(response.status).toBe(400);
     });
 
@@ -293,7 +293,7 @@ describe('Signal Delivery Layer (Phase 32)', () => {
       mockEntitlement.active = false;
 
       const request = new Request(`http://localhost/api/signals/${validUuid}`);
-      const response = await detailGET(request, { params: { id: validUuid } });
+      const response = await detailGET(request, { params: Promise.resolve({ id: validUuid }) });
       const payload = await response.json();
 
       expect(payload.success).toBe(true);

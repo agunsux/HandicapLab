@@ -7,8 +7,8 @@ import { MarketTag } from '../../../components/signals/MarketTag';
 import { OddsMovement } from '../../../components/signals/OddsMovement';
 import { ConfidenceBadge } from '../../../components/ConfidenceBadge';
 
-export default function SignalDetailPage({ params }: { params: { id: string } }) {
-  const id = params.id;
+export default function SignalDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = React.use(params);
   const [signal, setSignal] = useState<any | null>(null);
   const [isPremium, setIsPremium] = useState(false);
   const [loading, setLoading] = useState(true);
