@@ -36,6 +36,9 @@ export interface LeagueConfig {
     start: string;
     end?: string;
   };
+  tier?: number;
+  liquidity_score?: number;
+  market_coverage_score?: number;
 }
 
 export const LEAGUE_REGISTRY: LeagueConfig[] = [
@@ -65,7 +68,10 @@ export const LEAGUE_REGISTRY: LeagueConfig[] = [
     activation: {
       start: '2026-06-11',
       end: '2026-07-19'
-    }
+    },
+    tier: 1,
+    liquidity_score: 95,
+    market_coverage_score: 100
   },
   {
     id: 'uefa_champions_league',
@@ -88,7 +94,10 @@ export const LEAGUE_REGISTRY: LeagueConfig[] = [
     cohort: 'EUROPA',
     minimumHistoricalMatches: 5,
     priority: 1,
-    competition_type: 'cup'
+    competition_type: 'cup',
+    tier: 1,
+    liquidity_score: 95,
+    market_coverage_score: 100
   },
   {
     id: 'uefa_europa_league',
@@ -110,7 +119,10 @@ export const LEAGUE_REGISTRY: LeagueConfig[] = [
     cohort: 'EUROPA',
     minimumHistoricalMatches: 5,
     priority: 1,
-    competition_type: 'cup'
+    competition_type: 'cup',
+    tier: 1,
+    liquidity_score: 85,
+    market_coverage_score: 100
   },
   {
     id: 'eng_premier_league',
@@ -133,7 +145,10 @@ export const LEAGUE_REGISTRY: LeagueConfig[] = [
     cohort: 'EPL',
     minimumHistoricalMatches: 10,
     priority: 2,
-    competition_type: 'league'
+    competition_type: 'league',
+    tier: 1,
+    liquidity_score: 100,
+    market_coverage_score: 100
   },
   {
     id: 'esp_la_liga',
@@ -156,7 +171,10 @@ export const LEAGUE_REGISTRY: LeagueConfig[] = [
     cohort: 'OTHER',
     minimumHistoricalMatches: 10,
     priority: 2,
-    competition_type: 'league'
+    competition_type: 'league',
+    tier: 1,
+    liquidity_score: 90,
+    market_coverage_score: 100
   },
   {
     id: 'ita_serie_a',
@@ -179,7 +197,10 @@ export const LEAGUE_REGISTRY: LeagueConfig[] = [
     cohort: 'OTHER',
     minimumHistoricalMatches: 10,
     priority: 2,
-    competition_type: 'league'
+    competition_type: 'league',
+    tier: 2,
+    liquidity_score: 75,
+    market_coverage_score: 100
   },
   {
     id: 'ger_bundesliga',
@@ -202,7 +223,10 @@ export const LEAGUE_REGISTRY: LeagueConfig[] = [
     cohort: 'OTHER',
     minimumHistoricalMatches: 10,
     priority: 2,
-    competition_type: 'league'
+    competition_type: 'league',
+    tier: 1,
+    liquidity_score: 90,
+    market_coverage_score: 100
   },
   {
     id: 'fra_ligue_1',
@@ -225,7 +249,10 @@ export const LEAGUE_REGISTRY: LeagueConfig[] = [
     cohort: 'OTHER',
     minimumHistoricalMatches: 10,
     priority: 2,
-    competition_type: 'league'
+    competition_type: 'league',
+    tier: 2,
+    liquidity_score: 70,
+    market_coverage_score: 100
   },
   {
     id: 'uefa_conference_league',
@@ -247,7 +274,10 @@ export const LEAGUE_REGISTRY: LeagueConfig[] = [
     cohort: 'OTHER',
     minimumHistoricalMatches: 5,
     priority: 3,
-    competition_type: 'cup'
+    competition_type: 'cup',
+    tier: 2,
+    liquidity_score: 65,
+    market_coverage_score: 100
   },
   {
     id: 'fra_ligue_2',
@@ -269,7 +299,10 @@ export const LEAGUE_REGISTRY: LeagueConfig[] = [
     cohort: 'LIGUE2',
     minimumHistoricalMatches: 10,
     priority: 3,
-    competition_type: 'league'
+    competition_type: 'league',
+    tier: 3,
+    liquidity_score: 30,
+    market_coverage_score: 40
   }
 ];
 
