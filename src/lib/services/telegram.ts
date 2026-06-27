@@ -38,3 +38,40 @@ export async function sendTelegramAlert(message: string): Promise<boolean> {
     return false;
   }
 }
+
+export async function sendTelegramMessage(message: string): Promise<boolean> {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_CHAT_ID;
+
+  if (!token || !chatId) {
+    console.warn(`[TelegramMessage] (Disabled - config missing) Message: ${message}`);
+    return false;
+  }
+
+  try {
+    const url = `https://api.telegram.org/bot${token}/sendMessage`;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: message,
+        parse_mode: 'HTML'
+      })
+    });
+
+    if (!response.ok) {
+      const responseText = await response.text();
+      console.error(`[TelegramMessage] API returned error status ${response.status}:`, responseText);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('[TelegramMessage] Connection error dispatching message:', error);
+    return false;
+  }
+}
+

@@ -18,8 +18,8 @@
       "schedule": "0 0 * * *"
     },
     {
-      "path": "/api/cron/settle",
-      "schedule": "0 1 * * *"
+      "path": "/api/cron/settle-signals",
+      "schedule": "0 23 * * *"
     },
     {
       "path": "/api/cron/generate-signals",
@@ -27,11 +27,19 @@
     },
     {
       "path": "/api/cron/capture-closing",
-      "schedule": "30 3 * * *"
+      "schedule": "*/15 * * * *"
     },
     {
       "path": "/api/cron/update-ratings",
       "schedule": "30 6 * * *"
+    },
+    {
+      "path": "/api/cron/daily-summary",
+      "schedule": "0 7 * * *"
+    },
+    {
+      "path": "/api/cron/biweekly-model-report",
+      "schedule": "0 7 1,15 * *"
     }
   ]
 }

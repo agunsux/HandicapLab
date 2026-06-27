@@ -44,11 +44,12 @@ async function handleCaptureClosing(request: Request) {
   console.log(`[CaptureClosing Cron] Checking for pending signals kickoff in range: [${rangeStart}, ${rangeEnd}]`);
 
   try {
-    // 1. Fetch pending signals starting in next 15 minutes
+    // 1. Fetch pending signals starting in next 15 minutes where closing_odds is null
     const { data: pendingSignals, error: fetchErr } = await supabase
       .from('signals')
       .select('*')
       .eq('status', 'pending')
+      .is('closing_odds', null)
       .gte('kickoff_utc', rangeStart)
       .lte('kickoff_utc', rangeEnd);
 
@@ -160,6 +161,23 @@ async function handleCaptureClosing(request: Request) {
             console.error(`[CaptureClosing Cron] Failed to update signal ${signal.id} with closing odds:`, updateErr);
           } else {
             console.log(`[CaptureClosing Cron] Updated signal ${signal.id} with closing odds: ${closingOdds}`);
+            
+            // Store captured odds snapshot in odds_snapshots table
+            const { error: snapshotErr } = await supabase
+              .from('odds_snapshots')
+              .insert({
+                match_id: signal.match_id,
+                bookmaker: 'pinnacle',
+                market: signal.market,
+                line: Number(signal.handicap_line || 0.0),
+                odds: closingOdds,
+                captured_at: new Date().toISOString()
+              });
+
+            if (snapshotErr) {
+              console.error(`[CaptureClosing Cron] Failed to insert odds_snapshot for signal ${signal.id}:`, snapshotErr);
+            }
+            
             capturedCount++;
           }
         } else {

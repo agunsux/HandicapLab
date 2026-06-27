@@ -230,6 +230,17 @@ async function runAudit(): Promise<boolean> {
       const kickoffStr = p.prediction_timestamp || matchesMap.get(String(p.match_id))?.kickoff;
       if (!kickoffStr) continue;
 
+      // Skip historical seeds or backtests to avoid false positives on retrospectively generated test data
+      const isHistorical = new Date(kickoffStr).getUTCFullYear() < 2026 || 
+        (p.cohort_tag && (
+          p.cohort_tag.toLowerCase().includes('backtest') || 
+          p.cohort_tag.toLowerCase().includes('seed') || 
+          p.cohort_tag.toLowerCase().includes('historical')
+        ));
+      if (isHistorical) {
+        continue;
+      }
+
       const kickoffTime = new Date(kickoffStr).getTime();
       const generatedTime = p.generated_at ? new Date(p.generated_at).getTime() : null;
 
