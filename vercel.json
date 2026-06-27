@@ -27,7 +27,7 @@
     },
     {
       "path": "/api/cron/capture-closing",
-      "schedule": "*/15 * * * *"
+      "schedule": "30 22 * * *"
     },
     {
       "path": "/api/cron/update-ratings",
