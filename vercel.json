@@ -43,7 +43,7 @@
     },
     {
       "path": "/api/cron/capture-odds",
-      "schedule": "*/30 * * * *"
+      "schedule": "0 22 * * *"
     }
   ]
 }
