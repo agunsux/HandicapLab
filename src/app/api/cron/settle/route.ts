@@ -210,15 +210,24 @@ async function runSignalsSettlement(logId: string | null) {
         }
 
         try {
+          const isFulltimeValid = fixture.score?.fulltime?.home !== null && 
+                                  fixture.score?.fulltime?.away !== null && 
+                                  fixture.score?.fulltime?.home !== undefined && 
+                                  fixture.score?.fulltime?.away !== undefined;
+
+          const homeGoals = isFulltimeValid ? Number(fixture.score.fulltime.home) : Number(fixture.goals.home ?? 0);
+          const awayGoals = isFulltimeValid ? Number(fixture.score.fulltime.away) : Number(fixture.goals.away ?? 0);
+          const settlementSource = isFulltimeValid ? 'REGULAR_TIME' : 'GOALS_FALLBACK';
+
           // Update matches table if not already updated
           if (isFinished) {
             await supabase
               .from('matches')
               .update({
-                home_goals: fixture.goals.home,
-                away_goals: fixture.goals.away,
-                ht_home_goals: fixture.score.halftime.home,
-                ht_away_goals: fixture.score.halftime.away,
+                home_goals: homeGoals,
+                away_goals: awayGoals,
+                ht_home_goals: fixture.score?.halftime?.home,
+                ht_away_goals: fixture.score?.halftime?.away,
                 status: 'finished',
                 updated_at: new Date().toISOString()
               })
@@ -240,8 +249,7 @@ async function runSignalsSettlement(logId: string | null) {
             status = 'void';
             profit_loss = 0.0;
           } else {
-            const homeGoals = fixture.goals.home ?? 0;
-            const awayGoals = fixture.goals.away ?? 0;
+            console.log(`[Settlement Cron] Settle signal ${signal.id} (${signal.market}) using goals: ${homeGoals}-${awayGoals} (source: ${settlementSource})`);
             const odds = Number(signal.odds || 1.0);
             const selection = (signal.selection || 'home').toLowerCase();
             const market = (signal.market || '').toLowerCase();
