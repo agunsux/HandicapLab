@@ -76,6 +76,14 @@ export async function unlockForensicAction(ledgerId: string) {
       return { success: false, error: 'NO_ENTITLEMENT' };
     }
 
+    // Log the unlock action to entitlement_audit_log for observability
+    await supabase.from('entitlement_audit_log').insert({
+      user_id: user.id,
+      action: 'UNLOCKED',
+      access_type: 'FORENSIC_POPOVER',
+      reason: `Unlocked forensic parameters popover for prediction ledger: ${ledgerId}`
+    });
+
     // Query prediction snapshot and parse math parameters
     const { data: ledgerEntry } = await supabase
       .from('prediction_ledger')

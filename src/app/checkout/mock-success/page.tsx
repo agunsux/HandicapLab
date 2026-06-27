@@ -19,84 +19,45 @@ export default async function MockSuccessPage({ searchParams }: SuccessPageProps
   let success = false;
   let entitlementGranted = '';
 
-  if (txId) {
-    // 1. Fetch transaction
+  if (txId && sessionId) {
+    // 1. Simulate Stripe webhook call server-side securely
+    const host = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    try {
+      const webhookPayload = {
+        id: `evt_${sessionId}`,
+        type: 'checkout.session.completed',
+        data: {
+          object: {
+            id: sessionId,
+            metadata: {
+              transaction_id: txId
+            }
+          }
+        }
+      };
+
+      await fetch(`${host}/api/webhooks/stripe`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(webhookPayload)
+      });
+    } catch (err) {
+      console.error('[Mock Success Page] Failed to deliver webhook:', err);
+    }
+
+    // 2. Fetch the updated transaction state
     const { data: tx } = await supabase
       .from('transactions')
       .select('*')
       .eq('id', txId)
       .maybeSingle();
 
-    if (tx) {
-      if (tx.status === 'PENDING') {
-        // 2. Update status to SUCCESS
-        await supabase
-          .from('transactions')
-          .update({ status: 'SUCCESS' })
-          .eq('id', txId);
-
-        // Update payment history
-        await supabase.from('payment_status_history').insert({
-          transaction_id: txId,
-          from_status: 'PENDING',
-          to_status: 'SUCCESS'
-        });
-
-        // 3. Resolve user (use default mockup user if transaction has no user)
-        const userId = tx.user_id || '00000000-0000-0000-0000-000000000000';
-
-        // 4. Grant Entitlements
-        const isLifetime = tx.amount_usd >= 9.0; // Lifetime price is > $9; credits pack is $0.50-$3.00
-
-        if (isLifetime) {
-          // Check if lifetime entitlement already exists
-          const { data: existingEnt } = await supabase
-            .from('user_entitlements')
-            .select('id')
-            .eq('user_id', userId)
-            .eq('access_type', 'LIFETIME_PRO')
-            .maybeSingle();
-
-          if (!existingEnt) {
-            await supabase.from('user_entitlements').insert({
-              user_id: userId,
-              access_type: 'LIFETIME_PRO',
-              is_active: true
-            });
-          }
-          entitlementGranted = 'LIFETIME QUANT PRO';
-        } else {
-          // Increment Credits balance by 10
-          const { data: existingCredits } = await supabase
-            .from('user_entitlements')
-            .select('*')
-            .eq('user_id', userId)
-            .eq('access_type', 'CREDITS')
-            .maybeSingle();
-
-          if (existingCredits) {
-            await supabase
-              .from('user_entitlements')
-              .update({ credits_balance: (existingCredits.credits_balance || 0) + 10 })
-              .eq('id', existingCredits.id);
-          } else {
-            await supabase.from('user_entitlements').insert({
-              user_id: userId,
-              access_type: 'CREDITS',
-              credits_balance: 10,
-              is_active: true
-            });
-          }
-          entitlementGranted = '10 FORENSICS CREDITS';
-        }
-
-        success = true;
-        message = 'Payment Verified & Entitlement Granted successfully!';
-      } else if (tx.status === 'SUCCESS') {
-        success = true;
-        message = 'This order was already fulfilled successfully.';
-        entitlementGranted = tx.amount_usd >= 9.0 ? 'LIFETIME QUANT PRO' : '10 FORENSICS CREDITS';
-      }
+    if (tx && tx.status === 'SUCCESS') {
+      success = true;
+      message = 'Payment Verified & Entitlement Granted via Webhook!';
+      entitlementGranted = tx.amount_usd >= 9.0 ? 'LIFETIME QUANT PRO' : '10 FORENSICS CREDITS';
+    } else {
+      message = 'Fulfillment pending webhook processing...';
     }
   }
 

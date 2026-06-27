@@ -72,6 +72,15 @@ export async function POST(req: Request) {
       to_status: 'PENDING'
     });
 
+    // 6. Log checkout attempt event for observability
+    await supabase.from('paywall_events').insert({
+      user_id: userId === '00000000-0000-0000-0000-000000000000' ? null : userId,
+      event_type: 'CHECKOUT_ATTEMPT',
+      product_type: product_type,
+      ppp_tier: ppp_tier || 'TIER_1',
+      amount_usd: amount
+    });
+
     // Return redirect success URL
     const successUrl = `/checkout/mock-success?session_id=${mockSessionId}&transaction_id=${newTx.id}`;
 
