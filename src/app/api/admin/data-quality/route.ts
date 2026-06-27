@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { DataQualityEngine } from '../../../lib/analytics/data-quality';
+import { DataQualityEngine } from '../../../../lib/analytics/data-quality';
 
 export async function GET() {
   try {
