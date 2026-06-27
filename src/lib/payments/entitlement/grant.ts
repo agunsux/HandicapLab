@@ -63,7 +63,7 @@ export async function grantEntitlement(
 
     if (existing) {
       beforeVal = existing.credits_balance || 0;
-      afterVal = beforeVal + 10;
+      afterVal = (beforeVal || 0) + 10;
       entitlementId = existing.id;
 
       const { error } = await supabase

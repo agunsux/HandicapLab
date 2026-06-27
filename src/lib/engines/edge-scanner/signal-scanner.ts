@@ -49,7 +49,7 @@ export class SignalScanner {
       // Parse handicap line
       const lineNum = pick.line && pick.line !== '1X2' ? parseFloat(pick.line) : 0.0;
 
-      let marketSelection = pick.outcome;
+      let marketSelection: string = pick.outcome;
       if (pick.marketType === 'AH' || pick.marketType === 'OU') {
         marketSelection = `${pick.outcome}_${pick.line}`;
       }

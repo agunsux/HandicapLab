@@ -22,7 +22,7 @@ export async function POST(req: Request) {
     // 3. Process event
     const result = await paymentEventProcessor(normalizedEvent);
 
-    return NextResponse.json({ success: true, ...result });
+    return NextResponse.json(result);
   } catch (err: any) {
     console.error('[Midtrans Webhook Endpoint Error]:', err);
     return NextResponse.json({ error: err.message }, { status: 500 });

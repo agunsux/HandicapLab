@@ -53,6 +53,9 @@ export function calculateQualityMetrics(signal: {
 export interface DataQualityReport {
   score: number;
   status: 'healthy' | 'warning' | 'broken';
+  quality_score: number;
+  confidence_level: 'LOW' | 'MEDIUM' | 'HIGH';
+  sample_size: number;
   metrics: {
     totalSignals: number;
     orphanSignals: number;
