@@ -322,7 +322,7 @@ async function runSignalsSettlement(logId: string | null) {
 
           // Settle public prediction ledger (Settlement only updates result fields)
           const ledgerStatus = status === 'win' ? 'won' : status === 'half_win' ? 'won' : status === 'half_loss' ? 'lost' : status;
-          await supabase
+          const { data: ledgerEntry } = await supabase
             .from('prediction_ledger')
             .update({
               result_status: ledgerStatus,
@@ -332,30 +332,54 @@ async function runSignalsSettlement(logId: string | null) {
               updated_at: new Date().toISOString()
             })
             .eq('match_id', String(signal.match_id))
-            .eq('market', signal.market);
-
-          // Settle paper trade
-          const { data: trade } = await supabase
-            .from('paper_trades')
-            .select('*')
-            .eq('signal_id', signal.id)
+            .eq('market', signal.market)
+            .select('id')
             .maybeSingle();
 
-          if (trade) {
-            const stakeVal = Number(trade.stake || 10.0);
-            const tradeProfit = stakeVal * profit_loss;
+          // Settle paper trade
+          const ledgerId = ledgerEntry?.id;
+          let tradeResult = null;
+          if (ledgerId) {
+            const { data } = await supabase
+              .from('paper_trades')
+              .select('*')
+              .eq('prediction_ledger_id', ledgerId)
+              .maybeSingle();
+            tradeResult = data;
+          }
+
+          if (tradeResult) {
+            const entryOdds = Number(tradeResult.entry_odds || tradeResult.opening_odds || tradeResult.odds || 1.90);
+            const stakeUnits = Number(tradeResult.stake_units || 1.0);
+            
+            let pnlUnits = -1.0 * stakeUnits;
+            if (ledgerStatus === 'won') {
+              pnlUnits = stakeUnits * (entryOdds - 1.0);
+            } else if (ledgerStatus === 'void') {
+              pnlUnits = 0.0;
+            } else if (status === 'half_win') {
+              pnlUnits = stakeUnits * 0.5 * (entryOdds - 1.0);
+            } else if (status === 'half_loss') {
+              pnlUnits = stakeUnits * -0.5;
+            }
+
             const clvVal = CLVCalculator.calculate(openingOdds, closingOdds || null);
 
             await supabase
               .from('paper_trades')
               .update({
                 result: status,
-                profit: Number(tradeProfit.toFixed(2)),
-                status: 'settled',
+                profit: Number((pnlUnits * 10.0).toFixed(2)),
+                status: ledgerStatus.toUpperCase(),
                 clv: clvVal,
+                // New Engine v2 columns:
+                closing_odds: closingOdds || null,
+                pnl_units: Number(pnlUnits.toFixed(4)),
+                clv_percentage: clvVal,
+                settled_at: new Date().toISOString(),
                 updated_at: new Date().toISOString()
               })
-              .eq('id', trade.id);
+              .eq('id', tradeResult.id);
           }
 
           signalsSettled++;

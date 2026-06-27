@@ -22,6 +22,13 @@ export async function runPredictionCron(): Promise<any> {
     return { success: true, message: 'No upcoming matches found' };
   }
 
+  const { data: ptConfig } = await supabase
+    .from('paper_trading_config')
+    .select('min_edge_threshold')
+    .limit(1)
+    .maybeSingle();
+  const minEdgeThreshold = ptConfig?.min_edge_threshold ? Number(ptConfig.min_edge_threshold) : 2.0;
+
   const results: any[] = [];
 
   for (const match of matches) {
@@ -172,10 +179,16 @@ export async function runPredictionCron(): Promise<any> {
           .eq('market', ledgerMarket)
           .maybeSingle();
 
-        if (!existingLedger) {
+        let ledgerId: string | null = null;
+
+        if (existingLedger) {
+          ledgerId = existingLedger.id;
+        } else {
+          const newLedgerId = crypto.randomUUID();
           const { error: ledgerErr } = await supabase
             .from('prediction_ledger')
             .insert({
+              id: newLedgerId,
               prediction_snapshot_id: snapshotId,
               match_id: String(match.id),
               competition_id: leagueConfig.apiFootballId,
@@ -191,16 +204,23 @@ export async function runPredictionCron(): Promise<any> {
 
           if (ledgerErr) {
             console.error('Error logging to prediction_ledger:', ledgerErr);
+          } else {
+            ledgerId = newLedgerId;
           }
         }
 
-        // 8. Auto-populate a paper trade for a default user to help with testing and dashboard metrics (Idempotently)
-        if (topPick) {
+        // 8. Auto-populate a paper trade if qualifiers are met (confidence >= 70, expected_value > 0, edge >= threshold)
+        const confidenceScore = probOutput.confidence ? Math.round(probOutput.confidence.finalConfidence * 100) : 0;
+        const expectedValue = topPick ? Number(topPick.expectedValue || 0) : 0;
+        const edgeScore = expectedValue * 100;
+        const qualifiesForTrade = confidenceScore >= 70 && edgeScore >= minEdgeThreshold && expectedValue > 0;
+
+        if (qualifiesForTrade && topPick && ledgerId) {
           const testUserId = '00000000-0000-0000-0000-000000000000';
           const { data: existingTrade } = await supabase
             .from('paper_trades')
             .select('id')
-            .eq('prediction_id', storedPred.id)
+            .eq('prediction_ledger_id', ledgerId)
             .eq('user_id', testUserId)
             .maybeSingle();
 
@@ -208,14 +228,19 @@ export async function runPredictionCron(): Promise<any> {
             const { error: tradeInsertErr } = await supabase.from('paper_trades').insert({
               user_id: testUserId,
               prediction_id: storedPred.id,
+              prediction_ledger_id: ledgerId,
               match_id: String(match.id),
-              competition_id: leagueConfig.id,
+              competition_id: String(leagueConfig.apiFootballId),
               market_type: marketType,
               market_subtype: predictionPayload.market_subtype,
               selection: topPick.outcome,
               entry_odds: topPick.marketOdds,
-              opening_odds: topPick.marketOdds, // Sprint 6: Store opening odds
-              stake: topPick.kellyStake > 0 ? topPick.kellyStake : 0.05,
+              opening_odds: topPick.marketOdds,
+              odds: topPick.marketOdds,
+              stake: 1.0,
+              stake_units: 1.0,
+              expected_value: expectedValue,
+              edge_score: edgeScore,
               cohort_tag: cohortTag,
               status: 'PENDING'
             });
