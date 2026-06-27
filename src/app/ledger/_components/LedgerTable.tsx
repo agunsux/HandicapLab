@@ -1,6 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { checkUserEntitlementsAction, unlockForensicAction } from '@/app/actions/monetization';
+import UpsellModal from '@/components/UpsellModal';
 
 interface LedgerItem {
   id: string;
@@ -40,6 +42,63 @@ export function LedgerTable({ initialItems }: LedgerTableProps) {
   const [filter, setFilter] = useState<'all' | 'pending' | 'won' | 'lost'>('all');
   const [viewMode, setViewMode] = useState<'public' | 'pro'>('public');
   const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  // Gating & Entitlements state:
+  const [hasLifetime, setHasLifetime] = useState<boolean>(false);
+  const [userCredits, setUserCredits] = useState<number>(0);
+  const [unlockedForensics, setUnlockedForensics] = useState<Record<string, any>>({});
+  const [isUpsellOpen, setIsUpsellOpen] = useState<boolean>(false);
+  const [unlockingId, setUnlockingId] = useState<string | null>(null);
+
+  useEffect(() => {
+    loadUserEntitlements();
+  }, []);
+
+  async function loadUserEntitlements() {
+    const data = await checkUserEntitlementsAction();
+    setHasLifetime(data.hasLifetime);
+    setUserCredits(data.creditsBalance);
+  }
+
+  const toggleRow = async (id: string) => {
+    if (expandedId === id) {
+      setExpandedId(null);
+    } else {
+      setExpandedId(id);
+      // Auto-unlock if user has Lifetime Pro (since it doesn't cost credits)
+      if (hasLifetime && !unlockedForensics[id]) {
+        try {
+          const res = await unlockForensicAction(id);
+          if (res.success && res.forensics) {
+            setUnlockedForensics(prev => ({ ...prev, [id]: res.forensics }));
+          }
+        } catch (err) {
+          console.error('Auto unlock failed:', err);
+        }
+      }
+    }
+  };
+
+  const handleUnlockWithCredit = async (itemId: string) => {
+    if (userCredits <= 0) {
+      setIsUpsellOpen(true);
+      return;
+    }
+    setUnlockingId(itemId);
+    try {
+      const res = await unlockForensicAction(itemId);
+      if (res.success && res.forensics) {
+        setUnlockedForensics(prev => ({ ...prev, [itemId]: res.forensics }));
+        setUserCredits(prev => Math.max(0, prev - 1));
+      } else {
+        alert(res.error || 'Failed to unlock forensic popover.');
+      }
+    } catch (err) {
+      console.error('Unlock error:', err);
+    } finally {
+      setUnlockingId(null);
+    }
+  };
 
   const filteredItems = initialItems.filter((item) => {
     if (filter === 'all') return true;
@@ -116,9 +175,7 @@ export function LedgerTable({ initialItems }: LedgerTableProps) {
     return 'None';
   };
 
-  const toggleRow = (id: string) => {
-    setExpandedId(expandedId === id ? null : id);
-  };
+
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-8 space-y-8">
@@ -331,30 +388,71 @@ export function LedgerTable({ initialItems }: LedgerTableProps) {
                                   </div>
                                 </div>
                               ) : (
-                                <div className="space-y-3">
-                                  <div className="grid grid-cols-2 gap-y-1 text-slate-300 border-b border-slate-900 pb-2">
-                                    <span className="text-slate-500">Expected Value EV:</span>
-                                    <span className={item.expected_value && item.expected_value > 0 ? 'text-emerald-400 font-bold' : 'text-slate-400'}>
-                                      {item.expected_value ? `+${(item.expected_value * 100).toFixed(2)}% EV` : '—'}
-                                    </span>
-                                    <span className="text-slate-500">Edge Score:</span>
-                                    <span className="text-teal-400 font-bold">{item.edge_score ? `${item.edge_score.toFixed(2)}%` : '—'}</span>
-                                  </div>
-                                  <div className="grid grid-cols-3 gap-2 text-[10px]">
-                                    <div className="bg-slate-900/80 p-2 rounded border border-slate-850">
-                                      <span className="text-slate-500 block uppercase">ELO Shift</span>
-                                      <span className="text-slate-200 block font-bold mt-0.5">Home +18.4</span>
-                                      <span className="text-slate-200 block font-bold">Away -18.4</span>
+                                <div className="space-y-3 relative min-h-[140px]">
+                                  {/* Gating Overlay for Pro Quant view */}
+                                  {!hasLifetime && !unlockedForensics[item.id] ? (
+                                    <div className="absolute inset-0 bg-[#070D19]/90 backdrop-blur-sm flex flex-col items-center justify-center text-center p-4 z-20 rounded-lg border border-slate-800/60">
+                                      <span className="text-[11px] font-mono font-bold text-teal-400 mb-1">📊 FORENSIC FORECASTS LOCKED</span>
+                                      <p className="text-[10px] text-slate-400 max-w-[280px] mb-3 leading-relaxed">
+                                        Unlocked with Lifetime Pro or 1 credit. (Remaining: {userCredits} credits)
+                                      </p>
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          if (userCredits > 0) {
+                                            handleUnlockWithCredit(item.id);
+                                          } else {
+                                            setIsUpsellOpen(true);
+                                          }
+                                        }}
+                                        className="bg-teal-500 hover:bg-teal-400 text-slate-950 text-[10px] font-mono font-bold px-3 py-1.5 rounded uppercase tracking-wider transition-all"
+                                      >
+                                        {unlockingId === item.id 
+                                          ? 'UNLOCKING...' 
+                                          : userCredits > 0 
+                                            ? `Unlock with 1 Credit` 
+                                            : 'Get Lifetime Pro / Buy Credits'}
+                                      </button>
                                     </div>
-                                    <div className="bg-slate-900/80 p-2 rounded border border-slate-850">
-                                      <span className="text-slate-500 block uppercase">Poisson xG</span>
-                                      <span className="text-slate-200 block font-bold mt-0.5">H: 1.48 Gs</span>
-                                      <span className="text-slate-200 block font-bold">A: 0.94 Gs</span>
+                                  ) : null}
+
+                                  <div className="space-y-3">
+                                    <div className="grid grid-cols-2 gap-y-1 text-slate-300 border-b border-slate-900 pb-2">
+                                      <span className="text-slate-500">Expected Value EV:</span>
+                                      <span className={item.expected_value && item.expected_value > 0 ? 'text-emerald-400 font-bold' : 'text-slate-400'}>
+                                        {item.expected_value ? `+${(item.expected_value * 100).toFixed(2)}% EV` : '—'}
+                                      </span>
+                                      <span className="text-slate-500">Edge Score:</span>
+                                      <span className="text-teal-400 font-bold">{item.edge_score ? `${item.edge_score.toFixed(2)}%` : '—'}</span>
                                     </div>
-                                    <div className="bg-slate-900/80 p-2 rounded border border-slate-850">
-                                      <span className="text-slate-500 block uppercase">Dixon-Coles</span>
-                                      <span className="text-slate-200 block font-bold mt-0.5">Rho: -0.041</span>
-                                      <span className="text-slate-200 block font-bold">Decay: 0.998</span>
+                                    <div className="grid grid-cols-3 gap-2 text-[10px]">
+                                      <div className="bg-slate-900/80 p-2 rounded border border-slate-850">
+                                        <span className="text-slate-500 block uppercase">ELO Shift</span>
+                                        <span className="text-slate-200 block font-bold mt-0.5">
+                                          {unlockedForensics[item.id]?.eloHomeShift || 'Home +18.4'}
+                                        </span>
+                                        <span className="text-slate-200 block font-bold">
+                                          {unlockedForensics[item.id]?.eloAwayShift || 'Away -18.4'}
+                                        </span>
+                                      </div>
+                                      <div className="bg-slate-900/80 p-2 rounded border border-slate-850">
+                                        <span className="text-slate-500 block uppercase">Poisson xG</span>
+                                        <span className="text-slate-200 block font-bold mt-0.5">
+                                          {unlockedForensics[item.id]?.poissonHomeXG || 'H: 1.48 Gs'}
+                                        </span>
+                                        <span className="text-slate-200 block font-bold">
+                                          {unlockedForensics[item.id]?.poissonAwayXG || 'A: 0.94 Gs'}
+                                        </span>
+                                      </div>
+                                      <div className="bg-slate-900/80 p-2 rounded border border-slate-850">
+                                        <span className="text-slate-500 block uppercase">Dixon-Coles</span>
+                                        <span className="text-slate-200 block font-bold mt-0.5">
+                                          {unlockedForensics[item.id]?.dixonColesRho || 'Rho: -0.041'}
+                                        </span>
+                                        <span className="text-slate-200 block font-bold">
+                                          {unlockedForensics[item.id]?.dixonColesDecay || 'Decay: 0.998'}
+                                        </span>
+                                      </div>
                                     </div>
                                   </div>
                                 </div>
@@ -379,6 +477,16 @@ export function LedgerTable({ initialItems }: LedgerTableProps) {
           </table>
         </div>
       </div>
+
+      {/* Dynamic Upsell paywall modal */}
+      <UpsellModal
+        isOpen={isUpsellOpen}
+        onClose={() => setIsUpsellOpen(false)}
+        onSuccess={() => {
+          setIsUpsellOpen(false);
+          loadUserEntitlements();
+        }}
+      />
     </div>
   );
 }
