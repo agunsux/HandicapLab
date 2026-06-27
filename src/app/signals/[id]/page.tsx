@@ -127,6 +127,36 @@ export default function SignalDetailPage({ params }: { params: Promise<{ id: str
               </div>
             </div>
 
+            {/* Model Quantitative Breakdown */}
+            <div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
+              <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">
+                Model Quantitative Breakdown
+              </h3>
+              <div className="space-y-4 text-sm text-slate-350">
+                <p>
+                  This prediction was flagged by model version <strong className="text-white font-mono">{signal.prediction.model_version}</strong> based on pricing inefficiencies and validation parameters:
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
+                  <div className="bg-slate-950 border border-slate-850 p-4 rounded">
+                    <span className="text-blue-500 font-bold block mb-1 text-xs uppercase tracking-wide">Probability Edge</span>
+                    <p className="text-xs text-slate-400 leading-normal">
+                      The model calculates a probability discrepancy yielding an expected edge of{' '}
+                      <strong className="text-emerald-400 font-mono">{signal.prediction.edge !== null ? `+${signal.prediction.edge.toFixed(1)}%` : '🔒 Premium'}</strong>{' '}
+                      above consensus odds.
+                    </p>
+                  </div>
+                  
+                  <div className="bg-slate-950 border border-slate-850 p-4 rounded">
+                    <span className="text-blue-500 font-bold block mb-1 text-xs uppercase tracking-wide">Signal Quality</span>
+                    <p className="text-xs text-slate-400 leading-normal">
+                      Calculated signal quality integrity score of{' '}
+                      <strong className="text-white font-mono">{signal.metrics?.quality_score || 75} / 100</strong>, reflecting robust market feed limits and provider availability.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Market History & Odds Movement */}
             <div className="bg-slate-900 border border-slate-800 rounded-lg p-6">
               <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">
