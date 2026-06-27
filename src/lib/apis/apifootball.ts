@@ -283,6 +283,20 @@ export class ApiFootballClient {
       options
     );
   }
+
+  /**
+   * Fetch all currently live fixtures
+   */
+  public async getLiveFixtures(
+    options?: FetchOptions
+  ): Promise<z.infer<typeof ApiFootballFixturesResponseSchema>> {
+    return this.request(
+      'fixtures',
+      { live: 'all' },
+      ApiFootballFixturesResponseSchema,
+      options
+    );
+  }
 }
 
 export const apiFootballClient = new ApiFootballClient();
