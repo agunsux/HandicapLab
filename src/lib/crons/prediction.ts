@@ -192,6 +192,17 @@ export async function runPredictionCron(): Promise<any> {
           decisionReason = 'Passes confidence, edge, and EV criteria';
         }
 
+        let reasonCategory = 'QUALIFIED_EDGE';
+        if (!topPick) {
+          reasonCategory = 'NO_SELECTION';
+        } else if (confidenceScore < minConfidenceThreshold) {
+          reasonCategory = 'MIN_CONFIDENCE_UNDER_THRESHOLD';
+        } else if (edgeScore < minEdgeThreshold) {
+          reasonCategory = 'MIN_EDGE_UNDER_THRESHOLD';
+        } else if (expectedValue <= 0) {
+          reasonCategory = 'NEGATIVE_EXPECTED_VALUE';
+        }
+
         const ledgerMarket = marketType === 'AH' ? 'asian_handicap' : marketType === 'OU' ? 'over_under' : 'moneyline';
         const { data: existingLedger } = await supabase
           .from('prediction_ledger')
@@ -232,6 +243,40 @@ export async function runPredictionCron(): Promise<any> {
           }
         }
 
+        // Store in prediction_decisions table
+        let decisionId: string | null = null;
+        if (ledgerId) {
+          const { data: existingDecision } = await supabase
+            .from('prediction_decisions')
+            .select('id')
+            .eq('prediction_ledger_id', ledgerId)
+            .maybeSingle();
+
+          if (!existingDecision) {
+            const { data: newDecision, error: decisionErr } = await supabase
+              .from('prediction_decisions')
+              .insert({
+                prediction_ledger_id: ledgerId,
+                decision: decision,
+                reason_category: reasonCategory,
+                reason_text: decisionReason,
+                confidence_score: confidenceScore,
+                edge_score: edgeScore,
+                expected_value: expectedValue
+              })
+              .select('id')
+              .maybeSingle();
+
+            if (decisionErr) {
+              console.error('Error inserting prediction_decision:', decisionErr);
+            } else if (newDecision) {
+              decisionId = newDecision.id;
+            }
+          } else {
+            decisionId = existingDecision.id;
+          }
+        }
+
         // 8. Auto-populate a paper trade if qualifiesForTrade is met
         const qualifiesForTrade = decision === 'BET';
 
@@ -249,6 +294,7 @@ export async function runPredictionCron(): Promise<any> {
               user_id: testUserId,
               prediction_id: storedPred.id,
               prediction_ledger_id: ledgerId,
+              prediction_decision_id: decisionId,
               match_id: String(match.id),
               competition_id: String(leagueConfig.apiFootballId),
               market_type: marketType,

@@ -36,10 +36,17 @@ export default async function LedgerPage() {
     competitions = compData || [];
   }
 
+  // Fetch prediction decisions
+  const { data: decisions } = await supabase
+    .from('prediction_decisions')
+    .select('*');
+
   // 4. Combine data layers in memory
   const items = (ledgerEntries || []).map((entry) => {
     const match = matches.find(m => String(m.id) === String(entry.match_id) || String(m.external_match_id) === String(entry.match_id));
     const comp = competitions.find(c => Number(c.api_id) === Number(entry.competition_id));
+    const decisionObj = (decisions || []).find(d => String(d.prediction_ledger_id) === String(entry.id));
+
     return {
       id: entry.id,
       published_at: entry.published_at,
@@ -47,7 +54,7 @@ export default async function LedgerPage() {
       selection: entry.selection,
       odds_at_prediction: entry.odds_at_prediction,
       confidence: entry.confidence,
-      model_version: entry.model_version,
+      model_version: entry.model_version || 'prematch-v1',
       result_status: entry.result_status,
       settled_at: entry.settled_at,
       roi: entry.roi,
@@ -56,7 +63,18 @@ export default async function LedgerPage() {
       away_team: match?.away_team || 'Unknown Team',
       kickoff: match?.kickoff || entry.published_at,
       competition_name: comp?.name || 'Global Match',
-      competition_logo: comp?.logo_url || ''
+      competition_logo: comp?.logo_url || '',
+      
+      // Decisions mapping:
+      decision: decisionObj?.decision || entry.decision || 'SKIP',
+      reason_category: decisionObj?.reason_category || entry.decision_reason || 'NO_SELECTION',
+      reason_text: decisionObj?.reason_text || entry.decision_reason || 'Does not meet EV/confidence criteria',
+      edge_score: decisionObj?.edge_score !== undefined ? Number(decisionObj.edge_score) : null,
+      expected_value: decisionObj?.expected_value !== undefined ? Number(decisionObj.expected_value) : null,
+
+      // Source telemetry:
+      data_source: match?.source || 'API-Football / Pinnacle',
+      fetched_at: match?.fetched_at || entry.published_at
     };
   });
 
