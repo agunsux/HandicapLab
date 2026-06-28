@@ -13,6 +13,8 @@ import { runHealthCheck } from '@/lib/services/healthChecker';
 import { createSignalEvent } from '@/lib/alerts/events';
 import { ModelIntelligenceAdjuster } from '@/lib/intelligence/adjuster';
 import { PerformanceAttribution } from '@/lib/intelligence/attribution';
+import { toFiniteNumber, isMalformed } from '@/lib/utils/number';
+import { OddsIngestionContext } from '@/lib/observability/oddsIngestion';
 
 const SPORT_MAP: Record<number, string> = {
   39: 'soccer_epl',
@@ -214,6 +216,7 @@ async function handleGenerateSignals(request: Request) {
   }
 
   const logId = await CronLogger.start('generate-signals');
+  const ctx = new OddsIngestionContext('generate-signals');
   let recordsProcessed = 0;
 
   const isDryRun = process.env.CRON_DRY_RUN === 'true';
@@ -434,16 +437,36 @@ async function handleGenerateSignals(request: Request) {
               const drawOutcome = h2hMarket.outcomes.find((o: any) => o.name.toLowerCase() === 'draw');
               const awayOutcome = h2hMarket.outcomes.find((o: any) => isTeamMatch(o.name, awayTeam));
 
-              const evaluateML = async (selection: string, probability: number, odds: number) => {
-                if (odds < 1.70 || odds > 2.30) return;
-                const fairOdds = 1.0 / probability;
-                const edge = ((odds * probability) - 1.0) * 100;
+               const evaluateML = async (selection: string, probability: number, odds: number) => {
+                const safeOdds = toFiniteNumber(odds);
+                const safeProbability = toFiniteNumber(probability);
+                if (
+                  safeOdds === null ||
+                  safeProbability === null ||
+                  safeOdds <= 0 ||
+                  safeProbability <= 0
+                ) {
+                  if (isMalformed(odds) || isMalformed(probability)) {
+                    console.warn("Skipping invalid market data", {
+                      fixtureId: matchUuid,
+                      homeTeam,
+                      awayTeam,
+                      market: 'ML',
+                      rawOdds: odds,
+                      rawProbability: probability
+                    });
+                  }
+                  return;
+                }
+                if (safeOdds < 1.70 || safeOdds > 2.30) return;
+                const fairOdds = 1.0 / safeProbability;
+                const edge = ((safeOdds * safeProbability) - 1.0) * 100;
 
-                const impliedProb = 1.0 / odds;
-                const divergence = Math.abs(probability - impliedProb);
+                const impliedProb = 1.0 / safeOdds;
+                const divergence = Math.abs(safeProbability - impliedProb);
                 const isAnomaly = divergence > 0.15;
                 const anomalyReason = isAnomaly
-                  ? `Model probability (${(probability * 100).toFixed(1)}%) vs market implied probability (${(impliedProb * 100).toFixed(1)}%) exceeds 15% divergence threshold.`
+                  ? `Model probability (${(safeProbability * 100).toFixed(1)}%) vs market implied probability (${(impliedProb * 100).toFixed(1)}%) exceeds 15% divergence threshold.`
                   : null;
 
                 if (edge >= thresholds.ML) {
@@ -455,9 +478,9 @@ async function handleGenerateSignals(request: Request) {
                     kickoff_utc: kickoffTime.toISOString(),
                     market: 'moneyline',
                     selection,
-                    odds,
+                    odds: safeOdds,
                     fair_odds: Number(fairOdds.toFixed(4)),
-                    probability: Number(probability.toFixed(4)),
+                    probability: Number(safeProbability.toFixed(4)),
                     edge_pct: Number(edge.toFixed(2)),
                     confidence: confidenceScore,
                     status: 'pending',
@@ -521,16 +544,37 @@ async function handleGenerateSignals(request: Request) {
                 const lineKey = formatAhLine(isHome ? lineVal : -lineVal);
                 const probability = isHome ? probOutput.pAhHome[lineKey] : probOutput.pAhAway[lineKey];
 
-                if (!probability || outcome.price < 1.70 || outcome.price > 2.30) continue;
+                const safeOdds = toFiniteNumber(outcome.price);
+                const safeProbability = toFiniteNumber(probability);
+                if (
+                  safeOdds === null ||
+                  safeProbability === null ||
+                  safeOdds <= 0 ||
+                  safeProbability <= 0
+                ) {
+                  if (isMalformed(outcome.price) || isMalformed(probability)) {
+                    console.warn("Skipping invalid market data", {
+                      fixtureId: matchUuid,
+                      homeTeam,
+                      awayTeam,
+                      market: 'AH',
+                      rawOdds: outcome.price,
+                      rawProbability: probability
+                    });
+                  }
+                  continue;
+                }
 
-                const fairOdds = 1.0 / probability;
-                const edge = ((outcome.price * probability) - 1.0) * 100;
+                if (safeOdds < 1.70 || safeOdds > 2.30) continue;
 
-                const impliedProb = 1.0 / outcome.price;
-                const divergence = Math.abs(probability - impliedProb);
+                const fairOdds = 1.0 / safeProbability;
+                const edge = ((safeOdds * safeProbability) - 1.0) * 100;
+
+                const impliedProb = 1.0 / safeOdds;
+                const divergence = Math.abs(safeProbability - impliedProb);
                 const isAnomaly = divergence > 0.15;
                 const anomalyReason = isAnomaly
-                  ? `Model probability (${(probability * 100).toFixed(1)}%) vs market implied probability (${(impliedProb * 100).toFixed(1)}%) exceeds 15% divergence threshold.`
+                  ? `Model probability (${(safeProbability * 100).toFixed(1)}%) vs market implied probability (${(impliedProb * 100).toFixed(1)}%) exceeds 15% divergence threshold.`
                   : null;
 
                 if (edge >= thresholds.AH) {
@@ -543,9 +587,9 @@ async function handleGenerateSignals(request: Request) {
                     market: 'asian_handicap',
                     handicap_line: isHome ? lineVal : -lineVal,
                     selection: isHome ? 'home' : 'away',
-                    odds: outcome.price,
+                    odds: safeOdds,
                     fair_odds: Number(fairOdds.toFixed(4)),
-                    probability: Number(probability.toFixed(4)),
+                    probability: Number(safeProbability.toFixed(4)),
                     edge_pct: Number(edge.toFixed(2)),
                     confidence: confidenceScore,
                     status: 'pending',
@@ -589,6 +633,7 @@ async function handleGenerateSignals(request: Request) {
                     );
                     if (insertedSignal) {
                       generatedSignalsCount++;
+        ctx.signalsGenerated++;
                     }
                   }
                 }
@@ -604,16 +649,37 @@ async function handleGenerateSignals(request: Request) {
                 const lineKey = lineVal.toFixed(1);
                 const probability = isOver ? probOutput.pOver[lineKey] : probOutput.pUnder[lineKey];
 
-                if (!probability || outcome.price < 1.70 || outcome.price > 2.30) continue;
+                const safeOdds = toFiniteNumber(outcome.price);
+                const safeProbability = toFiniteNumber(probability);
+                if (
+                  safeOdds === null ||
+                  safeProbability === null ||
+                  safeOdds <= 0 ||
+                  safeProbability <= 0
+                ) {
+                  if (isMalformed(outcome.price) || isMalformed(probability)) {
+                    console.warn("Skipping invalid market data", {
+                      fixtureId: matchUuid,
+                      homeTeam,
+                      awayTeam,
+                      market: 'OU',
+                      rawOdds: outcome.price,
+                      rawProbability: probability
+                    });
+                  }
+                  continue;
+                }
 
-                const fairOdds = 1.0 / probability;
-                const edge = ((outcome.price * probability) - 1.0) * 100;
+                if (safeOdds < 1.70 || safeOdds > 2.30) continue;
 
-                const impliedProb = 1.0 / outcome.price;
-                const divergence = Math.abs(probability - impliedProb);
+                const fairOdds = 1.0 / safeProbability;
+                const edge = ((safeOdds * safeProbability) - 1.0) * 100;
+
+                const impliedProb = 1.0 / safeOdds;
+                const divergence = Math.abs(safeProbability - impliedProb);
                 const isAnomaly = divergence > 0.15;
                 const anomalyReason = isAnomaly
-                  ? `Model probability (${(probability * 100).toFixed(1)}%) vs market implied probability (${(impliedProb * 100).toFixed(1)}%) exceeds 15% divergence threshold.`
+                  ? `Model probability (${(safeProbability * 100).toFixed(1)}%) vs market implied probability (${(impliedProb * 100).toFixed(1)}%) exceeds 15% divergence threshold.`
                   : null;
 
                 if (edge >= thresholds.OU) {
@@ -626,9 +692,9 @@ async function handleGenerateSignals(request: Request) {
                     market: 'over_under',
                     handicap_line: lineVal,
                     selection: isOver ? 'over' : 'under',
-                    odds: outcome.price,
+                    odds: safeOdds,
                     fair_odds: Number(fairOdds.toFixed(4)),
-                    probability: Number(probability.toFixed(4)),
+                    probability: Number(safeProbability.toFixed(4)),
                     edge_pct: Number(edge.toFixed(2)),
                     confidence: confidenceScore,
                     status: 'pending',
@@ -672,6 +738,7 @@ async function handleGenerateSignals(request: Request) {
                     );
                     if (insertedSignal) {
                       generatedSignalsCount++;
+        ctx.signalsGenerated++;
                     }
                   }
                 }
@@ -685,6 +752,7 @@ async function handleGenerateSignals(request: Request) {
     if (isDryRun) {
       console.log(`[GenerateSignals DRY RUN COMPLETED] Candidate count: ${dryRunSignals.length}`);
       await CronLogger.end(logId, dryRunSignals.length, null);
+        await ctx.flush();
       try {
         await runHealthCheck();
       } catch (hcErr) {
@@ -700,6 +768,7 @@ async function handleGenerateSignals(request: Request) {
 
     console.log(`[GenerateSignals PIPELINE COMPLETED] Signals generated: ${generatedSignalsCount}`);
     await CronLogger.end(logId, generatedSignalsCount, null);
+        await ctx.flush();
     try {
       await runHealthCheck();
     } catch (hcErr) {
@@ -713,6 +782,7 @@ async function handleGenerateSignals(request: Request) {
   } catch (error: any) {
     console.error('[GenerateSignals Cron Fatal Error]:', error);
     await CronLogger.end(logId, 0, error);
+        await ctx.flush();
     // Send Telegram alert notification on fatal failure
     await sendTelegramAlert(`GenerateSignals Cron Failed: ${error.message || error}`);
     try {

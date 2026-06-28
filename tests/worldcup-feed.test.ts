@@ -96,7 +96,7 @@ describe('Phase 8.6: Competition Coverage & World Cup Validation Feed', () => {
         season: 2026,
         homeTeamId: '10',
         awayTeamId: '20',
-        tournamentStage: null
+        tournamentStage: 'Group Stage'
       });
       expect(apiFootballClient.getFixtures).toHaveBeenCalledWith(1, 2026);
     });

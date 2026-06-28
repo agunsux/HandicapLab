@@ -5,6 +5,7 @@ import { oddsApiClient } from '@/lib/apis/oddspapi';
 import { CronLogger } from '@/lib/services/cronLogger';
 import { runHealthCheck } from '@/lib/services/healthChecker';
 import { calculateQualityMetrics } from '@/lib/analytics/data-quality';
+import { OddsIngestionContext } from '@/lib/observability/oddsIngestion';
 
 const SPORT_MAP: Record<number, string> = {
   39: 'soccer_epl',
@@ -38,6 +39,7 @@ async function handleCaptureOdds(request: Request) {
   }
 
   const logId = await CronLogger.start('capture-odds');
+  const ctx = new OddsIngestionContext('capture-odds');
 
   const now = new Date();
   const rangeStart = now.toISOString();
@@ -62,10 +64,12 @@ async function handleCaptureOdds(request: Request) {
     if (!pendingSignals || pendingSignals.length === 0) {
       console.log('[CaptureOdds Cron] No pending signals starting in the next 48 hours.');
       await CronLogger.end(logId, 0, null);
-      return NextResponse.json({ success: true, capturedCount: 0 });
+      await ctx.flush();
+      return NextResponse.json({ success: true, capturedCount: 0, ingestion: ctx.summary() });
     }
 
     console.log(`[CaptureOdds Cron] Found ${pendingSignals.length} pending signals to capture closing odds for.`);
+    ctx.fixturesReceived = pendingSignals.length;
 
     const { LEAGUE_REGISTRY } = await import('@/lib/crons/leagueRegistry');
 
@@ -96,12 +100,21 @@ async function handleCaptureOdds(request: Request) {
       for (const signal of signals) {
         const matchOdds = oddsList.find(o => isTeamMatch(o.home_team, signal.home_team) && isTeamMatch(o.away_team, signal.away_team));
         if (!matchOdds) {
+          // Match not present in odds provider feed — not a rejection, just not listed yet.
           console.warn(`[CaptureOdds Cron] Match not found in odds list for signal ${signal.id}: ${signal.home_team} vs ${signal.away_team}`);
           continue;
         }
 
         const pinnacle = matchOdds.bookmakers.find((b: any) => b.key === 'pinnacle');
         if (!pinnacle) {
+          ctx.reject({
+            signalId: signal.id,
+            homeTeam: signal.home_team,
+            awayTeam: signal.away_team,
+            market: signal.market,
+            reason: 'invalid_bookmaker',
+            detail: 'pinnacle not present in bookmakers array',
+          });
           console.warn(`[CaptureOdds Cron] Pinnacle bookmaker not found in odds for match: ${signal.home_team} vs ${signal.away_team}`);
           continue;
         }
@@ -113,7 +126,16 @@ async function handleCaptureOdds(request: Request) {
 
         if (signal.market === 'moneyline') {
           const h2hMarket = pinnacle.markets.find((m: any) => m.key === 'h2h');
-          if (h2hMarket) {
+          if (!h2hMarket) {
+            ctx.reject({
+              signalId: signal.id,
+              homeTeam: signal.home_team,
+              awayTeam: signal.away_team,
+              market: signal.market,
+              reason: 'missing_market',
+              detail: 'h2h market key not found in pinnacle markets',
+            });
+          } else {
             const homeOutcome = h2hMarket.outcomes.find((o: any) => isTeamMatch(o.name, signal.home_team));
             const drawOutcome = h2hMarket.outcomes.find((o: any) => o.name.toLowerCase() === 'draw');
             const awayOutcome = h2hMarket.outcomes.find((o: any) => isTeamMatch(o.name, signal.away_team));
@@ -123,11 +145,29 @@ async function handleCaptureOdds(request: Request) {
             if (outcome) {
               closingOdds = outcome.price;
               closingLine = 0.0;
+            } else {
+              ctx.reject({
+                signalId: signal.id,
+                homeTeam: signal.home_team,
+                awayTeam: signal.away_team,
+                market: signal.market,
+                reason: 'missing_line',
+                detail: `No ${signal.selection} outcome found in h2h market`,
+              });
             }
           }
         } else if (signal.market === 'asian_handicap') {
           const spreadsMarket = pinnacle.markets.find((m: any) => m.key === 'spreads');
-          if (spreadsMarket) {
+          if (!spreadsMarket) {
+            ctx.reject({
+              signalId: signal.id,
+              homeTeam: signal.home_team,
+              awayTeam: signal.away_team,
+              market: signal.market,
+              reason: 'missing_market',
+              detail: 'spreads market key not found in pinnacle markets',
+            });
+          } else {
             const homeOutcome = spreadsMarket.outcomes.find((o: any) => isTeamMatch(o.name, signal.home_team));
             const awayOutcome = spreadsMarket.outcomes.find((o: any) => isTeamMatch(o.name, signal.away_team));
             oddsHome = homeOutcome?.price || null;
@@ -152,11 +192,29 @@ async function handleCaptureOdds(request: Request) {
               const isHome = isTeamMatch(outcome.name, signal.home_team);
               const lineVal = outcome.point;
               closingLine = isHome ? lineVal : -lineVal;
+            } else {
+              ctx.reject({
+                signalId: signal.id,
+                homeTeam: signal.home_team,
+                awayTeam: signal.away_team,
+                market: signal.market,
+                reason: 'missing_line',
+                detail: `No ${signal.selection} outcome found in spreads market for line ${signal.handicap_line}`,
+              });
             }
           }
         } else if (signal.market === 'over_under') {
           const totalsMarket = pinnacle.markets.find((m: any) => m.key === 'totals');
-          if (totalsMarket) {
+          if (!totalsMarket) {
+            ctx.reject({
+              signalId: signal.id,
+              homeTeam: signal.home_team,
+              awayTeam: signal.away_team,
+              market: signal.market,
+              reason: 'missing_market',
+              detail: 'totals market key not found in pinnacle markets',
+            });
+          } else {
             const overOutcome = totalsMarket.outcomes.find((o: any) => o.name.toLowerCase() === 'over');
             const underOutcome = totalsMarket.outcomes.find((o: any) => o.name.toLowerCase() === 'under');
             oddsHome = overOutcome?.price || null;
@@ -177,11 +235,29 @@ async function handleCaptureOdds(request: Request) {
             if (outcome) {
               closingOdds = outcome.price;
               closingLine = outcome.point;
+            } else {
+              ctx.reject({
+                signalId: signal.id,
+                homeTeam: signal.home_team,
+                awayTeam: signal.away_team,
+                market: signal.market,
+                reason: 'missing_line',
+                detail: `No ${signal.selection} outcome found in totals market for line ${signal.handicap_line}`,
+              });
             }
           }
         }
 
-        if (closingOdds !== undefined && closingOdds > 1.0 && closingLine !== undefined) {
+        if (closingOdds !== undefined && closingLine !== undefined && (!Number.isFinite(closingOdds) || closingOdds <= 1.0)) {
+          ctx.reject({
+            signalId: signal.id,
+            homeTeam: signal.home_team,
+            awayTeam: signal.away_team,
+            market: signal.market,
+            reason: 'malformed_price',
+            detail: `closingOdds=${closingOdds} is non-finite or <= 1.0`,
+          });
+        } else if (closingOdds !== undefined && closingOdds > 1.0 && closingLine !== undefined) {
           const openingOdds = Number(signal.opening_odds || signal.odds || 1.0);
           const openingLine = Number(signal.opening_line || signal.handicap_line || 0.0);
 
@@ -344,6 +420,7 @@ async function handleCaptureOdds(request: Request) {
             }
             
             capturedCount++;
+            ctx.oddsEnriched++;
           }
         } else {
           console.warn(`[CaptureOdds Cron] Could not find specific closing odds selection for signal ${signal.id}`);
@@ -352,16 +429,18 @@ async function handleCaptureOdds(request: Request) {
     }
 
     await CronLogger.end(logId, capturedCount, null);
+    await ctx.flush();
     try {
       await runHealthCheck();
     } catch (hcErr) {
       console.error('[CaptureOdds Cron] Health check audit failed:', hcErr);
     }
 
-    return NextResponse.json({ success: true, capturedCount });
+    return NextResponse.json({ success: true, capturedCount, ingestion: ctx.summary() });
   } catch (error: any) {
     console.error('[CaptureOdds Cron Fatal Error]:', error);
     await CronLogger.end(logId, 0, error);
+    await ctx.flush();
     try {
       await runHealthCheck();
     } catch (hcErr) {

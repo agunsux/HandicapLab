@@ -5,7 +5,7 @@ import { FeatureEngine } from '@/lib/engines/feature-engine';
 import { ProbabilityEngine } from '@/lib/engines/probability-engine';
 import { CalibrationEngine } from '@/lib/engine/calibration';
 import { ModelIntelligenceAdjuster } from '@/lib/intelligence/adjuster';
-import { toFiniteNumber } from '@/lib/utils/number';
+import { toFiniteNumber, isMalformed } from '@/lib/utils/number';
 
 export async function POST(request: Request) {
   try {
@@ -105,7 +105,18 @@ export async function POST(request: Request) {
           const probability = toFiniteNumber(probOutput.pHome);
           const odds = toFiniteNumber(oddsSnapshot.homeOdds);
           if (probability === null || odds === null || probability <= 0 || odds <= 0) {
-            console.warn("Skipping invalid market data", { probability, odds, market: mkt });
+            const rawOdds = oddsSnap.odds_home;
+            const rawProbability = probOutput.pHome;
+            if (isMalformed(rawOdds) || isMalformed(rawProbability)) {
+              console.warn("Skipping invalid market data", {
+                fixtureId: match.id,
+                homeTeam: match.home_team,
+                awayTeam: match.away_team,
+                market: mkt,
+                rawOdds,
+                rawProbability
+              });
+            }
             continue;
           }
           const edge = ((odds * probability) - 1.0) * 100;
