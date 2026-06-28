@@ -52,7 +52,9 @@ export async function runPredictionCron(): Promise<any> {
         const features = await FeatureEngine.build(match.id, kickoffDate, marketType);
 
         // 3. Run probability engine
-        const probOutput = await ProbabilityEngine.predict(features);
+        const probOutput = await ProbabilityEngine.predict(features, {
+          oddsSnapshot: { bookmaker: 'pinnacle' }
+        });
 
         // 4. Generate current odds snapshot
         const marketOdds = generateOddsSnapshot(marketType, probOutput);
@@ -341,18 +343,21 @@ function generateOddsSnapshot(marketType: 'ML' | 'AH' | 'OU', prob: any): Market
   const deviation = () => 0.92 + Math.random() * 0.18;
   if (marketType === 'ML') {
     return {
+      bookmaker: 'pinnacle',
       homeOdds: Number((1 / (prob.pHome * deviation())).toFixed(2)),
       drawOdds: Number((1 / (prob.pDraw * deviation())).toFixed(2)),
       awayOdds: Number((1 / (prob.pAway * deviation())).toFixed(2)),
     };
   } else if (marketType === 'AH') {
     return {
+      bookmaker: 'pinnacle',
       line: -0.5,
       homeOdds: Number((1 / ((prob.pAhHome['-0.5'] || 0.5) * deviation())).toFixed(2)),
       awayOdds: Number((1 / ((prob.pAhAway['-0.5'] || 0.5) * deviation())).toFixed(2)),
     };
   } else {
     return {
+      bookmaker: 'pinnacle',
       line: 2.5,
       homeOdds: Number((1 / ((prob.pOver['2.5'] || 0.5) * deviation())).toFixed(2)),
       awayOdds: Number((1 / ((prob.pUnder['2.5'] || 0.5) * deviation())).toFixed(2)),

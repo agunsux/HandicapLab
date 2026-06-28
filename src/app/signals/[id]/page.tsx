@@ -92,9 +92,54 @@ export default function SignalDetailPage({ params }: { params: Promise<{ id: str
           <h1 className="text-3xl font-extrabold text-white mb-2">
             {signal.match.home_team} vs {signal.match.away_team}
           </h1>
-          <p className="text-slate-450 text-xs font-mono">
+          <p className="text-slate-450 text-xs font-mono mb-4">
             KICKOFF (UTC): {new Date(signal.match.kickoff_time).toUTCString()}
           </p>
+
+          {/* Live Status Indicator Block */}
+          <div className="pt-4 border-t border-slate-800 flex items-center gap-3">
+            {signal.status.toUpperCase() === 'ACTIVE' || signal.status.toUpperCase() === 'OPEN' ? (
+              <>
+                <span className="text-emerald-400 text-lg">🟢</span>
+                <div>
+                  <span className="text-sm font-bold text-white block">Active</span>
+                  <span className="text-xs text-slate-400">
+                    Odds captured: {signal.odds_age_minutes !== undefined && signal.odds_age_minutes !== null ? `${signal.odds_age_minutes} minutes ago` : 'just now'}
+                  </span>
+                </div>
+              </>
+            ) : signal.status.toUpperCase() === 'STALE' ? (
+              <>
+                <span className="text-amber-400 text-lg">🟡</span>
+                <div>
+                  <span className="text-sm font-bold text-amber-400 block">Stale</span>
+                  <span className="text-xs text-slate-450">
+                    Odds captured: {signal.odds_age_minutes !== undefined && signal.odds_age_minutes !== null ? `${signal.odds_age_minutes} minutes ago` : 'long ago'}
+                  </span>
+                </div>
+              </>
+            ) : signal.status.toUpperCase() === 'CLOSED' ? (
+              <>
+                <span className="text-rose-400 text-lg">🔴</span>
+                <div>
+                  <span className="text-sm font-bold text-white block">Closed</span>
+                  <span className="text-xs text-slate-400">Kickoff passed, Result pending</span>
+                </div>
+              </>
+            ) : (
+              <>
+                <span className="text-blue-400 text-lg">🔵</span>
+                <div>
+                  <span className="text-sm font-bold text-white block capitalize">{signal.status.replace('_', ' ')}</span>
+                  {signal.timeline.settled_at && (
+                    <span className="text-xs text-slate-400">
+                      Settled: {new Date(signal.timeline.settled_at).toLocaleDateString()}
+                    </span>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
         </div>
 
         {/* Lifecycle Visual Timeline */}

@@ -20,16 +20,14 @@ export async function determineUserAccess(userId?: string): Promise<UserAccessPo
   };
 }
 
-/**
- * Masks sensitive predictive and odds progression fields for free users.
- */
 export function maskSignalData(signal: any, isPremium: boolean): any {
-  if (isPremium) {
-    return signal;
-  }
-
   // Deep copy/clone signal object
   const masked = JSON.parse(JSON.stringify(signal));
+
+  if (isPremium) {
+    // Premium shows all detailed data including probability and recommended stake
+    return masked;
+  }
 
   // Mask root level fields (for feed API)
   if (masked.current_odds !== undefined) masked.current_odds = null;
@@ -41,20 +39,27 @@ export function maskSignalData(signal: any, isPremium: boolean): any {
 
   // Mask nested fields (for detail API)
   if (masked.prediction) {
+    masked.prediction.selection = null;
+    masked.prediction.odds = null;
+    masked.prediction.probability = null;
+    masked.prediction.recommended_stake = null;
+    masked.prediction.explanation = null;
+    
+    // Maintain backward compatibility for existing tests
     masked.prediction.edge = null;
     masked.prediction.edge_pct = null;
   }
   if (masked.market_movement) {
+    masked.market_movement.opening_odds = null;
     masked.market_movement.current_odds = null;
     masked.market_movement.clv = null;
   }
 
-  // Hide internal calculation properties for all users
+  // Hide internal calculation properties for free users
   delete masked.fair_odds;
   delete masked.probability;
   if (masked.prediction) {
     delete masked.prediction.fair_odds;
-    delete masked.prediction.probability;
   }
 
   return masked;

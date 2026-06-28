@@ -7,6 +7,8 @@ import { runHealthCheck } from '@/lib/services/healthChecker';
 import { apiFootballClient } from '@/lib/apis/apifootball';
 import { LEAGUE_REGISTRY } from '@/lib/crons/leagueRegistry';
 import { CLVCalculator } from '@/lib/settlement/clv-calculator';
+import { createSignalEvent } from '@/lib/alerts/events';
+import { PerformanceAttribution } from '@/lib/intelligence/attribution';
 
 function isTeamMatch(name1: string, name2: string): boolean {
   const n1 = name1.toLowerCase().replace(/[\s-_]/g, '');
@@ -321,6 +323,42 @@ async function runSignalsSettlement(logId: string | null) {
             })
             .eq('id', signal.id);
 
+          try {
+            await createSignalEvent(signal.id, 'SIGNAL_CLOSED', {
+              status,
+              profit_loss
+            });
+          } catch (eventErr) {
+            console.error(`[Settlement Cron] Failed to log SIGNAL_CLOSED event for ${signal.id}:`, eventErr);
+          }
+
+          // Log performance attribution and model calibration
+          try {
+            const actualProb = status === 'won' ? 1.0 : (status === 'lost' ? 0.0 : 0.5);
+            const predictedProb = Number(signal.predicted_probability !== null && signal.predicted_probability !== undefined ? signal.predicted_probability : (signal.probability || 0.5));
+            const calibratedProb = Number(signal.calibrated_probability !== null && signal.calibrated_probability !== undefined ? signal.calibrated_probability : predictedProb);
+            const calibError = Math.abs(calibratedProb - actualProb);
+
+            // Log performance attribution record
+            await PerformanceAttribution.logAttribution(signal, status, profit_loss, clvPercentage / 100);
+
+            // Log model calibration history record (blocked if model validation mode is active)
+            if (process.env.MODEL_VALIDATION_MODE !== 'true') {
+              await supabase
+                .from('model_calibration_history')
+                .insert({
+                  signal_id: signal.id,
+                  model_probability: predictedProb,
+                  actual_result: actualProb,
+                  calibration_error: Number(calibError.toFixed(4))
+                });
+            } else {
+              console.log('[Settlement Cron] MODEL_VALIDATION_MODE active: skipping automatic calibration history recording.');
+            }
+          } catch (intelErr) {
+            console.error(`[Settlement Cron] Failed to log intelligence metrics for ${signal.id}:`, intelErr);
+          }
+
           // Log SIGNAL_SETTLED audit event (with transaction safety)
           try {
             let correlationId = null;
@@ -485,6 +523,7 @@ async function runSignalsSettlement(logId: string | null) {
   return {
     signalsSettled,
     signalsFailed,
+    tradesCalculated: settledTrades ? settledTrades.length : 0,
     message: 'Settlement pipeline and paper trading bankroll progression completed.'
   };
 }

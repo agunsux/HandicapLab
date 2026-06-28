@@ -7,6 +7,7 @@ import { AdaptiveWeightsEngine } from './adaptive-weights';
 import { UncertaintyEngine } from './uncertainty';
 import { PoissonModel } from './poisson';
 import { DixonColesModel } from './dixon-coles';
+import { MarketOdds } from '../edge-scanner/types';
 
 export class ProbabilityEngine {
   /**
@@ -21,6 +22,7 @@ export class ProbabilityEngine {
       plattA?: number;
       plattB?: number;
       rho?: number;
+      oddsSnapshot?: MarketOdds;
     } = {}
   ): Promise<ProbabilityOutput> {
     const calibrationMethod = options.calibrationMethod || 'platt';
@@ -221,7 +223,7 @@ export class ProbabilityEngine {
     }
 
     // 9. Calculate split confidence via UncertaintyEngine
-    const confidence = UncertaintyEngine.calculate(adjustedFeatures, poissonMl, dcMl);
+    const confidence = UncertaintyEngine.calculate(adjustedFeatures, poissonMl, dcMl, options.oddsSnapshot);
 
     // 10. Define model version details
     const modelVersion: ModelVersion = {

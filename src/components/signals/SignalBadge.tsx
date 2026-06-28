@@ -8,10 +8,12 @@ export function SignalBadge({ status }: SignalBadgeProps) {
   const normStatus = (status || '').toUpperCase();
   let colorClass = 'bg-slate-800 text-slate-300 border-slate-700';
 
-  if (normStatus === 'OPEN') {
+  if (normStatus === 'OPEN' || normStatus === 'ACTIVE') {
     colorClass = 'bg-emerald-950 text-emerald-400 border-emerald-800';
-  } else if (normStatus === 'LOCKED') {
+  } else if (normStatus === 'LOCKED' || normStatus === 'STALE') {
     colorClass = 'bg-amber-950 text-amber-400 border-amber-800';
+  } else if (normStatus === 'CLOSED') {
+    colorClass = 'bg-rose-950 text-rose-400 border-rose-800';
   } else if (normStatus === 'LIVE') {
     colorClass = 'bg-blue-950 text-blue-400 border-blue-800';
   } else if (normStatus === 'SETTLED') {

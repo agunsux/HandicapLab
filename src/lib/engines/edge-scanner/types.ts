@@ -3,6 +3,7 @@ export interface MarketOdds {
   awayOdds?: number; // away win (ML), away cover (AH), Under (OU)
   drawOdds?: number; // Draw (ML only)
   line?: number;     // Handicap or total line (AH/OU)
+  bookmaker?: string; // Bookmaker source
 }
 
 export interface EdgePick {

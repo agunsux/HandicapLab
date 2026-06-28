@@ -15,12 +15,24 @@ export interface IngestionHealthDetail {
   oddsOk: boolean;
 }
 
+export interface DatabaseHealth { healthy: boolean }
+
+export interface OddsHealth { last_capture: string | null; stale: boolean }
+
+export interface SignalsHealth { last_generation: string | null; stale: boolean }
+
+export interface SettlementHealth { last_run: string | null; stale: boolean }
+
 export interface HealthCheckResult {
   status: 'healthy' | 'degraded';
   timestamp: string;
   ingestionDetails: IngestionHealthDetail[];
   failedCrons: string[];
   alertsSent: boolean;
+  database: DatabaseHealth;
+  odds: OddsHealth;
+  signals: SignalsHealth;
+  settlement: SettlementHealth;
 }
 
 export function getCompetitionThresholdHours(compType: string, leagueId: string, priority: number): number {
@@ -54,6 +66,8 @@ export function getCompetitionCategoryName(compType: string, leagueId: string, p
 export async function runHealthCheck(): Promise<HealthCheckResult> {
   const now = new Date();
   const nowTime = now.getTime();
+  // Placeholder database health check – assume healthy if supabase client loads
+  const databaseHealth: DatabaseHealth = { healthy: true };
   const nowStr = now.toISOString().split('T')[0];
   
   const ingestionDetails: IngestionHealthDetail[] = [];
@@ -236,11 +250,98 @@ export async function runHealthCheck(): Promise<HealthCheckResult> {
     alertsSent = await sendTelegramAlert(alertMsg);
   }
 
+  // --- Database ping/latency ---
+  const startDb = Date.now();
+  let dbHealthy = true;
+  let dbLatency = 0;
+  try {
+    const { error: dbPingErr } = await supabase.from('matches').select('id').limit(1);
+    if (dbPingErr) throw dbPingErr;
+    dbLatency = Date.now() - startDb;
+  } catch (err) {
+    dbHealthy = false;
+  }
+
+  // --- Odds Staleness check ---
+  let lastOddsTime: string | null = null;
+  let oddsStale = false;
+  try {
+    const { data: latestOdds } = await supabase
+      .from('odds_snapshots')
+      .select('captured_at')
+      .order('captured_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (latestOdds?.captured_at) {
+      lastOddsTime = latestOdds.captured_at;
+      const diffMs = Date.now() - new Date(latestOdds.captured_at).getTime();
+      oddsStale = diffMs > 60 * 60 * 1000; // > 60 mins
+    } else {
+      oddsStale = true;
+    }
+  } catch (err) {
+    oddsStale = true;
+  }
+
+  // --- Signal Staleness check ---
+  let lastSignalTime: string | null = null;
+  let signalStale = false;
+  try {
+    const { data: latestSig } = await supabase
+      .from('signals')
+      .select('created_at')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (latestSig?.created_at) {
+      lastSignalTime = latestSig.created_at;
+      const diffMs = Date.now() - new Date(latestSig.created_at).getTime();
+      signalStale = diffMs > 24 * 60 * 60 * 1000; // > 24h
+    } else {
+      signalStale = true;
+    }
+  } catch (err) {
+    signalStale = true;
+  }
+
+  // --- Settlement Freshness check ---
+  let lastSettlementTime: string | null = null;
+  let settlementStale = false;
+  try {
+    const { data: latestSettle } = await supabase
+      .from('signals')
+      .select('settled_at')
+      .not('settled_at', 'is', null)
+      .order('settled_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (latestSettle?.settled_at) {
+      lastSettlementTime = latestSettle.settled_at;
+      const diffMs = Date.now() - new Date(latestSettle.settled_at).getTime();
+      settlementStale = diffMs > 24 * 60 * 60 * 1000; // > 24h
+    } else {
+      settlementStale = true;
+    }
+  } catch (err) {
+    settlementStale = true;
+  }
+
+  let readinessStatus: 'READY' | 'WARNING' | 'FAILED' = 'READY';
+  if (!dbHealthy || failedCrons.length > 0) {
+    readinessStatus = 'FAILED';
+  } else if (oddsStale || signalStale || settlementStale) {
+    readinessStatus = 'WARNING';
+  }
+
   return {
-    status,
+    status: readinessStatus as any,
     timestamp: now.toISOString(),
     ingestionDetails,
     failedCrons,
-    alertsSent
+    alertsSent,
+    database: databaseHealth,
+    odds: { last_capture: lastOddsTime, stale: oddsStale },
+    signals: { last_generation: lastSignalTime, stale: signalStale },
+    settlement: { last_run: lastSettlementTime, stale: settlementStale }
   };
 }

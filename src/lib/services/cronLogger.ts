@@ -135,4 +135,40 @@ export class CronLogger {
       console.error(`[CronLogger] Exception ending log for logId ${logId}:`, err);
     }
   }
+
+  public static async getCronMetrics(cronName: string): Promise<{
+    failureCount: number;
+    lastSuccessfulRun: string | null;
+    recentRuns: any[];
+  }> {
+    const { data: runs } = await supabase
+      .from('cron_runs')
+      .select('*')
+      .eq('cron_name', cronName)
+      .order('start_time', { ascending: false });
+
+    const recentRuns = (runs || []).map(r => {
+      const started = new Date(r.start_time).getTime();
+      const finished = r.end_time ? new Date(r.end_time).getTime() : null;
+      const duration = finished ? (finished - started) / 1000 : 0;
+      return {
+        run_id: r.id,
+        started_at: r.start_time,
+        finished_at: r.end_time || null,
+        duration,
+        status: r.errors ? 'failed' : (r.end_time ? 'success' : 'running'),
+        error_message: r.errors || null
+      };
+    });
+
+    const failureCount = recentRuns.filter(r => r.status === 'failed').length;
+    const successRun = recentRuns.find(r => r.status === 'success');
+    const lastSuccessfulRun = successRun ? successRun.started_at : null;
+
+    return {
+      failureCount,
+      lastSuccessfulRun,
+      recentRuns
+    };
+  }
 }

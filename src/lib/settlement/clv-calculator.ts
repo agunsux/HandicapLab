@@ -14,7 +14,7 @@ export class CLVCalculator {
     if (!closingOdds || closingOdds <= 1.0 || predictionOdds <= 1.0) {
       return null;
     }
-    const clv = ((1.0 / closingOdds) - (1.0 / predictionOdds)) * 100;
+    const clv = (closingOdds / predictionOdds) - 1.0;
     return Number(clv.toFixed(4));
   }
 }

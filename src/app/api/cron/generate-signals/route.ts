@@ -10,6 +10,9 @@ import { calculateKelly } from '@/lib/engine/kelly';
 import { sendTelegramAlert } from '@/lib/services/telegram';
 import { CronLogger } from '@/lib/services/cronLogger';
 import { runHealthCheck } from '@/lib/services/healthChecker';
+import { createSignalEvent } from '@/lib/alerts/events';
+import { ModelIntelligenceAdjuster } from '@/lib/intelligence/adjuster';
+import { PerformanceAttribution } from '@/lib/intelligence/attribution';
 
 const SPORT_MAP: Record<number, string> = {
   39: 'soccer_epl',
@@ -26,6 +29,163 @@ const SPORT_MAP: Record<number, string> = {
 
 function getSportKey(apiFootballId: number): string {
   return SPORT_MAP[apiFootballId] || 'soccer_epl';
+}
+
+async function saveOrUpdateSignal(
+  signalPayload: any,
+  leagueConfig: any,
+  matchUuid: string,
+  marketType: string,
+  odds: number,
+  probability: number,
+  maxStakePct: number,
+  settledSignalCount: number,
+  unitSize: number
+) {
+  // Fetch league quality score from cache
+  const { data: dbLeague } = await supabase
+    .from('leagues_cache')
+    .select('quality_score')
+    .eq('name', leagueConfig.name)
+    .maybeSingle();
+  const qualityScore = dbLeague?.quality_score ?? 75;
+
+  // Check if signal exists
+  const { data: existing } = await supabase
+    .from('signals')
+    .select('*')
+    .eq('match_id', signalPayload.match_id)
+    .eq('market', signalPayload.market)
+    .eq('handicap_line', signalPayload.handicap_line || 0.0)
+    .maybeSingle();
+
+  let steamScore = 0;
+  let lineMove = 0;
+
+  if (existing) {
+    const currentLine = Number(signalPayload.handicap_line || 0.0);
+    const openingLine = Number(existing.opening_line !== null ? existing.opening_line : existing.handicap_line || 0.0);
+    const currentOdds = Number(signalPayload.odds || 1.00);
+    const openingOdds = Number(existing.opening_odds !== null ? existing.opening_odds : existing.odds || 1.00);
+
+    const steamResult = ModelIntelligenceAdjuster.calculateSteamScore(
+      signalPayload.market,
+      signalPayload.selection,
+      openingLine,
+      currentLine,
+      openingOdds,
+      currentOdds
+    );
+    steamScore = steamResult.steamScore;
+    lineMove = steamResult.lineMove;
+  }
+
+  // Adjust confidence
+  const adjustedConfidence = ModelIntelligenceAdjuster.adjustConfidence(
+    Number(signalPayload.confidence || 50),
+    qualityScore,
+    steamScore
+  );
+
+  // Calibrate probability
+  const confidenceBucket = PerformanceAttribution.getConfidenceBucket(adjustedConfidence);
+  const { data: attributionStats } = await supabase
+    .from('signal_performance_attribution')
+    .select('roi, clv, is_win, is_loss')
+    .eq('confidence_bucket', confidenceBucket);
+
+  let historicalWinRate = 0.5;
+  if (attributionStats && attributionStats.length > 0) {
+    const wins = attributionStats.filter((a: any) => a.is_win).length;
+    historicalWinRate = wins / attributionStats.length;
+  }
+
+  const calibratedProb = attributionStats && attributionStats.length > 0
+    ? Number(((probability + historicalWinRate) / 2).toFixed(4))
+    : probability;
+
+  // Add calibration fields to payload
+  signalPayload.confidence = adjustedConfidence;
+  signalPayload.confidence_score = adjustedConfidence;
+  signalPayload.predicted_probability = probability;
+  signalPayload.calibrated_probability = calibratedProb;
+
+  if (existing) {
+    const updates: any = {
+      confidence: adjustedConfidence,
+      confidence_score: adjustedConfidence,
+      predicted_probability: probability,
+      calibrated_probability: calibratedProb
+    };
+    let changesOccurred = false;
+
+    if (Number(existing.odds) !== Number(signalPayload.odds)) {
+      updates.odds = signalPayload.odds;
+      changesOccurred = true;
+      await createSignalEvent(existing.id, 'ODDS_MOVEMENT', {
+        from: Number(existing.odds),
+        to: Number(signalPayload.odds)
+      });
+    }
+
+    if (Number(existing.edge_pct) !== Number(signalPayload.edge_pct)) {
+      updates.edge_pct = signalPayload.edge_pct;
+      changesOccurred = true;
+      await createSignalEvent(existing.id, 'EDGE_CHANGED', {
+        from: Number(existing.edge_pct),
+        to: Number(signalPayload.edge_pct)
+      });
+    }
+
+    if (Number(existing.confidence) !== Number(adjustedConfidence)) {
+      changesOccurred = true;
+      await createSignalEvent(existing.id, 'CONFIDENCE_CHANGED', {
+        from: Number(existing.confidence),
+        to: adjustedConfidence
+      });
+    }
+
+    if (changesOccurred) {
+      updates.updated_at = new Date().toISOString();
+      await supabase
+        .from('signals')
+        .update(updates)
+        .eq('id', existing.id);
+    }
+    return { ...existing, ...updates };
+  } else {
+    const { data: insertedSignal } = await supabase
+      .from('signals')
+      .insert(signalPayload)
+      .select()
+      .single();
+
+    if (insertedSignal) {
+      await createSignalEvent(insertedSignal.id, 'NEW_SIGNAL', {
+        selection: insertedSignal.selection,
+        odds: insertedSignal.odds
+      });
+
+      const kellyRes = calculateKelly(odds, probability, maxStakePct, settledSignalCount);
+      const kellyVal = kellyRes.stakeFraction;
+      await supabase.from('paper_trades').insert({
+        signal_id: insertedSignal.id,
+        match_id: matchUuid,
+        competition_id: leagueConfig.id,
+        market_type: marketType,
+        odds: odds,
+        stake: unitSize,
+        kelly_fraction: kellyVal,
+        kelly_metadata: {
+          stake_pct: kellyRes.stakeFraction,
+          kelly_mode: kellyRes.mode,
+          sample_size: kellyRes.sampleSize
+        },
+        status: 'pending'
+      });
+    }
+    return insertedSignal;
+  }
 }
 
 function isTeamMatch(name1: string, name2: string): boolean {
@@ -219,7 +379,49 @@ async function handleGenerateSignals(request: Request) {
             features.awayAttack = dynamicAwayAttack;
             features.awayDefense = dynamicAwayDefense;
 
-            const probOutput = await ProbabilityEngine.predict(features);
+            let oddsSnapshot: any = undefined;
+            if (pinnacle) {
+              if (marketType === 'ML') {
+                const h2hMarket = pinnacle.markets.find((m: any) => m.key === 'h2h');
+                if (h2hMarket) {
+                  const homeOutcome = h2hMarket.outcomes.find((o: any) => isTeamMatch(o.name, homeTeam));
+                  const drawOutcome = h2hMarket.outcomes.find((o: any) => o.name.toLowerCase() === 'draw');
+                  const awayOutcome = h2hMarket.outcomes.find((o: any) => isTeamMatch(o.name, awayTeam));
+                  oddsSnapshot = {
+                    bookmaker: 'pinnacle',
+                    homeOdds: homeOutcome?.price,
+                    drawOdds: drawOutcome?.price,
+                    awayOdds: awayOutcome?.price
+                  };
+                }
+              } else if (marketType === 'AH') {
+                const spreadsMarket = pinnacle.markets.find((m: any) => m.key === 'spreads');
+                if (spreadsMarket) {
+                  const homeOutcome = spreadsMarket.outcomes.find((o: any) => isTeamMatch(o.name, homeTeam));
+                  const awayOutcome = spreadsMarket.outcomes.find((o: any) => isTeamMatch(o.name, awayTeam));
+                  oddsSnapshot = {
+                    bookmaker: 'pinnacle',
+                    homeOdds: homeOutcome?.price,
+                    awayOdds: awayOutcome?.price,
+                    line: homeOutcome?.point
+                  };
+                }
+              } else if (marketType === 'OU') {
+                const totalsMarket = pinnacle.markets.find((m: any) => m.key === 'totals');
+                if (totalsMarket) {
+                  const overOutcome = totalsMarket.outcomes.find((o: any) => o.name.toLowerCase() === 'over');
+                  const underOutcome = totalsMarket.outcomes.find((o: any) => o.name.toLowerCase() === 'under');
+                  oddsSnapshot = {
+                    bookmaker: 'pinnacle',
+                    homeOdds: overOutcome?.price,
+                    awayOdds: underOutcome?.price,
+                    line: overOutcome?.point
+                  };
+                }
+              }
+            }
+
+            const probOutput = await ProbabilityEngine.predict(features, { oddsSnapshot });
             const confidenceScore = probOutput.confidence ? Math.round(probOutput.confidence.finalConfidence * 100) : 50;
 
             if (confidenceScore < 65) continue;
@@ -278,31 +480,26 @@ async function handleGenerateSignals(request: Request) {
                     opening_odds: odds,
                     opening_probability: Number(probability.toFixed(4)),
                     expires_at: kickoffTime.toISOString(),
-                    signal_type: 'PRE_MATCH'
+                    signal_type: 'PRE_MATCH',
+                    last_odds_update: new Date().toISOString(),
+                    odds_age_minutes: 0
                   };
 
                   if (isDryRun) {
                     dryRunSignals.push(signalPayload);
                   } else {
-                    const { data: insertedSignal } = await supabase.from('signals').insert(signalPayload).select().single();
+                    const insertedSignal = await saveOrUpdateSignal(
+                      signalPayload,
+                      leagueConfig,
+                      matchUuid,
+                      marketType,
+                      odds,
+                      probability,
+                      maxStakePct,
+                      settledSignalCount,
+                      unitSize
+                    );
                     if (insertedSignal) {
-                      const kellyRes = calculateKelly(odds, probability, maxStakePct, settledSignalCount);
-                      const kellyVal = kellyRes.stakeFraction;
-                      await supabase.from('paper_trades').insert({
-                        signal_id: insertedSignal.id,
-                        match_id: matchUuid,
-                        competition_id: leagueConfig.id,
-                        market_type: marketType,
-                        odds: odds,
-                        stake: unitSize,
-                        kelly_fraction: kellyVal,
-                        kelly_metadata: {
-                          stake_pct: kellyRes.stakeFraction,
-                          kelly_mode: kellyRes.mode,
-                          sample_size: kellyRes.sampleSize
-                        },
-                        status: 'pending'
-                      });
                       generatedSignalsCount++;
                     }
                   }
@@ -371,31 +568,26 @@ async function handleGenerateSignals(request: Request) {
                     opening_odds: outcome.price,
                     opening_probability: Number(probability.toFixed(4)),
                     expires_at: kickoffTime.toISOString(),
-                    signal_type: 'PRE_MATCH'
+                    signal_type: 'PRE_MATCH',
+                    last_odds_update: new Date().toISOString(),
+                    odds_age_minutes: 0
                   };
 
                   if (isDryRun) {
                     dryRunSignals.push(signalPayload);
                   } else {
-                    const { data: insertedSignal } = await supabase.from('signals').insert(signalPayload).select().single();
+                    const insertedSignal = await saveOrUpdateSignal(
+                      signalPayload,
+                      leagueConfig,
+                      matchUuid,
+                      marketType,
+                      outcome.price,
+                      probability,
+                      maxStakePct,
+                      settledSignalCount,
+                      unitSize
+                    );
                     if (insertedSignal) {
-                      const kellyRes = calculateKelly(outcome.price, probability, maxStakePct, settledSignalCount);
-                      const kellyVal = kellyRes.stakeFraction;
-                      await supabase.from('paper_trades').insert({
-                        signal_id: insertedSignal.id,
-                        match_id: matchUuid,
-                        competition_id: leagueConfig.id,
-                        market_type: marketType,
-                        odds: outcome.price,
-                        stake: unitSize,
-                        kelly_fraction: kellyVal,
-                        kelly_metadata: {
-                          stake_pct: kellyRes.stakeFraction,
-                          kelly_mode: kellyRes.mode,
-                          sample_size: kellyRes.sampleSize
-                        },
-                        status: 'pending'
-                      });
                       generatedSignalsCount++;
                     }
                   }
@@ -459,31 +651,26 @@ async function handleGenerateSignals(request: Request) {
                     opening_odds: outcome.price,
                     opening_probability: Number(probability.toFixed(4)),
                     expires_at: kickoffTime.toISOString(),
-                    signal_type: 'PRE_MATCH'
+                    signal_type: 'PRE_MATCH',
+                    last_odds_update: new Date().toISOString(),
+                    odds_age_minutes: 0
                   };
 
                   if (isDryRun) {
                     dryRunSignals.push(signalPayload);
                   } else {
-                    const { data: insertedSignal } = await supabase.from('signals').insert(signalPayload).select().single();
+                    const insertedSignal = await saveOrUpdateSignal(
+                      signalPayload,
+                      leagueConfig,
+                      matchUuid,
+                      marketType,
+                      outcome.price,
+                      probability,
+                      maxStakePct,
+                      settledSignalCount,
+                      unitSize
+                    );
                     if (insertedSignal) {
-                      const kellyRes = calculateKelly(outcome.price, probability, maxStakePct, settledSignalCount);
-                      const kellyVal = kellyRes.stakeFraction;
-                      await supabase.from('paper_trades').insert({
-                        signal_id: insertedSignal.id,
-                        match_id: matchUuid,
-                        competition_id: leagueConfig.id,
-                        market_type: marketType,
-                        odds: outcome.price,
-                        stake: unitSize,
-                        kelly_fraction: kellyVal,
-                        kelly_metadata: {
-                          stake_pct: kellyRes.stakeFraction,
-                          kelly_mode: kellyRes.mode,
-                          sample_size: kellyRes.sampleSize
-                        },
-                        status: 'pending'
-                      });
                       generatedSignalsCount++;
                     }
                   }

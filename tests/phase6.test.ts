@@ -4,23 +4,54 @@ import { GET as handleCaptureClosing } from '../src/app/api/cron/capture-closing
 import { GET as handleSettle } from '../src/app/api/cron/settle/route';
 import { GET as handlePerformance } from '../src/app/api/stats/performance/route';
 import { supabase } from '../src/lib/supabase.server';
+import { apiFootballClient } from '../src/lib/apis/apifootball';
 
 // Mock Supabase
 vi.mock('../src/lib/supabase.server', () => {
   const mockFrom = vi.fn((table: string) => {
-    return {
-      select: vi.fn().mockReturnThis(),
-      eq: vi.fn().mockReturnThis(),
-      gte: vi.fn().mockReturnThis(),
-      lte: vi.fn().mockReturnThis(),
-      not: vi.fn().mockReturnThis(),
-      order: vi.fn().mockReturnThis(),
-      limit: vi.fn().mockReturnThis(),
-      update: vi.fn().mockReturnThis(),
-      insert: vi.fn().mockReturnThis(),
-      in: vi.fn().mockReturnThis(),
-      maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
-      single: vi.fn().mockResolvedValue({ data: null, error: null }),
+    const chain: any = {
+      select: vi.fn().mockImplementation(() => chain),
+      eq: vi.fn().mockImplementation(() => chain),
+      gte: vi.fn().mockImplementation(() => chain),
+      lte: vi.fn().mockImplementation(() => chain),
+      not: vi.fn().mockImplementation(() => chain),
+      order: vi.fn().mockImplementation(() => chain),
+      limit: vi.fn().mockImplementation(() => chain),
+      in: vi.fn().mockImplementation(() => chain),
+      lt: vi.fn().mockImplementation(() => chain),
+      is: vi.fn().mockImplementation(() => chain),
+      or: vi.fn().mockImplementation(() => chain),
+      insert: vi.fn().mockImplementation(() => chain),
+      update: vi.fn().mockImplementation(() => chain),
+      upsert: vi.fn().mockImplementation(() => chain),
+      maybeSingle: vi.fn().mockImplementation(() => {
+        if (table === 'matches') {
+          return Promise.resolve({
+            data: {
+              id: 'match-1',
+              status: 'finished',
+              home_goals: 2,
+              away_goals: 1
+            },
+            error: null
+          });
+        }
+        return Promise.resolve({ data: { id: 'sig-1' }, error: null });
+      }),
+      single: vi.fn().mockImplementation(() => {
+        if (table === 'matches') {
+          return Promise.resolve({
+            data: {
+              id: 'match-1',
+              status: 'finished',
+              home_goals: 2,
+              away_goals: 1
+            },
+            error: null
+          });
+        }
+        return Promise.resolve({ data: { id: 'sig-1' }, error: null });
+      }),
       then: vi.fn().mockImplementation((resolve) => {
         if (table === 'signals') {
           resolve({
@@ -59,7 +90,8 @@ vi.mock('../src/lib/supabase.server', () => {
           resolve({ data: [], error: null });
         }
       })
-    } as any;
+    };
+    return chain;
   });
 
   return {
@@ -172,6 +204,27 @@ describe('Phase 6: Live Paper Trading & CLV Engine Activation', () => {
 
   describe('Settlement and CLV calculation', () => {
     it('should transition status to settling, compute clv_percentage, and settle signals', async () => {
+      vi.mocked(apiFootballClient.getFixtures).mockResolvedValue({
+        response: [
+          {
+            fixture: {
+              id: 101,
+              date: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+              status: { short: 'FT', elapsed: 90 }
+            },
+            goals: { home: 2, away: 1 },
+            score: {
+              halftime: { home: 1, away: 0 },
+              fulltime: { home: 2, away: 1 }
+            },
+            teams: {
+              home: { name: 'Arsenal' },
+              away: { name: 'Chelsea' }
+            }
+          }
+        ]
+      });
+
       const request = new Request('http://localhost/api/cron/settle', {
         headers: { authorization: 'Bearer test_cron_secret' }
       });

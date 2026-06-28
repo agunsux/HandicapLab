@@ -52,5 +52,14 @@ export async function GET() {
   const isHealthy = checks.database;
   const status = isHealthy ? 200 : 500;
 
-  return NextResponse.json(checks, { status });
+  const responseBody = {
+    status: isHealthy ? 'healthy' : 'unhealthy',
+    checks: {
+      database: checks.database ? 'healthy' : 'unhealthy',
+      lastCronRun: checks.lastCronRun,
+      activeCompetitions: checks.activeCompetitions
+    }
+  };
+
+  return NextResponse.json(responseBody, { status });
 }

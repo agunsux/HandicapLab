@@ -105,15 +105,18 @@ async function handleCaptureClosing(request: Request) {
         }
 
         let closingOdds: number | undefined;
+        let oddsHome: number | null = null;
+        let oddsAway: number | null = null;
 
         if (signal.market === 'moneyline') {
           const h2hMarket = pinnacle.markets.find((m: any) => m.key === 'h2h');
           if (h2hMarket) {
-            const outcome = h2hMarket.outcomes.find((o: any) => {
-              if (signal.selection === 'home') return isTeamMatch(o.name, signal.home_team);
-              if (signal.selection === 'away') return isTeamMatch(o.name, signal.away_team);
-              return o.name.toLowerCase() === 'draw';
-            });
+            const homeOutcome = h2hMarket.outcomes.find((o: any) => isTeamMatch(o.name, signal.home_team));
+            const drawOutcome = h2hMarket.outcomes.find((o: any) => o.name.toLowerCase() === 'draw');
+            const awayOutcome = h2hMarket.outcomes.find((o: any) => isTeamMatch(o.name, signal.away_team));
+            oddsHome = homeOutcome?.price || null;
+            oddsAway = awayOutcome?.price || null;
+            const outcome = signal.selection === 'home' ? homeOutcome : (signal.selection === 'away' ? awayOutcome : drawOutcome);
             if (outcome) {
               closingOdds = outcome.price;
             }
@@ -121,6 +124,11 @@ async function handleCaptureClosing(request: Request) {
         } else if (signal.market === 'asian_handicap') {
           const spreadsMarket = pinnacle.markets.find((m: any) => m.key === 'spreads');
           if (spreadsMarket) {
+            const homeOutcome = spreadsMarket.outcomes.find((o: any) => isTeamMatch(o.name, signal.home_team));
+            const awayOutcome = spreadsMarket.outcomes.find((o: any) => isTeamMatch(o.name, signal.away_team));
+            oddsHome = homeOutcome?.price || null;
+            oddsAway = awayOutcome?.price || null;
+
             const outcome = spreadsMarket.outcomes.find((o: any) => {
               const isHome = isTeamMatch(o.name, signal.home_team);
               const lineVal = o.point;
@@ -135,6 +143,11 @@ async function handleCaptureClosing(request: Request) {
         } else if (signal.market === 'over_under') {
           const totalsMarket = pinnacle.markets.find((m: any) => m.key === 'totals');
           if (totalsMarket) {
+            const overOutcome = totalsMarket.outcomes.find((o: any) => o.name.toLowerCase() === 'over');
+            const underOutcome = totalsMarket.outcomes.find((o: any) => o.name.toLowerCase() === 'under');
+            oddsHome = overOutcome?.price || null;
+            oddsAway = underOutcome?.price || null;
+
             const outcome = totalsMarket.outcomes.find((o: any) => {
               const isOver = o.name.toLowerCase() === 'over';
               const expectedSelection = isOver ? 'over' : 'under';
@@ -153,6 +166,8 @@ async function handleCaptureClosing(request: Request) {
             .update({
               closing_odds: closingOdds,
               closing_probability: closingProbability,
+              last_odds_update: new Date().toISOString(),
+              odds_age_minutes: 0,
               updated_at: new Date().toISOString()
             })
             .eq('id', signal.id);
@@ -167,10 +182,15 @@ async function handleCaptureClosing(request: Request) {
               .from('odds_snapshots')
               .insert({
                 match_id: signal.match_id,
+                signal_id: signal.id,
                 bookmaker: 'pinnacle',
                 market: signal.market,
                 line: Number(signal.handicap_line || 0.0),
                 odds: closingOdds,
+                market_type: signal.market === 'asian_handicap' ? 'AH' : (signal.market === 'over_under' ? 'OU' : 'ML'),
+                handicap_line: Number(signal.handicap_line || 0.0),
+                odds_home: oddsHome,
+                odds_away: oddsAway,
                 captured_at: new Date().toISOString()
               });
 

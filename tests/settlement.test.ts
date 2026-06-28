@@ -89,11 +89,11 @@ describe('Settlement Modules', () => {
   });
 
   describe('CLVCalculator', () => {
-    it('should calculate CLV using formula ((1.0 / closingOdds) - (1.0 / predictionOdds)) * 100', () => {
+    it('should calculate CLV using formula (closingOdds / predictionOdds) - 1', () => {
       // predOdds = 2.0, closingOdds = 2.20
-      // clv = ((1.0 / 2.20) - (1.0 / 2.0)) * 100 = -4.5455
+      // clv = (2.20 / 2.0) - 1.0 = 0.10
       const clv = CLVCalculator.calculate(2.0, 2.20);
-      expect(clv).toBe(-4.5455);
+      expect(clv).toBe(0.10);
     });
 
     it('should return null if closing odds are invalid', () => {

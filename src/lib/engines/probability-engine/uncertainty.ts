@@ -46,6 +46,22 @@ export class UncertaintyEngine {
       marketConfidence = Math.max(0.1, 1.0 - margin * 4.0);
     }
 
+    // Apply bookmaker quality scoring (sharp_score) to weight market confidence
+    let sharpScore = 100;
+    if (oddsSnapshot && oddsSnapshot.bookmaker) {
+      const bkey = oddsSnapshot.bookmaker.toLowerCase().trim();
+      if (bkey.includes('pinnacle') || bkey.includes('pinny')) {
+        sharpScore = 100;
+      } else if (bkey.includes('singbet') || bkey.includes('ibc') || bkey.includes('sbo') || bkey.includes('sbobet')) {
+        sharpScore = 90;
+      } else if (bkey.includes('betfair') || bkey.includes('smarkets') || bkey.includes('exchange') || bkey.includes('matchbook') || bkey.includes('smrk')) {
+        sharpScore = 85;
+      } else {
+        sharpScore = 50; // soft books
+      }
+    }
+    marketConfidence = marketConfidence * (sharpScore / 100.0);
+
     // Resolve league config for marketLiquidity and minimumHistoricalMatches
     let minMatches = 10;
     let liquidity: 'high' | 'medium' | 'low' = 'high';

@@ -5,34 +5,22 @@ import { supabase } from '../src/lib/supabase.server';
 
 // Mock Supabase Client
 vi.mock('../src/lib/supabase.server', () => {
-  const chain = {
-    select: vi.fn().mockReturnThis(),
-    eq: vi.fn().mockReturnThis(),
-    not: vi.fn().mockReturnThis(),
-    order: vi.fn().mockReturnThis(),
-    limit: vi.fn().mockReturnThis(),
-    in: vi.fn().mockReturnThis(),
-    maybeSingle: vi.fn().mockImplementation(() => Promise.resolve({ data: null, error: null })),
-    single: vi.fn().mockImplementation(() => Promise.resolve({ data: null, error: null })),
-    insert: vi.fn().mockImplementation((payload) => {
-      // Mock single return payload for inserted signal
-      return {
-        select: vi.fn().mockImplementation(() => {
-          return {
-            single: vi.fn().mockResolvedValue({
-              data: {
-                id: 'sig-inserted-123',
-                ...payload
-              },
-              error: null
-            })
-          };
-        })
-      };
-    }),
-    update: vi.fn().mockImplementation(() => ({
-      eq: vi.fn().mockResolvedValue({ error: null })
-    })),
+  const chain: any = {
+    select: vi.fn().mockImplementation(() => chain),
+    eq: vi.fn().mockImplementation(() => chain),
+    not: vi.fn().mockImplementation(() => chain),
+    order: vi.fn().mockImplementation(() => chain),
+    limit: vi.fn().mockImplementation(() => chain),
+    in: vi.fn().mockImplementation(() => chain),
+    lt: vi.fn().mockImplementation(() => chain),
+    is: vi.fn().mockImplementation(() => chain),
+    or: vi.fn().mockImplementation(() => chain),
+    gte: vi.fn().mockImplementation(() => chain),
+    lte: vi.fn().mockImplementation(() => chain),
+    maybeSingle: vi.fn().mockImplementation(() => Promise.resolve({ data: { id: 'sig-inserted-123' }, error: null })),
+    single: vi.fn().mockImplementation(() => Promise.resolve({ data: { id: 'sig-inserted-123' }, error: null })),
+    insert: vi.fn().mockImplementation(() => chain),
+    update: vi.fn().mockImplementation(() => chain),
     then: vi.fn().mockImplementation((resolve) => {
       resolve({
         data: [

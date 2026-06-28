@@ -110,32 +110,57 @@ vi.mock('../src/lib/supabase.server', () => {
 
   const mockFrom = vi.fn((table: string) => {
     const builder = new MockBuilder(table);
-    return {
-      select: builder.select,
-      eq: builder.eq,
-      or: builder.or,
-      lt: builder.lt,
-      order: builder.order,
-      limit: builder.limit,
-      in: builder.in,
-      is: builder.is,
-      gt: builder.gt,
-      single: builder.single,
-      maybeSingle: builder.maybeSingle,
-      then: builder.then,
-      insert: vi.fn().mockImplementation(() => {
-        return {
-          select: vi.fn().mockReturnValue({
-            single: vi.fn().mockResolvedValue({ data: { id: 'new-pred-uuid' }, error: null })
-          })
-        };
+    const chain: any = {
+      select: vi.fn().mockImplementation(() => chain),
+      eq: vi.fn().mockImplementation(() => chain),
+      or: vi.fn().mockImplementation(() => chain),
+      lt: vi.fn().mockImplementation(() => chain),
+      order: vi.fn().mockImplementation(() => chain),
+      limit: vi.fn().mockImplementation(() => chain),
+      in: vi.fn().mockImplementation(() => chain),
+      is: vi.fn().mockImplementation(() => chain),
+      gt: vi.fn().mockImplementation(() => chain),
+      single: vi.fn().mockImplementation(() => {
+        if (table === 'matches') {
+          return Promise.resolve({
+            data: {
+              id: 'match-upcoming-1',
+              home_team: 'Arsenal',
+              away_team: 'Chelsea',
+              league: 'Premier League',
+              kickoff: new Date(Date.now() + 86400000).toISOString(),
+              status: 'upcoming',
+              home_goals: null,
+              away_goals: null
+            },
+            error: null
+          });
+        }
+        return Promise.resolve({ data: { id: 'new-pred-uuid' }, error: null });
       }),
-      update: vi.fn().mockImplementation(() => {
-        return {
-          eq: vi.fn().mockResolvedValue({ data: null, error: null })
-        };
-      })
-    } as any;
+      maybeSingle: vi.fn().mockImplementation(() => {
+        if (table === 'matches') {
+          return Promise.resolve({
+            data: {
+              id: 'match-upcoming-1',
+              home_team: 'Arsenal',
+              away_team: 'Chelsea',
+              league: 'Premier League',
+              kickoff: new Date(Date.now() + 86400000).toISOString(),
+              status: 'upcoming',
+              home_goals: null,
+              away_goals: null
+            },
+            error: null
+          });
+        }
+        return Promise.resolve({ data: null, error: null });
+      }),
+      insert: vi.fn().mockImplementation(() => chain),
+      update: vi.fn().mockImplementation(() => chain),
+      then: builder.then
+    };
+    return chain;
   });
 
   return {

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { supabase } from '../../../../lib/supabase.server';
 import { determineUserAccess, maskSignalData } from '../../../../lib/signals/visibility';
+import { calculateKelly } from '@/lib/engine/kelly';
 
 export async function GET(
   request: Request,
@@ -93,7 +94,21 @@ export async function GET(
         odds: Number(signal.odds || 1.00),
         edge: Number(signal.edge_pct || 0.0),
         confidence: Number(signal.confidence || 0.5),
-        model_version: signal.model_version || 'rule_v1'
+        model_version: signal.model_version || 'rule_v1',
+        probability: signal.probability ? Number(signal.probability) : null,
+        recommended_stake: (() => {
+          const maxStakePct = 5.0;
+          const settledSignalCount = 250;
+          const kellyRes = calculateKelly(
+            Number(signal.odds || 1.0),
+            Number(signal.probability || 0.5),
+            maxStakePct,
+            settledSignalCount
+          );
+          return kellyRes.stakeFraction;
+        })(),
+        explanation: `Model detected edge on ${signal.selection} for market ${signal.market} with Dixon-Coles parameters.`,
+        general_explanation: `Standard Poisson-distributed team strength evaluation indicators.`
       },
       market_movement: {
         opening_odds: Number(signal.opening_odds || signal.odds || 1.00),
@@ -110,7 +125,46 @@ export async function GET(
         event_type: ev.event_type,
         created_at: ev.created_at
       })),
-      status: signal.status,
+      status: (() => {
+        const rawKickoff = signal.kickoff_utc || signal.kickoff_time || signal.created_at;
+        const parseKickoff = rawKickoff ? new Date(rawKickoff) : new Date();
+        const kickoffTime = isNaN(parseKickoff.getTime()) ? new Date(Date.now() + 2 * 24 * 60 * 60 * 1000) : parseKickoff;
+
+        const rawLastOdds = signal.last_odds_update || signal.updated_at || signal.created_at;
+        const parseLastOdds = rawLastOdds ? new Date(rawLastOdds) : new Date();
+        const lastOddsUpdate = isNaN(parseLastOdds.getTime()) ? new Date() : parseLastOdds;
+
+        const now = new Date();
+        const isKickoffPassed = now.getTime() >= kickoffTime.getTime();
+
+        const oddsAgeMinutes = signal.odds_age_minutes !== undefined && signal.odds_age_minutes !== null
+          ? signal.odds_age_minutes
+          : Math.max(0, Math.floor((now.getTime() - lastOddsUpdate.getTime()) / (1000 * 60)));
+
+        const isOddsStale = oddsAgeMinutes > 60;
+
+        if ((signal.kickoff_utc || signal.kickoff_time) && ['PENDING', 'ACTIVE', 'OPEN', 'LOCKED', 'LIVE', 'STALE', 'pending', 'active', 'open', 'locked', 'live', 'stale'].includes(signal.status)) {
+          if (isKickoffPassed) return 'CLOSED';
+          if (isOddsStale) return 'STALE';
+          return 'ACTIVE';
+        }
+        return signal.status;
+      })(),
+      last_odds_update: (() => {
+        const rawLastOdds = signal.last_odds_update || signal.updated_at || signal.created_at;
+        const parseLastOdds = rawLastOdds ? new Date(rawLastOdds) : new Date();
+        const lastOddsUpdate = isNaN(parseLastOdds.getTime()) ? new Date() : parseLastOdds;
+        return lastOddsUpdate.toISOString();
+      })(),
+      odds_age_minutes: (() => {
+        const rawLastOdds = signal.last_odds_update || signal.updated_at || signal.created_at;
+        const parseLastOdds = rawLastOdds ? new Date(rawLastOdds) : new Date();
+        const lastOddsUpdate = isNaN(parseLastOdds.getTime()) ? new Date() : parseLastOdds;
+        const now = new Date();
+        return signal.odds_age_minutes !== undefined && signal.odds_age_minutes !== null
+          ? signal.odds_age_minutes
+          : Math.max(0, Math.floor((now.getTime() - lastOddsUpdate.getTime()) / (1000 * 60)));
+      })(),
       metrics: {
         quality_score: metricsObj?.quality_score || 75,
         sharp_score: metricsObj?.sharp_score || 100,
