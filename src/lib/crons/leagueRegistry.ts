@@ -306,8 +306,13 @@ export const LEAGUE_REGISTRY: LeagueConfig[] = [
   }
 ];
 
-export function getLeagueConfig(apiFootballId: number): LeagueConfig | null {
-  return LEAGUE_REGISTRY.find(l => l.apiFootballId === apiFootballId) ?? null;
+export function getLeagueConfig(apiFootballId: number | string): LeagueConfig | null {
+  const lookupStr = String(apiFootballId).toLowerCase();
+  return LEAGUE_REGISTRY.find(l => 
+    String(l.apiFootballId) === lookupStr || 
+    l.id.toLowerCase() === lookupStr || 
+    l.name.toLowerCase() === lookupStr
+  ) ?? null;
 }
 
 export function getLeagueConfigById(id: string): LeagueConfig | null {

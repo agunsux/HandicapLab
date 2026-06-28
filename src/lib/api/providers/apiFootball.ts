@@ -1,6 +1,7 @@
 import { FootballProvider, NormalizedFixture } from './types';
 import { LeagueConfig } from '@/lib/crons/leagueRegistry';
 import { apiFootballClient } from '../apiFootball';
+import { normalizeTournamentStage } from '@/lib/utils/stageNormalization';
 
 export class ApiFootballProvider implements FootballProvider {
   async getFixtures(leagueConfig: LeagueConfig, season: number): Promise<NormalizedFixture[]> {
@@ -17,7 +18,7 @@ export class ApiFootballProvider implements FootballProvider {
         season: season,
         homeTeamId: String(f.teams.home.id),
         awayTeamId: String(f.teams.away.id),
-        tournamentStage: f.league.round || null,
+        tournamentStage: normalizeTournamentStage(f.league.round),
       }));
     } catch (e: any) {
       console.error(`[ApiFootballProvider] /fixtures error:`, e.message);

@@ -51,9 +51,39 @@ export async function GET(request: Request) {
         }
 
         let leagueInserts = 0;
+        let leagueFiltered = 0;
+        const filterReasons: Record<string, number> = {};
 
         // Step 2: Save matches to database
         for (const fixture of fixtures) {
+          // 1. Filter: Activation window
+          if (leagueConfig.activation) {
+            const { start, end } = leagueConfig.activation;
+            const matchDateStr = fixture.matchDate.split('T')[0];
+            if (matchDateStr < start || (end && matchDateStr > end)) {
+              leagueFiltered++;
+              const reason = `Outside league activation window (${start} to ${end})`;
+              filterReasons[reason] = (filterReasons[reason] || 0) + 1;
+              continue;
+            }
+          }
+
+          // 2. Filter: Already finished
+          if (fixture.status === 'finished') {
+            leagueFiltered++;
+            const reason = `Match already finished (status: ${fixture.status})`;
+            filterReasons[reason] = (filterReasons[reason] || 0) + 1;
+            continue;
+          }
+
+          // 3. Filter: Status is not upcoming or live
+          if (fixture.status !== 'upcoming' && fixture.status !== 'live') {
+            leagueFiltered++;
+            const reason = `Invalid fixture status (${fixture.status})`;
+            filterReasons[reason] = (filterReasons[reason] || 0) + 1;
+            continue;
+          }
+
           // Check if match already exists
           const { data: existingMatches, error: selectError } = await supabase
             .from('matches')
@@ -75,12 +105,7 @@ export async function GET(request: Request) {
                 league: fixture.competitionName,
                 status: fixture.status,
                 competition_type: isIntMatch ? 'international' : 'club',
-                tournament_stage: fixture.tournamentStage || null,
-                competition_id: leagueConfig.apiFootballId,
-                external_match_id: String(fixture.id),
-                source: process.env.DATA_PROVIDER || 'api-football',
-                fetched_at: new Date().toISOString(),
-                kickoff_time: fixture.matchDate
+                tournament_stage: fixture.tournamentStage || null
               })
               .eq('id', existingMatches[0].id);
             
@@ -96,12 +121,7 @@ export async function GET(request: Request) {
                 kickoff: fixture.matchDate,
                 status: fixture.status,
                 competition_type: isIntMatch ? 'international' : 'club',
-                tournament_stage: fixture.tournamentStage || null,
-                competition_id: leagueConfig.apiFootballId,
-                external_match_id: String(fixture.id),
-                source: process.env.DATA_PROVIDER || 'api-football',
-                fetched_at: new Date().toISOString(),
-                kickoff_time: fixture.matchDate
+                tournament_stage: fixture.tournamentStage || null
               });
 
             matchError = insertError;
@@ -116,7 +136,17 @@ export async function GET(request: Request) {
           totalSavedMatches++;
         }
 
-        console.log(`database inserts: ${leagueInserts}`);
+        console.log(`[INGEST DIAGNOSTIC] ${leagueConfig.name}:`);
+        console.log(`- fetched fixture count: ${fixtures.length}`);
+        console.log(`- normalized fixture count: ${fixtures.length}`);
+        console.log(`- inserted match count: ${leagueInserts}`);
+        console.log(`- filtered-out count: ${leagueFiltered}`);
+        if (leagueFiltered > 0) {
+          console.log(`- filter reason:`);
+          for (const [reason, count] of Object.entries(filterReasons)) {
+            console.log(`  * ${reason}: ${count}`);
+          }
+        }
 
       } catch (providerError: any) {
         console.error(`❌ Provider error fetching fixtures for ${leagueConfig.name}:`, providerError.message);

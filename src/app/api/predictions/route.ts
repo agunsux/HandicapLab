@@ -3,6 +3,7 @@ import { supabase } from '@/lib/supabase.server';
 import { getUserEntitlements } from '@/lib/pricing/entitlement';
 import { isRateLimited } from '@/lib/pricing/rate-limit';
 import { getUserDailyReveals, hashString } from '@/lib/pricing/access-logs';
+import { getCohortTag } from '@/lib/crons/cohortTag';
 
 export async function GET(request: Request) {
   try {
@@ -31,15 +32,27 @@ export async function GET(request: Request) {
       );
     }
 
-    // Query ensembled predictions from the database
-    const { data: predictions, error } = await supabase
+    // 2. Fetch upcoming matches
+    const { data: matches, error: matchesError } = await supabase
+      .from('matches')
+      .select('*')
+      .in('status', ['upcoming', 'live'])
+      .order('kickoff', { ascending: true })
+      .limit(60);
+
+    if (matchesError) {
+      throw matchesError;
+    }
+
+    // 3. Query ensembled predictions from the database
+    const { data: predictions, error: predsError } = await supabase
       .from('predictions')
       .select('*')
       .order('prediction_timestamp', { ascending: true })
       .limit(60);
 
-    if (error) {
-      throw error;
+    if (predsError) {
+      throw predsError;
     }
 
     // Resolve daily reveals for FREE tier users
@@ -51,6 +64,24 @@ export async function GET(request: Request) {
     // Format response grouped by match to match original layout
     const grouped: Record<string, any> = {};
 
+    // Initialize with upcoming matches first so they appear even if signals are not generated yet
+    for (const match of matches || []) {
+      const matchKey = `${match.home_team} vs ${match.away_team}`;
+      const cohortTag = getCohortTag(match.league, match.tournament_stage);
+      
+      grouped[matchKey] = {
+        matchId: match.id,
+        match: matchKey,
+        kickoff: match.kickoff,
+        league: cohortTag || 'EPL',
+        prediction: { home: null, draw: null, away: null },
+        asianHandicap: { line: 'N/A', confidence: null, odds: 0.0, fairOdds: null, edge: 0.0 },
+        overUnder: { line: 'N/A', over: null, under: null, odds: 0.0, fairOdds: null, edge: 0.0 },
+        confidence: '⚪ Low',
+        isLocked: false
+      };
+    }
+
     for (const pred of predictions || []) {
       const matchId = pred.match_id || pred.id; // Fallback to prediction ID if match_id is null
       const matchKey = `${pred.home_team} vs ${pred.away_team}`;
@@ -60,9 +91,9 @@ export async function GET(request: Request) {
           match: matchKey,
           kickoff: pred.prediction_timestamp,
           league: pred.cohort_tag || 'EPL',
-          prediction: { home: 0, draw: 0, away: 0 },
-          asianHandicap: { line: '', confidence: 0, odds: 0 },
-          overUnder: { line: '', over: 0, under: 0, odds: 0 },
+          prediction: { home: null, draw: null, away: null },
+          asianHandicap: { line: 'N/A', confidence: null, odds: 0.0, fairOdds: null, edge: 0.0 },
+          overUnder: { line: 'N/A', over: null, under: null, odds: 0.0, fairOdds: null, edge: 0.0 },
           confidence: '⚪ Low',
           isLocked: false
         };

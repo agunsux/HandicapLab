@@ -1,5 +1,6 @@
 import { FootballProvider, NormalizedFixture } from './types';
 import { LeagueConfig } from '@/lib/crons/leagueRegistry';
+import { normalizeTournamentStage } from '@/lib/utils/stageNormalization';
 
 export class FootballDataProvider implements FootballProvider {
   private baseUrl = 'https://api.football-data.org/v4';
@@ -60,7 +61,7 @@ export class FootballDataProvider implements FootballProvider {
       season: season,
       homeTeamId: String(m.homeTeam.id),
       awayTeamId: String(m.awayTeam.id),
-      tournamentStage: m.matchday ? `Matchday ${m.matchday}` : m.stage || null,
+      tournamentStage: normalizeTournamentStage(m.matchday ? `Matchday ${m.matchday}` : m.stage || null),
     }));
   }
 
@@ -81,7 +82,7 @@ export class FootballDataProvider implements FootballProvider {
       season: season,
       homeTeamId: String(m.homeTeam.id),
       awayTeamId: String(m.awayTeam.id),
-      tournamentStage: m.matchday ? `Matchday ${m.matchday}` : m.stage || null,
+      tournamentStage: normalizeTournamentStage(m.matchday ? `Matchday ${m.matchday}` : m.stage || null),
     }));
   }
 

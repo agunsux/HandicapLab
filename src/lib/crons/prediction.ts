@@ -65,7 +65,7 @@ export async function runPredictionCron(): Promise<any> {
         // 6. Select the top pick (if any positive EV pick exists)
         const topPick = picks[0]; // Already sorted by EV descending
         
-        let cohortTag = getCohortTag(match.league_id ?? match.league, match.stage);
+        let cohortTag = getCohortTag(match.league, match.tournament_stage);
         // Cohort tagging logic based on user rules:
         // GENERAL, 2H_UNDER_EPL, 2H_UNDER_LIGUE2
         if (marketType === 'OU' && topPick && topPick.outcome === 'under') {

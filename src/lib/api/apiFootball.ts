@@ -138,10 +138,11 @@ export class ApiFootballClient {
         leagueName = 'Ligue 2';
       }
 
-      // Generate 10 mock fixtures
+      // Generate mock fixtures
       const mockFixtures = [];
+      const count = league === 1 ? 12 : 10;
 
-      for (let i = 0; i < 10; i++) {
+      for (let i = 0; i < count; i++) {
         const fixtureId = 200000 + i;
         const homeTeam = teams[i % teams.length];
         const awayTeam = teams[(i + 1) % teams.length];
@@ -153,6 +154,15 @@ export class ApiFootballClient {
         const shAway = Math.floor(Math.random() * 2);
 
         const isFinished = league !== 1 && i < 7; // Keep some upcoming for World Cup
+
+        let round = league === 1 ? 'Group Stage' : 'Regular Season - ' + (i + 1);
+        if (league === 1) {
+          if (i === 2) {
+            round = 'World Championship Play Offs';
+          } else if (i === 4) {
+            round = 'Round of 32 / 1/16 Finals';
+          }
+        }
 
         mockFixtures.push({
           fixture: {
@@ -169,7 +179,7 @@ export class ApiFootballClient {
               ? { long: 'Match Finished', short: 'FT', elapsed: 90 }
               : { long: 'Not Started', short: 'NS', elapsed: 0 }
           },
-          league: { id: league, name: leagueName, country: league === 1 ? 'World' : 'England', logo: '', flag: '', season: season, round: league === 1 ? 'Group Stage' : 'Regular Season - ' + (i + 1) },
+          league: { id: league, name: leagueName, country: league === 1 ? 'World' : 'England', logo: '', flag: '', season: season, round },
           teams: {
             home: { id: homeTeam.id, name: homeTeam.name, logo: '', winner: isFinished ? htHome + shHome > htAway + shAway : null },
             away: { id: awayTeam.id, name: awayTeam.name, logo: '', winner: isFinished ? htAway + shAway > htHome + shHome : null }
@@ -188,6 +198,7 @@ export class ApiFootballClient {
           }
         });
       }
+
       return mockFixtures as unknown as T;
     }
 
