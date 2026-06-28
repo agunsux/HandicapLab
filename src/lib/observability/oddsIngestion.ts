@@ -62,6 +62,11 @@ export class OddsIngestionContext {
     return this._persistedId;
   }
 
+  /** Alias for persistedId for external usage */
+  get runId(): string | null {
+    return this._persistedId;
+  }
+
   /**
    * Record a single market rejection. Increments oddsRejected automatically.
    */
@@ -78,10 +83,34 @@ export class OddsIngestionContext {
    *   cannot mask the original pipeline error.
    */
   async flush(): Promise<void> {
+    // If we already have a persisted row, update it.
+    if (this._persistedId) {
+      try {
+        const { error } = await supabase
+          .from('odds_ingestion_runs')
+          .update({
+            fixtures_received: this.fixturesReceived,
+            odds_enriched: this.oddsEnriched,
+            odds_rejected: this.oddsRejected,
+            signals_generated: this.signalsGenerated,
+            fixtures_without_odds: this.fixturesWithoutOdds,
+            rejection_log: this.rejections,
+          })
+          .eq('id', this._persistedId);
+        if (error) {
+          console.error(`[OddsIngestionContext] update failed for execution ${this.executionId} (cron: "${this.cronName}"):`, error);
+        } else {
+          console.log(`[OddsIngestionContext] updated run ${this._persistedId} with latest counters.`);
+        }
+      } catch (err) {
+        console.error(`[OddsIngestionContext] update exception for execution ${this.executionId} (cron: "${this.cronName}"):`, err);
+      }
+      return;
+    }
+
+    // First flush – INSERT a new row.
     if (this._flushed) {
-      console.warn(
-        `[OddsIngestionContext] flush() already called for execution ${this.executionId} (cron: ${this.cronName}). Skipping duplicate.`
-      );
+      console.warn(`[OddsIngestionContext] flush() already called for execution ${this.executionId} (cron: ${this.cronName}). Skipping duplicate insert.`);
       return;
     }
     this._flushed = true;
@@ -99,15 +128,13 @@ export class OddsIngestionContext {
       }).select('id').maybeSingle();
 
       if (error) {
-        console.error(`[OddsIngestionContext] flush failed for execution ${this.executionId} (cron: "${this.cronName}"):`, error);
+        console.error(`[OddsIngestionContext] flush (insert) failed for execution ${this.executionId} (cron: "${this.cronName}"):`, error);
       } else {
         this._persistedId = data?.id ?? null;
-        console.log(
-          `[OddsIngestionContext] flushed — execution: ${this.executionId} | cron: ${this.cronName} | received: ${this.fixturesReceived} | enriched: ${this.oddsEnriched} | rejected: ${this.oddsRejected} | signals: ${this.signalsGenerated} | no-odds fixtures: ${this.fixturesWithoutOdds}`
-        );
+        console.log(`[OddsIngestionContext] flushed — execution: ${this.executionId} | cron: ${this.cronName} | received: ${this.fixturesReceived} | enriched: ${this.oddsEnriched} | rejected: ${this.oddsRejected} | signals: ${this.signalsGenerated} | no-odds fixtures: ${this.fixturesWithoutOdds}`);
       }
     } catch (err) {
-      console.error(`[OddsIngestionContext] flush exception for execution ${this.executionId} (cron: "${this.cronName}"):`, err);
+      console.error(`[OddsIngestionContext] flush (insert) exception for execution ${this.executionId} (cron: "${this.cronName}"):`, err);
     }
   }
 
