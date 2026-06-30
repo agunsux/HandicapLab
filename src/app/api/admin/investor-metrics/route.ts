@@ -28,10 +28,6 @@ export async function GET(request: Request) {
       return status !== 'rejected' && oddsValid && hasRef;
     });
 
-    if (pError || sError) {
-      const msg = pError?.message || sError?.message;
-      return NextResponse.json({ success: false, error: msg }, { status: 500 });
-    }
 
     const allProfiles = profiles || [];
     const allSignals = cleanSignals;

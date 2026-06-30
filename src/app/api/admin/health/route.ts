@@ -63,14 +63,14 @@ export async function GET(request: Request) {
       .select('id, status, odds, reference_book')
       .gte('created_at', startOfDay);
     const signalsToday = todaySignals?.length ?? 0;
-    const validSignals = todaySignals?.filter((s) => {
+    const validSignals = (todaySignals || []).filter((s) => {
       const status = (s.status || '').toLowerCase();
       const oddsValid = s.odds !== null && s.odds !== undefined && Number(s.odds) > 0;
       const hasRef = s.reference_book && s.reference_book.trim().length > 0;
       return status !== 'rejected' && oddsValid && hasRef;
-    }).length ?? 0;
+    }).length;
     const validPct = signalsToday > 0 ? (validSignals / signalsToday) * 100 : 0;
-    const missingOddsPct = signalsToday > 0 ? (todaySignals?.filter(s => s.odds === null || s.odds === undefined).length / signalsToday) * 100 : 0;
+    const missingOddsPct = signalsToday > 0 ? ((todaySignals || []).filter(s => s.odds === null || s.odds === undefined).length / signalsToday) * 100 : 0;
 
     // Data freshness checks
     const freshnessThresholdMs = 24 * 60 * 60 * 1000; // 1 day

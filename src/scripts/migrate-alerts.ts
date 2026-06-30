@@ -1,4 +1,4 @@
-import { supabase } from '../../lib/supabase.server';
+import { supabase } from '../lib/supabase.server';
 
 /**
  * Migration to create system_alerts table for internal monitoring.

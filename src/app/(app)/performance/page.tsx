@@ -212,8 +212,8 @@ export default function PerformancePage() {
               </button>
             ))}
           </div>
-
-</header>
+        </div>
+      </header>
         
         
 
