@@ -4,7 +4,7 @@ import type { NextRequest } from 'next/server';
 // Module-scoped map to store rate-limit counters in memory
 const ipRequests = new Map<string, { count: number; windowStart: number }>();
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const url = request.nextUrl.clone();
   const { pathname } = url;
 

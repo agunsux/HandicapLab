@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { middleware } from '../src/middleware';
+import { proxy } from '../src/proxy';
 import { NextRequest, NextResponse } from 'next/server';
 import { runHealthCheck } from '../src/lib/services/healthChecker';
 import { CronLogger } from '../src/lib/services/cronLogger';
@@ -100,7 +100,7 @@ describe('Phase 35.1: Production Hardening Integration tests', () => {
       const request = new NextRequest('http://localhost/api/admin/model-health', {
         headers: { 'x-admin-secret': 'wrong_secret' }
       });
-      const response = await middleware(request);
+      const response = await proxy(request);
       expect(response.status).toBe(401);
     });
 
@@ -111,7 +111,7 @@ describe('Phase 35.1: Production Hardening Integration tests', () => {
 
       let lastRes: any = null;
       for (let i = 0; i < 105; i++) {
-        lastRes = await middleware(request);
+        lastRes = await proxy(request);
       }
       expect(lastRes.status).toBe(429);
     });
