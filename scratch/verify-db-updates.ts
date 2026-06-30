@@ -7,24 +7,21 @@ const supabase = createClient(
 );
 
 async function main() {
-  console.log('--- Database Verification for World Cup Fixtures ---');
+  console.log('--- Database Verification for Sprint 9 CLV Columns ---');
   
-  const { data: matches, error } = await supabase
-    .from('matches')
-    .select('*')
-    .ilike('league', '%World Cup%')
-    .order('kickoff', { ascending: true });
+  const { data: signals, error } = await supabase
+    .from('signals')
+    .select('id, opening_reference_book, clv_status, clv_percentage, market_truth_score')
+    .limit(5);
 
   if (error) {
-    console.error('Error fetching matches:', error);
+    console.error('Error fetching signals:', error);
     return;
   }
 
-  console.log(`Found ${matches.length} World Cup matches in the database:`);
-  
-  matches.forEach((m, idx) => {
-    console.log(`[Match #${idx + 1}] ID: ${m.id} | Kickoff: ${m.kickoff} | Teams: ${m.home_team} vs ${m.away_team} | Stage: ${m.tournament_stage} | Status: ${m.status}`);
-  });
+  console.log(`Successfully verified columns. Row count fetched: ${signals.length}`);
+  console.log('Sample rows:', signals);
 }
 
 main();
+

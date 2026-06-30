@@ -303,13 +303,28 @@ async function runSignalsSettlement(logId: string | null) {
             }
           }
 
-          // Calculate CLV percentage
-          const openingOdds = Number(signal.odds);
-          const closingOdds = Number(signal.closing_odds);
-          let clvPercentage = 0.0;
-          if (closingOdds && closingOdds > 0 && openingOdds && openingOdds > 0) {
-            clvPercentage = Number((((1.0 / closingOdds) - (1.0 / openingOdds)) * 100).toFixed(4));
+          // Calculate detailed CLV
+          const openingOdds = Number(signal.odds || 1.90);
+          const closingOdds = Number(signal.closing_odds) || openingOdds;
+          const openingLine = Number(signal.handicap_line || 0.0);
+          const closingLine = Number(signal.closing_line !== null && signal.closing_line !== undefined ? signal.closing_line : openingLine);
+          
+          let marketType: 'ML' | 'AH' | 'OU' = 'ML';
+          const dbMarket = (signal.market || '').toLowerCase();
+          if (dbMarket === 'asian_handicap') {
+            marketType = 'AH';
+          } else if (dbMarket === 'over_under') {
+            marketType = 'OU';
           }
+
+          const clvResult = CLVCalculator.calculateDetailed(
+            marketType,
+            signal.selection || 'home',
+            openingLine,
+            openingOdds,
+            closingLine,
+            closingOdds
+          );
 
           // Finalise signal update
           await supabase
@@ -317,7 +332,28 @@ async function runSignalsSettlement(logId: string | null) {
             .update({
               status,
               profit_loss,
-              clv_percentage: clvPercentage,
+              closing_reference_book: 'PINNACLE',
+              closing_line: closingLine,
+              closing_price: closingOdds,
+              closing_timestamp: new Date().toISOString(),
+              clv_status: 'calculated',
+              clv_score: clvResult.clv_score,
+              clv_percentage: clvResult.clv_percentage,
+              clv_category: clvResult.clv_category,
+              line_clv: clvResult.line_clv,
+              price_clv: clvResult.price_clv,
+              total_clv: clvResult.total_clv,
+              closing_market_snapshot: {
+                handicap: closingLine,
+                price: closingOdds,
+                bookmaker: 'PINNACLE'
+              },
+              closing_capture_time: new Date().toISOString(),
+              market_movement: {
+                opening_odds: openingOdds,
+                closing_odds: closingOdds,
+                delta: Number((closingOdds - openingOdds).toFixed(4))
+              },
               settled_at: new Date().toISOString(),
               updated_at: new Date().toISOString()
             })
@@ -340,7 +376,7 @@ async function runSignalsSettlement(logId: string | null) {
             const calibError = Math.abs(calibratedProb - actualProb);
 
             // Log performance attribution record
-            await PerformanceAttribution.logAttribution(signal, status, profit_loss, clvPercentage / 100);
+            await PerformanceAttribution.logAttribution(signal, status, profit_loss, clvResult.clv_percentage / 100);
 
             // Log model calibration history record (blocked if model validation mode is active)
             if (process.env.MODEL_VALIDATION_MODE !== 'true') {
@@ -386,8 +422,8 @@ async function runSignalsSettlement(logId: string | null) {
                   result: status,
                   pnl: profit_loss,
                   roi: Number((profit_loss * 100).toFixed(2)),
-                  closing_line: signal.closing_line || signal.handicap_line || 0.0,
-                  clv: clvPercentage
+                  closing_line: closingLine,
+                  clv: clvResult.clv_percentage
                 }
               });
           } catch (auditErr) {

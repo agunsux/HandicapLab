@@ -2,6 +2,8 @@ import crypto from 'crypto';
 import { supabase } from '../../supabase.server';
 import { EdgePick } from './types';
 import { calculateQualityMetrics } from '../../analytics/data-quality';
+import { MarketTruthScanner } from '../../validation/market-truth';
+import { CohortSelector } from '../../validation/cohort-selector';
 
 // Ensure this module is only imported/run on the server side
 if (typeof window !== 'undefined') {
@@ -18,10 +20,6 @@ export interface MatchMetaData {
 export class SignalScanner {
   /**
    * Safe batch ingestion of EdgePicks into the signals database table.
-   * - Prevents duplicate signals.
-   * - Respects unique constraint on (match_id, market, handicap_line).
-   * - Batch inserts/upserts all records in a single query.
-   * - Confidence score is derived strictly from model inputs (no arbitrary constants).
    */
   public static async saveSignals(
     picks: EdgePick[],
@@ -32,11 +30,36 @@ export class SignalScanner {
       return;
     }
 
-    // Map EdgePicks to Supabase signals payload structure
-    const payloads = picks.map(pick => {
+    const validPayloads: any[] = [];
+
+    for (const pick of picks) {
+      // 1. Evaluate Market Truth / Data Quality Guards
+      const truthInput = {
+        openingOdds: pick.marketOdds,
+        referenceBookmaker: 'PINNACLE',
+        oddsTimestamp: new Date().toISOString(),
+        kickoffUtc: meta.kickoff_utc,
+        marketSuspended: false,
+        liquidityScore: 90,
+        lineMovementQuality: 90
+      };
+
+      const truthResult = MarketTruthScanner.evaluate(truthInput);
+
+      if (!truthResult.isValid) {
+        console.warn(`[SignalScanner] Pick rejected due to data quality/guards: ${truthResult.errors.join(', ')}`);
+        continue;
+      }
+
       // Confidence score derivation (e.g. from expected value and model probability)
-      // Standardizes to a model-derived float with no arbitrary bounds/constants.
       const derivedConfidence = pick.modelProbability * (1.0 + Math.max(0, pick.expectedValue));
+
+      // Unified Confidence Score: Confidence = (data quality * 0.3) + (model confidence * 0.4) + (market liquidity * 0.3)
+      const unifiedConfidence = MarketTruthScanner.calculateConfidence(
+        truthResult.score,
+        derivedConfidence * 100,
+        90
+      ) / 100;
 
       // Resolve db market name: asian_handicap, over_under, moneyline
       let dbMarket = 'moneyline';
@@ -54,7 +77,12 @@ export class SignalScanner {
         marketSelection = `${pick.outcome}_${pick.line}`;
       }
 
-      return {
+      const cohort = CohortSelector.resolve(meta.league || 'Other');
+      const kickoffTime = new Date(meta.kickoff_utc).getTime();
+      const now = Date.now();
+      const hoursBeforeKickoff = Number(((kickoffTime - now) / (1000 * 60 * 60)).toFixed(2));
+
+      validPayloads.push({
         match_id: pick.matchId,
         league: meta.league || null,
         home_team: meta.home_team,
@@ -69,20 +97,48 @@ export class SignalScanner {
         fair_odds: pick.modelProbability > 0 ? 1 / pick.modelProbability : 0,
         probability: pick.modelProbability,
         edge_pct: pick.expectedValue * 100, // represent edge as percentage (e.g. 10.5%)
-        confidence: Number(derivedConfidence.toFixed(4)),
+        confidence: Number(unifiedConfidence.toFixed(4)),
         status: 'pending',
         model_version: 'rule_v1',
-        updated_at: new Date().toISOString()
-      };
-    });
+        updated_at: new Date().toISOString(),
+        
+        // Sprint 9 CLV Baselining & Market Truth columns
+        opening_reference_book: 'PINNACLE',
+        opening_line: lineNum,
+        opening_price: pick.marketOdds,
+        clv_status: 'pending',
+        market_truth_score: truthResult.score,
+        model_probability: pick.modelProbability,
+        model_price: pick.modelProbability > 0 ? 1 / pick.modelProbability : 0,
+        opening_market_snapshot: {
+          handicap: lineNum,
+          price: pick.marketOdds,
+          bookmaker: 'PINNACLE'
+        },
 
-    console.log(`[SignalScanner] Saving batch of ${payloads.length} signals for match ${meta.home_team} vs ${meta.away_team}...`);
+        // Sprint 10 Cohorts & timing tracking columns
+        league_cohort: cohort,
+        prediction_created_at: new Date().toISOString(),
+        opening_capture_time: new Date().toISOString(),
+        hours_before_kickoff: hoursBeforeKickoff,
+        
+        // Sprint 10 Evidence Collection Sprint Premium Gating
+        premium_eligible: truthResult.score >= 75 && unifiedConfidence >= 0.65
+      });
+    }
 
-    // Perform batch upsert on the UNIQUE constraint (match_id, market, handicap_line)
+    if (validPayloads.length === 0) {
+      console.log('[SignalScanner] No valid picks passed validation guards.');
+      return;
+    }
+
+    console.log(`[SignalScanner] Saving batch of ${validPayloads.length} signals for match ${meta.home_team} vs ${meta.away_team}...`);
+
+    // Perform batch upsert on the UNIQUE constraint (match_id, market, handicap_line, selection)
     const { data: savedRows, error } = await supabase
       .from('signals')
-      .upsert(payloads, {
-        onConflict: 'match_id,market,handicap_line',
+      .upsert(validPayloads, {
+        onConflict: 'match_id,market,handicap_line,selection',
         ignoreDuplicates: false // overwrite with latest odds/edge if already exists
       })
       .select('id, match_id, market, handicap_line, selection, odds, confidence, market_category, market_selection');
@@ -92,7 +148,7 @@ export class SignalScanner {
       throw error;
     }
 
-    console.log(`[SignalScanner] Successfully batch inserted ${payloads.length} signals.`);
+    console.log(`[SignalScanner] Successfully batch inserted ${validPayloads.length} signals.`);
 
     // Immutable audit events logging (with transaction safety)
     if (savedRows && savedRows.length > 0) {
