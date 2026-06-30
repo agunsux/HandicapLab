@@ -212,7 +212,10 @@ export default function PerformancePage() {
               </button>
             ))}
           </div>
-        </header>
+
+</header>
+        
+        
 
         {/* Content Area with Paywall Overlay */}
         <div className="relative">
