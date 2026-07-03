@@ -63,6 +63,7 @@ interface MarketRow {
 
 export default function PerformancePage() {
   const [cohort, setCohort] = useState<string>('all');
+  const [mode, setMode] = useState<'production' | 'simulation'>('production');
   const [activeTab, setActiveTab] = useState<'overview' | 'market' | 'league' | 'model'>('overview');
   const [summary, setSummary] = useState<SummaryData | null>(null);
   const [clvData, setClvData] = useState<ClvData | null>(null);
@@ -89,7 +90,7 @@ export default function PerformancePage() {
         setError(null);
 
         const [resSummary, resClv, resLeagues, resMarkets] = await Promise.all([
-          fetch(`/api/performance/summary?cohort=${cohort}`),
+          fetch(`/api/performance/summary?cohort=${cohort}&mode=${mode}`),
           fetch('/api/performance/clv'),
           fetch('/api/performance/leagues'),
           fetch('/api/performance/markets')
@@ -118,7 +119,7 @@ export default function PerformancePage() {
     }
 
     fetchData();
-  }, [cohort]);
+  }, [cohort, mode]);
 
   if (loading) {
     return (
@@ -196,6 +197,26 @@ export default function PerformancePage() {
                 <option value="asia">Asia</option>
                 <option value="other">Other</option>
               </select>
+            </div>
+
+            {/* Mode Selection */}
+            <div className="flex bg-slate-900 border border-slate-800 p-0.5 rounded">
+              <button
+                onClick={() => setMode('production')}
+                className={`px-3 py-1 rounded text-[10px] uppercase font-bold tracking-wider transition ${
+                  mode === 'production' ? 'bg-emerald-500 text-slate-950' : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                Production Live
+              </button>
+              <button
+                onClick={() => setMode('simulation')}
+                className={`px-3 py-1 rounded text-[10px] uppercase font-bold tracking-wider transition ${
+                  mode === 'simulation' ? 'bg-emerald-500 text-slate-950' : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                Simulation
+              </button>
             </div>
 
             {/* Tab Selection */}
