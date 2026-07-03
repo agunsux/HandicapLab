@@ -29,6 +29,10 @@ class InsertBuilder {
     this.isSingle = true;
     return this;
   }
+  maybeSingle() {
+    this.isSingle = true;
+    return this;
+  }
   async then(resolve: any) {
     const data = this.isSingle 
       ? (Array.isArray(this.insertedData) ? this.insertedData[0] : this.insertedData)
