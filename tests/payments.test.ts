@@ -95,7 +95,7 @@ describe('Hardened Payment Infrastructure', () => {
     // Set safe default mock resolvers
     mockMaybeSingle.mockResolvedValue({ data: null, error: null });
     mockSingle.mockResolvedValue({ data: {}, error: null });
-    mockThen.mockImplementation((resolve) => {
+    mockThen.mockImplementation((resolve: any) => {
       if (resolve && typeof resolve === 'function') {
         resolve({ data: [], error: null });
       }

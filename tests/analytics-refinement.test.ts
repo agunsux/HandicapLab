@@ -194,7 +194,7 @@ describe('Analytics Refinement Layer', () => {
           expectedValue: 0.20,
           kellyStake: 0.10,
           clv: 0.05,
-          confidence: 0.80,
+          confidence: 'HIGH' as const,
           tier: 'ELITE' as const
         }
       ];
@@ -234,7 +234,7 @@ describe('Analytics Refinement Layer', () => {
           expectedValue: 0.20,
           kellyStake: 0.10,
           clv: 0.05,
-          confidence: 0.80,
+          confidence: 'HIGH' as const,
           tier: 'ELITE' as const
         }
       ];

@@ -225,6 +225,26 @@ export class ProbabilityEngine {
     // 9. Calculate split confidence via UncertaintyEngine
     const confidence = UncertaintyEngine.calculate(adjustedFeatures, poissonMl, dcMl, options.oddsSnapshot);
 
+    // Derive Expected Goals (xgHome, xgAway, combined expectedGoals) and BTTS Yes/No
+    let xgHome = 0;
+    let xgAway = 0;
+    let pBttsYes = 0;
+
+    for (let h = 0; h <= 10; h++) {
+      for (let a = 0; a <= 10; a++) {
+        const p = calibratedMatrix[h][a];
+        xgHome += h * p;
+        xgAway += a * p;
+        if (h >= 1 && a >= 1) {
+          pBttsYes += p;
+        }
+      }
+    }
+
+    const expectedGoals = Number((xgHome + xgAway).toFixed(2));
+    pBttsYes = Number(pBttsYes.toFixed(4));
+    const pBttsNo = Number(Math.max(0, 1.0 - pBttsYes).toFixed(4));
+
     // 10. Define model version details
     const modelVersion: ModelVersion = {
       name: 'prematch-v1',
@@ -245,6 +265,9 @@ export class ProbabilityEngine {
       pUnder,
       pAhHome,
       pAhAway,
+      pBttsYes,
+      pBttsNo,
+      expectedGoals,
       modelVersion,
       calibrationApplied,
       confidence

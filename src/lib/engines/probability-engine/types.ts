@@ -26,6 +26,11 @@ export interface ProbabilityOutput {
   pAhHome: Record<string, number>; // { '-0.5': 0.52, '-1.0': 0.38 }
   pAhAway: Record<string, number>;
   
+  // Both Teams To Score (BTTS) & Expected Goals
+  pBttsYes?: number;
+  pBttsNo?: number;
+  expectedGoals?: number;
+
   // Metadata
   modelVersion: ModelVersion;
   calibrationApplied: boolean;
@@ -34,6 +39,10 @@ export interface ProbabilityOutput {
     dataConfidence: number;
     marketConfidence: number;
     finalConfidence: number;
+    confidenceScore: number;
+    dataQualityScore: number;
+    recommendationStatus: 'Recommended' | 'Consider' | 'Neutral' | 'Caution' | 'Skip';
+    reasons: string[];
   };
 }
 

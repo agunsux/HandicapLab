@@ -186,7 +186,7 @@ describe('Immutable Signal Audit Layer & Performance Integrity', () => {
           expectedValue: 0.26,
           kellyStake: 0.15,
           clv: 0.05,
-          confidence: 0.75,
+          confidence: 'HIGH' as const,
           tier: 'ELITE' as const
         }
       ];
@@ -221,11 +221,16 @@ describe('Immutable Signal Audit Layer & Performance Integrity', () => {
       const { oddsApiClient } = await import('../src/lib/apis/oddspapi');
       vi.spyOn(oddsApiClient, 'getOdds').mockResolvedValueOnce([
         {
+          id: 'mock_match_1',
+          sport_key: 'soccer',
+          sport_title: 'Soccer',
+          commence_time: new Date().toISOString(),
           home_team: 'Man City',
           away_team: 'Liverpool',
           bookmakers: [
             {
               key: 'pinnacle',
+              title: 'Pinnacle',
               markets: [
                 {
                   key: 'spreads',

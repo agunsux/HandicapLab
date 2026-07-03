@@ -92,7 +92,9 @@ export async function runPredictionCron(): Promise<any> {
           over_prob: probOutput.pOver[marketOdds.line ? String(marketOdds.line) : '2.5'] ?? 0.5,
           pOver: probOutput.pOver,
           pUnder: probOutput.pUnder,
-          expected_goals: 2.5,
+          expected_goals: probOutput.expectedGoals,
+          pBttsYes: probOutput.pBttsYes,
+          pBttsNo: probOutput.pBttsNo,
           confidence: probOutput.confidence, // Sprint 6 structured Confidence object
         };
 
@@ -113,10 +115,15 @@ export async function runPredictionCron(): Promise<any> {
           selection: topPick ? topPick.outcome : null,
           model_probability: topPick ? topPick.modelProbability : null,
           fair_odds: topPick ? Number((1 / topPick.modelProbability).toFixed(4)) : null,
-          edge_pct: topPick ? topPick.expectedValue : null,
+          edge_pct: topPick ? Number(((topPick.modelProbability - topPick.impliedProbability) * 100).toFixed(2)) : null,
+          expected_value: topPick ? Number(topPick.expectedValue.toFixed(4)) : null,
           entry_odds: topPick ? topPick.marketOdds : null,
           // Sprint 6 new columns:
-          market_confidence_score: probOutput.confidence ? Math.round(probOutput.confidence.marketConfidence * 100) : null,
+          confidence: probOutput.confidence ? probOutput.confidence.confidenceScore : null,
+          model_confidence: probOutput.confidence ? Number(probOutput.confidence.modelConfidence.toFixed(4)) : null,
+          data_confidence: probOutput.confidence ? Number(probOutput.confidence.dataConfidence.toFixed(4)) : null,
+          market_confidence: probOutput.confidence ? Number(probOutput.confidence.marketConfidence.toFixed(4)) : null,
+          market_confidence_score: probOutput.confidence ? probOutput.confidence.confidenceScore : null,
           predicted_odds: topPick ? topPick.marketOdds : null,
         };
 

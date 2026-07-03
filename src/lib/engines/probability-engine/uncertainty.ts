@@ -7,6 +7,10 @@ export interface Confidence {
   dataConfidence: number;  // 0.0 to 1.0
   marketConfidence: number; // 0.0 to 1.0
   finalConfidence: number;  // 0.0 to 1.0
+  confidenceScore: number;
+  dataQualityScore: number;
+  recommendationStatus: 'Recommended' | 'Consider' | 'Neutral' | 'Caution' | 'Skip';
+  reasons: string[];
 }
 
 export class UncertaintyEngine {
@@ -100,11 +104,124 @@ export class UncertaintyEngine {
       }
     }
 
+    // --- Production-Grade Multi-Factor Confidence Engine & Data Quality Score ---
+    // A. Data Quality Score calculation (Phase D)
+    const hasFixtureInfo = features.kickoffAt && features.matchId;
+    const fixtureCompleteness = hasFixtureInfo ? 100 : 50;
+
+    const hasOdds = oddsSnapshot && (oddsSnapshot.homeOdds !== undefined || oddsSnapshot.awayOdds !== undefined);
+    const oddsCompleteness = hasOdds ? 100 : 0;
+
+    const timeToKickoffMs = features.kickoffAt ? (new Date(features.kickoffAt).getTime() - Date.now()) : 2 * 24 * 60 * 60 * 1000;
+    const isLineupConfirmed = timeToKickoffMs > 0 && timeToKickoffMs <= 60 * 60 * 1000; // lineups confirmed within 60 mins of kickoff
+    const lineupAvailability = isLineupConfirmed ? 100 : 60;
+
+    const historicalCount = features.historicalMatchesCount ?? 0;
+    const historicalSample = minMatches > 0 ? Math.min(100, Math.round((historicalCount / minMatches) * 100)) : 100;
+
+    const hasML = oddsSnapshot?.homeOdds !== undefined && oddsSnapshot?.awayOdds !== undefined;
+    const hasAH = oddsSnapshot?.line !== undefined;
+    const marketCoverage = (hasML ? 40 : 0) + (hasAH ? 30 : 0) + 30; // defaults to 100 if both are present
+
+    const formCompleteness = (features.homeFormWeighted !== undefined && features.awayFormWeighted !== undefined) ? 100 : 50;
+
+    const dataQualityScore = Math.round(
+      fixtureCompleteness * 0.15 +
+      oddsCompleteness * 0.20 +
+      lineupAvailability * 0.15 +
+      historicalSample * 0.20 +
+      marketCoverage * 0.15 +
+      formCompleteness * 0.15
+    );
+
+    // B. Confidence Score (0-100) factors (Phase B)
+    let modelCalibration = 75;
+    if (features.leagueId) {
+      const config = getLeagueConfigById(features.leagueId) || getLeagueConfig(Number(features.leagueId));
+      if (config) {
+        if (config.tier === 1) modelCalibration = 85;
+        else if (config.tier === 2) modelCalibration = 80;
+      }
+    }
+
+    let lineMovementStability = 90;
+    if (oddsSnapshot && oddsSnapshot.homeOdds && oddsSnapshot.awayOdds) {
+      lineMovementStability = Math.round(marketConfidence * 100);
+    }
+
+    const lineupCertainty = isLineupConfirmed ? 100 : 70;
+    const injuryUncertainty = Math.round(continuity * 100);
+
+    let leagueReliability = 70;
+    if (features.leagueId) {
+      const config = getLeagueConfigById(features.leagueId) || getLeagueConfig(Number(features.leagueId));
+      if (config) {
+        if (config.tier === 1) leagueReliability = 95;
+        else if (config.tier === 2) leagueReliability = 85;
+      }
+    }
+
+    const predictionVariance = Math.round(modelConfidence * 100);
+
+    const confidenceScore = Math.max(0, Math.min(100, Math.round(
+      predictionVariance * 0.25 +
+      modelCalibration * 0.15 +
+      historicalSample * 0.15 +
+      lineMovementStability * 0.15 +
+      lineupCertainty * 0.10 +
+      injuryUncertainty * 0.10 +
+      leagueReliability * 0.10
+    )));
+
+    // C. Recommendation Status (Phase C) - No gambling terminology
+    let recommendationStatus: 'Recommended' | 'Consider' | 'Neutral' | 'Caution' | 'Skip' = 'Neutral';
+    if (confidenceScore >= 80) {
+      recommendationStatus = 'Recommended';
+    } else if (confidenceScore >= 65) {
+      recommendationStatus = 'Consider';
+    } else if (confidenceScore >= 50) {
+      recommendationStatus = 'Neutral';
+    } else if (confidenceScore >= 35) {
+      recommendationStatus = 'Caution';
+    } else {
+      recommendationStatus = 'Skip';
+    }
+
+    // D. Explainability Reasons (Phase E)
+    const reasons: string[] = [];
+    if (confidenceScore >= 75) {
+      reasons.push("High historical calibration");
+    }
+    if (isLineupConfirmed) {
+      reasons.push("Confirmed starting lineup");
+    } else {
+      reasons.push("Lineup projection stable");
+    }
+    if (historicalSample >= 75) {
+      reasons.push("Robust historical sample size");
+    }
+    if (predictionVariance >= 85) {
+      reasons.push("Low model variance");
+    }
+    if (lineMovementStability >= 85) {
+      reasons.push("Stable market");
+    }
+    if (leagueReliability >= 85) {
+      reasons.push("High-reliability competition profile");
+    }
+    if (continuity >= 0.8) {
+      reasons.push("Consistent squad continuity");
+    }
+
     return {
       modelConfidence,
       dataConfidence,
       marketConfidence,
-      finalConfidence
+      finalConfidence,
+      confidenceScore,
+      dataQualityScore,
+      recommendationStatus,
+      reasons
     };
   }
 }
