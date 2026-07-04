@@ -43,7 +43,7 @@ export async function getUserProfileAndPPPTier(userId: string | null): Promise<{
 
   try {
     const { data: profile, error } = await supabase
-      .from('user_profiles')
+      .from('profiles')
       .select('*')
       .eq('id', userId)
       .maybeSingle();
