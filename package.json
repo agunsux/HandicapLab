@@ -14,7 +14,8 @@
     "migrate:sprint5": "tsx src/scripts/migrate-sprint5.ts",
     "migrate:monetization": "tsx src/scripts/migrate-monetization.ts",
     "ablation:report": "tsx src/lib/ablation/run-report.ts",
-    "test": "vitest run"
+    "test": "vitest run",
+    "backtest:level2": "tsx src/scripts/backtest-level2-production.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
