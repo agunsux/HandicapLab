@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS public.paywall_events (
 
 -- Enable RLS for paywall_events
 ALTER TABLE public.paywall_events ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "User can view own paywall events" ON public.paywall_events;
 CREATE POLICY "User can view own paywall events" ON public.paywall_events FOR SELECT USING (auth.uid() = user_id);
 
 -- 2. Create entitlement_audit_log
@@ -31,4 +32,5 @@ CREATE TABLE IF NOT EXISTS public.entitlement_audit_log (
 
 -- Enable RLS for audit logs
 ALTER TABLE public.entitlement_audit_log ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "User can view own entitlement audit logs" ON public.entitlement_audit_log;
 CREATE POLICY "User can view own entitlement audit logs" ON public.entitlement_audit_log FOR SELECT USING (auth.uid() = user_id);

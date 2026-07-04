@@ -43,5 +43,6 @@ CREATE TABLE IF NOT EXISTS public.competition_metrics (
 ALTER TABLE public.competition_metrics ENABLE ROW LEVEL SECURITY;
 
 -- Select policy: public viewable
+DROP POLICY IF EXISTS "Competition metrics are viewable by everyone" ON public.competition_metrics;
 CREATE POLICY "Competition metrics are viewable by everyone" ON public.competition_metrics
   FOR SELECT USING (true);

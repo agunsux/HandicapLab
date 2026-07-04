@@ -960,11 +960,14 @@ export async function getLeagueMatches(leagueApiId: number, slug: string): Promi
       return [];
     }
 
-    // 2. Query matches directly
+    // 2. Query matches directly, filtering for valid fields (not null)
     const { data: matches, error: matchError } = await supabase
       .from('matches')
       .select('id, home_team, away_team, kickoff, status')
       .eq('league', leagueName)
+      .not('home_team', 'is', null)
+      .not('away_team', 'is', null)
+      .not('kickoff', 'is', null)
       .order('kickoff', { ascending: true });
 
     if (matchError) {
@@ -976,8 +979,20 @@ export async function getLeagueMatches(leagueApiId: number, slug: string): Promi
       return [];
     }
 
+    // Validate in-memory: ensure no empty/whitespace team names or missing crucial properties
+    const validMatches = matches.filter((m: any) =>
+      m.id &&
+      m.home_team && m.home_team.trim() !== '' &&
+      m.away_team && m.away_team.trim() !== '' &&
+      m.kickoff
+    );
+
+    if (validMatches.length === 0) {
+      return [];
+    }
+
     // 3. Query predictions for those matches
-    const matchIds = matches.map((m: any) => m.id);
+    const matchIds = validMatches.map((m: any) => m.id);
     const { data: preds, error: predError } = await supabase
       .from('predictions')
       .select('*')
@@ -1034,13 +1049,13 @@ export async function getLeagueMatches(leagueApiId: number, slug: string): Promi
     }
 
     // 5. Map into the MatchPrediction layout
-    return matches.map((item: any) => {
+    return validMatches.map((item: any) => {
       const pred = matchPreds[item.id] || {};
       return {
         matchId: item.id,
         kickoffTime: item.kickoff,
-        homeTeamName: item.home_team || 'Home Team',
-        awayTeamName: item.away_team || 'Away Team',
+        homeTeamName: item.home_team,
+        awayTeamName: item.away_team,
         homeTeamLogo: `https://media.api-sports.io/football/teams/placeholder.png`,
         awayTeamLogo: `https://media.api-sports.io/football/teams/placeholder.png`,
         handicapLine: pred.handicapLine || 0,

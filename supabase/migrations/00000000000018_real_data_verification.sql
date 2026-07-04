@@ -34,5 +34,7 @@ CREATE TABLE IF NOT EXISTS public.match_results (
 ALTER TABLE public.prediction_snapshots ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.match_results ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Prediction snapshots are viewable by everyone" ON public.prediction_snapshots;
 CREATE POLICY "Prediction snapshots are viewable by everyone" ON public.prediction_snapshots FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Match results are viewable by everyone" ON public.match_results;
 CREATE POLICY "Match results are viewable by everyone" ON public.match_results FOR SELECT USING (true);

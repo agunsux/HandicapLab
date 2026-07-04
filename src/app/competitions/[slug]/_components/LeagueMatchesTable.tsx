@@ -157,9 +157,9 @@ export function LeagueMatchesTable({ matches }: LeagueMatchesTableProps) {
                   {isGated ? (
                     <div className="h-7 w-12 bg-slate-800 rounded opacity-20 blur-[2px]" />
                   ) : (
-                    <Link href="/scanner" className="pointer-events-auto">
+                    <Link href={`/matches/${match.matchId}`} className="pointer-events-auto">
                       <button className="px-3 py-1.5 rounded bg-slate-800 hover:bg-slate-750 text-slate-300 font-mono text-xs transition-colors">
-                        Scanner
+                        Analysis
                       </button>
                     </Link>
                   )}

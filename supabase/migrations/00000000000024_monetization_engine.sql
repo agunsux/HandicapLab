@@ -11,8 +11,11 @@ CREATE TABLE IF NOT EXISTS public.user_profiles (
 
 -- Enable RLS for profiles
 ALTER TABLE public.user_profiles ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "User can view own profile" ON public.user_profiles;
 CREATE POLICY "User can view own profile" ON public.user_profiles FOR SELECT USING (auth.uid() = id);
+DROP POLICY IF EXISTS "User can update own profile" ON public.user_profiles;
 CREATE POLICY "User can update own profile" ON public.user_profiles FOR UPDATE USING (auth.uid() = id);
+DROP POLICY IF EXISTS "Profiles are insertable by trigger/system" ON public.user_profiles;
 CREATE POLICY "Profiles are insertable by trigger/system" ON public.user_profiles FOR INSERT WITH CHECK (true);
 
 -- 2. Create user_entitlements
@@ -29,6 +32,7 @@ CREATE TABLE IF NOT EXISTS public.user_entitlements (
 
 -- Enable RLS for entitlements
 ALTER TABLE public.user_entitlements ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "User can view own entitlements" ON public.user_entitlements;
 CREATE POLICY "User can view own entitlements" ON public.user_entitlements FOR SELECT USING (auth.uid() = user_id);
 
 -- 3. Create transactions
@@ -46,6 +50,7 @@ CREATE TABLE IF NOT EXISTS public.transactions (
 
 -- Enable RLS for transactions
 ALTER TABLE public.transactions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "User can view own transactions" ON public.transactions;
 CREATE POLICY "User can view own transactions" ON public.transactions FOR SELECT USING (auth.uid() = user_id);
 
 -- 4. Create credit_deductions
@@ -60,6 +65,7 @@ CREATE TABLE IF NOT EXISTS public.credit_deductions (
 
 -- Enable RLS for credit deductions
 ALTER TABLE public.credit_deductions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "User can view own deductions" ON public.credit_deductions;
 CREATE POLICY "User can view own deductions" ON public.credit_deductions FOR SELECT USING (auth.uid() = user_id);
 
 -- 5. Create founders table
@@ -71,6 +77,7 @@ CREATE TABLE IF NOT EXISTS public.founders (
 
 -- Enable RLS for founders
 ALTER TABLE public.founders ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Founders are public" ON public.founders;
 CREATE POLICY "Founders are public" ON public.founders FOR SELECT USING (true);
 
 -- 6. Create webhook_events table
@@ -97,6 +104,7 @@ CREATE TABLE IF NOT EXISTS public.payment_status_history (
 
 -- Enable RLS for payment history
 ALTER TABLE public.payment_status_history ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "User can view own payment history" ON public.payment_status_history;
 CREATE POLICY "User can view own payment history" ON public.payment_status_history FOR SELECT USING (
   EXISTS (
     SELECT 1 FROM public.transactions 

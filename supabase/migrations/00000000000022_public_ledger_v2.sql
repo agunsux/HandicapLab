@@ -22,6 +22,7 @@ CREATE INDEX IF NOT EXISTS idx_prediction_decisions_decision ON public.predictio
 
 -- Enable RLS
 ALTER TABLE public.prediction_decisions ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Prediction decisions are viewable by everyone" ON public.prediction_decisions;
 CREATE POLICY "Prediction decisions are viewable by everyone" ON public.prediction_decisions FOR SELECT USING (true);
 
 -- 2. Alter paper_trades to reference prediction_decisions optionally

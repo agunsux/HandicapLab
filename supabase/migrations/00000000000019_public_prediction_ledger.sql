@@ -28,4 +28,5 @@ CREATE INDEX IF NOT EXISTS idx_prediction_ledger_result_status ON public.predict
 -- Enable RLS
 ALTER TABLE public.prediction_ledger ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Prediction ledger entries are viewable by everyone" ON public.prediction_ledger;
 CREATE POLICY "Prediction ledger entries are viewable by everyone" ON public.prediction_ledger FOR SELECT USING (true);

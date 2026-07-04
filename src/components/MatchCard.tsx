@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { PredictionCard } from './PredictionCard';
 import { ConfidenceBadge } from './ConfidenceBadge';
 
@@ -100,31 +101,33 @@ export function MatchCard({ match, prediction }: any) {
   });
 
   return (
-    <div className="bg-gradient-to-br from-white to-slate-50/50 border border-slate-200/80 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:border-slate-300/80 transition-all duration-300 flex flex-col justify-between">
-      {/* Card Header */}
-      <div className="p-5 border-b border-slate-100 flex justify-between items-center bg-white">
-        <div className="flex flex-col gap-1.5">
-          <div className="flex items-center gap-2">
-            <span className="inline-flex px-2 py-0.5 bg-indigo-50 text-[10px] font-black uppercase tracking-wider text-indigo-600 rounded">
-              {match.league || 'League'}
-            </span>
-            <span className="text-xs font-semibold text-slate-400">
-              {matchTime}
-            </span>
+    <Link href={`/matches/${match.id}`} className="block transition-transform duration-200 hover:-translate-y-0.5">
+      <div className="bg-gradient-to-br from-white to-slate-50/50 border border-slate-200/80 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:border-slate-300/80 transition-all duration-300 flex flex-col justify-between">
+        {/* Card Header */}
+        <div className="p-5 border-b border-slate-100 flex justify-between items-center bg-white">
+          <div className="flex flex-col gap-1.5">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex px-2 py-0.5 bg-indigo-50 text-[10px] font-black uppercase tracking-wider text-indigo-600 rounded">
+                {match.league || 'League'}
+              </span>
+              <span className="text-xs font-semibold text-slate-400">
+                {matchTime}
+              </span>
+            </div>
+            <h3 className="text-base font-extrabold text-slate-800 tracking-tight">
+              {homeTeam} <span className="text-slate-400 font-medium font-sans">vs</span> {awayTeam}
+            </h3>
           </div>
-          <h3 className="text-base font-extrabold text-slate-800 tracking-tight">
-            {homeTeam} <span className="text-slate-400 font-medium font-sans">vs</span> {awayTeam}
-          </h3>
+          <ConfidenceBadge confidence={confidenceVal} />
         </div>
-        <ConfidenceBadge confidence={confidenceVal} />
+        
+        {/* Card Predictions Grid (3 markets) */}
+        <div className="p-5 grid grid-cols-1 md:grid-cols-3 gap-3 bg-slate-50/30">
+          <PredictionCard market="Match Winner" pick={mlPick} probability={mlProb} />
+          <PredictionCard market="Over/Under" pick={ouPick} probability={ouProb} />
+          <PredictionCard market="Asian Handicap" pick={ahPick} probability={ahProb} />
+        </div>
       </div>
-      
-      {/* Card Predictions Grid (3 markets) */}
-      <div className="p-5 grid grid-cols-1 md:grid-cols-3 gap-3 bg-slate-50/30">
-        <PredictionCard market="Match Winner" pick={mlPick} probability={mlProb} />
-        <PredictionCard market="Over/Under" pick={ouPick} probability={ouProb} />
-        <PredictionCard market="Asian Handicap" pick={ahPick} probability={ahProb} />
-      </div>
-    </div>
+    </Link>
   );
 }

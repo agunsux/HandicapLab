@@ -20,4 +20,5 @@ CREATE TABLE IF NOT EXISTS public.forensic_reports (
 
 -- Enable RLS
 ALTER TABLE public.forensic_reports ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Forensic reports are viewable by everyone" ON public.forensic_reports;
 CREATE POLICY "Forensic reports are viewable by everyone" ON public.forensic_reports FOR SELECT USING (true);

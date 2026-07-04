@@ -1,63 +1,59 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase.server';
-import { LEAGUE_REGISTRY } from '@/lib/crons/leagueRegistry';
+import { checkEnvironmentStatus } from '@/lib/utils/envValidator';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
+  const envStatus = checkEnvironmentStatus();
+
+  const criticalVars = [
+    'NEXT_PUBLIC_SUPABASE_URL',
+    'SUPABASE_SERVICE_ROLE_KEY',
+    'NEXT_PUBLIC_SUPABASE_ANON_KEY',
+    'API_FOOTBALL_KEY',
+    'ODDSPAPI_KEY',
+    'CRON_SECRET'
+  ];
+  const criticalMissing = envStatus.missing.filter(v => criticalVars.includes(v));
+  const criticalMalformed = envStatus.malformed.filter(v => criticalVars.includes(v));
+  const isEnvHealthy = criticalMissing.length === 0 && criticalMalformed.length === 0;
+
   const checks = {
     database: false,
-    lastCronRun: null as string | null,
-    activeCompetitions: 0
+    environment: isEnvHealthy,
+    dbError: null as string | null
   };
 
   try {
-    // 1. Check Supabase DB connectivity by attempting a lightweight head select on matches
-    const { data, error } = await supabase
+    // Check Supabase DB connectivity by attempting a lightweight head select on matches
+    const { error } = await supabase
       .from('matches')
       .select('id', { count: 'exact', head: true })
       .limit(1);
 
-    checks.database = !error;
-  } catch (dbErr) {
+    if (error) {
+      checks.database = false;
+      checks.dbError = `${error.code}: ${error.message}`;
+    } else {
+      checks.database = true;
+    }
+  } catch (dbErr: any) {
     console.error('[Health Endpoint] Database connectivity test failed:', dbErr);
     checks.database = false;
+    checks.dbError = dbErr.message || 'Unknown DB error';
   }
 
-  try {
-    // 2. Count active configurations in registry
-    checks.activeCompetitions = LEAGUE_REGISTRY.filter(
-      (l) => l.enabled && (l.status === 'ACTIVE' || l.status === 'BETA')
-    ).length;
-  } catch (regErr) {
-    console.error('[Health Endpoint] Registry count failed:', regErr);
-  }
-
-  try {
-    // 3. Query the last cron run timestamp from cron_runs table
-    const { data: lastRun, error: runErr } = await supabase
-      .from('cron_runs')
-      .select('ran_at')
-      .order('ran_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
-
-    if (!runErr && lastRun) {
-      checks.lastCronRun = lastRun.ran_at;
-    }
-  } catch (cronErr) {
-    console.error('[Health Endpoint] Cron runs check failed:', cronErr);
-  }
-
-  const isHealthy = checks.database;
+  const isHealthy = checks.database && checks.environment;
   const status = isHealthy ? 200 : 500;
 
   const responseBody = {
     status: isHealthy ? 'healthy' : 'unhealthy',
+    timestamp: new Date().toISOString(),
     checks: {
       database: checks.database ? 'healthy' : 'unhealthy',
-      lastCronRun: checks.lastCronRun,
-      activeCompetitions: checks.activeCompetitions
+      environment: envStatus,
+      dbDetails: checks.dbError
     }
   };
 

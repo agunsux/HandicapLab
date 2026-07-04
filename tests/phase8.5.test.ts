@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterAll } from 'vitest';
 import { calculateKelly } from '../src/lib/engine/kelly';
 import { sendTelegramAlert } from '../src/lib/services/telegram';
 import { GET as handleHealthCheck } from '../src/app/api/health/route';
@@ -118,6 +118,11 @@ describe('Phase 8.5: System Hardening & Public Trust Layer', () => {
     vi.clearAllMocks();
     process.env.CRON_SECRET = 'test_secret';
     process.env.CRON_DRY_RUN = 'false';
+    process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://rgkrfzxipkrwqccfuqfq.supabase.co';
+    process.env.SUPABASE_SERVICE_ROLE_KEY = 'sb_secret_dummy';
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'sb_publishable_dummy';
+    process.env.API_FOOTBALL_KEY = 'dummy_key';
+    process.env.ODDSPAPI_KEY = 'dummy_key';
   });
 
   describe('Kelly Criterion Engine (kelly.ts)', () => {
@@ -141,19 +146,27 @@ describe('Phase 8.5: System Hardening & Public Trust Layer', () => {
   });
 
   describe('Telegram Alert Service (telegram.ts)', () => {
+    const originalBotToken = process.env.TELEGRAM_BOT_TOKEN;
+    const originalChatId = process.env.TELEGRAM_CHAT_ID;
+
     it('should warn and return false if env credentials are missing', async () => {
       delete process.env.TELEGRAM_BOT_TOKEN;
       delete process.env.TELEGRAM_CHAT_ID;
       const res = await sendTelegramAlert('Test Alert');
       expect(res).toBe(false);
     });
+
+    afterAll(() => {
+      if (originalBotToken) process.env.TELEGRAM_BOT_TOKEN = originalBotToken;
+      if (originalChatId) process.env.TELEGRAM_CHAT_ID = originalChatId;
+    });
   });
 
   describe('Health Check Route (/api/health)', () => {
     it('should execute DB check and API pings returning status 200', async () => {
       const response = await handleHealthCheck();
-      expect(response.status).toBe(200);
       const json = await response.json();
+      expect(response.status).toBe(200);
       expect(json.status).toBe('healthy');
       expect(json.checks.database).toBe('healthy');
     });

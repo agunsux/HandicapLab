@@ -38,6 +38,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS trg_prevent_audit_update_delete ON public.signal_audit_events;
 CREATE TRIGGER trg_prevent_audit_update_delete
 BEFORE UPDATE OR DELETE ON public.signal_audit_events
 FOR EACH ROW EXECUTE FUNCTION public.prevent_audit_update_delete();
