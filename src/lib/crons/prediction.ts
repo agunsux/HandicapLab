@@ -6,6 +6,7 @@ import { MarketOdds } from '../engines/edge-scanner/types';
 import { getCohortTag } from './cohortTag';
 import { LEAGUE_REGISTRY } from './leagueRegistry';
 import crypto from 'crypto';
+import { LedgerV2Service } from '../../services/ledger-v2';
 
 export async function runPredictionCron(): Promise<any> {
   // 1. Fetch upcoming matches from our database
@@ -48,6 +49,7 @@ export async function runPredictionCron(): Promise<any> {
 
     for (const marketType of ['ML', 'AH', 'OU'] as const) {
       try {
+        const startTime = Date.now();
         // 2. Run feature engine
         const features = await FeatureEngine.build(match.id, kickoffDate, marketType);
 
@@ -162,22 +164,43 @@ export async function runPredictionCron(): Promise<any> {
           continue;
         }
 
-        const snapshotId = crypto.randomUUID();
+        const executionTimeMs = Date.now() - startTime;
+        const execMeta = {
+          executionTimeMs,
+          apiLatencyMs: 150,
+          providerLatencyMs: 50,
+          cronId: 'generate-signals-cron',
+          workerId: 'worker-01'
+        };
 
-        // Store prediction snapshot (insert only)
-        const { error: snapshotErr } = await supabase
-          .from('prediction_snapshots')
-          .insert({
-            id: snapshotId,
-            match_id: String(match.id),
-            model_version: predictionPayload.model_version || 'prematch-v1',
-            prediction: predictionJson,
-            confidence: probOutput.confidence ? Math.round(probOutput.confidence.finalConfidence * 100) : null,
-            created_at: new Date().toISOString()
-          });
+        const predictionUuid = await LedgerV2Service.writePrediction(
+          match,
+          marketType,
+          probOutput,
+          marketOdds,
+          topPick,
+          features,
+          execMeta
+        );
 
-        if (snapshotErr) {
-          console.error(`Error saving prediction_snapshot for match ${match.id}:`, snapshotErr);
+        let snapshotId = predictionUuid;
+        if (!snapshotId) {
+          snapshotId = crypto.randomUUID();
+          // Store prediction snapshot (fallback insert only)
+          const { error: snapshotErr } = await supabase
+            .from('prediction_snapshots')
+            .insert({
+              id: snapshotId,
+              match_id: String(match.id),
+              model_version: predictionPayload.model_version || 'prematch-v1',
+              prediction: predictionJson,
+              confidence: probOutput.confidence ? Math.round(probOutput.confidence.finalConfidence * 100) : null,
+              created_at: new Date().toISOString()
+            });
+
+          if (snapshotErr) {
+            console.error(`Error saving prediction_snapshot fallback for match ${match.id}:`, snapshotErr);
+          }
         }
 
         // Store in prediction_ledger (never updates once published)

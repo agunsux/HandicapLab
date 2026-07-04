@@ -239,7 +239,7 @@ describe('New API Endpoints', () => {
     expect(json.success).toBe(true);
     expect(json.data.todayMatches.length).toBe(1);
     expect(json.data.todayMatches[0].home_team).toBe('Chelsea');
-    expect(json.data.todayMatches[0].recommendation_status).toBe('Recommended');
+    expect(json.data.todayMatches[0].recommendation_status).toBe('High Conviction');
     expect(json.data.valueBets.length).toBe(1);
     expect(json.data.valueBets[0].market).toBe('ML');
     expect(json.data.valueBets[0].ev).toBe(0.0725);

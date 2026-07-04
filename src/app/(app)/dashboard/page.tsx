@@ -189,16 +189,19 @@ export default function Dashboard() {
 
   const getStatusBadgeColor = (status: string) => {
     switch (status) {
+      case 'High Conviction':
       case 'Recommended':
         return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+      case 'Medium Conviction':
       case 'Consider':
         return 'bg-blue-500/10 text-blue-400 border-blue-500/20';
+      case 'Low Conviction':
       case 'Neutral':
         return 'bg-slate-500/10 text-slate-400 border-slate-500/20';
+      case 'Observation':
       case 'Caution':
-        return 'bg-amber-500/10 text-amber-400 border-amber-500/20';
       case 'Skip':
-        return 'bg-rose-500/10 text-rose-400 border-rose-500/20';
+        return 'bg-amber-500/10 text-amber-400 border-amber-500/20';
       default:
         return 'bg-slate-500/10 text-slate-400 border-slate-500/20';
     }
@@ -206,16 +209,19 @@ export default function Dashboard() {
 
   const getStatusDotColor = (status: string) => {
     switch (status) {
+      case 'High Conviction':
       case 'Recommended':
         return 'bg-emerald-500';
+      case 'Medium Conviction':
       case 'Consider':
         return 'bg-blue-500';
+      case 'Low Conviction':
       case 'Neutral':
         return 'bg-slate-500';
+      case 'Observation':
       case 'Caution':
-        return 'bg-amber-500';
       case 'Skip':
-        return 'bg-rose-500';
+        return 'bg-amber-500';
       default:
         return 'bg-slate-500';
     }
@@ -301,18 +307,17 @@ export default function Dashboard() {
 
           {/* Status Filter */}
           <div className="space-y-1">
-            <label className="text-[10px] text-slate-500 block uppercase">Recommendation</label>
+            <label className="text-[10px] text-slate-500 block uppercase">Conviction Tier</label>
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
               className="w-full bg-slate-900 border border-slate-800 rounded px-2 py-1 text-xs text-slate-300 focus:outline-none focus:border-emerald-500"
             >
-              <option value="all">All Recommendations</option>
-              <option value="Recommended">Recommended</option>
-              <option value="Consider">Consider</option>
-              <option value="Neutral">Neutral</option>
-              <option value="Caution">Caution</option>
-              <option value="Skip">Skip</option>
+              <option value="all">All Conviction Tiers</option>
+              <option value="High Conviction">High Conviction</option>
+              <option value="Medium Conviction">Medium Conviction</option>
+              <option value="Low Conviction">Low Conviction</option>
+              <option value="Observation">Observation</option>
             </select>
           </div>
 

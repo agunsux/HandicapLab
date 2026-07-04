@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { supabase } from '../../../../lib/supabase.server';
+import { LedgerV2Service } from '@/services/ledger-v2';
 import { settleAsianHandicap } from '@/lib/engine/settlement';
 import { CronLogger } from '@/lib/services/cronLogger';
 import { runHealthCheck } from '@/lib/services/healthChecker';
@@ -443,11 +444,35 @@ async function runSignalsSettlement(logId: string | null) {
             })
             .eq('match_id', String(signal.match_id))
             .eq('market', signal.market)
-            .select('id')
+            .select('id, prediction_snapshot_id')
             .maybeSingle();
 
-          // Settle paper trade
           const ledgerId = ledgerEntry?.id;
+          if (ledgerId && ledgerEntry.prediction_snapshot_id) {
+            try {
+              const snapId = ledgerEntry.prediction_snapshot_id;
+              const predictedProb = Number(signal.predicted_probability || signal.probability || 0.5);
+              const lineMovement = Number(closingOdds - openingOdds);
+
+              await LedgerV2Service.settlePrediction(
+                snapId, // prediction_uuid
+                snapId, // snapshot_id
+                status,
+                profit_loss,
+                homeGoals,
+                awayGoals,
+                closingOdds,
+                lineMovement,
+                clvResult.clv_percentage,
+                predictedProb,
+                true // paperTrade
+              );
+            } catch (err: any) {
+              console.error(`[Settlement Cron] Error writing Ledger V2 settlement: ${err.message}`);
+            }
+          }
+
+          // Settle paper trade
           let tradeResult = null;
           if (ledgerId) {
             const { data } = await supabase

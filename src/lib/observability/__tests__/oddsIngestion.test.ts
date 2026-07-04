@@ -109,9 +109,10 @@ describe('OddsIngestionContext', () => {
 
       await ctx.flush();
 
-      const insertPayload = mockInsert.mock.calls[0][0];
-      expect(insertPayload.execution_id).toBe(ctx.executionId);
-      expect(insertPayload.cron_name).toBe('generate-signals');
+      const calls = mockInsert.mock.calls as any[][];
+      const insertPayload = calls[0]?.[0];
+      expect(insertPayload?.execution_id).toBe(ctx.executionId);
+      expect(insertPayload?.cron_name).toBe('generate-signals');
     });
   });
 
@@ -197,13 +198,14 @@ describe('OddsIngestionContext', () => {
       successfulFlush();
       await ctx.flush();
 
-      const payload = mockInsert.mock.calls[0][0];
-      expect(payload.fixtures_received).toBe(60);
-      expect(payload.odds_enriched).toBe(0);
-      expect(payload.odds_rejected).toBe(0);
-      expect(payload.signals_generated).toBe(0);
-      expect(payload.fixtures_without_odds).toBe(60);
-      expect(payload.rejection_log).toEqual([]);
+      const calls = mockInsert.mock.calls as any[][];
+      const payload = calls[0]?.[0];
+      expect(payload?.fixtures_received).toBe(60);
+      expect(payload?.odds_enriched).toBe(0);
+      expect(payload?.odds_rejected).toBe(0);
+      expect(payload?.signals_generated).toBe(0);
+      expect(payload?.fixtures_without_odds).toBe(60);
+      expect(payload?.rejection_log).toEqual([]);
     });
 
     it('malformed odds batch — all rejected with malformed_price', async () => {
@@ -223,12 +225,13 @@ describe('OddsIngestionContext', () => {
       successfulFlush();
       await ctx.flush();
 
-      const payload = mockInsert.mock.calls[0][0];
-      expect(payload.fixtures_received).toBe(20);
-      expect(payload.odds_rejected).toBe(20);
-      expect(payload.odds_enriched).toBe(0);
-      expect(payload.signals_generated).toBe(0);
-      expect(payload.rejection_log).toHaveLength(20);
+      const calls = mockInsert.mock.calls as any[][];
+      const payload = calls[0]?.[0];
+      expect(payload?.fixtures_received).toBe(20);
+      expect(payload?.odds_rejected).toBe(20);
+      expect(payload?.odds_enriched).toBe(0);
+      expect(payload?.signals_generated).toBe(0);
+      expect(payload?.rejection_log).toHaveLength(20);
 
       const summary = ctx.summary();
       expect(summary.rejectionBreakdown.malformed_price).toBe(20);
@@ -251,10 +254,11 @@ describe('OddsIngestionContext', () => {
       successfulFlush();
       await ctx.flush();
 
-      const payload = mockInsert.mock.calls[0][0];
-      expect(payload.signals_generated).toBe(12);
-      expect(payload.odds_enriched).toBe(25);
-      expect(payload.odds_rejected).toBe(1);
+      const calls = mockInsert.mock.calls as any[][];
+      const payload = calls[0]?.[0];
+      expect(payload?.signals_generated).toBe(12);
+      expect(payload?.odds_enriched).toBe(25);
+      expect(payload?.odds_rejected).toBe(1);
     });
 
     it('partial success — 50 processed, 10 failed', async () => {
@@ -283,13 +287,14 @@ describe('OddsIngestionContext', () => {
       successfulFlush();
       await ctx.flush();
 
-      const payload = mockInsert.mock.calls[0][0];
-      expect(payload.fixtures_received).toBe(60);
-      expect(payload.odds_enriched).toBe(50);
-      expect(payload.odds_rejected).toBe(10);
-      expect(payload.signals_generated).toBe(45);
-      expect(payload.fixtures_without_odds).toBe(5);
-      expect(payload.rejection_log).toHaveLength(10);
+      const calls = mockInsert.mock.calls as any[][];
+      const payload = calls[0]?.[0];
+      expect(payload?.fixtures_received).toBe(60);
+      expect(payload?.odds_enriched).toBe(50);
+      expect(payload?.odds_rejected).toBe(10);
+      expect(payload?.signals_generated).toBe(45);
+      expect(payload?.fixtures_without_odds).toBe(5);
+      expect(payload?.rejection_log).toHaveLength(10);
 
       const summary = ctx.summary();
       expect(summary.rejectionBreakdown).toEqual({

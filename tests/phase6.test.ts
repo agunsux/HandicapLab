@@ -223,7 +223,7 @@ describe('Phase 6: Live Paper Trading & CLV Engine Activation', () => {
             }
           }
         ]
-      });
+      } as any);
 
       const request = new Request('http://localhost/api/cron/settle', {
         headers: { authorization: 'Bearer test_cron_secret' }

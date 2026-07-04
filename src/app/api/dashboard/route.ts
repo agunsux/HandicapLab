@@ -46,7 +46,17 @@ export async function GET(request: NextRequest) {
       // Standardize values
       const confidenceScore = conf.confidenceScore !== undefined ? conf.confidenceScore : (mlPred?.confidence ?? 60);
       const dataQualityScore = conf.dataQualityScore !== undefined ? conf.dataQualityScore : 75;
-      const recommendationStatus = conf.recommendationStatus || 'Neutral';
+      const rawRec = conf.recommendationStatus || 'Neutral';
+      let recommendationStatus = 'Low Conviction';
+      if (rawRec === 'Recommended') {
+        recommendationStatus = 'High Conviction';
+      } else if (rawRec === 'Consider') {
+        recommendationStatus = 'Medium Conviction';
+      } else if (rawRec === 'Neutral') {
+        recommendationStatus = 'Low Conviction';
+      } else if (rawRec === 'Caution' || rawRec === 'Skip') {
+        recommendationStatus = 'Observation';
+      }
       const reasons = conf.reasons || ['Model calibration stable', 'Standard historical data volume'];
 
       // Edge bets calculations
