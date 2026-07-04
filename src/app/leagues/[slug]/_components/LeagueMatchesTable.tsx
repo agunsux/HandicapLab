@@ -45,7 +45,7 @@ export function LeagueMatchesTable({ matches }: LeagueMatchesTableProps) {
   if (matches.length === 0) {
     return (
       <div className="text-center py-12 border border-slate-800 bg-slate-900/20 rounded-xl font-mono text-xs text-slate-500">
-        No active upcoming matches found for this league. Check back later.
+        No fixtures available
       </div>
     );
   }

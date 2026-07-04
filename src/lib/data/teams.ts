@@ -147,91 +147,117 @@ export async function getTeamBySlug(slug: string): Promise<TeamCache | undefined
 
 export async function getTeamMatches(teamApiId: number, slug: string): Promise<MatchPrediction[]> {
   try {
-    const { data, error } = await supabase
-      .from('matches_cache')
-      .select(`
-        id, kickoff, edge_pct, clv, prediction_json,
-        home:teams_cache!home_team_id (name, logo_url, api_id),
-        away:teams_cache!away_team_id (name, logo_url, api_id)
-      `)
-      .or(`home_team_id.eq.${teamApiId},away_team_id.eq.${teamApiId}`)
+    // 1. Resolve team from STATIC_TEAMS or matches query
+    const teamConfig = STATIC_TEAMS.find(t => t.api_id === teamApiId);
+    const teamName = teamConfig ? teamConfig.name : null;
+
+    if (!teamName) {
+      console.warn(`[Teams Service] Team not found for API ID ${teamApiId}`);
+      return [];
+    }
+
+    // 2. Query matches directly where home_team or away_team matches the team name
+    const { data: matches, error: matchError } = await supabase
+      .from('matches')
+      .select('id, home_team, away_team, kickoff, status')
+      .or(`home_team.eq."${teamName}",away_team.eq."${teamName}"`)
       .order('kickoff', { ascending: true });
 
-    if (!error && data && data.length > 0) {
-      return data.map((item: any) => {
-        const pred = item.prediction_json || {};
-        return {
-          matchId: item.id,
-          kickoffTime: item.kickoff,
-          homeTeamName: item.home?.name || 'Home Team',
-          awayTeamName: item.away?.name || 'Away Team',
-          homeTeamLogo: item.home?.logo_url,
-          awayTeamLogo: item.away?.logo_url,
-          handicapLine: pred.handicapLine || 0,
-          handicapProbability: pred.handicapProbability || 0,
-          handicapFairOdds: pred.handicapFairOdds || 0,
-          handicapMarketOdds: pred.handicapMarketOdds || 0,
-          handicapEdgePercent: pred.handicapEdgePercent || 0,
-          confidenceScore: pred.confidenceScore || 0,
-          totalLine: pred.totalLine || 2.5,
-          overProbability: pred.overProbability || 0,
-          underProbability: pred.underProbability || 0,
-          ouEdgePercent: pred.ouEdgePercent || 0,
-          homeProbability: pred.homeProbability || 0,
-          drawProbability: pred.drawProbability || 0,
-          awayProbability: pred.awayProbability || 0,
-        };
-      });
+    if (matchError) {
+      console.error(`[Teams Service] DB matches query failed: ${matchError.message}`);
+      return [];
     }
-  } catch (err) {
-    console.warn('[Teams Service] DB match query failed, falling back to mock data');
+
+    if (!matches || matches.length === 0) {
+      return [];
+    }
+
+    // 3. Query predictions for those matches
+    const matchIds = matches.map((m: any) => m.id);
+    const { data: preds, error: predError } = await supabase
+      .from('predictions')
+      .select('*')
+      .in('match_id', matchIds);
+
+    if (predError) {
+      console.error(`[Teams Service] DB predictions query failed: ${predError.message}`);
+    }
+
+    // 4. Pivot predictions in-memory
+    const matchPreds: Record<string, any> = {};
+    if (preds && preds.length > 0) {
+      for (const p of preds) {
+        const mId = p.match_id;
+        if (!matchPreds[mId]) {
+          matchPreds[mId] = {
+            handicapLine: 0,
+            handicapProbability: 0,
+            handicapFairOdds: 0,
+            handicapMarketOdds: 0,
+            handicapEdgePercent: 0,
+            confidenceScore: 0,
+            totalLine: 2.5,
+            overProbability: 0,
+            underProbability: 0,
+            ouEdgePercent: 0,
+            homeProbability: 0,
+            drawProbability: 0,
+            awayProbability: 0
+          };
+        }
+        
+        const predObj = p.prediction || {};
+        const edge = typeof p.edge_pct === 'number' ? p.edge_pct * 100 : 0;
+        
+        if (p.market_type === 'ML') {
+          matchPreds[mId].homeProbability = predObj.pHome || predObj.home_prob || 0;
+          matchPreds[mId].drawProbability = predObj.pDraw || predObj.draw_prob || 0;
+          matchPreds[mId].awayProbability = predObj.pAway || predObj.away_prob || 0;
+        } else if (p.market_type === 'AH') {
+          matchPreds[mId].handicapLine = predObj.ah_line || 0;
+          matchPreds[mId].handicapProbability = predObj.ah_prob || 0;
+          matchPreds[mId].handicapFairOdds = p.fair_odds || (predObj.ah_prob ? 1 / predObj.ah_prob : 0);
+          matchPreds[mId].handicapMarketOdds = p.entry_odds || 0;
+          matchPreds[mId].handicapEdgePercent = edge;
+          matchPreds[mId].confidenceScore = p.market_confidence_score || 0;
+        } else if (p.market_type === 'OU') {
+          matchPreds[mId].totalLine = predObj.ou_line || 2.5;
+          matchPreds[mId].overProbability = predObj.over_prob || 0;
+          matchPreds[mId].underProbability = predObj.under_prob || (predObj.over_prob ? 1 - predObj.over_prob : 0);
+          matchPreds[mId].ouEdgePercent = edge;
+        }
+      }
+    }
+
+    // 5. Map matches to MatchPrediction structure
+    return matches.map((item: any) => {
+      const pred = matchPreds[item.id] || {};
+      return {
+        matchId: item.id,
+        kickoffTime: item.kickoff,
+        homeTeamName: item.home_team || 'Home Team',
+        awayTeamName: item.away_team || 'Away Team',
+        homeTeamLogo: `https://media.api-sports.io/football/teams/placeholder.png`,
+        awayTeamLogo: `https://media.api-sports.io/football/teams/placeholder.png`,
+        handicapLine: pred.handicapLine || 0,
+        handicapProbability: pred.handicapProbability || 0,
+        handicapFairOdds: pred.handicapFairOdds || 0,
+        handicapMarketOdds: pred.handicapMarketOdds || 0,
+        handicapEdgePercent: pred.handicapEdgePercent || 0,
+        confidenceScore: pred.confidenceScore || 0,
+        totalLine: pred.totalLine || 2.5,
+        overProbability: pred.overProbability || 0,
+        underProbability: pred.underProbability || 0,
+        ouEdgePercent: pred.ouEdgePercent || 0,
+        homeProbability: pred.homeProbability || 0,
+        drawProbability: pred.drawProbability || 0,
+        awayProbability: pred.awayProbability || 0,
+      };
+    });
+
+  } catch (err: any) {
+    console.error('[Teams Service] Error in getTeamMatches:', err.message);
+    return [];
   }
-
-  // Fallback: Filter mock matches containing this team slug
-  const mockMatches = getMockMatches().filter(m => {
-    return (m.homeTeam && slugify(m.homeTeam.name) === slug) || 
-           (m.awayTeam && slugify(m.awayTeam.name) === slug);
-  });
-
-  return mockMatches.map(m => {
-    const pred = getMockPredictions(m.id) || {
-      matchId: m.id,
-      handicapLine: -0.25,
-      handicapProbability: 0.5,
-      handicapFairOdds: 2.0,
-      handicapMarketOdds: 2.0,
-      handicapEdgePercent: 0,
-      confidenceScore: 50,
-      totalLine: 2.5,
-      overProbability: 0.5,
-      underProbability: 0.5,
-      ouEdgePercent: 0,
-      homeProbability: 0.33,
-      drawProbability: 0.33,
-      awayProbability: 0.33
-    };
-
-    return {
-      matchId: m.id,
-      kickoffTime: m.kickoffTime.toISOString(),
-      homeTeamName: m.homeTeam?.name || 'Home Team',
-      awayTeamName: m.awayTeam?.name || 'Away Team',
-      homeTeamLogo: `https://media.api-sports.io/football/teams/${m.homeTeamId}.png`,
-      awayTeamLogo: `https://media.api-sports.io/football/teams/${m.awayTeamId}.png`,
-      handicapLine: pred.handicapLine,
-      handicapProbability: pred.handicapProbability,
-      handicapFairOdds: pred.handicapFairOdds,
-      handicapMarketOdds: pred.handicapMarketOdds,
-      handicapEdgePercent: pred.handicapEdgePercent,
-      confidenceScore: pred.confidenceScore,
-      totalLine: pred.totalLine,
-      overProbability: pred.overProbability,
-      underProbability: pred.underProbability,
-      ouEdgePercent: pred.ouEdgePercent,
-      homeProbability: pred.homeProbability,
-      drawProbability: pred.drawProbability,
-      awayProbability: pred.awayProbability
-    };
-  });
 }
 
