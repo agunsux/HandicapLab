@@ -30,7 +30,7 @@ async function flush(batch) {
   if (error) {
     console.error('INSERT ERROR:', error.message)
   } else {
-    console.log(`Inserted: ${batch.length}`)
+    console.log(`Inserted batch: ${batch.length}`)
   }
 }
 
