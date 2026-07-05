@@ -15,16 +15,19 @@
     "migrate:monetization": "tsx src/scripts/migrate-monetization.ts",
     "ablation:report": "tsx src/lib/ablation/run-report.ts",
     "test": "vitest run",
-    "backtest:level2": "tsx src/scripts/backtest-level2-production.ts"
+    "backtest:level2": "tsx src/scripts/backtest-level2-production.ts",
+    "import:football-data": "tsx src/scripts/importFootballData.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
     "@sentry/nextjs": "^10.62.0",
-    "@supabase/supabase-js": "^2.108.2",
+    "@supabase/supabase-js": "^2.110.0",
     "@types/pg": "^8.20.0",
     "axios": "^1.18.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "csv-parser": "^3.2.1",
+    "dotenv": "^17.4.2",
     "framer-motion": "^12.41.0",
     "lucide-react": "^1.21.0",
     "next": "16.2.9",

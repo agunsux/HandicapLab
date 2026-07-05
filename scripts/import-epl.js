@@ -1,10 +1,11 @@
+require('dotenv').config()
 const { createClient } = require('@supabase/supabase-js')
 const fs = require('fs')
 const csv = require('csv-parser')
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
-  process.env.SUPABASE_KEY
+  process.env.SUPABASE_SERVICE_ROLE_KEY
 )
 
 const BATCH_SIZE = 500
@@ -18,61 +19,102 @@ function toInt(v) {
 }
 
 function parseDate(v) {
-  const [d, m, y] = v.split('/')
-  return new Date(`20${y}-${m}-${d}`)
+  if (!v) return null
+  if (v.includes('-')) {
+    const parts = v.split('-')
+    if (parts.length === 3) {
+      if (parts[0].length === 4) {
+        return v
+      }
+      return `${parts[2]}-${parts[1]}-${parts[0]}`
+    }
+  }
+  const parts = v.split('/')
+  if (parts.length !== 3) return null
+  let [d, m, y] = parts
+  if (y.length === 2) {
+    y = `20${y}`
+  }
+  return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`
 }
 
 async function flush(batch) {
-  const { error } = await supabase
-    .from('raw_matches')
-    .insert(batch)
+  try {
+    const { error } = await supabase
+      .from('raw_matches')
+      .insert(batch)
 
-  if (error) {
-    console.error('INSERT ERROR:', error.message)
-  } else {
-    console.log(`Inserted batch: ${batch.length}`)
+    if (error) {
+      console.error('INSERT ERROR:', error.message)
+      return { success: false, failedCount: batch.length }
+    } else {
+      console.log(`Inserted batch: ${batch.length}`)
+      return { success: true, failedCount: 0 }
+    }
+  } catch (err) {
+    console.error('EXCEPTION DURING INSERT:', err.message)
+    return { success: false, failedCount: batch.length }
   }
 }
 
 function processFile(filePath, league, season) {
   return new Promise((resolve) => {
     const batch = []
+    let failedRows = 0
+    let totalRows = 0
 
-    fs.createReadStream(filePath)
-      .pipe(csv())
-      .on('data', async (row) => {
-        batch.push({
-          league,
-          season,
-          match_date: parseDate(row.Date),
+    const stream = fs.createReadStream(filePath).pipe(csv())
 
-          home_team: row.HomeTeam,
-          away_team: row.AwayTeam,
+    stream.on('data', async (row) => {
+      if (!row.Date || !row.HomeTeam) return;
 
-          full_time_home_goals: toInt(row.FTHG),
-          full_time_away_goals: toInt(row.FTAG),
+      batch.push({
+        league,
+        league_code: league,
+        season,
+        match_date: parseDate(row.Date),
 
-          home_odds: toFloat(row.B365H),
-          draw_odds: toFloat(row.B365D),
-          away_odds: toFloat(row.B365A),
+        home_team: row.HomeTeam,
+        away_team: row.AwayTeam,
 
-          over25_odds: toFloat(row['B365>2.5']),
-          under25_odds: toFloat(row['B365<2.5']),
+        full_time_home_goals: toInt(row.FTHG),
+        full_time_away_goals: toInt(row.FTAG),
 
-          source_file: filePath
-        })
+        home_odds: toFloat(row.B365H),
+        draw_odds: toFloat(row.B365D),
+        away_odds: toFloat(row.B365A),
 
-        if (batch.length >= BATCH_SIZE) {
-          const copy = batch.splice(0, batch.length)
-          await flush(copy)
-        }
+        over25_odds: toFloat(row['B365>2.5']),
+        under25_odds: toFloat(row['B365<2.5']),
+
+        result: row.FTR || 'D',
+        source_file: filePath
       })
-      .on('end', async () => {
-        if (batch.length > 0) {
-          await flush(batch)
+
+      totalRows++
+
+      if (batch.length >= BATCH_SIZE) {
+        stream.pause()
+        const copy = [...batch]
+        batch.length = 0
+        const res = await flush(copy)
+        if (!res.success) {
+          failedRows += res.failedCount
         }
-        resolve()
-      })
+        stream.resume()
+      }
+    })
+
+    stream.on('end', async () => {
+      if (batch.length > 0) {
+        const res = await flush(batch)
+        if (!res.success) {
+          failedRows += res.failedCount
+        }
+      }
+      console.log(`Finished ${filePath} | Total Rows: ${totalRows} | Failed Rows: ${failedRows}`)
+      resolve(failedRows)
+    })
   })
 }
 
