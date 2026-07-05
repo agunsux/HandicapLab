@@ -205,7 +205,7 @@ export async function runPredictionCron(): Promise<any> {
               const ledgerId = predictionUuid;
               let decisionId = null;
 
-              const decision = topPick && topPick.expectedValue > 0.02 && probOutput.confidence?.confidenceScore > 70 ? 'BET' : 'HOLD';
+              const decision = topPick && topPick.expectedValue > 0.02 && (probOutput.confidence?.confidenceScore ?? 0) > 70 ? 'BET' : 'HOLD';
               const decisionReason = decision === 'BET' ? `Value edge of ${(topPick.expectedValue * 100).toFixed(1)}%` : 'No actionable edge';
               const reasonCategory = decision === 'BET' ? 'value_edge' : 'observation';
               const edgeScore = topPick ? topPick.expectedValue : 0;

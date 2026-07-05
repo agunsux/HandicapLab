@@ -139,7 +139,7 @@ export class LedgerV2Service {
       }
 
       // 4. Write Child Tables in parallel
-      const childPromises: Promise<any>[] = [];
+      const childPromises: PromiseLike<any>[] = [];
 
       if (features) {
         const featureRecords = Object.keys(features).map(key => ({
