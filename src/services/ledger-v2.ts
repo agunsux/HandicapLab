@@ -138,7 +138,9 @@ export class LedgerV2Service {
         return null;
       }
 
-      // 4. Write Features Child Table
+      // 4. Write Child Tables in parallel
+      const childPromises: Promise<any>[] = [];
+
       if (features) {
         const featureRecords = Object.keys(features).map(key => ({
           snapshot_id: predictionUuid,
@@ -152,10 +154,12 @@ export class LedgerV2Service {
         }));
 
         if (featureRecords.length > 0) {
-          const { error: featErr } = await supabase
-            .from('prediction_snapshot_features')
-            .insert(featureRecords);
-          if (featErr) console.warn(`[LedgerV2] features insert failed: ${featErr.message}`);
+          childPromises.push(
+            supabase
+              .from('prediction_snapshot_features')
+              .insert(featureRecords)
+              .then(({ error }) => { if (error) console.warn(`[LedgerV2] features insert failed: ${error.message}`); })
+          );
         }
       }
 
@@ -173,10 +177,12 @@ export class LedgerV2Service {
         implied_prob: topPick ? Number(topPick.impliedProbability) : null
       };
 
-      const { error: mktErr } = await supabase
-        .from('prediction_snapshot_markets')
-        .insert(marketPayload);
-      if (mktErr) console.warn(`[LedgerV2] market insert failed: ${mktErr.message}`);
+      childPromises.push(
+        supabase
+          .from('prediction_snapshot_markets')
+          .insert(marketPayload)
+          .then(({ error }) => { if (error) console.warn(`[LedgerV2] market insert failed: ${error.message}`); })
+      );
 
       // 6. Write Explainability Child Table
       const explainabilityPayload = {
@@ -191,10 +197,12 @@ export class LedgerV2Service {
         reasoning_tree: { engine: 'poisson', PlattScaling: true }
       };
 
-      const { error: explErr } = await supabase
-        .from('prediction_snapshot_explainability')
-        .insert(explainabilityPayload);
-      if (explErr) console.warn(`[LedgerV2] explainability insert failed: ${explErr.message}`);
+      childPromises.push(
+        supabase
+          .from('prediction_snapshot_explainability')
+          .insert(explainabilityPayload)
+          .then(({ error }) => { if (error) console.warn(`[LedgerV2] explainability insert failed: ${error.message}`); })
+      );
 
       // 7. Write Execution Metadata Table
       const executionPayload = {
@@ -212,10 +220,12 @@ export class LedgerV2Service {
         provider_failures: null
       };
 
-      const { error: execErr } = await supabase
-        .from('prediction_snapshot_execution')
-        .insert(executionPayload);
-      if (execErr) console.warn(`[LedgerV2] execution insert failed: ${execErr.message}`);
+      childPromises.push(
+        supabase
+          .from('prediction_snapshot_execution')
+          .insert(executionPayload)
+          .then(({ error }) => { if (error) console.warn(`[LedgerV2] execution insert failed: ${error.message}`); })
+      );
 
       // 8. Write Model Version Details Table
       const versionPayload = {
@@ -226,10 +236,14 @@ export class LedgerV2Service {
         calibration_version: 'platt-scaling-v2'
       };
 
-      const { error: verErr } = await supabase
-        .from('prediction_model_versions')
-        .insert(versionPayload);
-      if (verErr) console.warn(`[LedgerV2] version details insert failed: ${verErr.message}`);
+      childPromises.push(
+        supabase
+          .from('prediction_model_versions')
+          .insert(versionPayload)
+          .then(({ error }) => { if (error) console.warn(`[LedgerV2] version details insert failed: ${error.message}`); })
+      );
+
+      await Promise.all(childPromises);
 
       console.log(`[LedgerV2] Successfully recorded dual-write ledger entry: ${predictionUuid}`);
       return predictionUuid;

@@ -46,8 +46,12 @@ export class FootyStatsAPI {
       return this.getMockMatches();
     }
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
     try {
-      const response = await fetch(url);
+      const response = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeoutId);
 
       if (response.status === 429) {
         if (retries < this.maxRetries) {
@@ -65,6 +69,7 @@ export class FootyStatsAPI {
       const data = await response.json();
       return data;
     } catch (error) {
+      clearTimeout(timeoutId);
       if (retries < this.maxRetries) {
         await new Promise((res) => setTimeout(res, 1000));
         return this.fetchWithRetry(url, retries + 1);

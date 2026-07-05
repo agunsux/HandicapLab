@@ -18,13 +18,19 @@ export class FootballDataProvider implements FootballProvider {
     const url = `${this.baseUrl}/${endpoint}`;
     console.log(`[FootballDataProvider] Fetching: ${url}`);
     
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
     try {
       const res = await fetch(url, {
         method: 'GET',
         headers: {
           'X-Auth-Token': this.apiKey,
         },
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
 
       if (!res.ok) {
         throw new Error(`Status: ${res.status} ${res.statusText}`);
@@ -33,6 +39,7 @@ export class FootballDataProvider implements FootballProvider {
       const data = await res.json();
       return data;
     } catch (e: any) {
+      clearTimeout(timeoutId);
       console.error(`[FootballDataProvider] ${endpoint} error:`, e.message);
       throw e;
     }

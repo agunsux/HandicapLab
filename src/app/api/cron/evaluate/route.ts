@@ -73,6 +73,8 @@ export async function GET(request: Request) {
       }
 
       const matchesMap = new Map(matches.map(m => [String(m.id), m]));
+      const predictionsToUpsert: any[] = [];
+      const predictionResultsToInsert: any[] = [];
 
       for (const pred of pendingPredictions) {
         const match = matchesMap.get(String(pred.match_id));
@@ -100,14 +102,12 @@ export async function GET(request: Request) {
         const predictedOu = overProb > 0.5 ? 'over' : 'under';
 
         if (pred.market_type === 'ML') {
-          // Actual outcome: 'home', 'draw', 'away'
           const actualOutcome = homeGoals > awayGoals ? 'home' : awayGoals > homeGoals ? 'away' : 'draw';
           const maxProb = Math.max(pHome, pDraw, pAway);
           const predictedOutcome = maxProb === pHome ? 'home' : maxProb === pAway ? 'away' : 'draw';
           isWin = predictedOutcome === actualOutcome;
           profit = isWin ? 0.90 : -1.0;
 
-          // Brier score: sum((p_c - y_c)^2)
           const yHome = actualOutcome === 'home' ? 1 : 0;
           const yDraw = actualOutcome === 'draw' ? 1 : 0;
           const yAway = actualOutcome === 'away' ? 1 : 0;
@@ -120,7 +120,7 @@ export async function GET(request: Request) {
             profit = 0.90;
           } else if (net === 0) {
             isWin = false;
-            profit = 0.0; // push
+            profit = 0.0;
           } else {
             isWin = false;
             profit = -1.0;
@@ -144,35 +144,49 @@ export async function GET(request: Request) {
           brierScore = Math.pow(overProb - yOu, 2);
         }
 
-        // Update prediction with brier score
-        await supabase
-          .from('predictions')
-          .update({ brier_score: Number(brierScore.toFixed(4)) })
-          .eq('id', pred.id);
+        predictionsToUpsert.push({
+          id: pred.id,
+          brier_score: Number(brierScore.toFixed(4))
+        });
 
-        // Save outcome to prediction_results for legacy reporting compatibility
-        await supabase
-          .from('prediction_results')
-          .insert({
-            prediction_id: pred.id,
-            match_id: match.id,
-            actual_home_score: homeGoals,
-            actual_away_score: awayGoals,
-            predicted_outcome: pHome > pAway ? 'home' : 'away',
-            actual_outcome: homeGoals > awayGoals ? 'home' : awayGoals > homeGoals ? 'away' : 'draw',
-            hit_1x2: pred.market_type === 'ML' ? isWin : false,
-            predicted_ah: predictedAh,
-            actual_ah: goalDiff > 0 ? 'home' : 'away',
-            hit_ah: pred.market_type === 'AH' ? isWin : false,
-            predicted_ou: predictedOu,
-            actual_ou: totalGoals > 2.5 ? 'over' : 'under',
-            hit_ou: pred.market_type === 'OU' ? isWin : false,
-            profit_1x2: pred.market_type === 'ML' ? profit : 0,
-            profit_ah: pred.market_type === 'AH' ? profit : 0,
-            profit_ou: pred.market_type === 'OU' ? profit : 0,
-          });
+        predictionResultsToInsert.push({
+          prediction_id: pred.id,
+          match_id: match.id,
+          actual_home_score: homeGoals,
+          actual_away_score: awayGoals,
+          predicted_outcome: pHome > pAway ? 'home' : 'away',
+          actual_outcome: homeGoals > awayGoals ? 'home' : awayGoals > homeGoals ? 'away' : 'draw',
+          hit_1x2: pred.market_type === 'ML' ? isWin : false,
+          predicted_ah: predictedAh,
+          actual_ah: goalDiff > 0 ? 'home' : 'away',
+          hit_ah: pred.market_type === 'AH' ? isWin : false,
+          predicted_ou: predictedOu,
+          actual_ou: totalGoals > 2.5 ? 'over' : 'under',
+          hit_ou: pred.market_type === 'OU' ? isWin : false,
+          profit_1x2: pred.market_type === 'ML' ? profit : 0,
+          profit_ah: pred.market_type === 'AH' ? profit : 0,
+          profit_ou: pred.market_type === 'OU' ? profit : 0,
+        });
 
         evaluatedCount++;
+      }
+
+      if (predictionsToUpsert.length > 0) {
+        const { error: upsertErr } = await supabase
+          .from('predictions')
+          .upsert(predictionsToUpsert);
+        if (upsertErr) {
+          console.error('Error batch upserting predictions brier_score:', upsertErr);
+        }
+      }
+
+      if (predictionResultsToInsert.length > 0) {
+        const { error: insertErr } = await supabase
+          .from('prediction_results')
+          .insert(predictionResultsToInsert);
+        if (insertErr) {
+          console.error('Error batch inserting prediction_results:', insertErr);
+        }
       }
 
     } else {
@@ -199,23 +213,44 @@ export async function GET(request: Request) {
         return NextResponse.json({ error: 'Failed to fetch predictions' }, { status: 500 });
       }
 
+      const predIds = pendingPredictions.map(p => p.id);
+      if (predIds.length === 0) {
+        return NextResponse.json({ success: true, evaluated: 0 });
+      }
+
+      // Fetch existing outcomes to filter already settled ones
+      const { data: existingOutcomes, error: existingErr } = await supabase
+        .from('prediction_results')
+        .select('prediction_id')
+        .in('prediction_id', predIds);
+
+      if (existingErr) {
+        console.error('Error fetching existing outcomes', existingErr);
+        return NextResponse.json({ error: 'Failed to fetch existing outcomes' }, { status: 500 });
+      }
+
+      const settledPredIds = new Set(existingOutcomes?.map(eo => eo.prediction_id) || []);
+
+      // Fetch corresponding matches
+      const matchIds = [...new Set(pendingPredictions.map(p => p.match_id))];
+      const { data: matches, error: matchesErr } = await supabase
+        .from('matches')
+        .select('id, status, home_goals, away_goals')
+        .in('id', matchIds);
+
+      if (matchesErr || !matches) {
+        console.error('Error fetching matches', matchesErr);
+        return NextResponse.json({ error: 'Failed to fetch matches' }, { status: 500 });
+      }
+
+      const matchesMap = new Map(matches.map(m => [String(m.id), m]));
+      const predictionResultsToInsert: any[] = [];
+
       for (const pred of pendingPredictions) {
-        // Check if outcome already exists in prediction_results
-        const { data: existingOutcome } = await supabase
-          .from('prediction_results')
-          .select('id')
-          .eq('prediction_id', pred.id)
-          .single();
-          
-        if (existingOutcome) continue; // Already settled
+        if (settledPredIds.has(pred.id)) continue; // Already settled
 
         // Fetch corresponding match
-        const { data: match } = await supabase
-          .from('matches')
-          .select('id, status, home_goals, away_goals')
-          .eq('id', pred.match_id)
-          .single();
-
+        const match = matchesMap.get(String(pred.match_id));
         if (!match || match.status !== 'finished') continue;
 
         const homeGoals = match.home_goals ?? 0;
@@ -251,29 +286,35 @@ export async function GET(request: Request) {
         const hitOu = predictedOu === actualOu;
         const profitOu = actualOu === 'push' ? 0.0 : hitOu ? 0.90 : -1.0;
 
-        // Save to prediction_results
-        await supabase
-          .from('prediction_results')
-          .insert({
-            prediction_id: pred.id,
-            match_id: match.id,
-            actual_home_score: homeGoals,
-            actual_away_score: awayGoals,
-            predicted_outcome: predictedOutcome,
-            actual_outcome: actualOutcome,
-            hit_1x2: hit1x2,
-            predicted_ah: predictedAh,
-            actual_ah: actualAh,
-            hit_ah: hitAh,
-            predicted_ou: predictedOu,
-            actual_ou: actualOu,
-            hit_ou: hitOu,
-            profit_1x2: profit1x2,
-            profit_ah: profitAh,
-            profit_ou: profitOu,
-          });
+        predictionResultsToInsert.push({
+          prediction_id: pred.id,
+          match_id: match.id,
+          actual_home_score: homeGoals,
+          actual_away_score: awayGoals,
+          predicted_outcome: predictedOutcome,
+          actual_outcome: actualOutcome,
+          hit_1x2: hit1x2,
+          predicted_ah: predictedAh,
+          actual_ah: actualAh,
+          hit_ah: hitAh,
+          predicted_ou: predictedOu,
+          actual_ou: actualOu,
+          hit_ou: hitOu,
+          profit_1x2: profit1x2,
+          profit_ah: profitAh,
+          profit_ou: profitOu,
+        });
 
         evaluatedCount++;
+      }
+
+      if (predictionResultsToInsert.length > 0) {
+        const { error: insertErr } = await supabase
+          .from('prediction_results')
+          .insert(predictionResultsToInsert);
+        if (insertErr) {
+          console.error('Error batch inserting prediction_results:', insertErr);
+        }
       }
     }
 

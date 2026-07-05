@@ -4,9 +4,33 @@ import { getUserEntitlements } from '@/lib/pricing/entitlement';
 import { isRateLimited } from '@/lib/pricing/rate-limit';
 import { getUserDailyReveals, hashString } from '@/lib/pricing/access-logs';
 import { getCohortTag } from '@/lib/crons/cohortTag';
+import { ApiHelper } from '@/lib/utils/apiHelper';
+import { z } from 'zod';
+
+const predictionsQuerySchema = z.object({
+  limit: z.preprocess((val) => val ? parseInt(val as string, 10) : undefined, z.number().min(1).max(100)).default(60),
+  page: z.preprocess((val) => val ? parseInt(val as string, 10) : undefined, z.number().min(1).max(1000)).default(1),
+});
 
 export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const queryParams = Object.fromEntries(searchParams.entries());
+    const validated = predictionsQuerySchema.safeParse(queryParams);
+
+    if (!validated.success) {
+      return ApiHelper.response(
+        false,
+        null,
+        'Invalid query parameters',
+        422,
+        validated.error.flatten().fieldErrors
+      );
+    }
+
+    const { limit, page } = validated.data;
+    const offset = (page - 1) * limit;
+
     const authHeader = request.headers.get('authorization');
     const token = authHeader?.split(' ')[1];
     let userId: string | undefined;
@@ -26,9 +50,11 @@ export async function GET(request: Request) {
     const rateLimitLimit = (entitlements.tier === 'free' || entitlements.tier === 'starter') ? 60 : 300;
 
     if (await isRateLimited(limitIdentifier, rateLimitLimit)) {
-      return NextResponse.json(
-        { success: false, error: 'Rate limit exceeded. Try again in a minute.' },
-        { status: 429 }
+      return ApiHelper.response(
+        false,
+        null,
+        'Rate limit exceeded. Try again in a minute.',
+        429
       );
     }
 
@@ -38,7 +64,7 @@ export async function GET(request: Request) {
       .select('*')
       .in('status', ['upcoming', 'live'])
       .order('kickoff', { ascending: true })
-      .limit(60);
+      .range(offset, offset + limit - 1);
 
     if (matchesError) {
       throw matchesError;
@@ -49,7 +75,7 @@ export async function GET(request: Request) {
       .from('predictions')
       .select('*')
       .order('prediction_timestamp', { ascending: true })
-      .limit(60);
+      .range(offset, offset + limit - 1);
 
     if (predsError) {
       throw predsError;
@@ -156,17 +182,25 @@ export async function GET(request: Request) {
 
     const response = Object.values(grouped);
 
-    return NextResponse.json({
-      success: true,
-      predictions: response,
-      revealedCount: revealedMatches.length,
-      maxReveals: 3
-    });
+    return ApiHelper.response(
+      true,
+      {
+        predictions: response,
+        revealedCount: revealedMatches.length,
+        maxReveals: 3
+      },
+      null,
+      200,
+      undefined,
+      { spread: true }
+    );
   } catch (error: any) {
     console.error('Predictions API Route Error:', error);
-    return NextResponse.json(
-      { success: false, error: error.message || 'Internal Server Error' },
-      { status: 500 }
+    return ApiHelper.response(
+      false,
+      null,
+      error.message || 'Internal Server Error',
+      500
     );
   }
 }

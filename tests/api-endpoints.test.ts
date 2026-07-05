@@ -15,6 +15,7 @@ const mockChain = {
   not: vi.fn(),
   order: vi.fn(),
   limit: vi.fn(),
+  range: vi.fn(),
   maybeSingle: vi.fn(),
   single: vi.fn()
 };
@@ -40,6 +41,7 @@ describe('New API Endpoints', () => {
     mockChain.not.mockReturnValue(mockChain);
     mockChain.order.mockReturnValue(mockChain);
     mockChain.limit.mockReturnValue(mockChain);
+    mockChain.range.mockReturnValue(mockChain);
     mockChain.maybeSingle.mockResolvedValue({ data: null, error: null });
     mockChain.single.mockResolvedValue({ data: {}, error: null });
 
@@ -52,7 +54,7 @@ describe('New API Endpoints', () => {
       { id: 'match_1', home_team: 'Chelsea', away_team: 'Arsenal', kickoff: '2026-07-04T12:00:00Z', status: 'upcoming' }
     ];
     
-    mockChain.limit.mockResolvedValue({ data: mockMatches, error: null } as any);
+    mockChain.range.mockResolvedValue({ data: mockMatches, error: null } as any);
 
     const req = new Request('http://localhost/api/fixtures');
     const res = await fixturesGET(req as any);

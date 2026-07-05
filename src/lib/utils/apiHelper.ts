@@ -2,8 +2,9 @@ import { NextResponse } from 'next/server';
 
 export interface ApiResponse<T = any> {
   success: boolean;
-  data: T | null;
-  error: string | null;
+  data?: T | null;
+  error?: string | null;
+  validationErrors?: Record<string, string[]>;
   request_id: string;
 }
 
@@ -15,19 +16,32 @@ export class ApiHelper {
     success: boolean,
     data: T | null = null,
     error: any = null,
-    status: number = 200
-  ): NextResponse<ApiResponse<T>> {
+    status: number = 200,
+    validationErrors?: Record<string, string[]>,
+    options: { spread?: boolean } = {}
+  ): NextResponse {
     const requestId = `req_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
     const errMessage = error ? (error.message || String(error)) : null;
-    return NextResponse.json(
-      {
-        success,
-        data,
-        error: errMessage,
-        request_id: requestId
-      },
-      { status }
-    );
+    
+    const payload: Record<string, any> = {
+      success,
+      request_id: requestId
+    };
+
+    if (success) {
+      if (options.spread && data && typeof data === 'object' && !Array.isArray(data)) {
+        Object.assign(payload, data);
+      } else {
+        payload.data = data;
+      }
+    } else {
+      payload.error = errMessage || 'Request failed';
+      if (validationErrors) {
+        payload.validationErrors = validationErrors;
+      }
+    }
+
+    return NextResponse.json(payload, { status });
   }
 
   /**

@@ -44,13 +44,19 @@ export class ApiFootballClient {
 
     console.log(`[ApiFootballClient] Fetching live data from: ${url.toString()}`);
     
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    
     try {
       const res = await fetch(url.toString(), {
         method: 'GET',
         headers: {
           'x-apisports-key': this.apiKey,
         },
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
 
       if (!res.ok) {
         throw new Error(`API-Football error status: ${res.status} ${res.statusText}`);
@@ -68,6 +74,7 @@ export class ApiFootballClient {
       apiCache.set(endpoint, params, responsePayload);
       return responsePayload;
     } catch (e) {
+      clearTimeout(timeoutId);
       console.error(`[ApiFootballClient] Network request failed for ${endpoint}:`, e);
       throw e;
     }

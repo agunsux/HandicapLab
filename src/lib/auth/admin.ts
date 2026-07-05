@@ -17,20 +17,33 @@ export async function requireAdmin(request: Request): Promise<void> {
   }
   const token = authHeader.substring('Bearer '.length).trim();
 
-  // Verify token via Supabase auth. The `auth.users` view is not directly exposed, but we can use the `auth.getUser` RPC if configured.
-  // For simplicity we query the `profiles` table which stores a `beta_status` and a `role` column.
-  const { data: user, error } = await supabase
-    .from('profiles')
-    .select('id, role')
-    .eq('auth_token', token) // assume a column storing the token for demo purposes
-    .single();
+  // 1. Verify token securely via Supabase Auth
+  const { data: { user }, error: authError } = await supabase.auth.getUser(token);
 
-  if (error || !user) {
+  if (authError || !user) {
     throw new NextResponse(JSON.stringify({ success: false, error: 'Invalid auth token' }), { status: 401 });
   }
 
-  // Check admin role
-  if ((user as any).role !== 'admin') {
+  // 2. Resolve admin role ID
+  const { data: adminRole, error: roleError } = await supabase
+    .from('roles')
+    .select('id')
+    .eq('name', 'admin')
+    .maybeSingle();
+
+  if (roleError || !adminRole) {
+    throw new NextResponse(JSON.stringify({ success: false, error: 'Forbidden: admin only' }), { status: 403 });
+  }
+
+  // 3. Verify user has active admin role relationship
+  const { data: userRole, error: userRoleError } = await supabase
+    .from('user_roles')
+    .select('user_id')
+    .eq('user_id', user.id)
+    .eq('role_id', adminRole.id)
+    .maybeSingle();
+
+  if (userRoleError || !userRole) {
     throw new NextResponse(JSON.stringify({ success: false, error: 'Forbidden: admin only' }), { status: 403 });
   }
   // Authorized – simply return.
