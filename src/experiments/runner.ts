@@ -273,7 +273,9 @@ export class ExperimentRunner {
 
       const probOutput = await ProbabilityEngine.predict(features, {
         weights: { poisson: 0.5, dixonColes: 0.5 },
-        calibrationMethod: 'platt'
+        calibrationMethod: this.config.featureFlags.calibration_method,
+        plattA: this.config.parameters.platt_a,
+        plattB: this.config.parameters.platt_b
       });
 
       const oddsSnap: BookmakerOddsSnapshot = {

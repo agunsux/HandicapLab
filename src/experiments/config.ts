@@ -8,6 +8,7 @@ export interface FeatureFlags {
   adaptive_kelly: boolean;
   single_bet_per_match: boolean;
   xg_integration: boolean;
+  calibration_method: 'platt' | 'isotonic';
 }
 
 export interface ModelParameters {
@@ -20,6 +21,8 @@ export interface ModelParameters {
   odds_max_limit: number;          // e.g. 30.0
   model_confidence_score: number;  // e.g. 0.80
   data_quality_score: number;      // e.g. 0.85
+  platt_a?: number;
+  platt_b?: number;
 }
 
 export interface ExperimentConfig {
@@ -44,7 +47,8 @@ export const DEFAULT_CONFIG: ExperimentConfig = {
     dynamic_home_advantage: false,
     adaptive_kelly: false,
     single_bet_per_match: true, // Default to true to match Sprint 11 baseline!
-    xg_integration: false
+    xg_integration: false,
+    calibration_method: 'platt'
   },
   parameters: {
     elo_k_factor: 32,
@@ -55,6 +59,8 @@ export const DEFAULT_CONFIG: ExperimentConfig = {
     odds_min_limit: 1.10,
     odds_max_limit: 30.0,
     model_confidence_score: 0.80,
-    data_quality_score: 0.85
+    data_quality_score: 0.85,
+    platt_a: 1.02,
+    platt_b: -0.01
   }
 };
