@@ -8,6 +8,7 @@ import { UncertaintyEngine } from './uncertainty';
 import { PoissonModel } from './poisson';
 import { DixonColesModel } from './dixon-coles';
 import { MarketOdds } from '../edge-scanner/types';
+import { PredictionFeatures } from '../../market-intelligence/types';
 
 export class ProbabilityEngine {
   /**
@@ -23,6 +24,7 @@ export class ProbabilityEngine {
       plattB?: number;
       rho?: number;
       oddsSnapshot?: MarketOdds;
+      marketFeatures?: PredictionFeatures;
     } = {}
   ): Promise<ProbabilityOutput> {
     const profile = CompetitionProfileEngine.getProfileForLeague(features.leagueId || 'EPL');
@@ -224,7 +226,13 @@ export class ProbabilityEngine {
     }
 
     // 9. Calculate split confidence via UncertaintyEngine
-    const confidence = UncertaintyEngine.calculate(adjustedFeatures, poissonMl, dcMl, options.oddsSnapshot);
+    const confidence = UncertaintyEngine.calculate(
+      adjustedFeatures, 
+      poissonMl, 
+      dcMl, 
+      options.oddsSnapshot, 
+      options.marketFeatures
+    );
 
     // Derive Expected Goals (xgHome, xgAway, combined expectedGoals) and BTTS Yes/No
     let xgHome = 0;

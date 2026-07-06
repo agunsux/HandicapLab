@@ -1,3 +1,4 @@
+import { PredictionFeatures } from '../../market-intelligence/types';
 import { MatchFeatures } from '../feature-engine/types';
 import { MarketOdds } from '../edge-scanner/types';
 import { getLeagueConfig, getLeagueConfigById } from '../../crons/leagueRegistry';
@@ -22,7 +23,8 @@ export class UncertaintyEngine {
     features: MatchFeatures,
     poissonProbs: number[], // ML probs [home, draw, away]
     dcProbs: number[],      // ML probs [home, draw, away]
-    oddsSnapshot?: MarketOdds
+    oddsSnapshot?: MarketOdds,
+    marketFeatures?: PredictionFeatures
   ): Confidence {
     // 1. Model Confidence: Discrepancy between models. Closer predictions = higher confidence.
     const modelDiff = Math.abs(poissonProbs[0] - dcProbs[0]) +
@@ -88,12 +90,16 @@ export class UncertaintyEngine {
       marketConfidence = Math.max(0.0, marketConfidence - 0.25);
     }
 
+    if (marketFeatures) {
+      marketConfidence = marketFeatures.marketConfidence / 100;
+    }
+
     marketConfidence = Number(Math.max(0.0, Math.min(1.0, marketConfidence)).toFixed(4));
 
-    // 4. Final Confidence: Weighted combination of the three
-    let finalConfidence = Number(
-      (modelConfidence * 0.4 + dataConfidence * 0.3 + marketConfidence * 0.3).toFixed(4)
-    );
+    // 4. Final Confidence: Weighted combination or direct Model + Market blend
+    let finalConfidence = marketFeatures
+      ? Number(((modelConfidence + marketConfidence) / 2).toFixed(4))
+      : Number((modelConfidence * 0.4 + dataConfidence * 0.3 + marketConfidence * 0.3).toFixed(4));
 
     // Apply history completeness discount (Requirement 2)
     if (features.historicalMatchesCount !== undefined) {
@@ -211,6 +217,12 @@ export class UncertaintyEngine {
     }
     if (continuity >= 0.8) {
       reasons.push("Consistent squad continuity");
+    }
+
+    if (marketFeatures && marketFeatures.anomalies.length > 0) {
+      for (const anomaly of marketFeatures.anomalies) {
+        reasons.push(`Market Anomaly: ${anomaly}`);
+      }
     }
 
     return {

@@ -13,6 +13,7 @@ export interface FeatureFlags {
   squad_dynamics: boolean;
   squad_dynamics_value_only: boolean;
   squad_dynamics_congestion_only: boolean;
+  market_intelligence: boolean;
 }
 
 export interface ModelParameters {
@@ -27,6 +28,7 @@ export interface ModelParameters {
   data_quality_score: number;      // e.g. 0.85
   platt_a?: number;
   platt_b?: number;
+  steam_move_threshold: number;
 }
 
 export interface ExperimentConfig {
@@ -54,7 +56,8 @@ export const DEFAULT_CONFIG: ExperimentConfig = {
     calibration_method: 'platt',
     squad_dynamics: false,
     squad_dynamics_value_only: false,
-    squad_dynamics_congestion_only: false
+    squad_dynamics_congestion_only: false,
+    market_intelligence: false
   },
   parameters: {
     elo_k_factor: 32,
@@ -67,6 +70,7 @@ export const DEFAULT_CONFIG: ExperimentConfig = {
     model_confidence_score: 0.80,
     data_quality_score: 0.85,
     platt_a: 1.02,
-    platt_b: -0.01
+    platt_b: -0.01,
+    steam_move_threshold: 0.05
   }
 };
