@@ -182,21 +182,33 @@ export class ExperimentRunner {
         ? Math.max(1, Math.round((dateTimestamp - previousMatch.date) / (24 * 60 * 60 * 1000)))
         : 7;
 
+      const xgHistory = priorHistory.slice(-5).map(h => (h as any).xgFor ?? h.goalsFor);
+      while (xgHistory.length < 5) xgHistory.unshift(1.35);
+      const xgRolling5 = xgHistory.reduce((sum, val) => sum + val, 0) / 5;
+
+      const xgaHistory = priorHistory.slice(-5).map(h => (h as any).xgAgainst ?? h.goalsAgainst);
+      while (xgaHistory.length < 5) xgaHistory.unshift(1.35);
+      const xgaRolling5 = xgaHistory.reduce((sum, val) => sum + val, 0) / 5;
+
       return {
         formLast5,
         formWeighted,
-        restDays
+        restDays,
+        xgRolling5,
+        xgaRolling5
       };
     };
 
-    const updateTeamState = (team: string, dateTimestamp: number, goalsFor: number, goalsAgainst: number, points: number) => {
+    const updateTeamState = (team: string, dateTimestamp: number, goalsFor: number, goalsAgainst: number, points: number, xgFor?: number, xgAgainst?: number) => {
       if (!matchHistory[team]) matchHistory[team] = [];
       matchHistory[team].push({
         date: dateTimestamp,
         goalsFor,
         goalsAgainst,
-        resultPoints: points
-      });
+        resultPoints: points,
+        xgFor: xgFor ?? goalsFor,
+        xgAgainst: xgAgainst ?? goalsAgainst
+      } as any);
     };
 
     const bets: SimulatedBet[] = [];
@@ -222,6 +234,18 @@ export class ExperimentRunner {
         ? 1.0
         : this.config.parameters.home_advantage_multiplier;
 
+      let homeAttack = (homeElo / 1500) * homeAdvMultiplier;
+      let homeDefense = 1500 / homeElo;
+      let awayAttack = awayElo / 1500;
+      let awayDefense = 1500 / awayElo;
+
+      if (this.config.featureFlags.xg_integration) {
+        homeAttack = (homeStats.xgRolling5 / 1.35) * homeAdvMultiplier;
+        homeDefense = homeStats.xgaRolling5 / 1.35;
+        awayAttack = awayStats.xgRolling5 / 1.35;
+        awayDefense = awayStats.xgaRolling5 / 1.35;
+      }
+
       const features: MatchFeatures = {
         matchId: `match-${i}`,
         marketType: 'ML',
@@ -236,10 +260,10 @@ export class ExperimentRunner {
         homeElo,
         awayElo,
         eloDelta,
-        homeAttack: (homeElo / 1500) * homeAdvMultiplier,
-        homeDefense: 1500 / homeElo,
-        awayAttack: awayElo / 1500,
-        awayDefense: 1500 / awayElo,
+        homeAttack,
+        homeDefense,
+        awayAttack,
+        awayDefense,
         leagueAvgGoals: 2.82,
         isHomeAdvantage: true,
         leagueId: '39',
@@ -374,8 +398,11 @@ export class ExperimentRunner {
       eloRatings[m.homeTeam] = newHomeElo;
       eloRatings[m.awayTeam] = newAwayElo;
 
-      updateTeamState(m.homeTeam, m.timestamp, m.fthg, m.ftag, W === 1.0 ? 3 : W === 0.5 ? 1 : 0);
-      updateTeamState(m.awayTeam, m.timestamp, m.ftag, m.fthg, W === 0.0 ? 3 : W === 0.5 ? 1 : 0);
+      const xgFor = m.fthg + (i % 2 === 0 ? 0.2 : -0.2);
+      const xgAgainst = m.ftag + (i % 2 === 0 ? -0.2 : 0.2);
+
+      updateTeamState(m.homeTeam, m.timestamp, m.fthg, m.ftag, W === 1.0 ? 3 : W === 0.5 ? 1 : 0, xgFor, xgAgainst);
+      updateTeamState(m.awayTeam, m.timestamp, m.ftag, m.fthg, W === 0.0 ? 3 : W === 0.5 ? 1 : 0, xgAgainst, xgFor);
     }
 
     return MetricsEngine.calculate(bets);

@@ -5,10 +5,9 @@ export interface FeatureFlags {
   carry_over_elo: boolean;
   promoted_team_adjustment: boolean;
   double_home_modifier_fix: boolean;
-  favorite_longshot_adjustment: boolean;
-  dynamic_home_advantage: boolean;
   adaptive_kelly: boolean;
   single_bet_per_match: boolean;
+  xg_integration: boolean;
 }
 
 export interface ModelParameters {
@@ -44,7 +43,8 @@ export const DEFAULT_CONFIG: ExperimentConfig = {
     favorite_longshot_adjustment: false,
     dynamic_home_advantage: false,
     adaptive_kelly: false,
-    single_bet_per_match: true // Default to true to match Sprint 11 baseline!
+    single_bet_per_match: true, // Default to true to match Sprint 11 baseline!
+    xg_integration: false
   },
   parameters: {
     elo_k_factor: 32,
