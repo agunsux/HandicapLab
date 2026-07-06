@@ -8,6 +8,7 @@ export interface FeatureFlags {
   favorite_longshot_adjustment: boolean;
   dynamic_home_advantage: boolean;
   adaptive_kelly: boolean;
+  single_bet_per_match: boolean;
 }
 
 export interface ModelParameters {
@@ -37,12 +38,13 @@ export const DEFAULT_CONFIG: ExperimentConfig = {
   datasetVersion: 'Gold_v1',
   seasons: ['2020-2021', '2021-2022', '2022-2023', '2023-2024', '2024-2025'],
   featureFlags: {
-    carry_over_elo: false,
+    carry_over_elo: true, // Baseline carries over Elo rating
     promoted_team_adjustment: false,
     double_home_modifier_fix: false,
     favorite_longshot_adjustment: false,
     dynamic_home_advantage: false,
-    adaptive_kelly: false
+    adaptive_kelly: false,
+    single_bet_per_match: true // Default to true to match Sprint 11 baseline!
   },
   parameters: {
     elo_k_factor: 32,

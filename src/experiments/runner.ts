@@ -275,6 +275,8 @@ export class ExperimentRunner {
 
       const edges = EdgeEngine.calculateEdges(probOutput, oddsSnap);
 
+      const recommendations: any[] = [];
+
       edges.forEach(edge => {
         const decision = DecisionEngine.evaluateDecision(
           features.matchId,
@@ -300,9 +302,27 @@ export class ExperimentRunner {
         }
 
         const rec = RecommendationEngine.generateRecommendation(decision, rawP, calP);
-        
+        if (rec.decision === 'VALUE' || rec.decision === 'STRONG_VALUE') {
+          recommendations.push(rec);
+        }
+      });
+
+      let selectedRecs = recommendations;
+      if (this.config.featureFlags.single_bet_per_match) {
+        let bestRec: any = null;
+        let highestEV = 0.0;
+        recommendations.forEach(rec => {
+          if (rec.expected_value > highestEV) {
+            highestEV = rec.expected_value;
+            bestRec = rec;
+          }
+        });
+        selectedRecs = bestRec ? [bestRec] : [];
+      }
+
+      selectedRecs.forEach(rec => {
         const isWarm = m.season !== '2020-2021';
-        if ((rec.decision === 'VALUE' || rec.decision === 'STRONG_VALUE') && isWarm) {
+        if (isWarm) {
           let stakeSize = rec.recommended_stake * 2.0;
 
           // Feature Flag: favorite_longshot_adjustment
