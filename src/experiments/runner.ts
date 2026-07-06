@@ -246,6 +246,21 @@ export class ExperimentRunner {
         awayDefense = awayStats.xgaRolling5 / 1.35;
       }
 
+      if (this.config.featureFlags.squad_dynamics) {
+        const homeSquadVal = Math.pow(homeElo / 1500, 3);
+        const awaySquadVal = Math.pow(awayElo / 1500, 3);
+        const squadRatio = homeSquadVal / (homeSquadVal + awaySquadVal);
+
+        homeAttack *= (squadRatio * 2.0);
+        awayAttack *= ((1 - squadRatio) * 2.0);
+
+        const homeInjuryMult = homeStats.restDays < 4 ? 0.95 : 0.99;
+        const awayInjuryMult = awayStats.restDays < 4 ? 0.95 : 0.99;
+
+        homeAttack *= homeInjuryMult;
+        awayAttack *= awayInjuryMult;
+      }
+
       const features: MatchFeatures = {
         matchId: `match-${i}`,
         marketType: 'ML',
