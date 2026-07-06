@@ -50,10 +50,10 @@ export class FeatureEngine {
 
     // 3. Trigger extractors in parallel
     const [form, fatigue, strength, xg] = await Promise.all([
-      FormExtractor.extract(homeTeam, awayTeam, kickoffAt),
+      FormExtractor.extract(homeTeam, awayTeam, kickoffAt, match.league),
       FatigueExtractor.extract(homeTeam, awayTeam, kickoffAt),
-      StrengthExtractor.extract(homeTeam, awayTeam, kickoffAt),
-      XgExtractor.extract(homeTeam, awayTeam, kickoffAt)
+      StrengthExtractor.extract(homeTeam, awayTeam, kickoffAt, match.league),
+      XgExtractor.extract(homeTeam, awayTeam, kickoffAt, match.league)
     ]);
 
     // Determine competition profile and type

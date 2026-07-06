@@ -3,6 +3,7 @@ import { IObjectStorage } from '../storage/storage.interface';
 import { BronzeWriter } from '../storage/bronzeWriter';
 import { CheckpointService, CheckpointModel } from './checkpoint';
 import { FixtureValidator, OddsSnapshotValidator, ValidationReport } from './validation';
+import { LEAGUE_REGISTRY } from '../../crons/leagueRegistry';
 
 export interface ImportConfig {
   provider: string;
@@ -85,8 +86,11 @@ export class HistoricalImportService {
       while (retryAttempts <= maxRetries) {
         try {
           if (endpoint === 'fixtures') {
-            // Translate league name string to numerical competition id (EPL = 39)
-            const competitionId = league.toUpperCase() === 'EPL' ? 39 : 140;
+            const config = LEAGUE_REGISTRY.find(
+              l => l.id.toLowerCase() === league.toLowerCase() ||
+                   l.name.toLowerCase() === league.toLowerCase()
+            );
+            const competitionId = config ? config.apiFootballId : 39;
             allItems = await this.provider.getFixtures(competitionId, season);
           } else {
             // Odds snapshots require checking specific fixtures

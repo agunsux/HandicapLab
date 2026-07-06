@@ -9,12 +9,13 @@ export interface XgResult {
 }
 
 export class XgExtractor {
-  static async extract(homeTeam: string, awayTeam: string, cutoffDate: Date): Promise<XgResult> {
+  static async extract(homeTeam: string, awayTeam: string, cutoffDate: Date, leagueId: string = 'EPL'): Promise<XgResult> {
     // 1. Fetch all finished matches before cutoff date to compute league averages
     const { data: allMatches, error: allErr } = await supabase
       .from('matches')
       .select('home_team, away_team, home_goals, away_goals')
       .eq('status', 'finished')
+      .eq('league', leagueId)
       .lt('kickoff', cutoffDate.toISOString());
 
     if (allErr || !allMatches || allMatches.length === 0) {

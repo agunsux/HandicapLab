@@ -1,0 +1,130 @@
+{
+  "entries": [
+    {
+      "experimentId": "EXP-0001",
+      "datasetVersion": "Gold_v1",
+      "modelId": "naive-home-v1",
+      "metrics": {
+        "logLoss": 1.0924,
+        "brier": 0.3854,
+        "ece": 0.1245,
+        "roi": -6.82,
+        "sharpe": -0.05
+      },
+      "status": "archived",
+      "description": "Baseline Home Win Only model."
+    },
+    {
+      "experimentId": "EXP-0002",
+      "datasetVersion": "Gold_v1",
+      "modelId": "market-favourite-v1",
+      "metrics": {
+        "logLoss": 3.1752,
+        "brier": 0.3447,
+        "ece": 0.0822,
+        "roi": -1.48,
+        "sharpe": 0.00
+      },
+      "status": "archived",
+      "description": "Baseline Market Favourite (highest implied prob) wins."
+    },
+    {
+      "experimentId": "EXP-0003",
+      "datasetVersion": "Gold_v1",
+      "modelId": "elo-only-v1",
+      "metrics": {
+        "logLoss": 0.6282,
+        "brier": 0.2195,
+        "ece": 0.0578,
+        "roi": -18.69,
+        "sharpe": -0.10
+      },
+      "status": "active",
+      "description": "Symmetrical Elo delta rating model."
+    },
+    {
+      "experimentId": "EXP-0004",
+      "datasetVersion": "Gold_v1",
+      "modelId": "poisson-only-v1",
+      "metrics": {
+        "logLoss": 0.6886,
+        "brier": 0.2352,
+        "ece": 0.1056,
+        "roi": -6.07,
+        "sharpe": -0.05
+      },
+      "status": "active",
+      "description": "Raw Poisson goal averages expectation model."
+    },
+    {
+      "experimentId": "EXP-0005",
+      "datasetVersion": "Gold_v1",
+      "modelId": "dixon-coles-only-v1",
+      "metrics": {
+        "logLoss": 0.6902,
+        "brier": 0.2355,
+        "ece": 0.1070,
+        "roi": -5.96,
+        "sharpe": -0.05
+      },
+      "status": "active",
+      "description": "Raw Dixon-Coles goal averages expectation model."
+    },
+    {
+      "experimentId": "EXP-0006",
+      "datasetVersion": "Gold_v1",
+      "modelId": "ensemble-platt-v1",
+      "metrics": {
+        "logLoss": 0.6456,
+        "brier": 0.2236,
+        "ece": 0.0390,
+        "roi": -9.41,
+        "sharpe": -0.06
+      },
+      "status": "active",
+      "description": "Ensemble (Poisson + Dixon-Coles) calibrated walk-forward using Platt."
+    },
+    {
+      "experimentId": "EXP-0012",
+      "datasetVersion": "Gold_v1",
+      "modelId": "uniform-random-v1",
+      "metrics": {
+        "logLoss": 0.7144,
+        "brier": 0.2597,
+        "ece": 0.1124,
+        "roi": -19.83,
+        "sharpe": -0.09
+      },
+      "status": "archived",
+      "description": "Uniform Random probability baseline."
+    },
+    {
+      "experimentId": "EXP-0013",
+      "datasetVersion": "Gold_v1",
+      "modelId": "bookmaker-implied-v1",
+      "metrics": {
+        "logLoss": 0.5881,
+        "brier": 0.2022,
+        "ece": 0.0215,
+        "roi": 0.00,
+        "sharpe": 0.00
+      },
+      "status": "active",
+      "description": "Implicit Pinnacle closing odds baseline."
+    },
+    {
+      "experimentId": "EXP-0014",
+      "datasetVersion": "Gold_v1",
+      "modelId": "ensemble-isotonic-v1",
+      "metrics": {
+        "logLoss": 0.6580,
+        "brier": 0.2252,
+        "ece": 0.0257,
+        "roi": -11.22,
+        "sharpe": -0.06
+      },
+      "status": "active",
+      "description": "Ensemble (Poisson + Dixon-Coles) calibrated walk-forward using Isotonic regression."
+    }
+  ]
+}

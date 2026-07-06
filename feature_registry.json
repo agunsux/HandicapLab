@@ -1,0 +1,64 @@
+{
+  "features": [
+    {
+      "feature": "Elo Delta",
+      "description": "Elo rating difference between home and away team.",
+      "owner": "Quant Team",
+      "source": "historical_ledger",
+      "latency": "10ms",
+      "ttl": "7 days",
+      "importance": "High",
+      "cost": "Low",
+      "qualityScore": 0.99,
+      "usedByModel": ["elo-only-v1", "ensemble-platt-v1", "ensemble-isotonic-v1"]
+    },
+    {
+      "feature": "Poisson Prob",
+      "description": "Implied home probability calculated using bivariate Poisson on goals.",
+      "owner": "Quant Team",
+      "source": "rolling_goals_db",
+      "latency": "25ms",
+      "ttl": "7 days",
+      "importance": "Medium",
+      "cost": "Low",
+      "qualityScore": 0.98,
+      "usedByModel": ["poisson-only-v1", "ensemble-platt-v1", "ensemble-isotonic-v1"]
+    },
+    {
+      "feature": "Starting XI Surprise",
+      "description": "Lineup surprise score computed from official Starting XI against expected starting XI.",
+      "owner": "Squad Context Team",
+      "source": "api-football",
+      "latency": "350ms",
+      "ttl": "2 hours",
+      "importance": "Very High",
+      "cost": "Medium",
+      "qualityScore": 0.95,
+      "usedByModel": ["context-gbt-v1"]
+    },
+    {
+      "feature": "Market Drift",
+      "description": "Closing implied home win probability minus opening implied probability.",
+      "owner": "Market Intel Team",
+      "source": "pinnacle",
+      "latency": "50ms",
+      "ttl": "15 mins",
+      "importance": "High",
+      "cost": "Medium",
+      "qualityScore": 0.97,
+      "usedByModel": ["context-gbt-v1"]
+    },
+    {
+      "feature": "Weather Rain",
+      "description": "Precipitation probability at fixture stadium.",
+      "owner": "Weather Feed Team",
+      "source": "weather_api",
+      "latency": "800ms",
+      "ttl": "6 hours",
+      "importance": "Low",
+      "cost": "Low",
+      "qualityScore": 0.92,
+      "usedByModel": ["context-gbt-v1"]
+    }
+  ]
+}

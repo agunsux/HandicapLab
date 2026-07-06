@@ -11,12 +11,13 @@ export interface StrengthResult {
  * of all finished matches before the cutoff date.
  */
 export class StrengthExtractor {
-  static async extract(homeTeam: string, awayTeam: string, cutoffDate: Date): Promise<StrengthResult> {
+  static async extract(homeTeam: string, awayTeam: string, cutoffDate: Date, leagueId: string = 'EPL'): Promise<StrengthResult> {
     // Fetch all finished matches before cutoff chronologically
     const { data: matches, error } = await supabase
       .from('matches')
       .select('home_team, away_team, home_goals, away_goals')
       .eq('status', 'finished')
+      .eq('league', leagueId)
       .lt('kickoff', cutoffDate.toISOString())
       .order('kickoff', { ascending: true });
 

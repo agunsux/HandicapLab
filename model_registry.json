@@ -1,0 +1,49 @@
+{
+  "models": [
+    {
+      "modelId": "naive-home-v1",
+      "version": "1.0.0",
+      "trainingDataset": "Gold_v1",
+      "featureSet": ["homeTeam"],
+      "hyperparameters": {},
+      "calibration": "none",
+      "validationDate": "2026-07-05"
+    },
+    {
+      "modelId": "elo-only-v1",
+      "version": "1.0.0",
+      "trainingDataset": "Gold_v1",
+      "featureSet": ["eloDelta"],
+      "hyperparameters": { "kFactor": 32, "homeBias": 50 },
+      "calibration": "none",
+      "validationDate": "2026-07-05"
+    },
+    {
+      "modelId": "poisson-only-v1",
+      "version": "1.0.0",
+      "trainingDataset": "Gold_v1",
+      "featureSet": ["rollingGoalsScored", "rollingGoalsConceded"],
+      "hyperparameters": { "decayFactor": 0.97 },
+      "calibration": "none",
+      "validationDate": "2026-07-05"
+    },
+    {
+      "modelId": "ensemble-platt-v1",
+      "version": "1.1.0",
+      "trainingDataset": "Gold_v1",
+      "featureSet": ["eloDelta", "poissonProb"],
+      "hyperparameters": { "kFactor": 32, "decayFactor": 0.97 },
+      "calibration": "dynamic-platt",
+      "validationDate": "2026-07-05"
+    },
+    {
+      "modelId": "ensemble-isotonic-v1",
+      "version": "1.1.0",
+      "trainingDataset": "Gold_v1",
+      "featureSet": ["eloDelta", "poissonProb"],
+      "hyperparameters": { "kFactor": 32, "decayFactor": 0.97 },
+      "calibration": "dynamic-isotonic",
+      "validationDate": "2026-07-05"
+    }
+  ]
+}

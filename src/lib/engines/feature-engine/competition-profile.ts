@@ -10,6 +10,8 @@ export interface CompetitionProfile {
   marketLiquidity: 'high' | 'medium' | 'low';
   goalEnvironmentConfig: string;
   varianceConfig: string;
+  plattA?: number;
+  plattB?: number;
 }
 
 export class CompetitionProfileEngine {
@@ -84,7 +86,9 @@ export class CompetitionProfileEngine {
       pressureFactor: config.type === 'international' ? 1.2 : 0.5,
       marketLiquidity: config.profile.marketLiquidity,
       goalEnvironmentConfig: config.profile.goalEnvironment,
-      varianceConfig: config.profile.variance
+      varianceConfig: config.profile.variance,
+      plattA: (config.profile as any).plattA,
+      plattB: (config.profile as any).plattB
     };
   }
 }

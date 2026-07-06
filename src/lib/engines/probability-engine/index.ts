@@ -25,13 +25,14 @@ export class ProbabilityEngine {
       oddsSnapshot?: MarketOdds;
     } = {}
   ): Promise<ProbabilityOutput> {
+    const profile = CompetitionProfileEngine.getProfileForLeague(features.leagueId || 'EPL');
+
     const calibrationMethod = options.calibrationMethod || 'platt';
-    const plattA = options.plattA !== undefined ? options.plattA : 1.02;
-    const plattB = options.plattB !== undefined ? options.plattB : -0.01;
+    const plattA = options.plattA !== undefined ? options.plattA : (profile.plattA !== undefined ? profile.plattA : 1.02);
+    const plattB = options.plattB !== undefined ? options.plattB : (profile.plattB !== undefined ? profile.plattB : -0.01);
     const rho = options.rho !== undefined ? options.rho : -0.06;
 
     // 1. Competition Profile adjustments
-    const profile = CompetitionProfileEngine.getProfileForLeague(features.leagueId || 'EPL');
     const adjustedFeatures = { ...features };
 
     // Apply rest sensitivity to fatigue multiplier calculation

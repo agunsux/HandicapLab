@@ -115,12 +115,18 @@ export class TeamNormalizer {
     // Fuzzy cleanses
     let matchedName = name.trim();
     
-    // Strip FC, Utd, City suffixes to try fallback matching
+    // Strip common football club suffixes across multiple languages (league-agnostic)
     let stripped = cleaned
       .replace(/\s+fc$/, '')
+      .replace(/\s+cf$/, '')
+      .replace(/\s+ud$/, '')
+      .replace(/\s+sd$/, '')
+      .replace(/\s+cd$/, '')
+      .replace(/\s+sc$/, '')
       .replace(/\s+utd$/, ' united')
       .replace(/\s+united$/, '')
       .replace(/\s+city$/, '')
+      .replace(/\s+wanderers$/, '')
       .trim();
 
     if (this.canonicalMap[stripped]) {
