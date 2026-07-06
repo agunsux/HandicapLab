@@ -6,15 +6,18 @@ import * as path from 'path';
 import { execSync } from 'child_process';
 
 export interface ExperimentRunRecord {
-  modelName: string;
-  weights: Record<string, number>;
-  roi: number;
-  yield: number;
-  logLoss: number;
-  brier: number;
-  avgCLV: number;
-  timestamp: string;
-  commitSha: string;
+  'Commit SHA': string;
+  'Dataset Version': string;
+  'Model Version': string;
+  'Feature Version': string;
+  'Calibration Version': string;
+  'Weights': Record<string, number>;
+  'ROI': number;
+  'Yield': number;
+  'Log Loss': number;
+  'Brier Score': number;
+  'CLV': number;
+  'Execution Date': string;
 }
 
 export class ExperimentRegistry {
@@ -23,9 +26,6 @@ export class ExperimentRegistry {
     'b0e51ad4-db7e-4196-9e0e-e58ff37caeeb', 'artifacts', 'experiment_runs.json'
   );
 
-  /**
-   * Retrieves the current Git commit SHA.
-   */
   private static getCommitSHA(): string {
     try {
       return execSync('git rev-parse HEAD', { encoding: 'utf8' }).trim();
@@ -37,10 +37,14 @@ export class ExperimentRegistry {
   /**
    * Automatically logs the details of an experiment run.
    */
-  public static logRun(record: Omit<ExperimentRunRecord, 'timestamp' | 'commitSha'>): void {
-    const timestamp = new Date().toISOString();
+  public static logRun(record: Omit<ExperimentRunRecord, 'Execution Date' | 'Commit SHA'>): void {
+    const executionDate = new Date().toISOString();
     const commitSha = this.getCommitSHA();
-    const fullRecord: ExperimentRunRecord = { ...record, timestamp, commitSha };
+    const fullRecord: ExperimentRunRecord = { 
+      ...record, 
+      'Execution Date': executionDate, 
+      'Commit SHA': commitSha 
+    };
 
     let runs: ExperimentRunRecord[] = [];
     try {
@@ -49,7 +53,7 @@ export class ExperimentRegistry {
         runs = JSON.parse(fileContent);
       }
     } catch (e) {
-      // Gracefully continue with an empty list
+      // Gracefully continue
     }
 
     runs.push(fullRecord);

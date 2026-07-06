@@ -11,10 +11,12 @@ class MockModel implements EnsembleSubModel {
 
   public async predict(features: MatchFeatures): Promise<ModelPrediction> {
     return {
-      pHome: this.pHome,
-      pDraw: this.pDraw,
-      pAway: this.pAway,
-      confidence: 80
+      homeProbability: this.pHome,
+      drawProbability: this.pDraw,
+      awayProbability: this.pAway,
+      confidence: 80,
+      modelName: this.name,
+      version: '1.0.0'
     };
   }
 }

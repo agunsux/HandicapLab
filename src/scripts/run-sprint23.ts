@@ -84,23 +84,26 @@ async function runSprint23() {
     dummyFeatures,
     ensemble,
     dummyMarket,
-    1.95, // market odds
-    'home', // selection
+    1.95,
+    'home',
     'Moneyline Home'
   );
 
   console.log('Recommendation Output:', JSON.stringify(rec, null, 2));
   console.log('SHAP Explainability:', JSON.stringify(shap, null, 2));
 
-  // 3. Log Experiment details to Experiment Registry
+  // 3. Log Experiment details to Experiment Registry using capitalized keys
   ExperimentRegistry.logRun({
-    modelName: 'Model_v3.4 (Ensemble Engine v1)',
-    weights,
-    roi: 12.8,
-    yield: 12.8,
-    logLoss: 0.5281,
-    brier: 0.1742,
-    avgCLV: 4.82
+    'Dataset Version': 'Gold_v1',
+    'Model Version': 'Model_v3.4',
+    'Feature Version': 'market_features_v1',
+    'Calibration Version': 'Beta',
+    'Weights': weights,
+    'ROI': 12.8,
+    'Yield': 12.8,
+    'Log Loss': 0.5281,
+    'Brier Score': 0.1742,
+    'CLV': 4.82
   });
   console.log('Experiment execution logged to registry.');
 
@@ -116,7 +119,7 @@ async function runSprint23() {
     `brier_score,0.1742`,
     `avg_clv_pct,4.82`,
     `recommendation_score,${rec.recommendationScore}`,
-    `recommendation_decision,${rec.decision}`
+    `recommendation_decision,${rec.recommendation}`
   ].join('\n');
   fs.writeFileSync(csvPath, headers + rows);
   console.log('decision_engine_metrics.csv saved.');
@@ -155,8 +158,8 @@ We dynamically loaded weights from \`model_weights.json\`:
 ## 3. Score-Based Betting Recommendation
 - **Target Selection**: Moneyline Home @ 1.95
 - **Recommendation Score**: **${rec.recommendationScore} / 100**
-- **Decision Tier**: **${rec.decision}**
-- **Reasons**: ${rec.reasons.join(', ')}
+- **Decision Tier**: **${rec.recommendation}**
+- **Reasons**: ${rec.reasonCodes.join(', ')}
 
 ---
 

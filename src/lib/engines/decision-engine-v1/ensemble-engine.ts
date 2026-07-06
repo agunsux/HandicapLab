@@ -32,7 +32,6 @@ export class EnsembleEngine {
         const fileContent = fs.readFileSync(filePath, 'utf-8');
         this.weights = JSON.parse(fileContent);
       } else {
-        // Fallback default weights
         this.weights = {
           poisson: 0.20,
           dixonColes: 0.20,
@@ -43,7 +42,6 @@ export class EnsembleEngine {
         };
       }
     } catch (e) {
-      // Graceful error fallback
       this.weights = {
         poisson: 0.20,
         dixonColes: 0.20,
@@ -57,7 +55,7 @@ export class EnsembleEngine {
   }
 
   /**
-   * Set custom weights directly (useful for testing or optimization).
+   * Set weights directly.
    */
   public static setWeights(customWeights: Record<string, number>): void {
     this.weights = { ...customWeights };
@@ -73,22 +71,20 @@ export class EnsembleEngine {
     let sumSqDraw = 0;
     let sumSqAway = 0;
 
-    const meanHome = predictions.reduce((sum, p) => sum + p.pHome, 0) / predictions.length;
-    const meanDraw = predictions.reduce((sum, p) => sum + p.pDraw, 0) / predictions.length;
-    const meanAway = predictions.reduce((sum, p) => sum + p.pAway, 0) / predictions.length;
+    const meanHome = predictions.reduce((sum, p) => sum + p.homeProbability, 0) / predictions.length;
+    const meanDraw = predictions.reduce((sum, p) => sum + p.drawProbability, 0) / predictions.length;
+    const meanAway = predictions.reduce((sum, p) => sum + p.awayProbability, 0) / predictions.length;
 
     predictions.forEach(p => {
-      sumSqHome += Math.pow(p.pHome - meanHome, 2);
-      sumSqDraw += Math.pow(p.pDraw - meanDraw, 2);
-      sumSqAway += Math.pow(p.pAway - meanAway, 2);
+      sumSqHome += Math.pow(p.homeProbability - meanHome, 2);
+      sumSqDraw += Math.pow(p.drawProbability - meanDraw, 2);
+      sumSqAway += Math.pow(p.awayProbability - meanAway, 2);
     });
 
     const sdHome = Math.sqrt(sumSqHome / predictions.length);
     const sdDraw = Math.sqrt(sumSqDraw / predictions.length);
     const sdAway = Math.sqrt(sumSqAway / predictions.length);
 
-    // Average standard deviation across outcomes, scaled to 0-100 range
-    // Theoretical max SD for probabilities is ~0.50, so multiplying by 200 normalizes to 0-100
     const avgSD = (sdHome + sdDraw + sdAway) / 3;
     const disagreement = Math.min(100, Math.round(avgSD * 200));
 
@@ -96,7 +92,7 @@ export class EnsembleEngine {
   }
 
   /**
-   * Predicts ensembled outcome probabilities across all registered models.
+   * Predicts ensembled outcome probabilities across registered models.
    */
   public static async predict(features: MatchFeatures): Promise<EnsemblePrediction> {
     const models = ModelRegistry.getModels();
@@ -121,18 +117,18 @@ export class EnsembleEngine {
       predictionsList.push(prediction);
 
       const weight = weights[model.id] !== undefined ? weights[model.id] : 1.0;
-      weightedHome += prediction.pHome * weight;
-      weightedDraw += prediction.pDraw * weight;
-      weightedAway += prediction.pAway * weight;
+      weightedHome += prediction.homeProbability * weight;
+      weightedDraw += prediction.drawProbability * weight;
+      weightedAway += prediction.awayProbability * weight;
       weightedConfidence += prediction.confidence * weight;
       totalWeight += weight;
     }
 
     if (totalWeight <= 0) {
       totalWeight = models.length;
-      weightedHome = predictionsList.reduce((sum, p) => sum + p.pHome, 0);
-      weightedDraw = predictionsList.reduce((sum, p) => sum + p.pDraw, 0);
-      weightedAway = predictionsList.reduce((sum, p) => sum + p.pAway, 0);
+      weightedHome = predictionsList.reduce((sum, p) => sum + p.homeProbability, 0);
+      weightedDraw = predictionsList.reduce((sum, p) => sum + p.drawProbability, 0);
+      weightedAway = predictionsList.reduce((sum, p) => sum + p.awayProbability, 0);
       weightedConfidence = predictionsList.reduce((sum, p) => sum + p.confidence, 0);
     }
 

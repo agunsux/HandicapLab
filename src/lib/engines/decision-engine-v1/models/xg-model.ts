@@ -10,10 +10,7 @@ export class XGModel implements EnsembleSubModel {
   public name = 'Expected Goals (xG) Probability Model';
 
   public async predict(features: MatchFeatures): Promise<ModelPrediction> {
-    // If specific xG metrics are present, adjust attack/defense rates
     const adjustedFeatures = { ...features };
-    
-    // Simple scaling factor representing clean xG rolling adjustments
     const homeXG = features.homeAttack * 1.05;
     const awayXG = features.awayAttack * 0.95;
 
@@ -36,17 +33,19 @@ export class XGModel implements EnsembleSubModel {
     }
 
     const sum = pHome + pDraw + pAway;
-    const home = pHome / sum;
-    const draw = pDraw / sum;
-    const away = pAway / sum;
+    const homeProbability = pHome / sum;
+    const drawProbability = pDraw / sum;
+    const awayProbability = pAway / sum;
 
     const confidence = 92;
 
     return {
-      pHome: Number(home.toFixed(4)),
-      pDraw: Number(draw.toFixed(4)),
-      pAway: Number(away.toFixed(4)),
-      confidence
+      homeProbability: Number(homeProbability.toFixed(4)),
+      drawProbability: Number(drawProbability.toFixed(4)),
+      awayProbability: Number(awayProbability.toFixed(4)),
+      confidence,
+      modelName: 'xG Model',
+      version: '1.0.0'
     };
   }
 }

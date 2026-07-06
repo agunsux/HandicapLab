@@ -26,18 +26,19 @@ export class PoissonModelWrapper implements EnsembleSubModel {
     }
 
     const sum = pHome + pDraw + pAway;
-    const home = pHome / sum;
-    const draw = pDraw / sum;
-    const away = pAway / sum;
+    const homeProbability = pHome / sum;
+    const drawProbability = pDraw / sum;
+    const awayProbability = pAway / sum;
 
-    // Simple confidence mapping based on historical accuracy of EPL Tier 1
     const confidence = features.leagueId === '39' ? 85 : 75;
 
     return {
-      pHome: Number(home.toFixed(4)),
-      pDraw: Number(draw.toFixed(4)),
-      pAway: Number(away.toFixed(4)),
-      confidence
+      homeProbability: Number(homeProbability.toFixed(4)),
+      drawProbability: Number(drawProbability.toFixed(4)),
+      awayProbability: Number(awayProbability.toFixed(4)),
+      confidence,
+      modelName: 'Poisson',
+      version: '1.0.0'
     };
   }
 }

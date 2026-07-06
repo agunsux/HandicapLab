@@ -4,10 +4,12 @@
 import { MatchFeatures } from '../feature-engine/types';
 
 export interface ModelPrediction {
-  pHome: number;
-  pDraw: number;
-  pAway: number;
+  homeProbability: number;
+  drawProbability: number;
+  awayProbability: number;
   confidence: number; // 0 to 100
+  modelName: string;
+  version: string;
 }
 
 export interface EnsembleSubModel {
