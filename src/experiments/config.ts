@@ -10,6 +10,8 @@ export interface FeatureFlags {
   xg_integration: boolean;
   calibration_method: 'platt' | 'isotonic';
   squad_dynamics: boolean;
+  squad_dynamics_value_only: boolean;
+  squad_dynamics_congestion_only: boolean;
 }
 
 export interface ModelParameters {
@@ -50,7 +52,9 @@ export const DEFAULT_CONFIG: ExperimentConfig = {
     single_bet_per_match: true, // Default to true to match Sprint 11 baseline!
     xg_integration: false,
     calibration_method: 'platt',
-    squad_dynamics: false
+    squad_dynamics: false,
+    squad_dynamics_value_only: false,
+    squad_dynamics_congestion_only: false
   },
   parameters: {
     elo_k_factor: 32,

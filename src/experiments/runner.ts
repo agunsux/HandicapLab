@@ -246,19 +246,31 @@ export class ExperimentRunner {
         awayDefense = awayStats.xgaRolling5 / 1.35;
       }
 
-      if (this.config.featureFlags.squad_dynamics) {
+      const applySquadValueAdjustment = () => {
         const homeSquadVal = Math.pow(homeElo / 1500, 3);
         const awaySquadVal = Math.pow(awayElo / 1500, 3);
-        const squadRatio = homeSquadVal / (homeSquadVal + awaySquadVal);
+        const logRatio = Math.log(homeSquadVal / awaySquadVal);
+        const scaledDelta = Math.tanh(logRatio * 0.2); // smooth bounded delta between -1.0 and 1.0
 
-        homeAttack *= (squadRatio * 2.0);
-        awayAttack *= ((1 - squadRatio) * 2.0);
+        // Restrict adjustment to +/- 10% maximum to prevent parameter stretching
+        homeAttack *= (1.0 + scaledDelta * 0.1);
+        awayAttack *= (1.0 - scaledDelta * 0.1);
+      };
 
-        const homeInjuryMult = homeStats.restDays < 4 ? 0.95 : 0.99;
-        const awayInjuryMult = awayStats.restDays < 4 ? 0.95 : 0.99;
-
+      const applyCongestionAdjustment = () => {
+        const homeInjuryMult = homeStats.restDays < 4 ? 0.96 : 0.99;
+        const awayInjuryMult = awayStats.restDays < 4 ? 0.96 : 0.99;
         homeAttack *= homeInjuryMult;
         awayAttack *= awayInjuryMult;
+      };
+
+      if (this.config.featureFlags.squad_dynamics_value_only) {
+        applySquadValueAdjustment();
+      } else if (this.config.featureFlags.squad_dynamics_congestion_only) {
+        applyCongestionAdjustment();
+      } else if (this.config.featureFlags.squad_dynamics) {
+        applySquadValueAdjustment();
+        applyCongestionAdjustment();
       }
 
       const features: MatchFeatures = {
