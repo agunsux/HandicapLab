@@ -1,0 +1,8 @@
+{
+  "clvThreshold": 0.03,
+  "steamThreshold": 0.05,
+  "volatilityThreshold": 20,
+  "consensusThreshold": 15,
+  "marketFreezeMinutes": 10,
+  "lateSteamMinutes": 60
+}
