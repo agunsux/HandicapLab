@@ -1,0 +1,12 @@
+{
+  "validationStrategy": "Walk-Forward Expanding Window",
+  "datasetVersion": "v1.0.0",
+  "featureVersion": "v2.1.0",
+  "modelVersion": "LightGBM-1.0.0",
+  "foldDefinitions": 5,
+  "randomSeed": 42,
+  "timestamp": "2026-07-06T23:39:55.594Z",
+  "metricsGenerated": true,
+  "reportLocations": "C:\\Users\\RYZEN\\.antigravity-ide\\HandicapLab\\research\\validation_reports",
+  "validationFingerprint": "abc123def456"
+}
