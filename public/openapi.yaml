@@ -7,6 +7,28 @@ servers:
   - url: https://handicap-lab.vercel.app/api/v1
     description: Production Server
 paths:
+  /health:
+    get:
+      summary: Get API Health Status
+      description: Returns health and uptime details.
+      responses:
+        '200':
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnterpriseResponse'
+  /features:
+    get:
+      summary: Get Features Registry
+      description: Returns active feature names and metadata.
+      responses:
+        '200':
+          description: Features list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnterpriseResponse'
   /predictions:
     get:
       summary: Get Calibrated Probabilities
