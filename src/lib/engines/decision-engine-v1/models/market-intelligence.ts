@@ -1,35 +1,57 @@
 // HandicapLab Decision Engine v1 - Market Derived Model
 // Location: src/lib/engines/decision-engine-v1/models/market-intelligence.ts
 
-import { EnsembleSubModel, ModelPrediction } from '../registry';
+import { PredictionModel, ModelMetadata, Prediction } from './predictionModel';
 import { MatchFeatures } from '../../feature-engine/types';
 
-export class MarketIntelligenceModel implements EnsembleSubModel {
-  public id = 'market';
-  public name = 'Market Intelligence Probabilities';
+export class MarketIntelligenceModel implements PredictionModel {
+  public metadata(): ModelMetadata {
+    return {
+      name: 'Market Intelligence CLV Model',
+      version: '2.0.0',
+      description: 'Heuristic model adjusting probabilities based on market movement and momentum',
+      isOnline: false
+    };
+  }
 
-  public async predict(features: MatchFeatures): Promise<ModelPrediction> {
-    const avgH = 2.0;
-    const avgD = 3.3;
-    const avgA = 3.8;
+  public async train(trainData: any[]): Promise<void> {}
 
-    const impH = 1 / avgH;
-    const impD = 1 / avgD;
-    const impA = 1 / avgA;
-    const totalImplied = impH + impD + impA;
+  public async predict(features: MatchFeatures | any): Promise<Prediction> {
+    const rawHome = features.closingOddsHome ? (1 / features.closingOddsHome) : 0.4;
+    const rawDraw = features.closingOddsDraw ? (1 / features.closingOddsDraw) : 0.25;
+    const rawAway = features.closingOddsAway ? (1 / features.closingOddsAway) : 0.35;
 
-    const homeProbability = impH / totalImplied;
-    const drawProbability = impD / totalImplied;
-    const awayProbability = impA / totalImplied;
-    const confidence = 85;
+    const margin = rawHome + rawDraw + rawAway - 1.0;
+    const marginPerSelection = margin / 3;
+
+    let pHome = Math.max(0.01, rawHome - marginPerSelection);
+    let pDraw = Math.max(0.01, rawDraw - marginPerSelection);
+    let pAway = Math.max(0.01, rawAway - marginPerSelection);
+
+    if (features.marketMomentumHome && features.marketMomentumHome > 1.0) {
+      pHome *= 1.02;
+    } else if (features.marketMomentumHome && features.marketMomentumHome < 1.0) {
+      pHome *= 0.98;
+    }
+
+    const sum = pHome + pDraw + pAway;
+    const homeProbability = pHome / sum;
+    const drawProbability = pDraw / sum;
+    const awayProbability = pAway / sum;
 
     return {
-      homeProbability: Number(homeProbability.toFixed(4)),
-      drawProbability: Number(drawProbability.toFixed(4)),
-      awayProbability: Number(awayProbability.toFixed(4)),
-      confidence,
-      modelName: 'Market Intelligence Model',
-      version: '1.0.0'
+      pHome: Number(homeProbability.toFixed(4)),
+      pDraw: Number(drawProbability.toFixed(4)),
+      pAway: Number(awayProbability.toFixed(4))
     };
+  }
+
+  public async predictProbability(features: MatchFeatures | any): Promise<{ pHome: number; pDraw: number; pAway: number }> {
+    const p = await this.predict(features);
+    return { pHome: p.pHome, pDraw: p.pDraw, pAway: p.pAway };
+  }
+
+  public async predictScore(features: MatchFeatures | any): Promise<{ home: number; away: number }> {
+    return { home: 0, away: 0 }; // Cannot predict score from odds easily without Poisson
   }
 }

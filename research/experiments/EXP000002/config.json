@@ -1,0 +1,14 @@
+{
+  "hyperparameters": {
+    "deterministic": true
+  },
+  "trainingWindow": {
+    "start": "2018",
+    "end": "2023"
+  },
+  "testingWindow": {
+    "start": "2018",
+    "end": "2023"
+  },
+  "randomSeed": 42
+}

@@ -1,18 +1,29 @@
 // HandicapLab Decision Engine v1 - Logistic Regression Model
 // Location: src/lib/engines/decision-engine-v1/models/logistic-regression.ts
 
-import { EnsembleSubModel, ModelPrediction } from '../registry';
+import { PredictionModel, ModelMetadata, Prediction } from './predictionModel';
 import { MatchFeatures } from '../../feature-engine/types';
 
-export class LogisticRegressionModel implements EnsembleSubModel {
-  public id = 'logistic';
-  public name = 'Logistic Regression Model';
+export class LogisticRegressionModel implements PredictionModel {
+  public metadata(): ModelMetadata {
+    return {
+      name: 'Logistic Regression Model',
+      version: '2.0.0',
+      description: 'Multinomial logistic regression model using Elo and Rest Days',
+      isOnline: false
+    };
+  }
 
   private sigmoid(z: number): number {
     return 1 / (1 + Math.exp(-z));
   }
 
-  public async predict(features: MatchFeatures): Promise<ModelPrediction> {
+  public async train(trainData: any[]): Promise<void> {
+    // In a full implementation, we'd learn weights here.
+    // For now, it uses hardcoded logistic weights.
+  }
+
+  public async predict(features: MatchFeatures | any): Promise<Prediction> {
     const eloDelta = (features.homeElo ?? 1500) - (features.awayElo ?? 1500);
     const restDelta = (features.homeRestDays ?? 4) - (features.awayRestDays ?? 4);
     
@@ -31,16 +42,22 @@ export class LogisticRegressionModel implements EnsembleSubModel {
     const drawProbability = pDrawRaw / sum;
     const awayProbability = pAwayRaw / sum;
 
-    const completeness = features.squadContinuityHome ?? 1.0;
-    const confidence = Math.round(Math.min(100, Math.max(20, completeness * 90)));
-
     return {
-      homeProbability: Number(homeProbability.toFixed(4)),
-      drawProbability: Number(drawProbability.toFixed(4)),
-      awayProbability: Number(awayProbability.toFixed(4)),
-      confidence,
-      modelName: 'Logistic Regression',
-      version: '1.0.0'
+      pHome: Number(homeProbability.toFixed(4)),
+      pDraw: Number(drawProbability.toFixed(4)),
+      pAway: Number(awayProbability.toFixed(4)),
+      expectedGoalsHome: homeProbability * 3, // rough
+      expectedGoalsAway: awayProbability * 3 // rough
     };
+  }
+
+  public async predictProbability(features: MatchFeatures | any): Promise<{ pHome: number; pDraw: number; pAway: number }> {
+    const p = await this.predict(features);
+    return { pHome: p.pHome, pDraw: p.pDraw, pAway: p.pAway };
+  }
+
+  public async predictScore(features: MatchFeatures | any): Promise<{ home: number; away: number }> {
+    const p = await this.predict(features);
+    return { home: p.expectedGoalsHome || 0, away: p.expectedGoalsAway || 0 };
   }
 }

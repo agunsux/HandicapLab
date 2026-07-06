@@ -1,30 +1,15 @@
 // HandicapLab Decision Engine v1 - Model Registry & Interfaces
 // Location: src/lib/engines/decision-engine-v1/registry.ts
 
-import { MatchFeatures } from '../feature-engine/types';
-
-export interface ModelPrediction {
-  homeProbability: number;
-  drawProbability: number;
-  awayProbability: number;
-  confidence: number; // 0 to 100
-  modelName: string;
-  version: string;
-}
-
-export interface EnsembleSubModel {
-  id: string;
-  name: string;
-  predict(features: MatchFeatures): Promise<ModelPrediction>;
-}
+import { PredictionModel } from './models/predictionModel';
 
 export class ModelRegistry {
-  private static models: Map<string, EnsembleSubModel> = new Map();
+  private static models: Map<string, PredictionModel> = new Map();
 
   /**
    * Registers a prediction model to the ensemble registry.
    */
-  public static register(id: string, model: EnsembleSubModel): void {
+  public static register(id: string, model: PredictionModel): void {
     this.models.set(id, model);
   }
 
@@ -36,10 +21,17 @@ export class ModelRegistry {
   }
 
   /**
-   * Returns all currently registered models.
+   * Returns a model by ID.
    */
-  public static getModels(): EnsembleSubModel[] {
-    return Array.from(this.models.values());
+  public static getModel(id: string): PredictionModel | undefined {
+    return this.models.get(id);
+  }
+
+  /**
+   * Returns all currently registered models and their IDs.
+   */
+  public static getModels(): { id: string, model: PredictionModel }[] {
+    return Array.from(this.models.entries()).map(([id, model]) => ({ id, model }));
   }
 
   /**

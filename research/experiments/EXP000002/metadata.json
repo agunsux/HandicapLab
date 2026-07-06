@@ -1,0 +1,27 @@
+{
+  "timestamp": "2026-07-06T23:09:21.161Z",
+  "gitCommit": "latest",
+  "datasetHash": "hash",
+  "datasetVersion": "v1.0",
+  "featureVersion": "v1.0",
+  "modelVersion": "2.0.0",
+  "calibrationVersion": "v1.0",
+  "randomSeed": 42,
+  "trainingWindow": {
+    "start": "2018",
+    "end": "2023"
+  },
+  "testingWindow": {
+    "start": "2018",
+    "end": "2023"
+  },
+  "hyperparameters": {
+    "deterministic": true
+  },
+  "executionTimeMs": 19291,
+  "machineInfo": {
+    "cpu": "unknown",
+    "ram": "unknown",
+    "os": "windows"
+  }
+}

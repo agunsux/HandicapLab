@@ -1,18 +1,28 @@
 // HandicapLab Decision Engine v1 - xG Based Poisson Model
 // Location: src/lib/engines/decision-engine-v1/models/xg-model.ts
 
-import { EnsembleSubModel, ModelPrediction } from '../registry';
+import { PredictionModel, ModelMetadata, Prediction } from './predictionModel';
 import { MatchFeatures } from '../../feature-engine/types';
 import { PoissonModel } from '../../probability-engine/poisson';
 
-export class XGModel implements EnsembleSubModel {
-  public id = 'xg';
-  public name = 'Expected Goals (xG) Probability Model';
+export class XGModel implements PredictionModel {
+  public metadata(): ModelMetadata {
+    return {
+      name: 'Expected Goals (xG) Probability Model',
+      version: '2.0.0',
+      description: 'xG Based Poisson Model',
+      isOnline: false
+    };
+  }
 
-  public async predict(features: MatchFeatures): Promise<ModelPrediction> {
+  public async train(trainData: any[]): Promise<void> {
+    // Statistically based on PoissonModel which uses input features directly.
+  }
+
+  public async predict(features: MatchFeatures | any): Promise<Prediction> {
     const adjustedFeatures = { ...features };
-    const homeXG = features.homeAttack * 1.05;
-    const awayXG = features.awayAttack * 0.95;
+    const homeXG = (features.homeAttack || 1.0) * 1.05;
+    const awayXG = (features.awayAttack || 1.0) * 0.95;
 
     adjustedFeatures.homeAttack = homeXG;
     adjustedFeatures.awayAttack = awayXG;
@@ -37,15 +47,22 @@ export class XGModel implements EnsembleSubModel {
     const drawProbability = pDraw / sum;
     const awayProbability = pAway / sum;
 
-    const confidence = 92;
-
     return {
-      homeProbability: Number(homeProbability.toFixed(4)),
-      drawProbability: Number(drawProbability.toFixed(4)),
-      awayProbability: Number(awayProbability.toFixed(4)),
-      confidence,
-      modelName: 'xG Model',
-      version: '1.0.0'
+      pHome: Number(homeProbability.toFixed(4)),
+      pDraw: Number(drawProbability.toFixed(4)),
+      pAway: Number(awayProbability.toFixed(4)),
+      expectedGoalsHome: raw.expectedGoalsHome,
+      expectedGoalsAway: raw.expectedGoalsAway
     };
+  }
+
+  public async predictProbability(features: MatchFeatures | any): Promise<{ pHome: number; pDraw: number; pAway: number }> {
+    const p = await this.predict(features);
+    return { pHome: p.pHome, pDraw: p.pDraw, pAway: p.pAway };
+  }
+
+  public async predictScore(features: MatchFeatures | any): Promise<{ home: number; away: number }> {
+    const p = await this.predict(features);
+    return { home: p.expectedGoalsHome || 0, away: p.expectedGoalsAway || 0 };
   }
 }

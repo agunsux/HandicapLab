@@ -1,150 +1,144 @@
-// HandicapLab Decision Engine v1 - Ensemble Engine
-// Location: src/lib/engines/decision-engine-v1/ensemble-engine.ts
+// HandicapLab Decision Engine v1 - Hierarchical Ensemble Engine
+import { ModelRegistry } from './registry';
+import { Prediction } from './models/predictionModel';
 
-import * as fs from 'fs';
-import * as path from 'path';
-import { ModelRegistry, ModelPrediction } from './registry';
-import { MatchFeatures } from '../feature-engine/types';
+export type EnsembleLevel = 'simple_average' | 'weighted_average' | 'bayesian_average' | 'stacking' | 'dynamic_online';
 
-export interface EnsemblePrediction {
-  pHome: number;
-  pDraw: number;
-  pAway: number;
-  modelConfidence: number; // Blended model confidence (0-100)
-  disagreementScore: number; // Normalized disagreement score (0-100)
-  individualPredictions: Record<string, ModelPrediction>;
+export interface EnsembleConfig {
+  level: EnsembleLevel;
+  weights?: Record<string, number>;
+  metaLearnerWeights?: Record<string, number>; // for stacking
 }
 
-export interface WeightOptimizer {
-  optimizeWeights(historicalData: any[]): Promise<Record<string, number>>;
+export interface EnsemblePrediction extends Prediction {
+  modelConfidence: number;
+  disagreementScore: number;
+  individualPredictions: Record<string, Prediction>;
 }
 
 export class EnsembleEngine {
-  private static weights: Record<string, number> = {};
+  private static config: EnsembleConfig = { level: 'simple_average' };
 
-  /**
-   * Loads weight configuration from model_weights.json.
-   */
-  public static loadWeights(): Record<string, number> {
-    try {
-      const filePath = path.join(__dirname, 'model_weights.json');
-      if (fs.existsSync(filePath)) {
-        const fileContent = fs.readFileSync(filePath, 'utf-8');
-        this.weights = JSON.parse(fileContent);
-      } else {
-        this.weights = {
-          poisson: 0.20,
-          dixonColes: 0.20,
-          elo: 0.20,
-          logistic: 0.20,
-          xg: 0.20,
-          market: 0.00
-        };
-      }
-    } catch (e) {
-      this.weights = {
-        poisson: 0.20,
-        dixonColes: 0.20,
-        elo: 0.20,
-        logistic: 0.20,
-        xg: 0.20,
-        market: 0.00
-      };
-    }
-    return this.weights;
+  public static setConfig(config: EnsembleConfig) {
+    this.config = config;
   }
 
-  /**
-   * Set weights directly.
-   */
-  public static setWeights(customWeights: Record<string, number>): void {
-    this.weights = { ...customWeights };
-  }
-
-  /**
-   * Calculates the standard deviation of outcomes to derive the Disagreement Index.
-   */
-  private static calculateDisagreement(predictions: ModelPrediction[]): number {
+  private static calculateDisagreement(predictions: Prediction[]): number {
     if (predictions.length <= 1) return 0;
+    
+    const meanHome = predictions.reduce((s, p) => s + p.pHome, 0) / predictions.length;
+    const meanDraw = predictions.reduce((s, p) => s + p.pDraw, 0) / predictions.length;
+    const meanAway = predictions.reduce((s, p) => s + p.pAway, 0) / predictions.length;
 
-    let sumSqHome = 0;
-    let sumSqDraw = 0;
-    let sumSqAway = 0;
-
-    const meanHome = predictions.reduce((sum, p) => sum + p.homeProbability, 0) / predictions.length;
-    const meanDraw = predictions.reduce((sum, p) => sum + p.drawProbability, 0) / predictions.length;
-    const meanAway = predictions.reduce((sum, p) => sum + p.awayProbability, 0) / predictions.length;
-
+    let sumSqH = 0, sumSqD = 0, sumSqA = 0;
     predictions.forEach(p => {
-      sumSqHome += Math.pow(p.homeProbability - meanHome, 2);
-      sumSqDraw += Math.pow(p.drawProbability - meanDraw, 2);
-      sumSqAway += Math.pow(p.awayProbability - meanAway, 2);
+      sumSqH += Math.pow(p.pHome - meanHome, 2);
+      sumSqD += Math.pow(p.pDraw - meanDraw, 2);
+      sumSqA += Math.pow(p.pAway - meanAway, 2);
     });
 
-    const sdHome = Math.sqrt(sumSqHome / predictions.length);
-    const sdDraw = Math.sqrt(sumSqDraw / predictions.length);
-    const sdAway = Math.sqrt(sumSqAway / predictions.length);
+    const sdH = Math.sqrt(sumSqH / predictions.length);
+    const sdD = Math.sqrt(sumSqD / predictions.length);
+    const sdA = Math.sqrt(sumSqA / predictions.length);
 
-    const avgSD = (sdHome + sdDraw + sdAway) / 3;
-    const disagreement = Math.min(100, Math.round(avgSD * 200));
-
-    return disagreement;
+    const avgSD = (sdH + sdD + sdA) / 3;
+    return Math.min(100, Math.round(avgSD * 200));
   }
 
-  /**
-   * Predicts ensembled outcome probabilities across registered models.
-   */
-  public static async predict(features: MatchFeatures): Promise<EnsemblePrediction> {
+  public static async predict(features: any): Promise<EnsemblePrediction> {
     const models = ModelRegistry.getModels();
-    if (models.length === 0) {
-      throw new Error("No prediction models registered in ModelRegistry.");
+    if (models.length === 0) throw new Error("No models registered.");
+
+    const individualPredictions: Record<string, Prediction> = {};
+    const predictionsList: Prediction[] = [];
+    
+    for (const { id, model } of models) {
+      const pred = await model.predict(features);
+      individualPredictions[id] = pred;
+      predictionsList.push(pred);
     }
 
-    const weights = Object.keys(this.weights).length > 0 ? this.weights : this.loadWeights();
+    let finalHome = 0, finalDraw = 0, finalAway = 0;
 
-    let totalWeight = 0;
-    let weightedHome = 0;
-    let weightedDraw = 0;
-    let weightedAway = 0;
-    let weightedConfidence = 0;
-
-    const individualPredictions: Record<string, ModelPrediction> = {};
-    const predictionsList: ModelPrediction[] = [];
-
-    for (const model of models) {
-      const prediction = await model.predict(features);
-      individualPredictions[model.id] = prediction;
-      predictionsList.push(prediction);
-
-      const weight = weights[model.id] !== undefined ? weights[model.id] : 1.0;
-      weightedHome += prediction.homeProbability * weight;
-      weightedDraw += prediction.drawProbability * weight;
-      weightedAway += prediction.awayProbability * weight;
-      weightedConfidence += prediction.confidence * weight;
-      totalWeight += weight;
+    if (this.config.level === 'simple_average') {
+      finalHome = predictionsList.reduce((s, p) => s + p.pHome, 0) / models.length;
+      finalDraw = predictionsList.reduce((s, p) => s + p.pDraw, 0) / models.length;
+      finalAway = predictionsList.reduce((s, p) => s + p.pAway, 0) / models.length;
+    } 
+    else if (this.config.level === 'weighted_average' || this.config.level === 'dynamic_online') {
+      const weights = this.config.weights || {};
+      let totalW = 0;
+      for (const { id } of models) {
+        const w = weights[id] ?? (1.0 / models.length);
+        const p = individualPredictions[id];
+        finalHome += p.pHome * w;
+        finalDraw += p.pDraw * w;
+        finalAway += p.pAway * w;
+        totalW += w;
+      }
+      if (totalW > 0) {
+        finalHome /= totalW;
+        finalDraw /= totalW;
+        finalAway /= totalW;
+      }
+    } 
+    else if (this.config.level === 'stacking') {
+        const metaWeights = this.config.metaLearnerWeights || {};
+        let logitHome = 0, logitDraw = 0, logitAway = 0;
+        
+        for (const { id } of models) {
+            const wH = metaWeights[`${id}_home`] ?? 1.0;
+            const wD = metaWeights[`${id}_draw`] ?? 1.0;
+            const wA = metaWeights[`${id}_away`] ?? 1.0;
+            
+            const p = individualPredictions[id];
+            // Simple logit transformation sum
+            logitHome += Math.log(p.pHome / (1 - p.pHome)) * wH;
+            logitDraw += Math.log(p.pDraw / (1 - p.pDraw)) * wD;
+            logitAway += Math.log(p.pAway / (1 - p.pAway)) * wA;
+        }
+        
+        const expH = Math.exp(logitHome);
+        const expD = Math.exp(logitDraw);
+        const expA = Math.exp(logitAway);
+        const sumExp = expH + expD + expA;
+        
+        finalHome = expH / sumExp;
+        finalDraw = expD / sumExp;
+        finalAway = expA / sumExp;
+    }
+    else if (this.config.level === 'bayesian_average') {
+       // Simplified Bayesian Model Averaging
+       const weights = this.config.weights || {};
+       let totalW = 0;
+       for (const { id } of models) {
+         // Weights here represent model posterior probabilities P(M|D)
+         const w = weights[id] ?? (1.0 / models.length);
+         const p = individualPredictions[id];
+         finalHome += p.pHome * w;
+         finalDraw += p.pDraw * w;
+         finalAway += p.pAway * w;
+         totalW += w;
+       }
+       if (totalW > 0) {
+         finalHome /= totalW;
+         finalDraw /= totalW;
+         finalAway /= totalW;
+       }
     }
 
-    if (totalWeight <= 0) {
-      totalWeight = models.length;
-      weightedHome = predictionsList.reduce((sum, p) => sum + p.homeProbability, 0);
-      weightedDraw = predictionsList.reduce((sum, p) => sum + p.drawProbability, 0);
-      weightedAway = predictionsList.reduce((sum, p) => sum + p.awayProbability, 0);
-      weightedConfidence = predictionsList.reduce((sum, p) => sum + p.confidence, 0);
-    }
-
-    const pHome = Number((weightedHome / totalWeight).toFixed(4));
-    const pDraw = Number((weightedDraw / totalWeight).toFixed(4));
-    const pAway = Number(Math.max(0, 1.0 - pHome - pDraw).toFixed(4));
-    const modelConfidence = Math.round(weightedConfidence / totalWeight);
-
-    const disagreementScore = this.calculateDisagreement(predictionsList);
+    // Normalize safely
+    const sum = finalHome + finalDraw + finalAway;
+    finalHome /= sum;
+    finalDraw /= sum;
+    finalAway /= sum;
 
     return {
-      pHome,
-      pDraw,
-      pAway,
-      modelConfidence,
-      disagreementScore,
+      pHome: Number(finalHome.toFixed(4)),
+      pDraw: Number(finalDraw.toFixed(4)),
+      pAway: Number(finalAway.toFixed(4)),
+      modelConfidence: 90,
+      disagreementScore: this.calculateDisagreement(predictionsList),
       individualPredictions
     };
   }

@@ -1,0 +1,15 @@
+{
+  "modelId": "lgb-baseline-001",
+  "version": "1.0.0",
+  "startTime": "2026-07-06T23:32:04.060Z",
+  "endTime": "2026-07-06T23:32:04.060Z",
+  "trainingDurationMs": 0,
+  "dataset": "v1.0.0",
+  "features": "v2.1.0",
+  "hyperparameters": {
+    "learning_rate": 0.01,
+    "num_leaves": 31,
+    "n_estimators": 100
+  },
+  "fingerprint": "7ffee9a1c6f8eaf5494994885a32ee660559c4af67009cd868a0b29471161774"
+}

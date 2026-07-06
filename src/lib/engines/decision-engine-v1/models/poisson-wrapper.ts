@@ -1,15 +1,26 @@
 // HandicapLab Decision Engine v1 - Poisson Model Wrapper
 // Location: src/lib/engines/decision-engine-v1/models/poisson-wrapper.ts
 
-import { EnsembleSubModel, ModelPrediction } from '../registry';
+import { PredictionModel, ModelMetadata, Prediction } from './predictionModel';
 import { MatchFeatures } from '../../feature-engine/types';
 import { PoissonModel } from '../../probability-engine/poisson';
 
-export class PoissonModelWrapper implements EnsembleSubModel {
-  public id = 'poisson';
-  public name = 'Poisson Probability Model';
+export class PoissonModelWrapper implements PredictionModel {
+  public metadata(): ModelMetadata {
+    return {
+      name: 'Poisson Probability Model',
+      version: '2.0.0',
+      description: 'Poisson distribution based expected goals model',
+      isOnline: false
+    };
+  }
 
-  public async predict(features: MatchFeatures): Promise<ModelPrediction> {
+  public async train(trainData: any[]): Promise<void> {
+    // Statistically based on PoissonModel which might have static learning or just uses input features directly.
+    // In this wrapper, we just pass through since PoissonModel uses match features.
+  }
+
+  public async predict(features: MatchFeatures | any): Promise<Prediction> {
     const raw = PoissonModel.predict(features);
     
     let pHome = 0;
@@ -30,15 +41,22 @@ export class PoissonModelWrapper implements EnsembleSubModel {
     const drawProbability = pDraw / sum;
     const awayProbability = pAway / sum;
 
-    const confidence = features.leagueId === '39' ? 85 : 75;
-
     return {
-      homeProbability: Number(homeProbability.toFixed(4)),
-      drawProbability: Number(drawProbability.toFixed(4)),
-      awayProbability: Number(awayProbability.toFixed(4)),
-      confidence,
-      modelName: 'Poisson',
-      version: '1.0.0'
+      pHome: Number(homeProbability.toFixed(4)),
+      pDraw: Number(drawProbability.toFixed(4)),
+      pAway: Number(awayProbability.toFixed(4)),
+      expectedGoalsHome: raw.expectedGoalsHome,
+      expectedGoalsAway: raw.expectedGoalsAway
     };
+  }
+
+  public async predictProbability(features: MatchFeatures | any): Promise<{ pHome: number; pDraw: number; pAway: number }> {
+    const p = await this.predict(features);
+    return { pHome: p.pHome, pDraw: p.pDraw, pAway: p.pAway };
+  }
+
+  public async predictScore(features: MatchFeatures | any): Promise<{ home: number; away: number }> {
+    const p = await this.predict(features);
+    return { home: p.expectedGoalsHome || 0, away: p.expectedGoalsAway || 0 };
   }
 }

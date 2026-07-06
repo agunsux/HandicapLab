@@ -1,0 +1,18 @@
+[
+  {
+    "featureName": "homeAttack",
+    "importanceScore": null
+  },
+  {
+    "featureName": "awayAttack",
+    "importanceScore": null
+  },
+  {
+    "featureName": "homeDefense",
+    "importanceScore": null
+  },
+  {
+    "featureName": "awayDefense",
+    "importanceScore": null
+  }
+]

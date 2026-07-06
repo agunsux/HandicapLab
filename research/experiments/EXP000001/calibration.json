@@ -1,0 +1,82 @@
+[
+  {
+    "binIndex": 0,
+    "minProb": 0,
+    "maxProb": 0.1,
+    "avgProbability": 0,
+    "avgOutcome": 0,
+    "count": 0
+  },
+  {
+    "binIndex": 1,
+    "minProb": 0.1,
+    "maxProb": 0.2,
+    "avgProbability": 0,
+    "avgOutcome": 0,
+    "count": 0
+  },
+  {
+    "binIndex": 2,
+    "minProb": 0.2,
+    "maxProb": 0.3,
+    "avgProbability": 0,
+    "avgOutcome": 0,
+    "count": 0
+  },
+  {
+    "binIndex": 3,
+    "minProb": 0.3,
+    "maxProb": 0.4,
+    "avgProbability": 0,
+    "avgOutcome": 0,
+    "count": 0
+  },
+  {
+    "binIndex": 4,
+    "minProb": 0.4,
+    "maxProb": 0.5,
+    "avgProbability": 0,
+    "avgOutcome": 0,
+    "count": 0
+  },
+  {
+    "binIndex": 5,
+    "minProb": 0.5,
+    "maxProb": 0.6,
+    "avgProbability": 0,
+    "avgOutcome": 0,
+    "count": 0
+  },
+  {
+    "binIndex": 6,
+    "minProb": 0.6,
+    "maxProb": 0.7,
+    "avgProbability": 0,
+    "avgOutcome": 0,
+    "count": 0
+  },
+  {
+    "binIndex": 7,
+    "minProb": 0.7,
+    "maxProb": 0.8,
+    "avgProbability": 0,
+    "avgOutcome": 0,
+    "count": 0
+  },
+  {
+    "binIndex": 8,
+    "minProb": 0.8,
+    "maxProb": 0.9,
+    "avgProbability": 0,
+    "avgOutcome": 0,
+    "count": 0
+  },
+  {
+    "binIndex": 9,
+    "minProb": 0.9,
+    "maxProb": 1,
+    "avgProbability": 0,
+    "avgOutcome": 0,
+    "count": 0
+  }
+]
