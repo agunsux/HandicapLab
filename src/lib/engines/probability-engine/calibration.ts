@@ -49,7 +49,7 @@ export class Calibrator {
    */
   public static calibrate(
     rawProbs: RawProbabilities,
-    method: 'platt' | 'isotonic' = 'platt',
+    method: 'platt' | 'isotonic' | 'beta' = 'platt',
     A: number = 1.02,
     B: number = -0.01
   ): RawProbabilities {

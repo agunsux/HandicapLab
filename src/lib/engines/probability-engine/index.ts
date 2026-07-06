@@ -18,7 +18,7 @@ export class ProbabilityEngine {
     features: MatchFeatures,
     options: {
       weights?: { poisson: number; dixonColes: number };
-      calibrationMethod?: 'platt' | 'isotonic' | 'none';
+      calibrationMethod?: 'platt' | 'isotonic' | 'beta' | 'none';
       plattA?: number;
       plattB?: number;
       rho?: number;

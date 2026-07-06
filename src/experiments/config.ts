@@ -5,10 +5,11 @@ export interface FeatureFlags {
   carry_over_elo: boolean;
   promoted_team_adjustment: boolean;
   double_home_modifier_fix: boolean;
+  favorite_longshot_adjustment: boolean;
   adaptive_kelly: boolean;
   single_bet_per_match: boolean;
   xg_integration: boolean;
-  calibration_method: 'platt' | 'isotonic';
+  calibration_method: 'platt' | 'isotonic' | 'beta';
   squad_dynamics: boolean;
   squad_dynamics_value_only: boolean;
   squad_dynamics_congestion_only: boolean;
@@ -47,7 +48,6 @@ export const DEFAULT_CONFIG: ExperimentConfig = {
     promoted_team_adjustment: false,
     double_home_modifier_fix: false,
     favorite_longshot_adjustment: false,
-    dynamic_home_advantage: false,
     adaptive_kelly: false,
     single_bet_per_match: true, // Default to true to match Sprint 11 baseline!
     xg_integration: false,
