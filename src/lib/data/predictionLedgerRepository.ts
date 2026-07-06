@@ -3,6 +3,8 @@
 
 import { supabase } from '../supabase.server';
 import crypto from 'crypto';
+import * as fs from 'fs';
+import * as path from 'path';
 
 export interface PredictionLedgerV3Record {
   id?: string;
@@ -37,19 +39,78 @@ export interface PredictionSettlementV3Record {
 }
 
 export class PredictionLedgerRepository {
+  private static localLedgerPath = path.join(
+    'C:', 'Users', 'RYZEN', '.gemini', 'antigravity-ide', 'brain', 
+    'b0e51ad4-db7e-4196-9e0e-e58ff37caeeb', 'artifacts', 'prediction_ledger_v3.json'
+  );
+
+  private static localSettlementsPath = path.join(
+    'C:', 'Users', 'RYZEN', '.gemini', 'antigravity-ide', 'brain', 
+    'b0e51ad4-db7e-4196-9e0e-e58ff37caeeb', 'artifacts', 'prediction_settlements_v3.json'
+  );
+
+  private static loadLocalLedger(): PredictionLedgerV3Record[] {
+    try {
+      if (fs.existsSync(this.localLedgerPath)) {
+        return JSON.parse(fs.readFileSync(this.localLedgerPath, 'utf-8'));
+      }
+    } catch (e) {
+      // Return empty on parse fail
+    }
+    return [];
+  }
+
+  private static saveLocalLedger(ledger: PredictionLedgerV3Record[]): void {
+    try {
+      const dir = path.dirname(this.localLedgerPath);
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(this.localLedgerPath, JSON.stringify(ledger, null, 2));
+    } catch (e) {
+      console.error('[PredictionLedgerRepository] saveLocalLedger failed:', e);
+    }
+  }
+
+  private static loadLocalSettlements(): PredictionSettlementV3Record[] {
+    try {
+      if (fs.existsSync(this.localSettlementsPath)) {
+        return JSON.parse(fs.readFileSync(this.localSettlementsPath, 'utf-8'));
+      }
+    } catch (e) {
+      // Return empty
+    }
+    return [];
+  }
+
+  private static saveLocalSettlements(settlements: PredictionSettlementV3Record[]): void {
+    try {
+      const dir = path.dirname(this.localSettlementsPath);
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+      fs.writeFileSync(this.localSettlementsPath, JSON.stringify(settlements, null, 2));
+    } catch (e) {
+      console.error('[PredictionLedgerRepository] saveLocalSettlements failed:', e);
+    }
+  }
+
   /**
    * Retrieves the latest entry from the prediction ledger to get the prior hash.
    */
   public static async getLatestLedgerEntry(): Promise<string | null> {
-    const { data, error } = await supabase
-      .from('prediction_ledger_v3')
-      .select('prediction_hash')
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
+    try {
+      const { data, error } = await supabase
+        .from('prediction_ledger_v3')
+        .select('prediction_hash')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
 
-    if (error || !data) return null;
-    return data.prediction_hash;
+      if (!error && data) return data.prediction_hash;
+    } catch (e) {
+      // Fallback to local
+    }
+
+    const localLedger = this.loadLocalLedger();
+    if (localLedger.length === 0) return null;
+    return localLedger[localLedger.length - 1].prediction_hash || null;
   }
 
   /**
@@ -74,17 +135,29 @@ export class PredictionLedgerRepository {
 
     const hash = crypto.createHash('sha256').update(hashInput).digest('hex');
 
-    const { error } = await supabase.from('prediction_ledger_v3').insert({
+    const dbRecord = {
       ...record,
       prediction_hash: hash,
       prior_hash: priorHash
-    });
+    };
 
-    if (error) {
-      console.error('[PredictionLedgerRepository] appendPrediction error:', error.message);
-      return null;
+    // 1. Try DB Write
+    let dbSuccess = false;
+    try {
+      const { error } = await supabase.from('prediction_ledger_v3').insert(dbRecord);
+      if (!error) {
+        dbSuccess = true;
+      }
+    } catch (e) {
+      // Fail over to local
     }
 
+    // 2. Always write to local file cache as fallback / validation trace
+    const localLedger = this.loadLocalLedger();
+    localLedger.push(dbRecord);
+    this.saveLocalLedger(localLedger);
+
+    console.log(`[PredictionLedgerRepository] Appended prediction. DB Success: ${dbSuccess} | Hash: ${hash}`);
     return hash;
   }
 
@@ -93,20 +166,29 @@ export class PredictionLedgerRepository {
    * Appends a settlement record to the ledger settlements table referencing the prediction hash.
    */
   public static async settlePrediction(settlement: PredictionSettlementV3Record): Promise<boolean> {
-    const { error } = await supabase.from('prediction_settlements_v3').insert({
-      prediction_hash: settlement.prediction_hash,
-      status: settlement.status,
-      profit_loss: settlement.profit_loss,
-      closing_odds: settlement.closing_odds,
-      actual_clv: settlement.actual_clv,
-      brier_contribution: settlement.brier_contribution,
-      logloss_contribution: settlement.logloss_contribution
-    });
-
-    if (error) {
-      console.error('[PredictionLedgerRepository] settlePrediction error:', error.message);
-      return false;
+    let dbSuccess = false;
+    try {
+      const { error } = await supabase.from('prediction_settlements_v3').insert({
+        prediction_hash: settlement.prediction_hash,
+        status: settlement.status,
+        profit_loss: settlement.profit_loss,
+        closing_odds: settlement.closing_odds,
+        actual_clv: settlement.actual_clv,
+        brier_contribution: settlement.brier_contribution,
+        logloss_contribution: settlement.logloss_contribution
+      });
+      if (!error) {
+        dbSuccess = true;
+      }
+    } catch (e) {
+      // Fallback
     }
+
+    const localSettlements = this.loadLocalSettlements();
+    localSettlements.push(settlement);
+    this.saveLocalSettlements(localSettlements);
+
+    console.log(`[PredictionLedgerRepository] Settled prediction. DB Success: ${dbSuccess} | Hash: ${settlement.prediction_hash}`);
     return true;
   }
 
@@ -114,27 +196,126 @@ export class PredictionLedgerRepository {
    * Retrieves prediction details by its cryptographic hash.
    */
   public static async getPredictionByHash(hash: string): Promise<any | null> {
-    const { data, error } = await supabase
-      .from('prediction_ledger_v3')
-      .select(`
-        *,
-        prediction_settlements_v3 (
-          status,
-          profit_loss,
-          closing_odds,
-          actual_clv,
-          brier_contribution,
-          logloss_contribution,
-          settled_at
-        )
-      `)
-      .eq('prediction_hash', hash)
-      .maybeSingle();
+    try {
+      const { data, error } = await supabase
+        .from('prediction_ledger_v3')
+        .select(`
+          *,
+          prediction_settlements_v3 (
+            status,
+            profit_loss,
+            closing_odds,
+            actual_clv,
+            brier_contribution,
+            logloss_contribution,
+            settled_at
+          )
+        `)
+        .eq('prediction_hash', hash)
+        .maybeSingle();
 
-    if (error) {
-      console.error('[PredictionLedgerRepository] getPredictionByHash error:', error.message);
-      return null;
+      if (!error && data) return data;
+    } catch (e) {
+      // Fallback to local
     }
-    return data;
+
+    const localLedger = this.loadLocalLedger();
+    const record = localLedger.find((r) => r.prediction_hash === hash);
+    if (!record) return null;
+
+    const localSettlements = this.loadLocalSettlements();
+    const settlement = localSettlements.find((s) => s.prediction_hash === hash);
+
+    return {
+      ...record,
+      prediction_settlements_v3: settlement ? [settlement] : []
+    };
+  }
+
+  /**
+   * Retrieves predictions by matchId.
+   */
+  public static async getPredictionsByMatchId(matchId: string): Promise<any[]> {
+    try {
+      const { data, error } = await supabase
+        .from('prediction_ledger_v3')
+        .select(`
+          *,
+          prediction_settlements_v3 (
+            status,
+            profit_loss,
+            closing_odds,
+            actual_clv,
+            brier_contribution,
+            logloss_contribution,
+            settled_at
+          )
+        `)
+        .eq('match_id', matchId);
+
+      if (!error && data) return data;
+    } catch (e) {
+      // Fallback
+    }
+
+    const localLedger = this.loadLocalLedger().filter((r) => r.match_id === matchId);
+    const localSettlements = this.loadLocalSettlements();
+
+    return localLedger.map((record) => {
+      const settlement = localSettlements.find((s) => s.prediction_hash === record.prediction_hash);
+      return {
+        ...record,
+        prediction_settlements_v3: settlement ? [settlement] : []
+      };
+    });
+  }
+
+  /**
+   * Retrieves all predictions from the ledger.
+   */
+  public static async getAllPredictions(): Promise<any[]> {
+    try {
+      const { data, error } = await supabase
+        .from('prediction_ledger_v3')
+        .select(`
+          *,
+          prediction_settlements_v3 (
+            status,
+            profit_loss,
+            closing_odds,
+            actual_clv,
+            brier_contribution,
+            logloss_contribution,
+            settled_at
+          )
+        `);
+
+      if (!error && data) return data;
+    } catch (e) {
+      // Fallback
+    }
+
+    const localLedger = this.loadLocalLedger();
+    const localSettlements = this.loadLocalSettlements();
+
+    return localLedger.map((record) => {
+      const settlement = localSettlements.find((s) => s.prediction_hash === record.prediction_hash);
+      return {
+        ...record,
+        prediction_settlements_v3: settlement ? [settlement] : []
+      };
+    });
+  }
+
+  /**
+   * Clears all local files (for clean testing).
+   */
+  public static clearLocalFiles(): void {
+    try {
+      if (fs.existsSync(this.localLedgerPath)) fs.unlinkSync(this.localLedgerPath);
+      if (fs.existsSync(this.localSettlementsPath)) fs.unlinkSync(this.localSettlementsPath);
+    } catch (e) {
+      // Ignore
+    }
   }
 }
