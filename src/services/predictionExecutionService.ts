@@ -151,7 +151,7 @@ export class PredictionExecutionService {
           expected_value: ev,
           kelly_fraction: rawKelly,
           risk_adjusted_stake: finalWeight,
-          feature_version: features.featureVersion || 'basic-v1',
+          feature_version: (features as any).featureVersion || 'basic-v1',
           feature_vector_snapshot: features,
           explainability_json: explainability,
           prediction_timestamp: match.kickoff

@@ -3,7 +3,7 @@
 
 import { supabase } from '../lib/supabase.server';
 import { ProbabilityEngine } from '../lib/engines/probability-engine';
-import { OddsNormalizer } from '../src/lib/data/oddsNormalizer';
+import { OddsNormalizer } from '../lib/data/oddsNormalizer';
 import { MarketMath } from '../lib/engine/market-math';
 
 export interface BacktestReport {
@@ -78,8 +78,10 @@ export class BacktestService {
 
       let eceErrorSum = 0.0;
 
+      const matchesList = matches || [];
+
       // Replay matches chronologically
-      for (const match of matches) {
+      for (const match of matchesList) {
         const homeGoals = match.home_goals !== null ? Number(match.home_goals) : 0;
         const awayGoals = match.away_goals !== null ? Number(match.away_goals) : 0;
 
