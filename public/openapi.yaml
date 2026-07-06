@@ -1,0 +1,124 @@
+openapi: 3.0.3
+info:
+  title: HandicapLab Football Market Intelligence API
+  description: Bloomberg Terminal style football intelligence market comparison and decision API.
+  version: 1.0.0
+servers:
+  - url: https://handicap-lab.vercel.app/api/v1
+    description: Production Server
+paths:
+  /predictions:
+    get:
+      summary: Get Calibrated Probabilities
+      description: Returns calibrated home, draw, away, and over/under goal probabilities.
+      parameters:
+        - name: match_id
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful execution
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnterpriseResponse'
+
+  /edges:
+    get:
+      summary: Get Market Edges
+      description: Returns edge comparison (model fair odds vs bookmaker current/closing odds). Restricted to Premium or Enterprise.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Successful execution
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnterpriseResponse'
+
+  /recommendations:
+    get:
+      summary: Get Actionable Decisions
+      description: Returns actionable betting recommendations with Kelly fractions and risk classifications. Restricted to Premium/Enterprise.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Successful execution
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnterpriseResponse'
+
+  /timeline:
+    get:
+      summary: Get Prediction Evolution Timeline
+      description: Returns chronological prediction changes from T-7 days to Kickoff. Restricted to Premium/Enterprise.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Successful execution
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnterpriseResponse'
+
+  /explain:
+    get:
+      summary: Get Prediction Explanations Graph
+      description: Returns structured feature impact contributions graph. Restricted to Premium/Enterprise.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Successful execution
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnterpriseResponse'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    EnterpriseResponse:
+      type: object
+      properties:
+        metadata:
+          type: object
+          properties:
+            model_version:
+              type: string
+            dataset_version:
+              type: string
+            prediction_timestamp:
+              type: string
+            generated_at:
+              type: string
+            processing_time_ms:
+              type: number
+            metrics:
+              type: object
+              properties:
+                prediction_latency_ms:
+                  type: number
+                edge_latency_ms:
+                  type: number
+                decision_latency_ms:
+                  type: number
+                cache_hit:
+                  type: boolean
+                cache_miss:
+                  type: boolean
+                feature_age_hours:
+                  type: number
+        data:
+          type: array
+          items:
+            type: object
