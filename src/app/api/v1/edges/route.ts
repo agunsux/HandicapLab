@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase.server';
 import { getUserEntitlements } from '@/lib/pricing/entitlement';
 import { isRateLimited } from '@/lib/pricing/rate-limit';
 import { ApiHelper } from '@/lib/utils/apiHelper';
+import { FootballIntelligenceService } from '@/services/football-intelligence.service';
 
 export async function GET(request: Request) {
   try {
@@ -40,59 +41,28 @@ export async function GET(request: Request) {
       return ApiHelper.response(false, null, 'Rate limit exceeded.', 429);
     }
 
-    // Fetch predictions to locate edges with graceful fallback
-    let predictions: any[] = [];
-    try {
-      const { data, error } = await supabase
-        .from('predictions')
-        .select('*')
-        .order('prediction_timestamp', { ascending: true })
-        .limit(50);
-      if (error || !data || data.length === 0) throw error || new Error('No database records');
-      predictions = data;
-    } catch (err) {
-      predictions = [
-        {
-          id: 'mock-1001',
-          match_id: 'match-1001',
-          home_team: 'Liverpool',
-          away_team: 'Arsenal',
-          prediction: { pHome: 0.58, pDraw: 0.22, pAway: 0.20 },
-          model_version: 'ensemble-platt-v1',
-          prediction_timestamp: new Date().toISOString()
-        }
-      ];
+    // Call service layer for a sample match
+    const result = await FootballIntelligenceService.getMatchIntelligence('match-1001');
+    if (!result) {
+      return ApiHelper.response(false, null, 'Failed to fetch edges.', 500);
     }
 
-    const formatted = predictions.map(p => {
-      const predObj = typeof p.prediction === 'object' && p.prediction ? (p.prediction as any) : {};
-      const homeProb = predObj.pHome || 0.46;
-      const awayProb = predObj.pAway || 0.31;
-      
-      // Calculate odds values
-      const homeOdds = Number((1.1 / homeProb).toFixed(2));
-      const awayOdds = Number((1.1 / awayProb).toFixed(2));
-
-      // Calculate implied bookmaker probability (e.g. Pinnacle closing odds)
-      const bookmakerOdds = Number((1.05 / homeProb).toFixed(2));
-      const ev = (homeProb * bookmakerOdds - 1) * 100;
-
-      return {
-        match_id: p.match_id || p.id,
-        home_team: p.home_team,
-        away_team: p.away_team,
-        market: 'Moneyline Home',
-        fair_odds: homeOdds,
-        bookmaker_odds: bookmakerOdds,
-        edge_percent: parseFloat(ev.toFixed(2)),
-        model_version: p.model_version || 'ensemble-platt-v1',
-        generated_at: p.prediction_timestamp
-      };
-    });
+    // Format output specifically for edges
+    const edgesData = result.data.map(r => ({
+      match_id: r.match_id,
+      market: r.market,
+      fair_odds: r.fair_odds,
+      bookmaker_odds: r.market_odds,
+      edge_percent: r.edge,
+      expected_value: r.expected_value,
+      clv_projection: Number((r.market_odds * 0.02).toFixed(2)), // simulated CLV
+      steam: r.market_odds > 1.80, // simulated steam
+      reverse_line: r.market_odds < 1.90 // simulated reverse line
+    }));
 
     return NextResponse.json({
-      success: true,
-      data: formatted
+      metadata: result.metadata,
+      data: edgesData
     });
   } catch (err: any) {
     return ApiHelper.response(false, null, err.message, 500);

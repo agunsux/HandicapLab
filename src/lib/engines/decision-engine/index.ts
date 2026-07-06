@@ -1,122 +1,87 @@
 // HandicapLab Decision Engine
 // Location: src/lib/engines/decision-engine/index.ts
 
-import { ProbabilityOutput } from '../probability-engine/types';
+import { EdgeOutput } from '../edge-engine';
 
 export interface DecisionOutput {
   matchId: string;
-  market: string;          // e.g. "Moneyline Home", "AH -0.5", "Over 2.5"
-  edge: number;            // e.g. 6.30 (expressed as percentage)
-  confidence: 'High' | 'Medium' | 'Low';
-  fairOdds: number;        // e.g. 1.71
-  marketOdds: number;      // e.g. 1.89
-  expectedValue: number;   // e.g. 10.50 (%)
-  recommendedStake: number; // e.g. 1.40 (%)
+  market: string;
+  expectedValue: number;
+  confidence_score: number; // 0-100
+  confidence_label: 'Very High' | 'High' | 'Medium' | 'Low' | 'Very Low';
   risk: 'Low' | 'Medium' | 'High';
-  reasons: string[];
+  edge: number;
+  fairOdds: number;
+  marketOdds: number;
+  decision: 'NO_ACTION' | 'WATCH' | 'VALUE' | 'STRONG_VALUE' | 'AVOID';
 }
 
 export class DecisionEngine {
-  private kellyMultiplier: number;
-
-  constructor(kellyMultiplier: number = 0.25) {
-    this.kellyMultiplier = kellyMultiplier;
-  }
-
-  public calculateDecision(
+  /**
+   * Deterministically evaluates an Edge to produce a Decision.
+   * Input is completely stateless. No random variables or Date.now().
+   */
+  public static evaluateDecision(
     matchId: string,
-    prob: ProbabilityOutput,
-    odds: { homeOdds: number; drawOdds: number; awayOdds: number; over25Odds?: number; under25Odds?: number }
-  ): DecisionOutput | null {
-    const decisions: DecisionOutput[] = [];
+    edge: EdgeOutput,
+    modelConfidenceScore: number, // 0.0 - 1.0
+    dataQualityScore: number // 0.0 - 1.0
+  ): DecisionOutput {
+    // Confidence Score: scale 0-100 from model confidence and data quality
+    const calculatedScore = Math.max(0, Math.min(100, Math.round(((modelConfidenceScore * 0.7) + (dataQualityScore * 0.3)) * 100)));
 
-    // Helper to calculate EV, Kelly and construct recommendation
-    const evaluateMarket = (
-      marketName: string,
-      modelProb: number,
-      bookmakerOdds: number,
-      reasons: string[]
-    ) => {
-      if (!bookmakerOdds || bookmakerOdds <= 1.0) return;
+    // Confidence Label
+    let confidence_label: 'Very High' | 'High' | 'Medium' | 'Low' | 'Very Low';
+    if (calculatedScore >= 80) {
+      confidence_label = 'Very High';
+    } else if (calculatedScore >= 60) {
+      confidence_label = 'High';
+    } else if (calculatedScore >= 40) {
+      confidence_label = 'Medium';
+    } else if (calculatedScore >= 20) {
+      confidence_label = 'Low';
+    } else {
+      confidence_label = 'Very Low';
+    }
 
-      const fairOdds = 1 / Math.max(0.01, modelProb);
-      const ev = (modelProb * bookmakerOdds - 1) * 100; // in %
-      
-      if (ev <= 0) return;
+    // Risk calculation based on bookmaker odds and model confidence
+    // High odds or low confidence indicates high risk.
+    let risk: 'Low' | 'Medium' | 'High' = 'Medium';
+    if (edge.current_odds > 3.0 || calculatedScore < 40) {
+      risk = 'High';
+    } else if (edge.current_odds < 1.7 && calculatedScore > 60) {
+      risk = 'Low';
+    }
 
-      // Kelly staking
-      const rawKelly = (modelProb * bookmakerOdds - 1) / (bookmakerOdds - 1);
-      const recommendedStake = Math.max(0, rawKelly * this.kellyMultiplier * 100); // in %
+    // Decision rule logic (deterministic):
+    // STRONG_VALUE: EV > 8.0% and Confidence >= High
+    // VALUE: EV > 2.0% and Confidence >= Medium
+    // WATCH: EV between 0.0% and 2.0%
+    // AVOID: EV is negative OR confidence is Very Low
+    // NO_ACTION: Default state
+    let decision: 'NO_ACTION' | 'WATCH' | 'VALUE' | 'STRONG_VALUE' | 'AVOID' = 'NO_ACTION';
 
-      // Classify confidence and risk
-      const confidence = prob.confidence?.confidenceScore && prob.confidence.confidenceScore > 0.75
-        ? 'High'
-        : prob.confidence?.confidenceScore && prob.confidence.confidenceScore > 0.50
-        ? 'Medium'
-        : 'Low';
+    if (edge.EV < 0.0 || confidence_label === 'Very Low') {
+      decision = 'AVOID';
+    } else if (edge.EV >= 8.0 && (confidence_label === 'Very High' || confidence_label === 'High')) {
+      decision = 'STRONG_VALUE';
+    } else if (edge.EV >= 2.0 && (confidence_label === 'Very High' || confidence_label === 'High' || confidence_label === 'Medium')) {
+      decision = 'VALUE';
+    } else if (edge.EV >= 0.0) {
+      decision = 'WATCH';
+    }
 
-      const risk = recommendedStake > 3.0 ? 'High' : recommendedStake > 1.0 ? 'Medium' : 'Low';
-
-      decisions.push({
-        matchId,
-        market: marketName,
-        edge: parseFloat(ev.toFixed(2)),
-        confidence,
-        fairOdds: parseFloat(fairOdds.toFixed(2)),
-        marketOdds: bookmakerOdds,
-        expectedValue: parseFloat(ev.toFixed(2)),
-        recommendedStake: parseFloat(recommendedStake.toFixed(2)),
-        risk,
-        reasons
-      });
+    return {
+      matchId,
+      market: edge.market,
+      expectedValue: edge.EV,
+      confidence_score: calculatedScore,
+      confidence_label,
+      risk,
+      edge: edge.edge,
+      fairOdds: edge.fair_odds,
+      marketOdds: edge.current_odds,
+      decision
     };
-
-    // 1. Evaluate Moneyline Home
-    evaluateMarket('Moneyline Home', prob.pHome, odds.homeOdds, [
-      'Elo difference supports home edge',
-      `Model probability of ${(prob.pHome * 100).toFixed(1)}% is higher than bookmaker implied probability of ${(100 / odds.homeOdds).toFixed(1)}%`
-    ]);
-
-    // 2. Evaluate Moneyline Away
-    evaluateMarket('Moneyline Away', prob.pAway, odds.awayOdds, [
-      'Elo difference supports away edge',
-      `Model probability of ${(prob.pAway * 100).toFixed(1)}% is higher than bookmaker implied probability of ${(100 / odds.awayOdds).toFixed(1)}%`
-    ]);
-
-    // 3. Evaluate Over 2.5 Goals (if odds and model prob are present)
-    const probOver25 = prob.pOver && prob.pOver['2.5'];
-    if (probOver25 && odds.over25Odds) {
-      evaluateMarket('Over 2.5 Goals', probOver25, odds.over25Odds, [
-        `High goal projections indicate an Over value`
-      ]);
-    }
-
-    // 4. Evaluate Under 2.5 Goals
-    const probUnder25 = prob.pUnder && prob.pUnder['2.5'];
-    if (probUnder25 && odds.under25Odds) {
-      evaluateMarket('Under 2.5 Goals', probUnder25, odds.under25Odds, [
-        `Tactical low-scoring projections indicate an Under value`
-      ]);
-    }
-
-    if (decisions.length === 0) {
-      // Return a neutral default recommendation if no positive EV exists
-      return {
-        matchId,
-        market: 'No Bet',
-        edge: 0.0,
-        confidence: 'Low',
-        fairOdds: 0.0,
-        marketOdds: 0.0,
-        expectedValue: 0.0,
-        recommendedStake: 0.0,
-        risk: 'Low',
-        reasons: ['No positive EV edge identified against bookmaker odds.']
-      };
-    }
-
-    // Sort decisions by EV and return the highest edge recommendation
-    decisions.sort((a, b) => b.expectedValue - a.expectedValue);
-    return decisions[0];
   }
 }

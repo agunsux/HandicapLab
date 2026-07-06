@@ -3,71 +3,51 @@
 
 import { describe, it, expect } from 'vitest';
 import { DecisionEngine } from '../src/lib/engines/decision-engine';
-import { ProbabilityOutput } from '../src/lib/engines/probability-engine/types';
+import { EdgeOutput } from '../src/lib/engines/edge-engine';
 
 describe('DecisionEngine Unit Tests', () => {
-  const engine = new DecisionEngine(0.25); // Quarter-Kelly
-
-  const mockProb: ProbabilityOutput = {
-    matchId: 'fixture-001',
-    marketType: 'ML',
-    pHome: 0.55,
-    pDraw: 0.23,
-    pAway: 0.22,
-    pOver: { '2.5': 0.60 },
-    pUnder: { '2.5': 0.40 },
-    pAhHome: {},
-    pAhAway: {},
-    modelVersion: {
-      name: 'prematch-v1',
-      algo: 'ensemble',
-      features: 'basic-v1',
-      trainedAt: new Date(),
-      trainedOnMatches: 1000
-    },
-    calibrationApplied: true,
-    confidence: {
-      modelConfidence: 0.8,
-      dataConfidence: 0.8,
-      marketConfidence: 0.8,
-      finalConfidence: 0.8,
-      confidenceScore: 0.8,
-      dataQualityScore: 0.9,
-      recommendationStatus: 'Recommended',
-      reasons: []
-    }
-  };
-
   it('should identify a home win edge when bookmaker odds represent value', () => {
-    const odds = {
-      homeOdds: 2.0, // Implied probability is 50%, model has 55%
-      drawOdds: 4.0,
-      awayOdds: 4.5
+    const edge: EdgeOutput = {
+      market: 'Moneyline Home',
+      bookmaker: 'Pinnacle',
+      opening_odds: 1.80,
+      current_odds: 2.00,
+      closing_odds: 2.00,
+      fair_odds: 1.82,
+      edge: 5.0,
+      EV: 10.0,
+      CLV_projection: 10.0,
+      steam: false,
+      reverse_line: false
     };
 
-    const decision = engine.calculateDecision('fixture-001', mockProb, odds);
+    const decision = DecisionEngine.evaluateDecision('fixture-001', edge, 0.85, 0.90);
 
     expect(decision).not.toBeNull();
-    expect(decision!.market).toBe('Moneyline Home');
-    // EV = 0.55 * 2.0 - 1 = +10%
-    expect(decision!.expectedValue).toBe(10.0);
-    // Kelly Stake = (EV / (odds - 1)) * 0.25 = (0.10 / 1) * 0.25 = 0.025 (2.5%)
-    expect(decision!.recommendedStake).toBe(2.5);
-    expect(decision!.risk).toBe('Medium');
+    expect(decision.market).toBe('Moneyline Home');
+    expect(decision.expectedValue).toBe(10.0);
+    expect(decision.decision).toBe('STRONG_VALUE');
+    expect(decision.risk).toBe('Medium');
   });
 
-  it('should return No Bet when all market options have negative expected value', () => {
-    const odds = {
-      homeOdds: 1.7, // Implied probability is 58.8% (> 55% model)
-      drawOdds: 3.5,
-      awayOdds: 3.5
+  it('should return AVOID when expected value is negative', () => {
+    const edge: EdgeOutput = {
+      market: 'Moneyline Home',
+      bookmaker: 'Pinnacle',
+      opening_odds: 1.80,
+      current_odds: 1.70,
+      closing_odds: 1.70,
+      fair_odds: 1.82,
+      edge: -3.0,
+      EV: -5.0,
+      CLV_projection: 0.0,
+      steam: false,
+      reverse_line: false
     };
 
-    const decision = engine.calculateDecision('fixture-001', mockProb, odds);
+    const decision = DecisionEngine.evaluateDecision('fixture-001', edge, 0.85, 0.90);
 
     expect(decision).not.toBeNull();
-    expect(decision!.market).toBe('No Bet');
-    expect(decision!.expectedValue).toBe(0.0);
-    expect(decision!.recommendedStake).toBe(0.0);
+    expect(decision.decision).toBe('AVOID');
   });
 });
