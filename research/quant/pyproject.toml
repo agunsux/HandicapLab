@@ -1,0 +1,15 @@
+[project]
+name = "quant"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "duckdb>=1.5.4",
+    "mlflow>=3.14.0",
+    "numpy>=2.5.1",
+    "optuna>=4.9.0",
+    "pandas>=2.3.3",
+    "scikit-learn>=1.9.0",
+    "xgboost>=3.3.0",
+]
