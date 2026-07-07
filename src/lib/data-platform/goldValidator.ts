@@ -46,52 +46,52 @@ export class GoldValidator {
     // Validate Fixtures
     fixtures.forEach((f, idx) => {
       // 1. Duplicate check
-      if (fixtureIds.has(f.id)) {
+      if (fixtureIds.has(f.match_id)) {
         duplicateCount++;
-        issues.push(`Duplicate fixture ID: ${f.id}`);
+        issues.push(`Duplicate fixture ID: ${f.match_id}`);
       } else {
-        fixtureIds.add(f.id);
+        fixtureIds.add(f.match_id);
       }
 
       // 2. Team mismatch
-      if (!f.homeTeam?.name || !f.awayTeam?.name) {
+      if (!f.home_team_id || !f.away_team_id) {
         teamMismatchCount++;
         issues.push(`Missing team name in fixture index ${idx}`);
-      } else if (f.homeTeam.name === f.awayTeam.name) {
+      } else if (f.home_team_id === f.away_team_id) {
         teamMismatchCount++;
-        issues.push(`Home and Away teams are identical: ${f.homeTeam.name} in fixture ${f.id}`);
+        issues.push(`Home and Away teams are identical: ${f.home_team_id} in fixture ${f.match_id}`);
       }
 
       // 3. Impossible score
-      if (f.fullTimeHomeGoals !== undefined && f.fullTimeHomeGoals !== null) {
-        if (f.fullTimeHomeGoals < 0 || f.fullTimeHomeGoals > 20) {
+      if (f.home_goals !== undefined && f.home_goals !== null) {
+        if (f.home_goals < 0 || f.home_goals > 20) {
           impossibleScoreCount++;
-          issues.push(`Impossible Home goals score: ${f.fullTimeHomeGoals} in fixture ${f.id}`);
+          issues.push(`Impossible Home goals score: ${f.home_goals} in fixture ${f.match_id}`);
         }
       }
-      if (f.fullTimeAwayGoals !== undefined && f.fullTimeAwayGoals !== null) {
-        if (f.fullTimeAwayGoals < 0 || f.fullTimeAwayGoals > 20) {
+      if (f.away_goals !== undefined && f.away_goals !== null) {
+        if (f.away_goals < 0 || f.away_goals > 20) {
           impossibleScoreCount++;
-          issues.push(`Impossible Away goals score: ${f.fullTimeAwayGoals} in fixture ${f.id}`);
+          issues.push(`Impossible Away goals score: ${f.away_goals} in fixture ${f.match_id}`);
         }
       }
 
       // 4. Kickoff & Timezone mismatch
-      const kickoff = new Date(f.kickoffTime);
+      const kickoff = new Date(f.kickoff);
       if (isNaN(kickoff.getTime())) {
         kickoffMismatchCount++;
-        issues.push(`Invalid kickoff date/time string: ${f.kickoffTime} in fixture ${f.id}`);
+        issues.push(`Invalid kickoff date/time string: ${f.kickoff} in fixture ${f.match_id}`);
       } else {
         const year = kickoff.getUTCFullYear();
         if (year < 2010 || year > 2030) {
           kickoffMismatchCount++;
-          issues.push(`Kickoff date out of standard EPL timeline range (2010-2030): ${f.kickoffTime} in fixture ${f.id}`);
+          issues.push(`Kickoff date out of standard EPL timeline range (2010-2030): ${f.kickoff} in fixture ${f.match_id}`);
         }
       }
 
-      if (!f.kickoffTime.endsWith('Z') && !f.kickoffTime.includes('+00:00')) {
+      if (!f.kickoff.endsWith('Z') && !f.kickoff.includes('+00:00')) {
         timezoneMismatchCount++;
-        issues.push(`Kickoff timezone is not in UTC format: ${f.kickoffTime} in fixture ${f.id}`);
+        issues.push(`Kickoff timezone is not in UTC format: ${f.kickoff} in fixture ${f.match_id}`);
       }
     });
 

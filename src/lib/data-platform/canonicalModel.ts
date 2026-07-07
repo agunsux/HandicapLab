@@ -2,28 +2,33 @@
 // Location: src/lib/data-platform/canonicalModel.ts
 
 export interface CanonicalFixture {
-  id: string; // CDM standard UUID/standard identifier
-  providerId: string; // original ID from bookmaker
-  provider: string; // Pinnacle, SBO, Bet365, Orbit, Mock, File
-  competition: {
-    id: string;
-    name: string;
-    region: string;
-  };
-  homeTeam: {
-    id: string;
-    name: string;
-  };
-  awayTeam: {
-    id: string;
-    name: string;
-  };
-  kickoffTime: string; // ISO UTC format
+  match_id: string;
+  provider_id: string;
+  provider: string;
+  competition_id: string;
+  season: string;
+  
+  home_team_id: string;
+  away_team_id: string;
+  kickoff: string; // ISO UTC format
+  
+  home_goals: number | null;
+  away_goals: number | null;
+  
+  home_xg: number | null;
+  away_xg: number | null;
+  
+  home_shots: number | null;
+  away_shots: number | null;
+  
+  home_shots_on_target: number | null;
+  away_shots_on_target: number | null;
+  
   status: 'SCHEDULED' | 'LIVE' | 'SUSPENDED' | 'FINISHED';
-  schemaVersion: string;
-  referee?: string;
-  fullTimeHomeGoals?: number | null;
-  fullTimeAwayGoals?: number | null;
+  
+  schema_version: string;
+  generated_at: string;
+  checksum: string;
 }
 
 export interface CanonicalOdds {

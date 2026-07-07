@@ -18,6 +18,7 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  serverExternalPackages: ['duckdb'],
 };
 
 export default withSentryConfig(nextConfig, {

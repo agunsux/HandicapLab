@@ -71,17 +71,20 @@ export class TimeTravelSnapshot {
     this.cutoffDate = cutoffDate;
     this.goldDir = goldDir;
 
-    // Load tables synchronously if not cached
+    // Initialization must now happen via loadCache before instantiating.
+  }
+
+  public static async loadCache(goldDir: string): Promise<void> {
     if (!TimeTravelSnapshot.cachedFixtures) {
-      TimeTravelSnapshot.cachedFixtures = ParquetHelper.readSync(path.join(goldDir, 'fixtures.parquet'));
-      TimeTravelSnapshot.cachedOddsOpen = ParquetHelper.readSync(path.join(goldDir, 'odds_open.parquet'));
-      TimeTravelSnapshot.cachedOddsClose = ParquetHelper.readSync(path.join(goldDir, 'odds_close.parquet'));
-      TimeTravelSnapshot.cachedLineups = ParquetHelper.readSync(path.join(goldDir, 'lineups.parquet'));
-      TimeTravelSnapshot.cachedInjuries = ParquetHelper.readSync(path.join(goldDir, 'injuries.parquet'));
-      TimeTravelSnapshot.cachedStandings = ParquetHelper.readSync(path.join(goldDir, 'standings.parquet'));
-      TimeTravelSnapshot.cachedElo = ParquetHelper.readSync(path.join(goldDir, 'elo.parquet'));
-      TimeTravelSnapshot.cachedReferees = ParquetHelper.readSync(path.join(goldDir, 'referees.parquet'));
-      TimeTravelSnapshot.cachedTeamStats = ParquetHelper.readSync(path.join(goldDir, 'team_stats.parquet'));
+      TimeTravelSnapshot.cachedFixtures = await ParquetHelper.read(path.join(goldDir, 'fixtures.parquet'));
+      TimeTravelSnapshot.cachedOddsOpen = await ParquetHelper.read(path.join(goldDir, 'odds_open.parquet'));
+      TimeTravelSnapshot.cachedOddsClose = await ParquetHelper.read(path.join(goldDir, 'odds_close.parquet'));
+      TimeTravelSnapshot.cachedLineups = await ParquetHelper.read(path.join(goldDir, 'lineups.parquet'));
+      TimeTravelSnapshot.cachedInjuries = await ParquetHelper.read(path.join(goldDir, 'injuries.parquet'));
+      TimeTravelSnapshot.cachedStandings = await ParquetHelper.read(path.join(goldDir, 'standings.parquet'));
+      TimeTravelSnapshot.cachedElo = await ParquetHelper.read(path.join(goldDir, 'elo.parquet'));
+      TimeTravelSnapshot.cachedReferees = await ParquetHelper.read(path.join(goldDir, 'referees.parquet'));
+      TimeTravelSnapshot.cachedTeamStats = await ParquetHelper.read(path.join(goldDir, 'team_stats.parquet'));
     }
   }
 
@@ -90,13 +93,13 @@ export class TimeTravelSnapshot {
    */
   public getFixtures(): CanonicalFixture[] {
     return this.fixtures.map((f) => {
-      const kickoff = new Date(f.kickoffTime);
+      const kickoff = new Date(f.kickoff);
       if (kickoff.getTime() >= this.cutoffDate.getTime()) {
         // Lookahead leakage check: mask all scores and results
         return {
           ...f,
-          fullTimeHomeGoals: null,
-          fullTimeAwayGoals: null,
+          home_goals: null,
+          away_goals: null,
           status: 'SCHEDULED'
         };
       }
@@ -153,9 +156,9 @@ export class TimeTravelSnapshot {
   public getInjuries(teamName: string): CanonicalInjury[] {
     // Keep only injuries for matches played before cutoff date
     return this.injuries.filter((inj) => {
-      const parentFixture = this.fixtures.find((f) => f.id === inj.fixtureId);
+      const parentFixture = this.fixtures.find((f) => f.match_id === inj.fixtureId);
       if (!parentFixture) return false;
-      const kickoff = new Date(parentFixture.kickoffTime);
+      const kickoff = new Date(parentFixture.kickoff);
       
       // Match of injury must be before cutoff
       if (kickoff.getTime() >= this.cutoffDate.getTime()) return false;
@@ -193,9 +196,9 @@ export class TimeTravelSnapshot {
   public getTeamStatsHistory(teamName: string): CanonicalTeamStats[] {
     return this.teamStats.filter((ts) => {
       if (ts.teamName !== teamName) return false;
-      const parentFixture = this.fixtures.find((f) => f.id === ts.fixtureId);
+      const parentFixture = this.fixtures.find((f) => f.match_id === ts.fixtureId);
       if (!parentFixture) return false;
-      return new Date(parentFixture.kickoffTime).getTime() < this.cutoffDate.getTime();
+      return new Date(parentFixture.kickoff).getTime() < this.cutoffDate.getTime();
     });
   }
 }

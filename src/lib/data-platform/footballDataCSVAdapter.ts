@@ -91,28 +91,26 @@ export class FootballDataCSVAdapter {
     const awayGoals = row.FTAG !== undefined && row.FTAG !== '' ? parseInt(row.FTAG, 10) : null;
     
     const fixture: CanonicalFixture = {
-      id: fixtureId,
-      providerId: `csv-${idx}`,
+      match_id: fixtureId,
+      provider_id: `csv-${idx}`,
       provider: 'FootballData',
-      competition: {
-        id: 'EPL',
-        name: 'English Premier League',
-        region: 'England'
-      },
-      homeTeam: {
-        id: homeTeam.toLowerCase().replace(/[^a-z0-9]/g, ''),
-        name: homeTeam
-      },
-      awayTeam: {
-        id: awayTeam.toLowerCase().replace(/[^a-z0-9]/g, ''),
-        name: awayTeam
-      },
-      kickoffTime: kickoffISO,
+      competition_id: 'EPL',
+      season: '2023-2024',
+      home_team_id: homeTeam.toLowerCase().replace(/[^a-z0-9]/g, ''),
+      away_team_id: awayTeam.toLowerCase().replace(/[^a-z0-9]/g, ''),
+      kickoff: kickoffISO,
+      home_goals: homeGoals,
+      away_goals: awayGoals,
+      home_xg: null,
+      away_xg: null,
+      home_shots: parseInt(row.HS, 10) || null,
+      away_shots: parseInt(row.AS, 10) || null,
+      home_shots_on_target: parseInt(row.HST, 10) || null,
+      away_shots_on_target: parseInt(row.AST, 10) || null,
       status: 'FINISHED',
-      schemaVersion: '1.0.0',
-      referee: row.Referee || 'Unknown Referee',
-      fullTimeHomeGoals: homeGoals,
-      fullTimeAwayGoals: awayGoals
+      schema_version: '1.0.0',
+      generated_at: new Date().toISOString(),
+      checksum: 'dummy'
     };
 
     // Extract Odds (betting lines)
@@ -223,7 +221,7 @@ export class FootballDataCSVAdapter {
     for (let i = 0; i < 16; i++) {
       lineups.push({
         fixtureId,
-        teamId: fixture.homeTeam.id,
+        teamId: fixture.home_team_id,
         playerId: `h-player-${i}`,
         playerName: homeRoster[i],
         position: positions[i],
@@ -232,7 +230,7 @@ export class FootballDataCSVAdapter {
 
       lineups.push({
         fixtureId,
-        teamId: fixture.awayTeam.id,
+        teamId: fixture.away_team_id,
         playerId: `a-player-${i}`,
         playerName: awayRoster[i],
         position: positions[i],
@@ -245,7 +243,7 @@ export class FootballDataCSVAdapter {
     if (rand() > 0.6) {
       injuries.push({
         fixtureId,
-        teamId: fixture.homeTeam.id,
+        teamId: fixture.home_team_id,
         playerId: 'h-player-18',
         playerName: homeRoster[18],
         injuryType: 'Hamstring Strain',
@@ -256,7 +254,7 @@ export class FootballDataCSVAdapter {
     if (rand() > 0.6) {
       injuries.push({
         fixtureId,
-        teamId: fixture.awayTeam.id,
+        teamId: fixture.away_team_id,
         playerId: 'a-player-19',
         playerName: awayRoster[19],
         injuryType: 'Ankle Sprain',
@@ -272,7 +270,7 @@ export class FootballDataCSVAdapter {
     const asReds = parseInt(row.AR, 10) || 0;
 
     const referee: CanonicalReferee = {
-      refereeName: fixture.referee!,
+      refereeName: row.Referee || 'Unknown Referee',
       date: kickoffISO,
       matchId: fixtureId,
       yellowCards: hsCards + asCards,

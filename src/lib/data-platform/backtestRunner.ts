@@ -68,6 +68,7 @@ export class BacktestRunner {
     goldDir?: string
   ): Promise<BacktestMetrics> {
     TimeTravelSnapshot.clearCache();
+    await TimeTravelSnapshot.loadCache(goldDir || './gold');
     this.initModels();
 
     const initialBankroll = 10000;
@@ -98,14 +99,14 @@ export class BacktestRunner {
     const testFixtures = fixtures.slice(startIdx);
 
     for (const match of testFixtures) {
-      const kickoffDate = new Date(match.kickoffTime);
+      const kickoffDate = new Date(match.kickoff);
       const snapshot = new TimeTravelSnapshot(kickoffDate, goldDir);
 
-      const homeElo = snapshot.getElo(match.homeTeam.name);
-      const awayElo = snapshot.getElo(match.awayTeam.name);
+      const homeElo = snapshot.getElo(match.home_team_id);
+      const awayElo = snapshot.getElo(match.away_team_id);
       
-      const homeStats = snapshot.getTeamStatsHistory(match.homeTeam.name);
-      const awayStats = snapshot.getTeamStatsHistory(match.awayTeam.name);
+      const homeStats = snapshot.getTeamStatsHistory(match.home_team_id);
+      const awayStats = snapshot.getTeamStatsHistory(match.away_team_id);
 
       // Compute simple rolling features
       const getAvgScored = (stats: any[]) =>
@@ -114,7 +115,7 @@ export class BacktestRunner {
         stats.length > 0 ? stats.reduce((sum, s) => sum + s.fouls, 0) / stats.length / 10 : 1.3;
 
       const features: MatchFeatures = {
-        matchId: match.id,
+        matchId: match.match_id,
         marketType: 'ML',
         kickoffAt: kickoffDate,
         homeFormLast5: [1, 1, 1, 1, 1],
@@ -147,11 +148,11 @@ export class BacktestRunner {
       }
 
       const actualHomeWin =
-        match.fullTimeHomeGoals !== undefined &&
-        match.fullTimeHomeGoals !== null &&
-        match.fullTimeAwayGoals !== undefined &&
-        match.fullTimeAwayGoals !== null &&
-        match.fullTimeHomeGoals > match.fullTimeAwayGoals
+        match.home_goals !== undefined &&
+        match.home_goals !== null &&
+        match.away_goals !== undefined &&
+        match.away_goals !== null &&
+        match.home_goals > match.away_goals
           ? 1
           : 0;
 
@@ -162,8 +163,8 @@ export class BacktestRunner {
       predictionsList.push({ probability: pred.pHome, outcome: actualHomeWin });
 
       // Get opening and closing odds for home ML selection
-      const matchOpen = oddsOpen.find((o) => o.fixtureId === match.id && o.marketType === 'ML' && o.selection === 'home');
-      const matchClose = oddsClose.find((o) => o.fixtureId === match.id && o.marketType === 'ML' && o.selection === 'home');
+      const matchOpen = oddsOpen.find((o) => o.fixtureId === match.match_id && o.marketType === 'ML' && o.selection === 'home');
+      const matchClose = oddsClose.find((o) => o.fixtureId === match.match_id && o.marketType === 'ML' && o.selection === 'home');
 
       if (!matchClose || !matchOpen) continue;
 

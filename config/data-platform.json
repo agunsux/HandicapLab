@@ -1,0 +1,17 @@
+{
+  "paths": {
+    "raw": "./data/raw",
+    "bronze": "./data/bronze",
+    "silver": "./data/silver",
+    "gold": "./data/gold",
+    "feature_store": {
+      "base": "./data/feature_store",
+      "match_features": "./data/feature_store/match_features",
+      "team_features": "./data/feature_store/team_features",
+      "player_features": "./data/feature_store/player_features",
+      "rolling_features": "./data/feature_store/rolling_features",
+      "market_features": "./data/feature_store/market_features"
+    },
+    "registry": "./data/registry"
+  }
+}

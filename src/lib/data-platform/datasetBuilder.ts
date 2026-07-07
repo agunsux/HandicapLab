@@ -1,81 +1,128 @@
-// HandicapLab Live Data Platform - Dataset Builder
-// Location: src/lib/data-platform/datasetBuilder.ts
-
-import { CanonicalOdds } from './canonicalModel';
-import { DataQualityEngine, DataQualityReport } from './dataQualityEngine';
-import { FeatureStore } from './featureStore';
 import fs from 'fs';
 import path from 'path';
+import { SchemaDriftDetector } from './schemaDriftDetector';
 
-export interface DatasetManifest {
-  datasetId: string;
-  version: string;
-  recordCount: number;
-  qualityReport: DataQualityReport;
-  featuresVersion: string;
-  exportedAt: string;
+export interface DatasetMetadata {
+  provider: string;
+  league: string;
+  season: string;
+  rows: number;
+  checksum: string;
+  updated_at: string;
+  schema_version: string;
 }
 
 export class DatasetBuilder {
-  private static manifestsPath = 'C:\\Users\\RYZEN\\.gemini\\antigravity-ide\\brain\\b0e51ad4-db7e-4196-9e0e-e58ff37caeeb\\artifacts\\data-platform\\datasets.json';
-
-  private static loadManifests(): DatasetManifest[] {
-    if (fs.existsSync(this.manifestsPath)) {
-      try {
-        return JSON.parse(fs.readFileSync(this.manifestsPath, 'utf8'));
-      } catch {
-        return [];
+  private static getConfig() {
+    const configPath = path.resolve(process.cwd(), 'config', 'data-platform.json');
+    if (fs.existsSync(configPath)) {
+      return JSON.parse(fs.readFileSync(configPath, 'utf8'));
+    }
+    // Fallback
+    return {
+      paths: {
+        silver: './data/silver',
+        registry: './data/registry'
       }
-    }
-    return [];
-  }
-
-  private static saveManifests(data: DatasetManifest[]): void {
-    const dir = path.dirname(this.manifestsPath);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-    fs.writeFileSync(this.manifestsPath, JSON.stringify(data, null, 2), 'utf8');
+    };
   }
 
   /**
-   * Builds, validates, and registers a versioned research dataset.
+   * Builds and partitions the dataset into the Silver Layer (Parquet).
    */
-  public static build(
-    records: CanonicalOdds[],
-    datasetVersion: string,
-    featuresVersion: string
-  ): DatasetManifest {
-    const qualityReport = DataQualityEngine.evaluate(records);
-    const datasetId = `ds-${datasetVersion}`;
-    const exportedAt = new Date().toISOString();
-
-    const manifest: DatasetManifest = {
-      datasetId,
-      version: datasetVersion,
-      recordCount: records.length,
-      qualityReport,
-      featuresVersion,
-      exportedAt
+  public static async buildPartition(
+    records: any[],
+    leagueId: string,
+    season: string,
+    version: string,
+    provider: string
+  ): Promise<DatasetMetadata> {
+    
+    // 1. Fail-fast Schema Validation
+    const expectedSchema = {
+      match_id: 'string',
+      competition_id: 'string',
+      season: 'string'
     };
-
-    const manifests = this.loadManifests();
-    const filtered = manifests.filter((m) => m.version !== datasetVersion);
-    filtered.push(manifest);
-    this.saveManifests(filtered);
-
-    return manifest;
-  }
-
-  public static getDatasets(): DatasetManifest[] {
-    return this.loadManifests();
-  }
-
-  public static clear(): void {
-    if (fs.existsSync(this.manifestsPath)) {
-      try {
-        fs.unlinkSync(this.manifestsPath);
-      } catch {}
+    const driftResult = SchemaDriftDetector.validate(records, expectedSchema);
+    if (!driftResult.isValid) {
+      throw new Error(`Schema Drift Detected! Validation failed: ${driftResult.errors.join(', ')}`);
     }
+
+    const config = this.getConfig();
+    const basePath = config.paths.silver;
+    
+    const partitionDir = path.resolve(process.cwd(), basePath, leagueId, season, version);
+    if (!fs.existsSync(partitionDir)) {
+      fs.mkdirSync(partitionDir, { recursive: true });
+    }
+    
+    const parquetPath = path.join(partitionDir, 'dataset.parquet');
+
+    // 2. Dump temp JSON to use DuckDB for Parquet creation
+    const tempJsonPath = path.join(partitionDir, 'temp.json');
+    fs.writeFileSync(tempJsonPath, records.map(r => JSON.stringify(r)).join('\n'));
+
+    try {
+      // Dynamic require to avoid Next.js Turbopack crashing on duckdb native module
+      const { DuckDBAdapter } = eval(`require('./duckdbAdapter')`);
+      const db = new DuckDBAdapter();
+      try {
+        await db.exec(`COPY (SELECT * FROM read_json_auto('${tempJsonPath.replace(/\\/g, '/')}')) TO '${parquetPath.replace(/\\/g, '/')}' (FORMAT PARQUET)`);
+      } finally {
+        await db.close();
+      }
+    } catch (e) {
+      console.warn('DuckDBAdapter could not be loaded, skipping parquet creation.', e);
+    } finally {
+      if (fs.existsSync(tempJsonPath)) {
+        fs.unlinkSync(tempJsonPath);
+      }
+    }
+
+    // 3. Generate Checksum & Metadata
+    const checksum = "chk_" + Date.now().toString(16); // mock checksum
+    
+    const metadata: DatasetMetadata = {
+      provider,
+      league: leagueId,
+      season,
+      rows: records.length,
+      checksum,
+      updated_at: new Date().toISOString(),
+      schema_version: 'v1.0'
+    };
+    
+    // 4. Update the centralized registry
+    this.updateRegistry(metadata);
+    
+    return metadata;
+  }
+
+  private static updateRegistry(metadata: DatasetMetadata) {
+    const config = this.getConfig();
+    const registryPath = path.resolve(process.cwd(), config.paths.registry, 'dataset_metadata.json');
+    const dir = path.dirname(registryPath);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+
+    let existing: DatasetMetadata[] = [];
+    if (fs.existsSync(registryPath)) {
+      existing = JSON.parse(fs.readFileSync(registryPath, 'utf8'));
+    }
+    
+    // Replace old metadata for same partition
+    existing = existing.filter(e => !(e.league === metadata.league && e.season === metadata.season && e.provider === metadata.provider));
+    existing.push(metadata);
+    
+    fs.writeFileSync(registryPath, JSON.stringify(existing, null, 2), 'utf8');
+  }
+
+  public static getDatasets(): DatasetMetadata[] {
+    const config = this.getConfig();
+    const registryPath = path.resolve(process.cwd(), config.paths.registry, 'dataset_metadata.json');
+    if (fs.existsSync(registryPath)) {
+      return JSON.parse(fs.readFileSync(registryPath, 'utf8'));
+    }
+    return [];
   }
 }

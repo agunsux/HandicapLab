@@ -36,15 +36,26 @@ export class MockOddsProvider implements OddsProvider {
   public async getFixtures(): Promise<CanonicalFixture[]> {
     return [
       {
-        id: 'mock-match-1',
-        providerId: 'm-1',
+        match_id: 'mock-match-1',
+        provider_id: 'm-1',
         provider: 'Mock',
-        competition: { id: '39', name: 'English Premier League', region: 'England' },
-        homeTeam: { id: '1', name: 'Arsenal' },
-        awayTeam: { id: '2', name: 'Chelsea' },
-        kickoffTime: new Date(Date.now() + 4 * 3600 * 1000).toISOString(),
+        competition_id: '39',
+        season: '2023-2024',
+        home_team_id: '1',
+        away_team_id: '2',
+        kickoff: new Date(Date.now() + 4 * 3600 * 1000).toISOString(),
+        home_goals: null,
+        away_goals: null,
+        home_xg: null,
+        away_xg: null,
+        home_shots: null,
+        away_shots: null,
+        home_shots_on_target: null,
+        away_shots_on_target: null,
         status: 'SCHEDULED',
-        schemaVersion: '1.0.0'
+        schema_version: '1.0.0',
+        generated_at: new Date().toISOString(),
+        checksum: 'dummy'
       }
     ];
   }

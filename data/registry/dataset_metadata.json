@@ -1,0 +1,56 @@
+[
+  {
+    "provider": "football-data",
+    "league": "39",
+    "season": "2023-2024",
+    "rows": 50,
+    "checksum": "chk_19f3a265640",
+    "updated_at": "2026-07-07T01:16:58.816Z",
+    "schema_version": "v1.0"
+  },
+  {
+    "provider": "football-data",
+    "league": "40",
+    "season": "2023-2024",
+    "rows": 50,
+    "checksum": "chk_19f3a265656",
+    "updated_at": "2026-07-07T01:16:58.838Z",
+    "schema_version": "v1.0"
+  },
+  {
+    "provider": "football-data",
+    "league": "140",
+    "season": "2023-2024",
+    "rows": 50,
+    "checksum": "chk_19f3a26566b",
+    "updated_at": "2026-07-07T01:16:58.859Z",
+    "schema_version": "v1.0"
+  },
+  {
+    "provider": "football-data",
+    "league": "135",
+    "season": "2023-2024",
+    "rows": 50,
+    "checksum": "chk_19f3a26567e",
+    "updated_at": "2026-07-07T01:16:58.878Z",
+    "schema_version": "v1.0"
+  },
+  {
+    "provider": "football-data",
+    "league": "78",
+    "season": "2023-2024",
+    "rows": 50,
+    "checksum": "chk_19f3a265691",
+    "updated_at": "2026-07-07T01:16:58.897Z",
+    "schema_version": "v1.0"
+  },
+  {
+    "provider": "football-data",
+    "league": "61",
+    "season": "2023-2024",
+    "rows": 50,
+    "checksum": "chk_19f3a2656a5",
+    "updated_at": "2026-07-07T01:16:58.917Z",
+    "schema_version": "v1.0"
+  }
+]

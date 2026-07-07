@@ -23,10 +23,10 @@ export class EloRatingModel implements OnlineModel {
   }
 
   public update(match: CanonicalFixture, features?: MatchFeatures): void {
-    const homeTeam = match.homeTeam.name;
-    const awayTeam = match.awayTeam.name;
-    const homeGoals = match.fullTimeHomeGoals ?? 0;
-    const awayGoals = match.fullTimeAwayGoals ?? 0;
+    const homeTeam = match.home_team_id;
+    const awayTeam = match.away_team_id;
+    const homeGoals = match.home_goals ?? 0;
+    const awayGoals = match.away_goals ?? 0;
 
     const homeRating = this.ratings[homeTeam] ?? 1500;
     const awayRating = this.ratings[awayTeam] ?? 1500;
@@ -57,7 +57,7 @@ export class EloRatingModel implements OnlineModel {
   public async train(trainData: any[]): Promise<void> {
     this.initialize();
     for (const match of trainData) {
-      if (match.fullTimeHomeGoals !== null && match.fullTimeAwayGoals !== null && match.fullTimeHomeGoals !== undefined && match.fullTimeAwayGoals !== undefined) {
+      if (match.home_goals !== null && match.away_goals !== null && match.home_goals !== undefined && match.away_goals !== undefined) {
          this.update(match);
       }
     }

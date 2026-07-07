@@ -49,15 +49,26 @@ export class FileOddsProvider implements OddsProvider {
     try {
       const data = JSON.parse(fs.readFileSync(this.filePath, 'utf8')) as any[];
       return data.map((d) => ({
-        id: d.matchId,
-        providerId: d.matchId,
+        match_id: d.matchId,
+        provider_id: d.matchId,
         provider: 'File',
-        competition: { id: '39', name: 'English Premier League', region: 'England' },
-        homeTeam: { id: 'h', name: 'Home' },
-        awayTeam: { id: 'a', name: 'Away' },
-        kickoffTime: d.timestamp || new Date().toISOString(),
+        competition_id: '39',
+        season: '2023-2024',
+        home_team_id: 'h',
+        away_team_id: 'a',
+        kickoff: d.timestamp || new Date().toISOString(),
+        home_goals: null,
+        away_goals: null,
+        home_xg: null,
+        away_xg: null,
+        home_shots: null,
+        away_shots: null,
+        home_shots_on_target: null,
+        away_shots_on_target: null,
         status: 'FINISHED',
-        schemaVersion: '1.0.0'
+        schema_version: '1.0.0',
+        generated_at: new Date().toISOString(),
+        checksum: 'dummy'
       }));
     } catch {
       return [];

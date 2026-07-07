@@ -39,9 +39,9 @@ async function main() {
   // 2. Load Parquet Files for validation
   console.log('\n🛡️ Loading compiled Parquet files for automatic validation checks...');
   const goldDir = GoldDatasetBuilder.getTargetDir();
-  const fixtures = ParquetHelper.readSync(path.join(goldDir, 'fixtures.parquet'));
-  const oddsOpen = ParquetHelper.readSync(path.join(goldDir, 'odds_open.parquet'));
-  const oddsClose = ParquetHelper.readSync(path.join(goldDir, 'odds_close.parquet'));
+  const fixtures = await ParquetHelper.read(path.join(goldDir, 'fixtures.parquet'));
+  const oddsOpen = await ParquetHelper.read(path.join(goldDir, 'odds_open.parquet'));
+  const oddsClose = await ParquetHelper.read(path.join(goldDir, 'odds_close.parquet'));
 
   // 3. Validation Scoring
   const valReport = GoldValidator.validate(fixtures, oddsOpen, oddsClose);
@@ -83,7 +83,7 @@ async function main() {
   // 5. Reliability Diagram
   const predictionsList = fixtures.slice(Math.min(100, fixtures.length)).map((f, idx) => {
     // Generate dummy prediction array representing backtester outputs
-    const actual = f.fullTimeHomeGoals! > f.fullTimeAwayGoals! ? 1 : 0;
+    const actual = f.home_goals! > f.away_goals! ? 1 : 0;
     // synthesize odds delta corresponding to ece
     const baseProb = actual === 1 ? 0.65 : 0.35;
     return {

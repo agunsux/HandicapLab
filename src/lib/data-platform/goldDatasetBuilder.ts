@@ -99,7 +99,7 @@ export class GoldDatasetBuilder {
 
     // Sort chronologically to simulate chronological ingestion (prevent leak)
     allParsedMatches.sort((a, b) => {
-      return new Date(a.parsed.fixture.kickoffTime).getTime() - new Date(b.parsed.fixture.kickoffTime).getTime();
+      return new Date(a.parsed.fixture.kickoff).getTime() - new Date(b.parsed.fixture.kickoff).getTime();
     });
 
     // Dynamic calculations: ELO & Standings
@@ -141,9 +141,9 @@ export class GoldDatasetBuilder {
       const p = m.parsed;
       const { fixture, oddsOpen: oOpen, oddsClose: oClose, events: evts, lineups: lps, injuries: injs, referee: ref, teamStats: tStats, weather: wth } = p;
 
-      const dateStr = fixture.kickoffTime;
-      const homeTeamName = fixture.homeTeam.name;
-      const awayTeamName = fixture.awayTeam.name;
+      const dateStr = fixture.kickoff;
+      const homeTeamName = fixture.home_team_id;
+      const awayTeamName = fixture.away_team_id;
 
       // 1. Record ELO before match
       const homeElo = getElo(homeTeamName);
@@ -153,9 +153,9 @@ export class GoldDatasetBuilder {
       elo.push({ teamName: awayTeamName, date: dateStr, elo: awayElo });
 
       // Update ELO post-match
-      const homeWin = fixture.fullTimeHomeGoals! > fixture.fullTimeAwayGoals! ? 1 : 0;
-      const draw = fixture.fullTimeHomeGoals! === fixture.fullTimeAwayGoals! ? 1 : 0;
-      const awayWin = fixture.fullTimeHomeGoals! < fixture.fullTimeAwayGoals! ? 1 : 0;
+      const homeWin = fixture.home_goals! > fixture.away_goals! ? 1 : 0;
+      const draw = fixture.home_goals! === fixture.away_goals! ? 1 : 0;
+      const awayWin = fixture.home_goals! < fixture.away_goals! ? 1 : 0;
 
       const S_H = homeWin === 1 ? 1.0 : draw === 1 ? 0.5 : 0.0;
       const S_A = 1.0 - S_H;
@@ -172,8 +172,8 @@ export class GoldDatasetBuilder {
       standings.push({ teamName: awayTeamName, season: m.season, date: dateStr, ...aStanding });
 
       // Update Standings post-match
-      const homeGoals = fixture.fullTimeHomeGoals || 0;
-      const awayGoals = fixture.fullTimeAwayGoals || 0;
+      const homeGoals = fixture.home_goals || 0;
+      const awayGoals = fixture.away_goals || 0;
 
       const hs = getStanding(homeTeamName);
       const as = getStanding(awayTeamName);
@@ -218,17 +218,17 @@ export class GoldDatasetBuilder {
     }
 
     // Write all tables as Parquet (Newtonian JSON Lines + Gzip)
-    ParquetHelper.writeSync(path.join(this.targetDir, 'fixtures.parquet'), fixtures);
-    ParquetHelper.writeSync(path.join(this.targetDir, 'odds_open.parquet'), oddsOpen);
-    ParquetHelper.writeSync(path.join(this.targetDir, 'odds_close.parquet'), oddsClose);
-    ParquetHelper.writeSync(path.join(this.targetDir, 'events.parquet'), events);
-    ParquetHelper.writeSync(path.join(this.targetDir, 'lineups.parquet'), lineups);
-    ParquetHelper.writeSync(path.join(this.targetDir, 'injuries.parquet'), injuries);
-    ParquetHelper.writeSync(path.join(this.targetDir, 'standings.parquet'), standings);
-    ParquetHelper.writeSync(path.join(this.targetDir, 'elo.parquet'), elo);
-    ParquetHelper.writeSync(path.join(this.targetDir, 'weather.parquet'), weather);
-    ParquetHelper.writeSync(path.join(this.targetDir, 'referees.parquet'), referees);
-    ParquetHelper.writeSync(path.join(this.targetDir, 'team_stats.parquet'), teamStats);
+    await ParquetHelper.write(path.join(this.targetDir, 'fixtures.parquet'), fixtures);
+    await ParquetHelper.write(path.join(this.targetDir, 'odds_open.parquet'), oddsOpen);
+    await ParquetHelper.write(path.join(this.targetDir, 'odds_close.parquet'), oddsClose);
+    await ParquetHelper.write(path.join(this.targetDir, 'events.parquet'), events);
+    await ParquetHelper.write(path.join(this.targetDir, 'lineups.parquet'), lineups);
+    await ParquetHelper.write(path.join(this.targetDir, 'injuries.parquet'), injuries);
+    await ParquetHelper.write(path.join(this.targetDir, 'standings.parquet'), standings);
+    await ParquetHelper.write(path.join(this.targetDir, 'elo.parquet'), elo);
+    await ParquetHelper.write(path.join(this.targetDir, 'weather.parquet'), weather);
+    await ParquetHelper.write(path.join(this.targetDir, 'referees.parquet'), referees);
+    await ParquetHelper.write(path.join(this.targetDir, 'team_stats.parquet'), teamStats);
 
     // Calculate metadata
     const tableKeys = [
