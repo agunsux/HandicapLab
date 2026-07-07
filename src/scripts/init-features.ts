@@ -38,7 +38,7 @@ export function initializeFeatures() {
   featureRegistry.register({
     id: 'rolling_xg_5',
     name: 'Rolling xG (5 Match)',
-    category: 'Recent Form',
+    category: 'Form',
     description: 'Average xG over the last 5 matches.',
     formula: 'Moving average of match_xg over the previous 5 fixtures.',
     unit: 'xG',

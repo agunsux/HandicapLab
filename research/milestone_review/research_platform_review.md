@@ -1,0 +1,13 @@
+# Part 1: Platform Inventory
+- **Data Platform**: Status: Stable. Coverage: EPL 2016-2023. Debt: Needs API scaling.
+- **Gold Dataset**: Status: Immutable. Coverage: 500 matches.
+- **Feature Registry**: Status: Active. Coverage: 100% of defined features.
+- **Feature Store**: Status: Beta. Limitations: Lacks real-time streaming.
+- **Feature Intelligence**: Status: Active. Coverage: Leakage/Drift checks operational.
+- **Benchmark Engine**: Status: Active. Coverage: LogLoss, Brier, ECE, ROI.
+- **Validation Engine**: Status: Active. Limitations: Cross-league not implemented.
+- **Training Pipeline**: Status: Active. Coverage: Deterministic hashes.
+- **ML Platform**: Status: Active. Limitations: LightGBM only.
+- **Experiment Registry**: Status: Active. Coverage: Git commit, Seed, Data versions.
+- **Model Registry**: Status: Active. Coverage: Lifecycle statuses (Shadow, Promoted).
+- **Observability**: Status: Scaffolding. Limitations: Needs frontend UI.

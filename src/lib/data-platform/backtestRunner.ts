@@ -46,12 +46,15 @@ export class BacktestRunner {
     ModelRegistry.register('dixonColes', new DixonColesModelWrapper());
     
     // Set standard weight configuration (Poisson, DC, Elo, Logistic, xG equal weight)
-    EnsembleEngine.setWeights({
-      poisson: 0.20,
-      dixonColes: 0.20,
-      elo: 0.20,
-      logistic: 0.20,
-      xg: 0.20
+    EnsembleEngine.setConfig({
+      level: 'weighted_average',
+      weights: {
+        poisson: 0.20,
+        dixonColes: 0.20,
+        elo: 0.20,
+        logistic: 0.20,
+        xg: 0.20
+      }
     });
   }
 

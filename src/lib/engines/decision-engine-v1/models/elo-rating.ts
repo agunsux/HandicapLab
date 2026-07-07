@@ -23,8 +23,8 @@ export class EloRatingModel implements OnlineModel {
   }
 
   public update(match: CanonicalFixture, features?: MatchFeatures): void {
-    const homeTeam = match.homeTeam;
-    const awayTeam = match.awayTeam;
+    const homeTeam = match.homeTeam.name;
+    const awayTeam = match.awayTeam.name;
     const homeGoals = match.fullTimeHomeGoals ?? 0;
     const awayGoals = match.fullTimeAwayGoals ?? 0;
 

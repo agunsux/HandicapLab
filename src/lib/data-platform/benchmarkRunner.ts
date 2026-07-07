@@ -167,6 +167,8 @@ export class BenchmarkRunner {
     // We'd normally use parquet, just mock buffers for the prototype
     const mockParquetBuf = Buffer.from('PAR1'); 
     
+    const mappedImportance = importance.map(i => ({ name: i.featureName, score: i.importanceScore }));
+
     // Log to Registry
     const expId = ExperimentRegistry.logExperiment(
       experimentRecord,
@@ -174,7 +176,7 @@ export class BenchmarkRunner {
       mockParquetBuf,
       reliabilityData,
       mockParquetBuf,
-      importance
+      mappedImportance
     );
 
     // Generate Dashboard
@@ -182,7 +184,7 @@ export class BenchmarkRunner {
     DashboardGenerator.generateDashboard(
       bettingPerformance.bankrollHistory,
       reliabilityData,
-      importance,
+      mappedImportance,
       path.join(expDir, 'dashboard.html')
     );
 

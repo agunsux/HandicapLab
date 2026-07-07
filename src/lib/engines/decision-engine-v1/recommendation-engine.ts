@@ -21,6 +21,7 @@ export interface RecommendationOutput {
   recommendation: 'NO BET' | 'LEAN' | 'VALUE BET' | 'PREMIUM BET';
   reasonCodes: string[];
   featureContributions: SHAPContribution[];
+  kellyFraction?: number;
 }
 
 export class RecommendationEngine {
@@ -46,6 +47,10 @@ export class RecommendationEngine {
 
     // 3. Evaluate Kelly stake fraction
     const kelly = RiskEngine.calculateKellyFraction(prob, marketOdds, kellyMultiplier);
+    
+    // Apply Uncertainty Shrinkage
+    const uncertaintyScore = 1 - (ensemble.modelConfidence / 100);
+    const finalKellyFraction = kelly.kellyFraction * (1 - uncertaintyScore);
 
     // 4. Combine Model + Market Confidence
     const finalConfidence = Math.round((ensemble.modelConfidence + marketFeatures.marketConfidence) / 2);
@@ -55,7 +60,7 @@ export class RecommendationEngine {
       ensemble.disagreementScore,
       marketFeatures.steamScore,
       marketFeatures.marketRegime,
-      kelly.kellyFraction
+      finalKellyFraction
     );
 
     // 6. Compute the continuous Recommendation Score (0-100)
@@ -69,7 +74,7 @@ export class RecommendationEngine {
     const riskPenalty = riskScore * 0.1;
 
     const rawScore = evFactor + steamConfirmation + confidenceFactor + marketAgreement + liquidityBonus - disagreementPenalty - riskPenalty;
-    const recommendationScore = Math.round(Math.max(0, Math.min(100, rawScore)));
+    let recommendationScore = Math.round(Math.max(0, Math.min(100, rawScore)));
 
     // 7. Map to Tiers
     let recommendation: 'NO BET' | 'LEAN' | 'VALUE BET' | 'PREMIUM BET' = 'NO BET';
@@ -82,8 +87,11 @@ export class RecommendationEngine {
     }
 
     // 8. Strict EV / Steam filter rejection
-    if (value.expectedValue <= 0) {
+    if (value.expectedValue <= 0 || uncertaintyScore >= 0.95) {
       recommendation = 'NO BET';
+      if (uncertaintyScore >= 0.95) {
+          recommendationScore = 0;
+      }
     }
 
     // 9. Generate reason codes
@@ -92,6 +100,7 @@ export class RecommendationEngine {
     if (marketFeatures.steamScore > 60) reasonCodes.push('Steam Confirmed');
     if (ensemble.disagreementScore < 15) reasonCodes.push('Low Model Disagreement');
     if (finalConfidence > 80) reasonCodes.push('High composite confidence');
+    if (uncertaintyScore >= 0.95) reasonCodes.push('Quarantined: High Calibration Uncertainty');
 
     // 10. Generate SHAP explainability contributions
     const featureContributions = ExplainabilityEngine.explain(features);
@@ -108,7 +117,8 @@ export class RecommendationEngine {
       recommendationScore,
       recommendation,
       reasonCodes,
-      featureContributions
+      featureContributions,
+      kellyFraction: finalKellyFraction
     };
   }
 }

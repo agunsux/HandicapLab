@@ -1,6 +1,7 @@
 // HandicapLab Decision Engine v1 - Hierarchical Ensemble Engine
 import { ModelRegistry } from './registry';
 import { Prediction } from './models/predictionModel';
+import { calibrationRouter, CalibrationRouter } from '../../ml-platform/calibration/router';
 
 export type EnsembleLevel = 'simple_average' | 'weighted_average' | 'bayesian_average' | 'stacking' | 'dynamic_online';
 
@@ -45,7 +46,7 @@ export class EnsembleEngine {
     return Math.min(100, Math.round(avgSD * 200));
   }
 
-  public static async predict(features: any): Promise<EnsemblePrediction> {
+  public static async predict(features: any, context?: { leagueId?: string, marketType?: string }): Promise<EnsemblePrediction> {
     const models = ModelRegistry.getModels();
     if (models.length === 0) throw new Error("No models registered.");
 
@@ -133,11 +134,24 @@ export class EnsembleEngine {
     finalDraw /= sum;
     finalAway /= sum;
 
+    // Apply Calibration Routing
+    const leagueId = context?.leagueId || 'unknown';
+    const marketType = context?.marketType || 'ML';
+    // Using Ensemble_v1 as a placeholder model version for the routing key
+    const routingKey = CalibrationRouter.generateKey('Ensemble_v1', leagueId, marketType);
+    
+    const calibrated = calibrationRouter.calibrate(routingKey, [finalHome, finalDraw, finalAway]);
+    
+    finalHome = calibrated.probabilities[0];
+    finalDraw = calibrated.probabilities[1];
+    finalAway = calibrated.probabilities[2];
+    const uncertaintyScore = calibrated.uncertaintyScore;
+
     return {
       pHome: Number(finalHome.toFixed(4)),
       pDraw: Number(finalDraw.toFixed(4)),
       pAway: Number(finalAway.toFixed(4)),
-      modelConfidence: 90,
+      modelConfidence: Number((100 * (1 - uncertaintyScore)).toFixed(1)),
       disagreementScore: this.calculateDisagreement(predictionsList),
       individualPredictions
     };

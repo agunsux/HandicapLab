@@ -67,6 +67,7 @@ export class CrossValidator {
 
     // Default step size for non-season modes (e.g., chunks of 10% or a fixed window)
     const step = this.windowSize || Math.floor(datasetSize / 5);
+    const wSize = this.windowSize;
     
     if (this.mode === 'expanding') {
       let currentTrainEnd = step;
@@ -76,22 +77,22 @@ export class CrossValidator {
         splits.push({ trainIndices: train, testIndices: test });
         currentTrainEnd += step;
       }
-    } else if (this.mode === 'rolling' && this.windowSize) {
-       for (let start = 0; start + this.windowSize * 2 <= datasetSize; start += this.windowSize) {
-         const train = Array.from({length: this.windowSize}, (_, i) => start + i);
-         const test = Array.from({length: this.windowSize}, (_, i) => start + this.windowSize + i);
+    } else if (this.mode === 'rolling' && wSize !== undefined) {
+       for (let start = 0; start + wSize * 2 <= datasetSize; start += wSize) {
+         const train = Array.from({length: wSize}, (_, i) => start + i);
+         const test = Array.from({length: wSize}, (_, i) => start + wSize + i);
          splits.push({ trainIndices: train, testIndices: test });
        }
-    } else if (this.mode === 'sliding' && this.windowSize) {
+    } else if (this.mode === 'sliding' && wSize !== undefined) {
       // Similar to rolling but test window might be smaller
       let start = 0;
-      while (start + this.windowSize < datasetSize) {
-         const train = Array.from({length: this.windowSize}, (_, i) => start + i);
-         const testEnd = Math.min(datasetSize, start + this.windowSize + Math.floor(this.windowSize/2));
-         const testSize = testEnd - (start + this.windowSize);
-         const test = Array.from({length: testSize}, (_, i) => start + this.windowSize + i);
+      while (start + wSize < datasetSize) {
+         const train = Array.from({length: wSize}, (_, i) => start + i);
+         const testEnd = Math.min(datasetSize, start + wSize + Math.floor(wSize/2));
+         const testSize = testEnd - (start + wSize);
+         const test = Array.from({length: testSize}, (_, i) => start + wSize + i);
          splits.push({ trainIndices: train, testIndices: test });
-         start += Math.floor(this.windowSize / 2); // slide forward by half window
+         start += Math.floor(wSize / 2); // slide forward by half window
       }
     }
 

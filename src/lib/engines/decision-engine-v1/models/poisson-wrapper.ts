@@ -45,8 +45,8 @@ export class PoissonModelWrapper implements PredictionModel {
       pHome: Number(homeProbability.toFixed(4)),
       pDraw: Number(drawProbability.toFixed(4)),
       pAway: Number(awayProbability.toFixed(4)),
-      expectedGoalsHome: raw.expectedGoalsHome,
-      expectedGoalsAway: raw.expectedGoalsAway
+      expectedGoalsHome: raw.homeLambda,
+      expectedGoalsAway: raw.awayLambda
     };
   }
 

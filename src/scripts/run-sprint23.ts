@@ -37,7 +37,15 @@ async function runSprint23() {
   console.log(`Registered ${ModelRegistry.getModels().length} pluggable models in registry.`);
 
   // 2. Load Weights Configuration
-  const weights = EnsembleEngine.loadWeights();
+  const weights = {
+    poisson: 0.2,
+    dixonColes: 0.2,
+    elo: 0.2,
+    logistic: 0.2,
+    xg: 0.2,
+    market: 0.0
+  };
+  EnsembleEngine.setConfig({ level: 'weighted_average', weights });
   console.log('Loaded Model Weights:', JSON.stringify(weights, null, 2));
 
   // Backtest 5 EPL fixtures
