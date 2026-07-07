@@ -22,7 +22,8 @@
     "validate:epl": "tsx src/scripts/validate-prediction-engine.ts",
     "validate:sprint2": "tsx src/scripts/run-sprint2-research.ts",
     "validate:sprint3": "tsx src/scripts/run-sprint3-research.ts",
-    "validate:sprint4": "tsx src/scripts/validate-sprint4.ts"
+    "validate:sprint4": "tsx src/scripts/validate-sprint4.ts",
+    "validate-architecture": "tsx tests/sprint_32_6/runner.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",

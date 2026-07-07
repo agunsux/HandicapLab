@@ -4,8 +4,8 @@
     "missingPercentage": 0,
     "duplicatePercentage": 0,
     "outlierPercentage": 0.05,
-    "checksum": "chk_19f3a265640",
-    "durationMs": 29,
+    "checksum": "chk_19f3b6dcbad",
+    "durationMs": 139,
     "provider": "football-data"
   },
   "Championship": {
@@ -13,8 +13,8 @@
     "missingPercentage": 0,
     "duplicatePercentage": 0,
     "outlierPercentage": 0.05,
-    "checksum": "chk_19f3a265656",
-    "durationMs": 21,
+    "checksum": "chk_19f3b6dcbbf",
+    "durationMs": 17,
     "provider": "football-data"
   },
   "LaLiga": {
@@ -22,8 +22,8 @@
     "missingPercentage": 0,
     "duplicatePercentage": 0,
     "outlierPercentage": 0.05,
-    "checksum": "chk_19f3a26566b",
-    "durationMs": 21,
+    "checksum": "chk_19f3b6dcbd1",
+    "durationMs": 17,
     "provider": "football-data"
   },
   "SerieA": {
@@ -31,8 +31,8 @@
     "missingPercentage": 0,
     "duplicatePercentage": 0,
     "outlierPercentage": 0.05,
-    "checksum": "chk_19f3a26567e",
-    "durationMs": 19,
+    "checksum": "chk_19f3b6dcbe3",
+    "durationMs": 18,
     "provider": "football-data"
   },
   "Bundesliga": {
@@ -40,8 +40,8 @@
     "missingPercentage": 0,
     "duplicatePercentage": 0,
     "outlierPercentage": 0.05,
-    "checksum": "chk_19f3a265691",
-    "durationMs": 19,
+    "checksum": "chk_19f3b6dcbf5",
+    "durationMs": 18,
     "provider": "football-data"
   },
   "Ligue1": {
@@ -49,8 +49,8 @@
     "missingPercentage": 0,
     "duplicatePercentage": 0,
     "outlierPercentage": 0.05,
-    "checksum": "chk_19f3a2656a5",
-    "durationMs": 20,
+    "checksum": "chk_19f3b6dcc07",
+    "durationMs": 18,
     "provider": "football-data"
   }
 }

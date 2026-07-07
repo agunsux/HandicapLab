@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
-import { SchemaDriftDetector } from './schemaDriftDetector';
+import { ZodSchemaValidator } from '../validation/zodSchemaValidator';
+import { MatchBusinessValidator } from '../validation/matchBusinessValidator';
 
 export interface DatasetMetadata {
   provider: string;
@@ -9,6 +10,7 @@ export interface DatasetMetadata {
   rows: number;
   checksum: string;
   updated_at: string;
+  schema_name: string;
   schema_version: string;
 }
 
@@ -38,15 +40,20 @@ export class DatasetBuilder {
     provider: string
   ): Promise<DatasetMetadata> {
     
-    // 1. Fail-fast Schema Validation
-    const expectedSchema = {
-      match_id: 'string',
-      competition_id: 'string',
-      season: 'string'
-    };
-    const driftResult = SchemaDriftDetector.validate(records, expectedSchema);
-    if (!driftResult.isValid) {
-      throw new Error(`Schema Drift Detected! Validation failed: ${driftResult.errors.join(', ')}`);
+    // 1. Fail-fast Schema & Business Validation
+    const schemaValidator = new ZodSchemaValidator();
+    const businessValidator = new MatchBusinessValidator();
+    
+    const schemaReport = schemaValidator.validateBatch(records);
+    if (!schemaReport.isValid) {
+      const fatalErrors = schemaReport.errors.filter(e => e.severity === 'FATAL').map(e => `${e.field}: ${e.message}`);
+      throw new Error(`Schema Drift Detected! Validation failed: ${fatalErrors.join(', ')}`);
+    }
+
+    const businessReport = businessValidator.validateBatch(records);
+    if (!businessReport.isValid) {
+      const fatalErrors = businessReport.errors.filter(e => e.severity === 'FATAL').map(e => `${e.field}: ${e.message}`);
+      throw new Error(`Business Logic Violation! Validation failed: ${fatalErrors.join(', ')}`);
     }
 
     const config = this.getConfig();
@@ -90,7 +97,8 @@ export class DatasetBuilder {
       rows: records.length,
       checksum,
       updated_at: new Date().toISOString(),
-      schema_version: 'v1.0'
+      schema_name: schemaValidator.schemaName,
+      schema_version: schemaValidator.schemaVersion
     };
     
     // 4. Update the centralized registry

@@ -26,15 +26,15 @@ function calculateWeightedForm(points: number[]): number {
   return Number((weightedSum / weightTotal).toFixed(2));
 }
 
-async function getTeamPoints(teamName: string, cutoffDate: Date, leagueId: string): Promise<number[]> {
+async function getTeamPoints(teamName: string, predictionTime: Date, leagueId: string): Promise<number[]> {
   const { data: matches, error } = await supabase
     .from('matches')
-    .select('home_team, away_team, home_goals, away_goals, kickoff')
+    .select('home_team, away_team, home_goals, away_goals, available_at')
     .eq('status', 'finished')
     .eq('league', leagueId)
     .or(`home_team.eq."${teamName}",away_team.eq."${teamName}"`)
-    .lt('kickoff', cutoffDate.toISOString())
-    .order('kickoff', { ascending: false })
+    .lte('available_at', predictionTime.toISOString())
+    .order('available_at', { ascending: false })
     .limit(5);
 
   if (error || !matches) {
@@ -54,9 +54,9 @@ async function getTeamPoints(teamName: string, cutoffDate: Date, leagueId: strin
 }
 
 export class FormExtractor {
-  static async extract(homeTeam: string, awayTeam: string, cutoffDate: Date, leagueId: string = 'EPL'): Promise<FormResult> {
-    const homeFormLast5 = await getTeamPoints(homeTeam, cutoffDate, leagueId);
-    const awayFormLast5 = await getTeamPoints(awayTeam, cutoffDate, leagueId);
+  static async extract(homeTeam: string, awayTeam: string, predictionTime: Date, leagueId: string = 'EPL'): Promise<FormResult> {
+    const homeFormLast5 = await getTeamPoints(homeTeam, predictionTime, leagueId);
+    const awayFormLast5 = await getTeamPoints(awayTeam, predictionTime, leagueId);
 
     const homeFormWeighted = calculateWeightedForm(homeFormLast5);
     const awayFormWeighted = calculateWeightedForm(awayFormLast5);
