@@ -27,6 +27,8 @@ def load_canonical_data(base_path: str = "../../data/silver") -> pd.DataFrame:
             df['available_at'] = pd.to_datetime(df['available_at'])
         if 'date' in df.columns:
             df['date'] = pd.to_datetime(df['date'])
+        if 'kickoff' in df.columns:
+            df['kickoff'] = pd.to_datetime(df['kickoff'])
             
         # Basic sanity checks
         if df.empty:

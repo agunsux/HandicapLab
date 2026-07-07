@@ -1,0 +1,29 @@
+experiment:
+  id: EXP-001
+  title: Pure Probability Calibration (Bookmaker Input)
+  description: Calibrating Bookmaker Implied Probabilities using Platt, Isotonic, and internal Beta calibration.
+
+validation:
+  walk_forward: true
+  leave_one_league_out: false
+  time_column: "available_at"
+  league_column: "competition_id"
+  train_start: "2018-08-01"  # Optional limit
+
+calibration:
+  methods:
+    - platt
+    - isotonic
+    - beta
+
+metrics:
+  - logloss
+  - brier
+  - ece
+  - mce
+  - adaptive_ece
+  - sharpness
+  - calibration_slope
+  - calibration_intercept
+
+seed: 42
