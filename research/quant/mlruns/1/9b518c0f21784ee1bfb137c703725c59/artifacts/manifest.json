@@ -1,0 +1,52 @@
+{
+    "experiment_id": "EXP-001",
+    "git_commit": "446cceb6ce66603d07bacfbba450dad5f0a066fd",
+    "status": "INVALID",
+    "dataset_metadata": {},
+    "metrics": [
+        {
+            "Method": "Uncalibrated",
+            "logloss": 0.7063243722705415,
+            "brier": 0.2560041672896507,
+            "ece": 0.07239654198386386,
+            "mce": 0.24548704021353546,
+            "adaptive_ece": 0.08974045958405838,
+            "sharpness": 0.004710535921745501,
+            "calibration_slope": -0.18453515584397867,
+            "calibration_intercept": -0.2552467353690569
+        },
+        {
+            "Method": "beta",
+            "logloss": 0.6908044745055627,
+            "brier": 0.24880734421158374,
+            "ece": 0.026777939483383917,
+            "mce": 0.14521502237232697,
+            "adaptive_ece": 0.06888041820447119,
+            "sharpness": 0.00043717568758101533,
+            "calibration_slope": -2.214070801201693,
+            "calibration_intercept": -0.6539212728746104
+        },
+        {
+            "Method": "isotonic",
+            "logloss": 0.7586951114610385,
+            "brier": 0.25121275291754874,
+            "ece": 0.03972750029191942,
+            "mce": 0.30568672319233775,
+            "adaptive_ece": 0.05493006712683199,
+            "sharpness": 0.0033453262819608492,
+            "calibration_slope": -0.28032311368219553,
+            "calibration_intercept": -0.2331660488260856
+        },
+        {
+            "Method": "platt",
+            "logloss": 0.6901912066118333,
+            "brier": 0.24851246693432533,
+            "ece": 0.02550145752455992,
+            "mce": 0.2646151562712511,
+            "adaptive_ece": 0.068360509464537,
+            "sharpness": 7.640504663220715e-05,
+            "calibration_slope": -4.050019013265276,
+            "calibration_intercept": -1.0115573622690381
+        }
+    ]
+}

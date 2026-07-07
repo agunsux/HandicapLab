@@ -26,7 +26,7 @@ Platt Scaling, Isotonic Regression, internal Beta Calibration.
 - **beta**: p-value = 0.0060
 
 ## Decision
-**ADOPT**
+**INVALID**
 
 ## Next Experiment
 Proceed to EXP-002: Simple Logistic Regression

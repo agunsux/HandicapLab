@@ -53,12 +53,36 @@ def calculate_sharpness(y_prob):
     """Variance of predictions (higher is sharper)"""
     return np.var(y_prob)
 
+from sklearn.linear_model import LogisticRegression
+from scipy.special import logit
+
+def calculate_calibration_slope_and_intercept(y_true, y_prob):
+    """
+    Fits a Logistic Regression on the log-odds of predictions to extract slope and intercept.
+    Ideal: Slope = 1, Intercept = 0.
+    """
+    eps = 1e-15
+    y_prob = np.clip(y_prob, eps, 1 - eps)
+    log_odds = logit(y_prob).reshape(-1, 1)
+    
+    # Needs at least 2 classes
+    if len(np.unique(y_true)) < 2:
+        return 1.0, 0.0
+        
+    lr = LogisticRegression(penalty=None, solver='lbfgs')
+    lr.fit(log_odds, y_true)
+    
+    return lr.coef_[0][0], lr.intercept_[0]
+
 def get_all_metrics(y_true, y_prob):
+    slope, intercept = calculate_calibration_slope_and_intercept(y_true, y_prob)
     return {
         'logloss': log_loss(y_true, y_prob),
         'brier': brier_score_loss(y_true, y_prob),
         'ece': calculate_ece(y_true, y_prob),
         'mce': calculate_mce(y_true, y_prob),
         'adaptive_ece': calculate_adaptive_ece(y_true, y_prob),
-        'sharpness': calculate_sharpness(y_prob)
+        'sharpness': calculate_sharpness(y_prob),
+        'calibration_slope': slope,
+        'calibration_intercept': intercept
     }

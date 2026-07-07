@@ -36,5 +36,27 @@ class MLflowLogger:
     def log_artifact(self, file_path):
         mlflow.log_artifact(file_path)
         
-    def end_run(self):
+    def log_dataset_metadata(self, metadata: dict):
+        self.dataset_metadata = metadata
+        mlflow.log_params({
+            "dataset_hash": metadata.get("dataset_hash"),
+            "row_count": metadata.get("row_count"),
+            "league_count": metadata.get("league_count")
+        })
+        
+    def end_run(self, final_metrics=None, status="INVALID"):
+        import json
+        manifest = {
+            "experiment_id": self.config['experiment']['id'],
+            "git_commit": get_git_commit(),
+            "status": status,
+            "dataset_metadata": getattr(self, 'dataset_metadata', {}),
+            "metrics": final_metrics or {}
+        }
+        
+        manifest_path = "manifest.json"
+        with open(manifest_path, 'w') as f:
+            json.dump(manifest, f, indent=4)
+            
+        self.log_artifact(manifest_path)
         mlflow.end_run()

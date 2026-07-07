@@ -50,33 +50,60 @@ Proceed to EXP-002: Simple Logistic Regression
         f.write(report)
 
 
+from utils.reproducibility import seed_everything
+from validation.quality_gate import run_quality_gate
+import pytest
+
 def run_experiment():
     config_path = Path(__file__).resolve().parent.parent / "config" / "exp_001.yaml"
     with open(config_path, 'r') as f:
         config = yaml.safe_load(f)
         
-    np.random.seed(config.get('seed', 42))
+    # 1. Seed Everything for Reproducibility
+    seed_everything(config.get('seed', 42))
     
     logger = MLflowLogger("Probability Calibration")
     logger.start_run(config_path)
     
+    # 2. Automated Leakage Tests
+    print("Running automated leakage unit tests...")
+    test_path = Path(__file__).resolve().parent.parent / "tests" / "test_leakage.py"
+    test_result = pytest.main(['-q', str(test_path)])
+    leakage_passed = (test_result == 0)
+    
     df = load_canonical_data("../../data/silver")
     
-    # Mock odds if missing or to ensure multi-year data for walk-forward
+    # Mock odds if missing
     if 'odds_home' not in df.columns or len(df['kickoff'].dt.year.unique()) < 2:
         print("Injecting multi-year mock data to validate walk-forward architecture...")
         dates = pd.date_range(start='2020-01-01', end='2024-12-31', periods=2000)
-        df = pd.DataFrame({'kickoff': dates, 'match_id': range(2000)})
+        df = pd.DataFrame({'kickoff': dates, 'match_id': range(2000), 'status': 'FINISHED'})
         df['odds_home'] = np.random.uniform(1.5, 3.5, len(df))
         df['odds_draw'] = np.random.uniform(2.5, 4.5, len(df))
         df['odds_away'] = np.random.uniform(2.0, 5.0, len(df))
         df['home_goals'] = np.random.poisson(1.5, len(df))
         df['away_goals'] = np.random.poisson(1.1, len(df))
+        df['competition_id'] = np.random.choice(['EPL', 'LaLiga'], len(df))
+        
+        import hashlib
+        hash_val = hashlib.sha256(pd.util.hash_pandas_object(df, index=True).values).hexdigest()
+        df.attrs['metadata'] = {
+            "row_count": len(df),
+            "league_count": 2,
+            "season_min": 2020,
+            "season_max": 2024,
+            "dataset_hash": hash_val
+        }
         
     df['target_home_win'] = (df['home_goals'] > df['away_goals']).astype(int)
     
     total_implied = (1/df['odds_home']) + (1/df['odds_draw']) + (1/df['odds_away'])
     df['prob_home_bookie_true'] = (1/df['odds_home']) / total_implied
+    
+    # Log Dataset Metadata
+    metadata = getattr(df, 'attrs', {}).get('metadata', {})
+    logger.log_dataset_metadata(metadata)
+    metadata_logged = ('dataset_hash' in metadata)
     
     methods = config['calibration']['methods']
     
@@ -94,7 +121,6 @@ def run_experiment():
         y_test = df_test['target_home_win'].values
         p_test_bookie = df_test['prob_home_bookie_true'].values
         
-        # Baseline Uncalibrated Metrics
         base_metrics = get_all_metrics(y_test, p_test_bookie)
         base_metrics['Method'] = 'Uncalibrated'
         base_metrics['Fold'] = fold_name
@@ -102,17 +128,18 @@ def run_experiment():
         
         fold_predictions = pd.DataFrame({
             'match_id': df_test['match_id'] if 'match_id' in df_test.columns else df_test.index,
+            'league': df_test['competition_id'] if 'competition_id' in df_test.columns else 'Unknown',
+            'market': config['experiment'].get('market', '1X2'),
             'fold': fold_name,
             'actual_result': y_test,
             'bookmaker_probability': p_test_bookie,
-            'Uncalibrated': p_test_bookie
+            'prediction_timestamp': pd.Timestamp.now()
         })
+        fold_predictions['Uncalibrated'] = p_test_bookie
         
-        # Train and evaluate calibrators
         for method in methods:
             calibrator = get_calibrator(method)
             calibrator.fit(p_train_bookie, y_train)
-            
             p_test_calib = calibrator.predict_proba(p_test_bookie)
             
             calib_metrics = get_all_metrics(y_test, p_test_calib)
@@ -122,46 +149,49 @@ def run_experiment():
             
             fold_predictions[method] = p_test_calib
             
-            # Significance vs uncalibrated (just last fold for simplicity or track overall)
             obs_diff, p_val = paired_permutation_test(y_test, p_test_bookie, p_test_calib)
             significance_results[method] = p_val
             
         all_raw_predictions.append(fold_predictions)
 
-    # Aggregate
     df_metrics = pd.DataFrame(fold_metrics)
     avg_metrics = df_metrics.groupby('Method').mean(numeric_only=True).reset_index()
     
     print("=== EXP-001 Validation Results ===")
     print(avg_metrics.to_string(index=False))
     
-    # Save artifacts
     artifacts_dir = Path("exp_001_artifacts")
     artifacts_dir.mkdir(exist_ok=True)
     
-    # 1. Raw Predictions Parquet
     full_preds = pd.concat(all_raw_predictions)
     preds_path = artifacts_dir / "raw_predictions.parquet"
     full_preds.to_parquet(preds_path)
     logger.log_artifact(str(preds_path))
     
-    # 2. Calibration Plot (using latest fold as example)
     dict_probs = {m: full_preds[full_preds['fold'] == fold_name][m].values for m in ['Uncalibrated'] + methods}
     y_true_plot = full_preds[full_preds['fold'] == fold_name]['actual_result'].values
     plot_path = artifacts_dir / "calibration_report.png"
     generate_calibration_report(y_true_plot, dict_probs, str(plot_path))
     logger.log_artifact(str(plot_path))
     
-    # Decision Logic Example (using Isotonic)
-    decision = "ADOPT Isotonic" if significance_results.get('isotonic', 1.0) < 0.05 else "REVISIT"
+    # Execute Quality Gate
+    # Check if metrics improved (e.g. Isotonic ECE < Uncalibrated ECE)
+    uncalib_ece = avg_metrics[avg_metrics['Method'] == 'Uncalibrated']['ece'].values[0]
+    best_calib_ece = avg_metrics[avg_metrics['Method'] != 'Uncalibrated']['ece'].min()
+    metrics_passed = best_calib_ece < uncalib_ece
     
-    # 3. Paper Review
+    # Check if significance is < 0.05 for any method
+    sig_passed = any(p < 0.05 for p in significance_results.values())
+    
+    final_status = run_quality_gate(metrics_passed, leakage_passed, metadata_logged, sig_passed)
+    
     review_path = artifacts_dir / "Paper_Review.md"
-    generate_paper_review(avg_metrics, significance_results, decision, str(review_path))
+    generate_paper_review(avg_metrics, significance_results, final_status, str(review_path))
     logger.log_artifact(str(review_path))
     
-    logger.end_run()
-    print(f"\nArtifacts saved to {artifacts_dir}")
+    logger.end_run(final_metrics=avg_metrics.to_dict(orient='records'), status=final_status)
+    print(f"\nExperiment finished with status: {final_status}")
+    print(f"Artifacts saved to {artifacts_dir}")
 
 if __name__ == "__main__":
     run_experiment()

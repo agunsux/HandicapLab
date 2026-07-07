@@ -30,13 +30,40 @@ def load_canonical_data(base_path: str = "../../data/silver") -> pd.DataFrame:
         if 'kickoff' in df.columns:
             df['kickoff'] = pd.to_datetime(df['kickoff'])
             
+        # --- FAIL-FAST VALIDATIONS ---
+        # 1. No unplayed, postponed, or live matches
+        if 'status' in df.columns:
+            pre_count = len(df)
+            df = df[df['status'] == 'FINISHED']
+            post_count = len(df)
+            if pre_count != post_count:
+                print(f"Data Filter: Removed {pre_count - post_count} non-finished matches.")
+                
+        # 2. No null targets
+        if 'home_goals' in df.columns and 'away_goals' in df.columns:
+            if df['home_goals'].isnull().any() or df['away_goals'].isnull().any():
+                raise ValueError("FAIL-FAST: Found NULL values in target columns (home_goals/away_goals).")
+                
         # Basic sanity checks
         if df.empty:
             print("Warning: Loaded dataset is empty.")
             
-        # Drop duplicates just in case (though dataset builder enforces it)
+        # Drop duplicates
         if 'match_id' in df.columns:
             df = df.drop_duplicates(subset=['match_id'])
+            
+        # Compute Dataset Metadata and Hash
+        import hashlib
+        # Hash pandas object is fast and deterministic for same data
+        hash_val = hashlib.sha256(pd.util.hash_pandas_object(df, index=True).values).hexdigest()
+        
+        df.attrs['metadata'] = {
+            "row_count": len(df),
+            "league_count": df['competition_id'].nunique() if 'competition_id' in df.columns else 1,
+            "season_min": df['season'].min() if 'season' in df.columns else None,
+            "season_max": df['season'].max() if 'season' in df.columns else None,
+            "dataset_hash": hash_val
+        }
             
         return df
     finally:
