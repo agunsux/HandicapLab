@@ -1,0 +1,20 @@
+{
+  "version": "1.0.0",
+  "entities": {
+    "TEAM_MAN_UTD": {
+      "canonical_name": "Manchester United",
+      "country": "England",
+      "aliases": ["Man United", "Man Utd", "Manchester Utd", "Man United FC"]
+    },
+    "TEAM_ARSENAL": {
+      "canonical_name": "Arsenal",
+      "country": "England",
+      "aliases": ["Arsenal", "Arsenal FC"]
+    },
+    "TEAM_CHELSEA": {
+      "canonical_name": "Chelsea",
+      "country": "England",
+      "aliases": ["Chelsea", "Chelsea FC"]
+    }
+  }
+}

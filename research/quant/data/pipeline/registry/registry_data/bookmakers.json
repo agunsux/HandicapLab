@@ -1,0 +1,25 @@
+{
+  "version": "1.0.0",
+  "entities": {
+    "BOOKMAKER_PINNACLE": {
+      "canonical_name": "Pinnacle",
+      "aliases": ["Pinnacle", "Pinnacle Sports", "PSCH", "PSCA", "PSCD"],
+      "markets": ["ML", "AH", "OU"]
+    },
+    "BOOKMAKER_BET365": {
+      "canonical_name": "Bet365",
+      "aliases": ["Bet365", "B365", "B365H", "B365D", "B365A", "B365>2.5", "B365<2.5", "B365AHH", "B365AHA"],
+      "markets": ["ML", "AH", "OU"]
+    },
+    "BOOKMAKER_MAXIMBET": {
+      "canonical_name": "Maximbet",
+      "aliases": ["Maximbet", "Max", "MaxH", "MaxD", "MaxA"],
+      "markets": ["ML"]
+    },
+    "BOOKMAKER_PINNACLE_ASIAN": {
+      "canonical_name": "Pinnacle Asian",
+      "aliases": ["PAHH", "PAHA"],
+      "markets": ["AH"]
+    }
+  }
+}
