@@ -1,0 +1,32 @@
+# HandicapLab Quant Research - Experiment Registry
+
+experiments:
+  EXP-000:
+    name: "Bookmaker Baseline (Zero-Intelligence)"
+    objective: "Establish the raw bookmaker implied probabilities without vigorish removal as absolute baseline."
+    owner: "Quant Team"
+    status: "adopted"
+    date: "2026-07-06"
+    dataset: "mock_data_v1"
+    main_result: "LogLoss: 0.706, Brier: 0.256"
+
+  EXP-001:
+    name: "Pure Probability Calibration"
+    objective: "Calibrate raw odds using Platt, Isotonic, and Beta calibration to remove bookie margins optimally."
+    owner: "Quant Team"
+    status: "adopted"
+    date: "2026-07-07"
+    dataset: "mock_data_v1 (walk-forward)"
+    main_result: "Isotonic LogLoss: 0.758, Beta LogLoss: 0.690 (Significant Improvement)"
+
+  EXP-002:
+    name: "Simple Logistic Regression"
+    objective: "Combine base features (Elo, xG) with Bookmaker probabilities."
+    owner: "Quant Team"
+    status: "planned"
+
+  EXP-003:
+    name: "Poisson Hybrid"
+    objective: "Predict exact goals using bivariate Poisson augmented with Elo components."
+    owner: "Quant Team"
+    status: "planned"
