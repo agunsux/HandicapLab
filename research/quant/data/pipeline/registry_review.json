@@ -1,504 +1,2614 @@
 {
     "unknown_teams": [
         {
-            "provider": "football_data_co_uk",
-            "name": "Hoffenheim"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "FC Koln"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Man City"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Ath Bilbao"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Everton"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Nimes"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Angers"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Werder Bremen"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Crotone"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "RB Leipzig"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Southampton"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Lille"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Espanol"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Cagliari"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Lorient"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Liverpool"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Sassuolo"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Fortuna Dusseldorf"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Alaves"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Las Palmas"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Dortmund"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Sociedad"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Betis"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Monaco"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Reims"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Napoli"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Freiburg"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Udinese"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Bayern Munich"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Mainz"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Metz"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Huddersfield"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Levante"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Celta"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Caen"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Lazio"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Dijon"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Chievo"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Vallecano"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Stuttgart"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Nice"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Newcastle"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Granada"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Amiens"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Marseille"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Toulouse"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Darmstadt"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "West Ham"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Juventus"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Malaga"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "West Brom"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Montpellier"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Leverkusen"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Crystal Palace"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Tottenham"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Genoa"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Stoke"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Frosinone"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Getafe"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Nantes"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Guingamp"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Wolfsburg"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Troyes"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Villarreal"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Nurnberg"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Valencia"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Augsburg"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Hull"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Watford"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Palermo"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Ein Frankfurt"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Huesca"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Strasbourg"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Leicester"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Bastia"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Barcelona"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Real Madrid"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Hannover"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Bologna"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Hertha"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Milan"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Parma"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Mallorca"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Sheffield United"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Empoli"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Paris SG"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Ath Madrid"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "La Coruna"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "M'gladbach"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Bournemouth"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Sunderland"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Inter"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Cardiff"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Eibar"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "St Etienne"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Torino"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Rennes"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Osasuna"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Roma"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Brighton"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Hamburg"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Atalanta"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Nancy"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Girona"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Leganes"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Fiorentina"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Valladolid"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Spal"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Benevento"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Lyon"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Norwich"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Wolves"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Sampdoria"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Aston Villa"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Swansea"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Burnley"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Ingolstadt"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Fulham"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Sevilla"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Middlesbrough"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Verona"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Pescara"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Schalke 04"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Sp Gijon"
-        },
-        {
-            "provider": "football_data_co_uk",
-            "name": "Bordeaux"
+            "raw_name": "Sociedad",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 45.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 40.0,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 40.0,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Nancy",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 60.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 36.0,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 20.0,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Burnley",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Arsenal",
+                    "score": 42.86,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 38.57,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 28.57,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Eibar",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 36.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 36.0,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 36.0,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Cagliari",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Arsenal",
+                    "score": 26.67,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 26.67,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 24.0,
+                    "id": "TEAM_MAN_UTD"
+                }
+            ]
+        },
+        {
+            "raw_name": "Fortuna Dusseldorf",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Arsenal",
+                    "score": 42.75,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 38.57,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 28.5,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Liverpool",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 27.69,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 25.0,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 25.0,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Ein Frankfurt",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 38.57,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 38.57,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 25.71,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Crotone",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 38.57,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 28.57,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 14.29,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Malaga",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Arsenal",
+                    "score": 32.73,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 30.77,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 22.5,
+                    "id": "TEAM_MAN_UTD"
+                }
+            ]
+        },
+        {
+            "raw_name": "Nurnberg",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 33.75,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 26.67,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 13.33,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "West Ham",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 45.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 40.0,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 26.67,
+                    "id": "TEAM_ARSENAL"
+                }
+            ]
+        },
+        {
+            "raw_name": "Middlesbrough",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Chelsea",
+                    "score": 27.69,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 22.22,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 15.0,
+                    "id": "TEAM_ARSENAL"
+                }
+            ]
+        },
+        {
+            "raw_name": "Toulouse",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Chelsea",
+                    "score": 40.0,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 32.73,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 26.67,
+                    "id": "TEAM_ARSENAL"
+                }
+            ]
+        },
+        {
+            "raw_name": "Hertha",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Chelsea",
+                    "score": 46.15,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 45.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 30.77,
+                    "id": "TEAM_ARSENAL"
+                }
+            ]
+        },
+        {
+            "raw_name": "Dortmund",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 41.54,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 26.67,
+                    "id": "TEAM_ARSENAL"
+                }
+            ]
+        },
+        {
+            "raw_name": "Real Madrid",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Arsenal",
+                    "score": 65.45,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 38.57,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 38.57,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Roma",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Arsenal",
+                    "score": 36.36,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 36.0,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 30.0,
+                    "id": "TEAM_MAN_UTD"
+                }
+            ]
+        },
+        {
+            "raw_name": "Celta",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 54.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 54.0,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 36.0,
+                    "id": "TEAM_ARSENAL"
+                }
+            ]
+        },
+        {
+            "raw_name": "Genoa",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Arsenal",
+                    "score": 54.0,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 36.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 36.0,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Hamburg",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Chelsea",
+                    "score": 28.57,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 25.71,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 14.29,
+                    "id": "TEAM_ARSENAL"
+                }
+            ]
+        },
+        {
+            "raw_name": "Ath Bilbao",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Chelsea",
+                    "score": 35.29,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 30.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 23.53,
+                    "id": "TEAM_ARSENAL"
+                }
+            ]
+        },
+        {
+            "raw_name": "Parma",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Arsenal",
+                    "score": 36.0,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 25.71,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 20.0,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Bastia",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 34.78,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 30.77,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 30.77,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Marseille",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Arsenal",
+                    "score": 50.0,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 38.46,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 37.5,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Lazio",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Chelsea",
+                    "score": 36.0,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 26.67,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 20.0,
+                    "id": "TEAM_ARSENAL"
+                }
+            ]
+        },
+        {
+            "raw_name": "Strasbourg",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 27.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 23.53,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 23.53,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Sunderland",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 37.89,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 35.29,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 35.29,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Lorient",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Arsenal",
+                    "score": 42.86,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 38.57,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 28.57,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Torino",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 45.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 32.73,
+                    "id": "TEAM_ARSENAL"
+                }
+            ]
+        },
+        {
+            "raw_name": "Fulham",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Chelsea",
+                    "score": 30.77,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 22.5,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 18.0,
+                    "id": "TEAM_ARSENAL"
+                }
+            ]
+        },
+        {
+            "raw_name": "La Coruna",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Arsenal",
+                    "score": 50.0,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 31.58,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 31.58,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Leicester",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 60.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 37.5,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 25.0,
+                    "id": "TEAM_ARSENAL"
+                }
+            ]
+        },
+        {
+            "raw_name": "Wolfsburg",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Chelsea",
+                    "score": 25.0,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 21.18,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 12.5,
+                    "id": "TEAM_ARSENAL"
+                }
+            ]
+        },
+        {
+            "raw_name": "Napoli",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Arsenal",
+                    "score": 46.15,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 32.73,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 18.0,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Metz",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 45.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 30.0,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 22.5,
+                    "id": "TEAM_ARSENAL"
+                }
+            ]
+        },
+        {
+            "raw_name": "Angers",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 60.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 40.0,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 32.73,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "FC Koln",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 27.69,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 14.29,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 14.29,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Empoli",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Chelsea",
+                    "score": 36.0,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 30.77,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 30.0,
+                    "id": "TEAM_MAN_UTD"
+                }
+            ]
+        },
+        {
+            "raw_name": "Ath Madrid",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 40.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 23.53,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 20.0,
+                    "id": "TEAM_ARSENAL"
+                }
+            ]
+        },
+        {
+            "raw_name": "Montpellier",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Chelsea",
+                    "score": 41.54,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 35.71,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 27.69,
+                    "id": "TEAM_ARSENAL"
+                }
+            ]
+        },
+        {
+            "raw_name": "Mallorca",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 30.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 26.67,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 26.67,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Reims",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Arsenal",
+                    "score": 45.0,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 36.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 36.0,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Augsburg",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 27.27,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 13.33,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 13.33,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Leverkusen",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Arsenal",
+                    "score": 47.06,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 36.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 35.29,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Everton",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 41.54,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 28.57,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 28.57,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Milan",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 45.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 36.0,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 20.0,
+                    "id": "TEAM_ARSENAL"
+                }
+            ]
+        },
+        {
+            "raw_name": "Valladolid",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 30.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 23.53,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 23.53,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Hannover",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 45.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 26.67,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 13.33,
+                    "id": "TEAM_ARSENAL"
+                }
+            ]
+        },
+        {
+            "raw_name": "Juventus",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 33.75,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 26.67,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 26.67,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Cardiff",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 30.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 14.29,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 14.29,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Getafe",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 45.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 32.73,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 30.77,
+                    "id": "TEAM_ARSENAL"
+                }
+            ]
+        },
+        {
+            "raw_name": "Leganes",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 51.43,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 42.86,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 28.57,
+                    "id": "TEAM_ARSENAL"
+                }
+            ]
+        },
+        {
+            "raw_name": "Inter",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 60.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 25.71,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 22.5,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Rennes",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Arsenal",
+                    "score": 49.09,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 45.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 32.73,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Atalanta",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 40.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 26.67,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 26.67,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Pescara",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Chelsea",
+                    "score": 42.86,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 38.57,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 28.57,
+                    "id": "TEAM_ARSENAL"
+                }
+            ]
+        },
+        {
+            "raw_name": "St Etienne",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 45.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 35.29,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 30.0,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Newcastle",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 50.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 37.5,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 37.5,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Sheffield United",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 63.53,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 38.57,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 36.0,
+                    "id": "TEAM_ARSENAL"
+                }
+            ]
+        },
+        {
+            "raw_name": "Mainz",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 45.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 20.0,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 18.0,
+                    "id": "TEAM_ARSENAL"
+                }
+            ]
+        },
+        {
+            "raw_name": "Darmstadt",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 38.57,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 37.5,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 25.0,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Stuttgart",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 42.35,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 25.0,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 25.0,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Fiorentina",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Arsenal",
+                    "score": 47.06,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 30.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 23.53,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Huddersfield",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Arsenal",
+                    "score": 51.43,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 42.11,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 41.38,
+                    "id": "TEAM_MAN_UTD"
+                }
+            ]
+        },
+        {
+            "raw_name": "Frosinone",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Arsenal",
+                    "score": 37.5,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 31.76,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 25.0,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Udinese",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 51.43,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 42.86,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 28.57,
+                    "id": "TEAM_ARSENAL"
+                }
+            ]
+        },
+        {
+            "raw_name": "Wolves",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Chelsea",
+                    "score": 32.73,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 30.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 20.0,
+                    "id": "TEAM_ARSENAL"
+                }
+            ]
+        },
+        {
+            "raw_name": "Granada",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 42.86,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 42.86,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 14.29,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Aston Villa",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 41.54,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 40.0,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 33.33,
+                    "id": "TEAM_ARSENAL"
+                }
+            ]
+        },
+        {
+            "raw_name": "Watford",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 42.86,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 14.29,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 14.29,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Villarreal",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Arsenal",
+                    "score": 47.06,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 35.29,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 25.71,
+                    "id": "TEAM_MAN_UTD"
+                }
+            ]
+        },
+        {
+            "raw_name": "Barcelona",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Arsenal",
+                    "score": 50.0,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 37.5,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 36.0,
+                    "id": "TEAM_MAN_UTD"
+                }
+            ]
+        },
+        {
+            "raw_name": "Schalke 04",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Arsenal",
+                    "score": 40.0,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 40.0,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 36.0,
+                    "id": "TEAM_MAN_UTD"
+                }
+            ]
+        },
+        {
+            "raw_name": "Stoke",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 54.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 40.0,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 36.0,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Vallecano",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Chelsea",
+                    "score": 37.5,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 30.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 25.0,
+                    "id": "TEAM_ARSENAL"
+                }
+            ]
+        },
+        {
+            "raw_name": "Huesca",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Chelsea",
+                    "score": 61.54,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 45.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 30.77,
+                    "id": "TEAM_ARSENAL"
+                }
+            ]
+        },
+        {
+            "raw_name": "Monaco",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 36.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 30.77,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 18.0,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Valencia",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 45.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 40.0,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 40.0,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Levante",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 47.06,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 42.86,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 28.57,
+                    "id": "TEAM_ARSENAL"
+                }
+            ]
+        },
+        {
+            "raw_name": "Spal",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Arsenal",
+                    "score": 60.0,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 51.43,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 30.0,
+                    "id": "TEAM_MAN_UTD"
+                }
+            ]
+        },
+        {
+            "raw_name": "Alaves",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 45.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 32.73,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 32.73,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "West Brom",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 40.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 31.58,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 25.0,
+                    "id": "TEAM_ARSENAL"
+                }
+            ]
+        },
+        {
+            "raw_name": "Sassuolo",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Arsenal",
+                    "score": 40.0,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 26.67,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 24.0,
+                    "id": "TEAM_MAN_UTD"
+                }
+            ]
+        },
+        {
+            "raw_name": "Freiburg",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Arsenal",
+                    "score": 26.67,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 25.71,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 13.33,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Girona",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Arsenal",
+                    "score": 46.15,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 30.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 18.0,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Espanol",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Arsenal",
+                    "score": 42.86,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 42.86,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 36.0,
+                    "id": "TEAM_MAN_UTD"
+                }
+            ]
+        },
+        {
+            "raw_name": "Norwich",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 45.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 14.29,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 14.29,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Nimes",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 54.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 36.0,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 22.5,
+                    "id": "TEAM_ARSENAL"
+                }
+            ]
+        },
+        {
+            "raw_name": "Sampdoria",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 30.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 25.0,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 25.0,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Betis",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 36.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 36.0,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 22.5,
+                    "id": "TEAM_ARSENAL"
+                }
+            ]
+        },
+        {
+            "raw_name": "Amiens",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 45.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 32.73,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 32.73,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Caen",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 51.43,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 45.0,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 36.0,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Chievo",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 45.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 40.0,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 18.0,
+                    "id": "TEAM_ARSENAL"
+                }
+            ]
+        },
+        {
+            "raw_name": "Guingamp",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Arsenal",
+                    "score": 26.67,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 18.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 13.33,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Benevento",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 38.46,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 25.0,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 25.0,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Dijon",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 30.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 18.0,
+                    "id": "TEAM_ARSENAL"
+                }
+            ]
+        },
+        {
+            "raw_name": "RB Leipzig",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 30.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 30.0,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 23.53,
+                    "id": "TEAM_ARSENAL"
+                }
+            ]
+        },
+        {
+            "raw_name": "Bordeaux",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Arsenal",
+                    "score": 40.0,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 27.69,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 26.67,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "M'gladbach",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Chelsea",
+                    "score": 51.43,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 38.57,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 38.57,
+                    "id": "TEAM_ARSENAL"
+                }
+            ]
+        },
+        {
+            "raw_name": "Crystal Palace",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Arsenal",
+                    "score": 51.43,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 32.73,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 32.26,
+                    "id": "TEAM_MAN_UTD"
+                }
+            ]
+        },
+        {
+            "raw_name": "Verona",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Arsenal",
+                    "score": 46.15,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 45.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 32.73,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Lyon",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Arsenal",
+                    "score": 36.0,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 25.71,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 22.5,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Lille",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 40.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 36.0,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 20.0,
+                    "id": "TEAM_ARSENAL"
+                }
+            ]
+        },
+        {
+            "raw_name": "Osasuna",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Arsenal",
+                    "score": 42.86,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 36.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 28.57,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Bologna",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Arsenal",
+                    "score": 28.57,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 28.57,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 20.0,
+                    "id": "TEAM_MAN_UTD"
+                }
+            ]
+        },
+        {
+            "raw_name": "Brighton",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 33.75,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 26.67,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 13.33,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Hull",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Chelsea",
+                    "score": 45.0,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 36.0,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 22.5,
+                    "id": "TEAM_MAN_UTD"
+                }
+            ]
+        },
+        {
+            "raw_name": "Sp Gijon",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 33.75,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 26.67,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 22.22,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Bayern Munich",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 43.48,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 27.69,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 22.5,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Tottenham",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Arsenal",
+                    "score": 37.5,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 30.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 25.0,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Southampton",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 27.69,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 27.69,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 27.69,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Paris SG",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Arsenal",
+                    "score": 33.33,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 30.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 22.22,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Hoffenheim",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 36.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 35.29,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 23.53,
+                    "id": "TEAM_ARSENAL"
+                }
+            ]
+        },
+        {
+            "raw_name": "Bournemouth",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Arsenal",
+                    "score": 30.0,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 28.42,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 22.5,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Werder Bremen",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Arsenal",
+                    "score": 45.0,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 36.64,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 32.73,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Troyes",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 40.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 40.0,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 32.73,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Las Palmas",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Arsenal",
+                    "score": 35.29,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 35.29,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 27.0,
+                    "id": "TEAM_MAN_UTD"
+                }
+            ]
+        },
+        {
+            "raw_name": "Nantes",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 60.0,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 32.73,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 30.77,
+                    "id": "TEAM_ARSENAL"
+                }
+            ]
+        },
+        {
+            "raw_name": "Man City",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 56.25,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 22.22,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 22.22,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
+        },
+        {
+            "raw_name": "Sevilla",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Arsenal",
+                    "score": 42.86,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 42.86,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 25.71,
+                    "id": "TEAM_MAN_UTD"
+                }
+            ]
+        },
+        {
+            "raw_name": "Nice",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 67.5,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 30.0,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 25.71,
+                    "id": "TEAM_ARSENAL"
+                }
+            ]
+        },
+        {
+            "raw_name": "Swansea",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Arsenal",
+                    "score": 42.86,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 42.86,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Manchester United",
+                    "score": 41.54,
+                    "id": "TEAM_MAN_UTD"
+                }
+            ]
+        },
+        {
+            "raw_name": "Ingolstadt",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 38.57,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 35.29,
+                    "id": "TEAM_CHELSEA"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 23.53,
+                    "id": "TEAM_ARSENAL"
+                }
+            ]
+        },
+        {
+            "raw_name": "Palermo",
+            "provider": "football_data_co_uk",
+            "top_candidates": [
+                {
+                    "name": "Manchester United",
+                    "score": 28.57,
+                    "id": "TEAM_MAN_UTD"
+                },
+                {
+                    "name": "Arsenal",
+                    "score": 28.57,
+                    "id": "TEAM_ARSENAL"
+                },
+                {
+                    "name": "Chelsea",
+                    "score": 28.57,
+                    "id": "TEAM_CHELSEA"
+                }
+            ]
         }
     ],
     "unknown_leagues": [],

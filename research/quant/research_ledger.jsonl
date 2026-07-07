@@ -1,0 +1,1 @@
+{"experiment_id": "RQ-042-002", "git_commit": "abcdef12345", "dataset_fingerprint": "hash_synthetic_data", "feature_version": "v1.0", "config_hash": "hash_config", "random_seed": 42, "timestamp": "2026-07-07T18:06:19.267003Z", "evidence_level": "L1", "outcome": "INCONCLUSIVE", "promotion_decision": "Simulation Validated", "pipeline_version": "v42"}

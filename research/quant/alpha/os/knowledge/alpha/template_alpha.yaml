@@ -1,0 +1,23 @@
+alpha_id: A-041
+name: Example Alpha Signal
+status: TESTING
+owner: research_engine
+reviewer: auto
+
+depends_on:
+  - RQ-040-001
+  - EXP-221
+  - DATASET-014
+
+produces:
+  - FEATURE-018
+
+metrics:
+  sample_size: 15000
+  roi: 0.052
+  clv: 0.021
+  brier: 0.181
+  p_value: 0.012
+
+evidence_level: null
+replication_score: null

@@ -1,0 +1,8 @@
+champion: true
+dataset_version: v1.0
+date: '2026-07-07'
+experiment_id: EXP-000005
+feature_version: '1.0'
+model: LogisticRegression
+status: SUCCESS
+validation: walk_forward

@@ -12,10 +12,14 @@ class FootballDataCoUkProvider(ProviderInterface):
     def __init__(self):
         # We will focus on 2016-2023 for Top 5 Leagues
         # E0 = EPL, SP1 = LaLiga, I1 = Serie A, D1 = Bundesliga, F1 = Ligue 1
-        self.leagues = ["E0", "SP1", "I1", "D1", "F1"]
-        # Seasons like "1617", "1718", ..., "2324"
-        self.seasons = [f"{str(y).zfill(2)}{str(y+1).zfill(2)}" for y in range(16, 24)]
-        self.base_url = "https://www.football-data.co.uk/mmz4281/{}/{}.csv"
+        self.leagues = ['E0', 'E1', 'E2', 'E3', 'SP1', 'SP2', 'I1', 'I2', 'D1', 'D2', 'F1', 'F2', 'N1', 'P1', 'B1', 'SC0', 'T1']
+        
+        self.seasons = []
+        for year in range(10, 24):
+            y1 = str(year).zfill(2)
+            y2 = str(year + 1).zfill(2)
+            self.seasons.append(f"{y1}{y2}")
+        self.base_url = "https://www.football-data.co.uk/mmz4281"
         
     def download_raw(self, output_dir: str):
         out_path = Path(output_dir) / self.provider_id
@@ -23,28 +27,27 @@ class FootballDataCoUkProvider(ProviderInterface):
         
         for season in self.seasons:
             for league in self.leagues:
-                url = self.base_url.format(season, league)
-                target_file = out_path / f"{league}_{season}.csv"
+                url = f"{self.base_url}/{season}/{league}.csv"
+                file_path = out_path / f"{season}" / f"{league}_{season}_v1.csv"
                 
-                if target_file.exists():
-                    print(f"Skipping {league} {season}, already downloaded.")
+                if file_path.exists():
                     continue
                     
-                print(f"Downloading {url} ...")
+                file_path.parent.mkdir(parents=True, exist_ok=True)
+                
                 try:
-                    # Added a dummy header since some servers block vanilla python urllib
-                    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-                    with urllib.request.urlopen(req) as response, open(target_file, 'wb') as out_file:
-                        out_file.write(response.read())
-                    time.sleep(1) # Be polite
+                    df = pd.read_csv(url)
+                    df.to_csv(file_path, index=False)
+                    print(f"Downloaded {league} {season}")
+                    time.sleep(1) # Rate limit
                 except Exception as e:
-                    print(f"Failed to download {url}: {e}")
+                    print(f"Failed to download {league} {season} - {e}")
                     
     def parse_to_raw_dataframe(self, raw_dir: str) -> pd.DataFrame:
         in_path = Path(raw_dir) / self.provider_id
         all_dfs = []
         
-        for file in in_path.glob("*.csv"):
+        for file in in_path.rglob("*.csv"):
             try:
                 # football-data sometimes has trailing commas or bad lines
                 df = pd.read_csv(file, on_bad_lines='skip', encoding='latin1')

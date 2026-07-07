@@ -14,10 +14,32 @@ def generate_match_uuid(row) -> str:
     return hashlib.sha256(key.encode('utf-8')).hexdigest()
 
 def apply_match_uuid(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.copy()
-    # We assume league_id, season, date, home_team_id, away_team_id are available
-    df['match_uuid'] = df.apply(generate_match_uuid, axis=1)
-    return df
+    """
+    Applies a deterministic SHA256 match_uuid based on Season, League, Home, Away, and Sequence.
+    The Sequence handles multiple meetings of the same teams in the same season/league.
+    """
+    if df.empty:
+        return df
+        
+    # Ensure date is sorted to assign chronological sequences
+    if 'date' in df.columns:
+        df['date_parsed'] = pd.to_datetime(df['date'], errors='coerce', dayfirst=True)
+        df = df.sort_values('date_parsed')
+        
+    # Calculate match sequence (1st meeting, 2nd meeting, etc. in same season/league)
+    # We group by league, season, home_team, away_team and take cumulative count + 1
+    df['match_sequence'] = df.groupby(['league_id', 'season', 'home_team_id', 'away_team_id']).cumcount() + 1
+    
+    def generate_uuid(row):
+        base_string = f"{row.get('league_id','')}|{row.get('season','')}|{row.get('home_team_id','')}|{row.get('away_team_id','')}|seq:{row.get('match_sequence', 1)}"
+        return hashlib.sha256(base_string.encode('utf-8')).hexdigest()
+        
+    df['match_uuid'] = df.apply(generate_uuid, axis=1)
+    
+    if 'date_parsed' in df.columns:
+        df = df.drop(columns=['date_parsed'])
+        
+    return df.copy()
 
 def normalize_odds(df: pd.DataFrame, bookmaker: str) -> pd.DataFrame:
     """

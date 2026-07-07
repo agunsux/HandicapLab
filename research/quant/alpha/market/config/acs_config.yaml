@@ -1,0 +1,42 @@
+evidence_levels:
+  L0:
+    name: "Concept"
+    multiplier: 0.0
+  L1:
+    name: "Simulation"
+    multiplier: 0.0
+  L2:
+    name: "Historical"
+    multiplier: 0.4
+  L3:
+    name: "Out-of-Sample"
+    multiplier: 0.7
+  L4:
+    name: "Walk Forward"
+    multiplier: 0.9
+  L5:
+    name: "Live Paper Trading"
+    multiplier: 1.0
+  L6:
+    name: "Real Market"
+    multiplier: 1.0
+
+acs:
+  min_sample_size: 300
+  min_leagues: 5
+  min_seasons: 3
+  weights:
+    statistical_strength: 0.25
+    replication: 0.25
+    generalization: 0.20
+    clv_consistency: 0.15
+    dataset_quality: 0.15
+
+governance_metrics:
+  # Base requirements for governance metrics
+  novelty:
+    threshold_for_promotion: 60  # Minimum Novelty Score
+  robustness:
+    threshold_for_promotion: 75  # Minimum Robustness Score
+  deployability:
+    threshold_for_promotion: 80  # Minimum Deployability Score

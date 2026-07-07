@@ -1,0 +1,7 @@
+brier: 0.0003
+champion: true
+dataset: v1.0
+experiment: EXP-000005
+feature: v1.0
+model: LogisticRegression
+roi: 0.0

@@ -1,0 +1,28 @@
+# HandicapLab Trusted Providers Hierarchy
+# Defines the provider precedence for resolving cross-provider conflicts.
+
+default:
+  result:
+    - fbref
+    - football_data_co_uk
+    - understat
+  stats:
+    - fbref
+    - football_data_co_uk
+    - understat
+  odds:
+    - oddsapi
+    - football_data_co_uk
+  attendance:
+    - fbref
+    - worldfootball
+  referee:
+    - worldfootball
+    - fbref
+
+# You can override per competition if specific providers are more reliable there
+competitions:
+  LEAGUE_EPL:
+    result:
+      - fbref
+      - football_data_co_uk

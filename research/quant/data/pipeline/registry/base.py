@@ -4,18 +4,18 @@ from typing import Optional, List, Dict
 class RegistryInterface(ABC):
     
     @abstractmethod
-    def get_canonical_team_id(self, provider_name: str, team_name: str) -> Optional[str]:
-        """Resolves a raw team name to the internal canonical team ID."""
+    def get_canonical_team_id(self, provider_name: str, team_name: str, context: Dict = None) -> Dict:
+        """Resolves a raw team name to a resolution dict containing id, canonical_name, confidence, method."""
         pass
         
     @abstractmethod
-    def get_canonical_league_id(self, provider_name: str, league_name: str) -> Optional[str]:
-        """Resolves a raw league name to the internal canonical league ID."""
+    def get_canonical_league_id(self, provider_name: str, league_name: str, context: Dict = None) -> Dict:
+        """Resolves a raw league name to a resolution dict containing id, canonical_name, confidence, method."""
         pass
         
     @abstractmethod
-    def get_canonical_bookmaker_id(self, provider_name: str, bookmaker_name: str) -> Optional[str]:
-        """Resolves a raw bookmaker name to the internal canonical bookmaker ID."""
+    def get_canonical_bookmaker_id(self, provider_name: str, bookmaker_name: str, context: Dict = None) -> Dict:
+        """Resolves a raw bookmaker name to a resolution dict containing id, canonical_name, confidence, method."""
         pass
         
     @abstractmethod

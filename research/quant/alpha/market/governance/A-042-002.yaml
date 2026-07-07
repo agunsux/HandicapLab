@@ -1,0 +1,12 @@
+alpha_id: A-042-002
+source_rq: RQ-042-002
+evidence_level: L1
+acs: null
+status: Simulation Validated
+governance_metrics:
+  novelty: 70
+  robustness: 85
+  deployability: 90
+history:
+- stage: Simulation
+  reason: Initial extraction from RQ pipeline

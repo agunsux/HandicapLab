@@ -1,0 +1,156 @@
+features:
+  # WAVE 1: Team Strength
+  elo_rating:
+    version: 1.0
+    depends_on: results
+    window: null # ELO is continuous
+    lag: 1
+    owner: feature_engine
+    leakage_safe: true
+
+  rolling_points:
+    version: 1.0
+    depends_on: results
+    window: 5
+    lag: 1
+    owner: feature_engine
+    leakage_safe: true
+    
+  rolling_goal_difference:
+    version: 1.0
+    depends_on: results
+    window: 5
+    lag: 1
+    owner: feature_engine
+    leakage_safe: true
+    
+  rolling_goals_for:
+    version: 1.0
+    depends_on: results
+    window: 5
+    lag: 1
+    owner: feature_engine
+    leakage_safe: true
+    
+  rolling_goals_against:
+    version: 1.0
+    depends_on: results
+    window: 5
+    lag: 1
+    owner: feature_engine
+    leakage_safe: true
+    
+  rolling_win_rate:
+    version: 1.0
+    depends_on: results
+    window: 5
+    lag: 1
+    owner: feature_engine
+    leakage_safe: true
+
+  # WAVE 2: Form
+  recent_form_3:
+    version: 1.0
+    depends_on: results
+    window: 3
+    lag: 1
+    owner: feature_engine
+    leakage_safe: true
+
+  recent_form_5:
+    version: 1.0
+    depends_on: results
+    window: 5
+    lag: 1
+    owner: feature_engine
+    leakage_safe: true
+
+  recent_form_10:
+    version: 1.0
+    depends_on: results
+    window: 10
+    lag: 1
+    owner: feature_engine
+    leakage_safe: true
+    
+  home_form_5:
+    version: 1.0
+    depends_on: results
+    window: 5
+    lag: 1
+    owner: feature_engine
+    leakage_safe: true
+    
+  away_form_5:
+    version: 1.0
+    depends_on: results
+    window: 5
+    lag: 1
+    owner: feature_engine
+    leakage_safe: true
+
+  # WAVE 3: Schedule
+  rest_days:
+    version: 1.0
+    depends_on: schedule
+    window: 1
+    lag: 1
+    owner: feature_engine
+    leakage_safe: true
+    
+  match_congestion:
+    version: 1.0
+    depends_on: schedule
+    window: 14 # games in last 14 days
+    lag: 1
+    owner: feature_engine
+    leakage_safe: true
+    
+  consecutive_home:
+    version: 1.0
+    depends_on: schedule
+    window: null
+    lag: 1
+    owner: feature_engine
+    leakage_safe: true
+    
+  consecutive_away:
+    version: 1.0
+    depends_on: schedule
+    window: null
+    lag: 1
+    owner: feature_engine
+    leakage_safe: true
+
+  # WAVE 4: Market
+  implied_probability:
+    version: 1.0
+    depends_on: odds
+    window: 1
+    lag: 0 # Available PRE-KICKOFF
+    owner: feature_engine
+    leakage_safe: true
+    
+  bookmaker_margin:
+    version: 1.0
+    depends_on: odds
+    window: 1
+    lag: 0
+    owner: feature_engine
+    leakage_safe: true
+    
+  consensus_odds:
+    version: 1.0
+    depends_on: odds
+    window: 1
+    lag: 0
+    owner: feature_engine
+    leakage_safe: true
+    
+  odds_dispersion:
+    version: 1.0
+    depends_on: odds
+    window: 1
+    lag: 0
+    owner: feature_engine
+    leakage_safe: true

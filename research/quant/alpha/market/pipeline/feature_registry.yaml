@@ -1,0 +1,18 @@
+features:
+  - name: price_discovery_speed
+    description: Speed at which market price converges from opening to closing
+    owner: quant_research
+    formula: "(closing_price - opening_price) / time_to_close"
+    tags: ["price", "discovery", "velocity"]
+    version: "1.0"
+    status: "production"
+    dependencies: []
+  
+  - name: steam_move_indicator
+    description: Flags if a rapid price shift happened in the last hour before kickoff
+    owner: quant_research
+    formula: "if (price_t - price_t_minus_1) > threshold then 1 else 0"
+    tags: ["steam", "momentum"]
+    version: "1.0"
+    status: "experimental"
+    dependencies: []
