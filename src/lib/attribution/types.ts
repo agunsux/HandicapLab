@@ -126,7 +126,7 @@ export interface OutcomeContribution {
 
 // ─── Causal Graph ─────────────────────────────────────────────────────────────
 
-export type NodeType = 'DECISION' | 'CONFIDENCE' | 'EVIDENCE' | 'FEATURE' | 'OUTCOME' | 'UNCERTAINTY' | 'RISK';
+export type NodeType = 'DECISION' | 'CONFIDENCE' | 'EVIDENCE' | 'FEATURE' | 'OUTCOME' | 'UNCERTAINTY' | 'RISK' | 'HEALTH';
 export type EdgeRelation = 'INCREASES' | 'DECREASES' | 'BLOCKS' | 'CAUSES';
 
 export interface CausalNode {

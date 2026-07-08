@@ -12,12 +12,12 @@ export class StructuredEvidenceBuilder {
     const vector = decisionObject.uncertainty_vector;
 
     if (vector) {
-      if (vector.epistemic !== undefined) {
+      if (vector.epistemic != null) {
         if (vector.epistemic < 0.4) contributing.push({ name: 'epistemic_uncertainty', description: 'Low model uncertainty', direction: 'POSITIVE', magnitude: 1 - vector.epistemic });
         else if (vector.epistemic > 0.6) opposing.push({ name: 'epistemic_uncertainty', description: 'High model uncertainty', direction: 'NEGATIVE', magnitude: vector.epistemic });
       }
 
-      if (vector.data_quality !== undefined) {
+      if (vector.data_quality != null) {
         if (vector.data_quality > 0.8) contributing.push({ name: 'data_quality', description: 'High data quality', direction: 'POSITIVE', magnitude: vector.data_quality });
         else if (vector.data_quality < 0.6) opposing.push({ name: 'data_quality', description: 'Poor data quality', direction: 'NEGATIVE', magnitude: 1 - vector.data_quality });
       }
@@ -73,7 +73,7 @@ export class StructuredEvidenceBuilder {
   static buildSignals(decisionObject: DecisionObject): Signal[] {
     const signals: Signal[] = [];
     
-    if (decisionObject.confidence !== undefined) {
+    if (decisionObject.confidence != null) {
       signals.push({
         source: 'Decision Confidence',
         value: decisionObject.confidence,
@@ -81,7 +81,7 @@ export class StructuredEvidenceBuilder {
       });
     }
 
-    if (decisionObject.expected_value !== undefined) {
+    if (decisionObject.expected_value != null) {
       signals.push({
         source: 'Expected Value',
         value: decisionObject.expected_value,

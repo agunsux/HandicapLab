@@ -72,7 +72,7 @@ async function run() {
     
     confSum += verdict.decisionConfidence;
     
-    if (verdict.verdict === 'VETO' || verdict.verdict === 'REJECT') {
+    if (verdict.verdict === 'REJECT' || verdict.verdict === 'HOLD') {
        vetos++;
     } else {
        approvals++;

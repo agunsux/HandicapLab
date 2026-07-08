@@ -33,7 +33,7 @@ export class ConfidenceAttribution {
     }
 
     // 2. Evidence Agreement Contribution
-    if (vector?.evidence_agreement !== undefined) {
+    if (vector?.evidence_agreement != null) {
       contributions.push({
         name: 'evidence_agreement', type: 'EVIDENCE',
         weight: vector.evidence_agreement,

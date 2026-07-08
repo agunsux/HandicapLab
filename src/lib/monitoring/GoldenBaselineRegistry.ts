@@ -20,7 +20,7 @@ export class GoldenBaselineRegistry {
    */
   static register(baseline: GoldenBaseline): GoldenBaseline {
     // Mark all previous as inactive when a new one is approved
-    for (const b of registry) b['is_active'] = false;
+    for (const b of registry) (b as any).is_active = false;
 
     const entry: GoldenBaseline & { is_active: boolean } = {
       ...baseline,

@@ -11,8 +11,8 @@ export class UncertaintyAttribution {
 
     if (!vector) return contributions;
 
-    const mapDim = (name: string, val: number | undefined, invert: boolean = false) => {
-      if (val === undefined) return;
+    const mapDim = (name: string, val: number | undefined | null, invert: boolean = false) => {
+      if (val === undefined || val === null) return;
       // Some dimensions (like epistemic) are bad when high.
       // Some (like data_quality) are bad when low (so we invert them).
       const magnitude = invert ? 1 - val : val;

@@ -59,10 +59,10 @@ export class ConfidenceNarrativeBuilder {
     // Uncertainty context
     const vector = decisionObject.uncertainty_vector;
     if (vector) {
-      if (vector.epistemic !== undefined && vector.epistemic < 0.3) positiveFactors.push('Epistemic uncertainty is low');
-      if (vector.epistemic !== undefined && vector.epistemic > 0.7) negativeFactors.push('Epistemic uncertainty is high');
+      if (vector.epistemic != null && vector.epistemic < 0.3) positiveFactors.push('Epistemic uncertainty is low');
+      if (vector.epistemic != null && vector.epistemic > 0.7) negativeFactors.push('Epistemic uncertainty is high');
       
-      if (vector.aleatoric !== undefined && vector.aleatoric > 0.8) negativeFactors.push('Aleatoric (inherent) uncertainty is very high');
+      if (vector.aleatoric != null && vector.aleatoric > 0.8) negativeFactors.push('Aleatoric (inherent) uncertainty is very high');
     }
 
     if (positiveFactors.length > 0) {

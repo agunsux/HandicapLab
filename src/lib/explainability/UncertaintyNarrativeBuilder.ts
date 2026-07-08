@@ -7,25 +7,25 @@ export class UncertaintyNarrativeBuilder {
   static build(vector: UncertaintyVector): string {
     const lines: string[] = [];
     
-    if (vector.epistemic !== undefined) {
+    if (vector.epistemic != null) {
       lines.push(`• Epistemic (model knowledge): ${this.describeLevel(vector.epistemic)}`);
     }
-    if (vector.aleatoric !== undefined) {
+    if (vector.aleatoric != null) {
       lines.push(`• Aleatoric (inherent variance): ${this.describeLevel(vector.aleatoric)}`);
     }
-    if (vector.data_quality !== undefined) {
+    if (vector.data_quality != null) {
       lines.push(`• Data quality impact: ${this.describeLevel(1 - vector.data_quality)}`);
     }
-    if (vector.distribution_shift !== undefined) {
+    if (vector.distribution_shift != null) {
       lines.push(`• Distribution shift: ${this.describeLevel(1 - vector.distribution_shift)}`);
     }
-    if (vector.calibration_quality !== undefined) {
+    if (vector.calibration_quality != null) {
       lines.push(`• Calibration uncertainty: ${this.describeLevel(1 - vector.calibration_quality)}`);
     }
-    if (vector.ensemble_agreement !== undefined) {
+    if (vector.ensemble_agreement != null) {
       lines.push(`• Ensemble disagreement: ${this.describeLevel(1 - vector.ensemble_agreement)}`);
     }
-    if (vector.external_consensus !== undefined) {
+    if (vector.external_consensus != null) {
       lines.push(`• External disagreement: ${this.describeLevel(1 - vector.external_consensus)}`);
     }
 

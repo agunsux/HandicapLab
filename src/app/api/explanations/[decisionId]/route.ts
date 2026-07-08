@@ -12,10 +12,10 @@ import { ExplanationFormat } from '@/lib/explainability/types';
  */
 export async function GET(
   req: Request,
-  { params }: { params: { decisionId: string } }
+  { params }: { params: Promise<{ decisionId: string }> }
 ) {
   try {
-    const { decisionId } = params;
+    const { decisionId } = await params;
     const url = new URL(req.url);
     const format = (url.searchParams.get('format') || 'json') as ExplanationFormat;
 

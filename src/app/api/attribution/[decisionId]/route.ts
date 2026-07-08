@@ -11,10 +11,10 @@ import { ExplanationRegistry } from '@/lib/explainability/ExplanationRegistry';
  */
 export async function GET(
   req: Request,
-  { params }: { params: { decisionId: string } }
+  { params }: { params: Promise<{ decisionId: string }> }
 ) {
   try {
-    const { decisionId } = params;
+    const { decisionId } = await params;
     
     // For scaffolding, we pull the M4 explanation from memory.
     // In production, we'd query `decision_attributions` table directly.

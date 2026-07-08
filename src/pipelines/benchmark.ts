@@ -15,7 +15,8 @@ export async function runCalibrationBenchmark(datasetPath: string, rawPrediction
     protocol,
     ece: 0.08,
     brier: 0.21,
-    log_loss: 0.61
+    log_loss: 0.61,
+    champion: false
   };
   
   const plattEntry: CalibrationRegistryEntry = {
@@ -24,7 +25,8 @@ export async function runCalibrationBenchmark(datasetPath: string, rawPrediction
     protocol,
     ece: 0.04,
     brier: 0.19,
-    log_loss: 0.58
+    log_loss: 0.58,
+    champion: false
   };
   
   const tempEntry: CalibrationRegistryEntry = {
@@ -33,7 +35,8 @@ export async function runCalibrationBenchmark(datasetPath: string, rawPrediction
     protocol,
     ece: 0.035,
     brier: 0.192,
-    log_loss: 0.585
+    log_loss: 0.585,
+    champion: false
   };
   
   const isotonicEntry: CalibrationRegistryEntry = {
@@ -42,7 +45,8 @@ export async function runCalibrationBenchmark(datasetPath: string, rawPrediction
     protocol,
     ece: 0.03,
     brier: 0.185,
-    log_loss: 0.57
+    log_loss: 0.57,
+    champion: false
   };
 
   const betaEntry: CalibrationRegistryEntry = {
@@ -51,7 +55,8 @@ export async function runCalibrationBenchmark(datasetPath: string, rawPrediction
     protocol,
     ece: 0.025,
     brier: 0.18,
-    log_loss: 0.56
+    log_loss: 0.56,
+    champion: false
   };
 
   const candidates = await Promise.all([

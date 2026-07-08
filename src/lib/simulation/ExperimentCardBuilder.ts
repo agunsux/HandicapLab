@@ -11,18 +11,21 @@ export class ExperimentCardBuilder {
 
     const deltas: MetricDelta[] = [];
 
+    let promotionScore = 0;
+    let promotionReady = false;
+
     if (base && cand) {
       deltas.push(this.calculateDelta('Yield', base.yield, cand.yield, true));
       deltas.push(this.calculateDelta('Coverage', base.coverage, cand.coverage, true));
       deltas.push(this.calculateDelta('Decision Quality', base.decisionQuality, cand.decisionQuality, true));
       deltas.push(this.calculateDelta('Correct Skips', base.correctSkips, cand.correctSkips, true, false)); // raw number
       deltas.push(this.calculateDelta('Missed Opportunities', base.missedOpportunities, cand.missedOpportunities, false, false));
+      
+      // Calculate Promotion Score
+      const scoreResult = PromotionScorer.score(base, cand, experiment.evidenceLevel);
+      promotionScore = scoreResult.compositeScore;
+      promotionReady = promotionScore >= 90;
     }
-
-    // Calculate Promotion Score
-    const scoreResult = PromotionScorer.score(base, cand, experiment.evidenceLevel);
-    const promotionScore = scoreResult.compositeScore;
-    const promotionReady = promotionScore >= 90;
 
     return {
       experimentId: experiment.id,

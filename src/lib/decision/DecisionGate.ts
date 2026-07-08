@@ -23,7 +23,7 @@ export class DecisionGate {
     let risk_level: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL' = 'LOW';
 
     // 1. Evidence Agreement Check
-    if (vector.evidence_agreement !== undefined && vector.evidence_agreement < 0.5) {
+    if (vector.evidence_agreement != null && vector.evidence_agreement < 0.5) {
       decision = 'INCONCLUSIVE';
       blocking_flags.push('CONFLICTING_EVIDENCE');
       reasoning.push('Sources are providing conflicting signals.');
@@ -43,16 +43,30 @@ export class DecisionGate {
     }
 
     // 2. Data Quality Check
-    if (vector.data_quality !== undefined && vector.data_quality < 0.6) {
+    if (vector.data_quality != null && vector.data_quality < 0.6) {
       blocking_flags.push('POOR_DATA_QUALITY');
       reasoning.push('Data quality is below acceptable thresholds.');
       risk_level = 'HIGH';
     }
 
-    // 3. Distribution Shift Check
-    if (vector.distribution_shift !== undefined && vector.distribution_shift < 0.7) {
+    // 3. Epistemic Uncertainty Check
+    if (vector.epistemic != null && vector.epistemic > 0.4) {
+      blocking_flags.push('HIGH_EPISTEMIC_UNCERTAINTY');
+      reasoning.push('Model lacks knowledge about this specific scenario.');
+      risk_level = 'HIGH';
+    }
+
+    // 4. Aleatoric Uncertainty Check
+    if (vector.aleatoric != null && vector.aleatoric > 0.6) {
+      blocking_flags.push('HIGH_ALEATORIC_UNCERTAINTY');
+      reasoning.push('Inherent randomness is too high for a confident prediction.');
+      risk_level = 'HIGH';
+    }
+
+    // 5. Distribution Shift Check
+    if (vector.distribution_shift != null && vector.distribution_shift > 0.3) {
       blocking_flags.push('DISTRIBUTION_SHIFT_DETECTED');
-      reasoning.push('Significant macro-level distribution shift detected.');
+      reasoning.push('Current data distribution deviates from training data.');
       risk_level = 'HIGH';
     }
 
@@ -60,7 +74,7 @@ export class DecisionGate {
     if (confidence < CONFIDENCE_THRESHOLD) {
       blocking_flags.push('LOW_CONFIDENCE');
       reasoning.push(`Overall confidence (${(confidence * 100).toFixed(1)}%) is below threshold (${CONFIDENCE_THRESHOLD * 100}%).`);
-      if (risk_level !== 'CRITICAL') risk_level = 'HIGH';
+      risk_level = 'HIGH';
     }
 
     // 5. Value Check

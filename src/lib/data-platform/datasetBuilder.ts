@@ -16,7 +16,7 @@ export interface DatasetMetadata {
 
 export class DatasetBuilder {
   private static getConfig() {
-    const configPath = path.resolve(process.cwd(), 'config', 'data-platform.json');
+    const configPath = path.resolve(/*turbopackIgnore: true*/ process.cwd(), 'config', 'data-platform.json');
     if (fs.existsSync(configPath)) {
       return JSON.parse(fs.readFileSync(configPath, 'utf8'));
     }
@@ -59,7 +59,7 @@ export class DatasetBuilder {
     const config = this.getConfig();
     const basePath = config.paths.silver;
     
-    const partitionDir = path.resolve(process.cwd(), basePath, leagueId, season, version);
+    const partitionDir = path.resolve(/*turbopackIgnore: true*/ process.cwd(), basePath, leagueId, season, version);
     if (!fs.existsSync(partitionDir)) {
       fs.mkdirSync(partitionDir, { recursive: true });
     }
@@ -109,7 +109,7 @@ export class DatasetBuilder {
 
   private static updateRegistry(metadata: DatasetMetadata) {
     const config = this.getConfig();
-    const registryPath = path.resolve(process.cwd(), config.paths.registry, 'dataset_metadata.json');
+    const registryPath = path.resolve(/*turbopackIgnore: true*/ process.cwd(), config.paths.registry, 'dataset_metadata.json');
     const dir = path.dirname(registryPath);
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 
@@ -127,7 +127,7 @@ export class DatasetBuilder {
 
   public static getDatasets(): DatasetMetadata[] {
     const config = this.getConfig();
-    const registryPath = path.resolve(process.cwd(), config.paths.registry, 'dataset_metadata.json');
+    const registryPath = path.resolve(/*turbopackIgnore: true*/ process.cwd(), config.paths.registry, 'dataset_metadata.json');
     if (fs.existsSync(registryPath)) {
       return JSON.parse(fs.readFileSync(registryPath, 'utf8'));
     }
