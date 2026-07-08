@@ -1,6 +1,8 @@
 import { Feature, calculateFeatureScore, sigmoid, extractExplainability } from '../lib/model/features';
 import { StateWeightResult } from '../lib/calibration/stateWeightLearner';
 import { calculatePoissonProbabilities } from '../lib/model/poisson';
+import { OODDetector } from '../lib/ood/OODDetector';
+import { ConfidenceCalculator } from '../lib/confidence/ConfidenceCalculator';
 
 export interface MatchInput {
   odds_home: number;
@@ -58,6 +60,8 @@ export interface PredictionOutput {
   expected_goals_home: number;
   expected_goals_away: number;
   final_confidence: number; // 0.0 to 1.0 (or 0-100, we normalize to 0.0-1.0)
+  ood_score: number;
+
   model_version: string;
   topPositiveFactors: string[];
   topNegativeFactors: string[];
@@ -129,17 +133,33 @@ export function generatePrediction(
 
   const { positive, negative } = extractExplainability(shUnderFeatures);
 
+  // Calculate OOD Score
+  const featureValues = [
+    input.xg_home, input.xg_away, input.shots_home, input.shots_away,
+    input.domain_tempo || 0, input.domain_pressure || 0
+  ];
+  const ood_score = OODDetector.computeOODScore(featureValues);
+
   // 4. Calculate prediction confidence (0.0 to 1.0)
   // Use highest probability from primary markets as a baseline confidence metric
   const primaryMarkets = [poisson.homeProb, poisson.drawProb, poisson.awayProb, poisson.overProb, poisson.underProb];
   const maxMarketProb = Math.max(...primaryMarkets);
   
-  let final_confidence = maxMarketProb;
+  let baseConfidence = maxMarketProb;
   if (pm) {
     // Add H2H reliability factor (higher win/loss consistency in H2H increases confidence)
     const h2hSkew = Math.abs(pm.h2hHomeWinRate - pm.h2hAwayWinRate);
-    final_confidence = Math.min(0.99, Math.max(0.35, final_confidence + h2hSkew * 0.1));
+    baseConfidence = Math.min(0.99, Math.max(0.35, baseConfidence + h2hSkew * 0.1));
   }
+
+  // Composite Confidence
+  const final_confidence = ConfidenceCalculator.calculate(
+    1.0, // Mock calibration quality (would come from Registry/ECE)
+    0.9, // Mock model stability
+    0.95, // Mock data coverage
+    ood_score,
+    baseConfidence // Mock agreement score (using max market prob as proxy)
+  );
 
   // Base raw logits for legacy metrics
   const ouBaseLine = 2.5;
@@ -170,6 +190,7 @@ export function generatePrediction(
     expected_goals_home: Number(lambdaHome.toFixed(2)),
     expected_goals_away: Number(lambdaAway.toFixed(2)),
     final_confidence,
+    ood_score,
     model_version: 'v0.5-ai',
     topPositiveFactors: pm ? ['Form & Strength Adjusted', ...positive] : positive,
     topNegativeFactors: negative,

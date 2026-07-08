@@ -1,0 +1,60 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DecisionObject",
+  "description": "Versioned contract for final decisions in HandicapLab.",
+  "type": "object",
+  "properties": {
+    "decision_version": {
+      "type": "string",
+      "description": "Version of the decision contract schema used.",
+      "const": "v1"
+    },
+    "probability": {
+      "type": ["number", "null"],
+      "description": "The calibrated probability of the event."
+    },
+    "expected_value": {
+      "type": ["number", "null"],
+      "description": "Expected value of the decision."
+    },
+    "uncertainty_vector": {
+      "type": "object",
+      "properties": {
+        "epistemic": { "type": ["number", "null"] },
+        "aleatoric": { "type": ["number", "null"] },
+        "data_quality": { "type": ["number", "null"] },
+        "distribution_shift": { "type": ["number", "null"] },
+        "calibration_quality": { "type": ["number", "null"] },
+        "ensemble_agreement": { "type": ["number", "null"] },
+        "external_consensus": { "type": ["number", "null"] },
+        "evidence_agreement": { "type": ["number", "null"] }
+      },
+      "description": "Multi-dimensional uncertainty vector."
+    },
+    "confidence": {
+      "type": ["number", "null"],
+      "description": "Final aggregated confidence score (0-1)."
+    },
+    "risk_level": {
+      "type": "string",
+      "enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"],
+      "description": "Categorical risk assessment."
+    },
+    "decision": {
+      "type": "string",
+      "enum": ["BET", "NO_BET", "INCONCLUSIVE", "WAIT"],
+      "description": "The final recommendation."
+    },
+    "reasoning": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Human-readable reasoning for the decision."
+    },
+    "blocking_flags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "List of flags that blocked a positive signal."
+    }
+  },
+  "required": ["decision_version", "uncertainty_vector", "decision"]
+}

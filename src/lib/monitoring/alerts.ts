@@ -60,3 +60,30 @@ export async function insertAlert(
     console.info('Alert inserted:', alertType, source);
   }
 }
+
+/**
+ * Typed wrapper for dispatching model health alerts.
+ * Maps HealthStatus → severity automatically.
+ * Called by ModelHealthMonitor when health degrades.
+ */
+export async function dispatchModelAlert(
+  modelVersion: string,
+  healthStatus: 'HEALTHY' | 'DEGRADED' | 'CRITICAL' | 'INSUFFICIENT_DATA',
+  healthScore: number,
+  driftedMetrics: string[]
+): Promise<void> {
+  if (healthStatus === 'HEALTHY' || healthStatus === 'INSUFFICIENT_DATA') return;
+
+  const severity = healthStatus === 'CRITICAL' ? 'critical' : 'warning';
+  const driftSummary = driftedMetrics.length > 0
+    ? ` Drifted: [${driftedMetrics.join(', ')}].`
+    : '';
+
+  await insertAlert(
+    'model_health_degraded',
+    severity,
+    `model_health_monitor:${modelVersion}`,
+    `Model ${modelVersion} health score dropped to ${healthScore}/100 (${healthStatus}).${driftSummary}`,
+    { modelVersion, healthScore, healthStatus, driftedMetrics }
+  );
+}

@@ -1,0 +1,97 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ProbabilityObject",
+  "description": "Versioned contract for probability predictions in HandicapLab.",
+  "type": "object",
+  "properties": {
+    "probability_version": {
+      "type": "string",
+      "description": "Version of the probability contract schema used.",
+      "const": "v1"
+    },
+    "raw_probability": {
+      "type": "number",
+      "description": "The raw probability output by the base model.",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "calibrated_probability": {
+      "type": ["number", "null"],
+      "description": "The calibrated probability.",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "calibration_method": {
+      "type": ["string", "null"],
+      "description": "The method used for calibration."
+    },
+    "confidence_interval": {
+      "type": ["array", "null"],
+      "items": {
+        "type": "number"
+      },
+      "minItems": 2,
+      "maxItems": 2,
+      "description": "[Lower bound, Upper bound] of the confidence interval."
+    },
+    "uncertainty_score": {
+      "type": ["number", "null"],
+      "description": "Overall uncertainty score for the prediction."
+    },
+    "epistemic_uncertainty": {
+      "type": ["number", "null"],
+      "description": "Uncertainty due to lack of knowledge (model uncertainty)."
+    },
+    "aleatoric_uncertainty": {
+      "type": ["number", "null"],
+      "description": "Uncertainty due to inherent noise (data uncertainty)."
+    },
+    "expected_calibration_error": {
+      "type": ["number", "null"],
+      "description": "ECE for the underlying model/calibration."
+    },
+    "brier_score": {
+      "type": ["number", "null"],
+      "description": "Brier score for the underlying model/calibration."
+    },
+    "log_loss": {
+      "type": ["number", "null"],
+      "description": "Log loss for the underlying model/calibration."
+    },
+    "entropy": {
+      "type": ["number", "null"],
+      "description": "Predictive entropy."
+    },
+    "reliability_bucket": {
+      "type": ["integer", "null"],
+      "description": "The reliability bucket this prediction falls into."
+    },
+    "risk_flags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Array of risk flags identified for this prediction."
+    },
+    "explanation": {
+      "type": ["string", "null"],
+      "description": "Human-readable explanation of the prediction."
+    },
+    "feature_attribution": {
+      "type": ["object", "null"],
+      "additionalProperties": {
+        "type": "number"
+      },
+      "description": "Key-value pairs of feature names and their attribution scores."
+    },
+    "prediction_confidence": {
+      "type": ["number", "null"],
+      "description": "Composite confidence score."
+    },
+    "ood_score": {
+      "type": ["number", "null"],
+      "description": "Out-of-distribution score for the input."
+    }
+  },
+  "required": ["probability_version", "raw_probability", "risk_flags"]
+}
