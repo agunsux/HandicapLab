@@ -1,3 +1,5 @@
+import { sigmoid } from '../math/metrics';
+
 export function gridSearchTemperature(
   logits: number[],
   labels: number[],
@@ -6,34 +8,20 @@ export function gridSearchTemperature(
 ): number {
   let bestTemp = 1.0;
   let bestLoss = Infinity;
-  
   const [min, max] = tempRange;
   const stepSize = (max - min) / steps;
-  
   for (let t = min; t <= max; t += stepSize) {
     const calibrated = logits.map(logit => sigmoid(logit / t));
     const loss = binaryCrossEntropy(calibrated, labels);
-    
-    if (loss < bestLoss) {
-      bestLoss = loss;
-      bestTemp = t;
-    }
+    if (loss < bestLoss) { bestLoss = loss; bestTemp = t; }
   }
-  
   return bestTemp;
 }
 
-export function applyTemperature(
-  rawProbability: number,
-  temperature: number
-): number {
+export function applyTemperature(rawProbability: number, temperature: number): number {
   const p = Math.max(0.001, Math.min(0.999, rawProbability));
   const logit = Math.log(p / (1 - p));
   return sigmoid(logit / temperature);
-}
-
-export function sigmoid(x: number): number {
-  return 1 / (1 + Math.exp(-x));
 }
 
 export function binaryCrossEntropy(predictions: number[], labels: number[]): number {

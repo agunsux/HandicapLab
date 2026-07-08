@@ -1,6 +1,4 @@
 // explain API route
-// Location: src/app/api/v1/explain/route.ts
-
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase.server';
 import { getUserEntitlements } from '@/lib/pricing/entitlement';
@@ -19,16 +17,12 @@ export async function GET(request: Request) {
       if (user) userId = user.id;
     }
 
-    // Auth token premium bypass for testing
     let tier = 'free';
-    if (token === 'mock-premium-token') {
-      tier = 'premium';
-    } else if (userId) {
+    if (userId) {
       const entitlements = await getUserEntitlements(userId);
       tier = entitlements.tier;
     }
 
-    // Enforce billing restriction
     if (tier !== 'premium' && tier !== 'enterprise') {
       return ApiHelper.response(false, null, 'Access restricted to Premium or Enterprise subscribers.', 403);
     }
@@ -41,7 +35,6 @@ export async function GET(request: Request) {
       return ApiHelper.response(false, null, 'Rate limit exceeded.', 429);
     }
 
-    // Call service layer for a sample match
     const result = await FootballIntelligenceService.getMatchExplanations('match-1001');
     if (!result) {
       return ApiHelper.response(false, null, 'Failed to fetch explanations.', 500);

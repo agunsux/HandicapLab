@@ -1,5 +1,5 @@
 import { fitPlattScaling, applyPlattScaling, PlattParams } from './plattScaling';
-import { calculateBrierScore } from '../validation/calibration';
+import { calculateECE, brierScore } from '../math/metrics';
 
 export interface MarketCalibrationResult {
   market: string;
@@ -8,30 +8,6 @@ export interface MarketCalibrationResult {
   postCalibrationECE: number;
   brierScore: number;
   sampleSize: number;
-}
-
-export function calculateECE(predictions: { probability: number; actual: number }[]): number {
-  const bins = Array.from({ length: 10 }, () => ({ count: 0, predMean: 0, actualRate: 0 }));
-  
-  for (const p of predictions) {
-    const bIdx = Math.min(9, Math.floor(p.probability * 10));
-    bins[bIdx].count++;
-    bins[bIdx].predMean += p.probability;
-    bins[bIdx].actualRate += p.actual;
-  }
-
-  let eceSum = 0;
-  const N = predictions.length;
-
-  for (const b of bins) {
-    if (b.count > 0) {
-      b.predMean /= b.count;
-      b.actualRate /= b.count;
-      const error = Math.abs(b.predMean - b.actualRate);
-      eceSum += (b.count / N) * error;
-    }
-  }
-  return eceSum;
 }
 
 export function calibrateMarket(
@@ -48,10 +24,11 @@ export function calibrateMarket(
     actual: p.actual
   }));
   
-  const preECE = calculateECE(predictions);
-  const postECE = calculateECE(calibrated);
+  const preECE = calculateECE(predictions.map(p => p.probability), predictions.map(p => p.actual));
+  const postECE = calculateECE(calibrated.map(p => p.probability), calibrated.map(p => p.actual));
   
-  const brier = calculateBrierScore(calibrated.map(p => ({ prob: p.probability, outcome: p.actual })));
+  const brierSum = calibrated.reduce((sum, p) => sum + brierScore(p.probability, p.actual), 0);
+  const brier = calibrated.length > 0 ? brierSum / calibrated.length : 0;
   
   return {
     market,

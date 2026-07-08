@@ -1,6 +1,4 @@
 // edges API route
-// Location: src/app/api/v1/edges/route.ts
-
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase.server';
 import { getUserEntitlements } from '@/lib/pricing/entitlement';
@@ -19,16 +17,12 @@ export async function GET(request: Request) {
       if (user) userId = user.id;
     }
 
-    // Auth token premium bypass for testing
     let tier = 'free';
-    if (token === 'mock-premium-token') {
-      tier = 'premium';
-    } else if (userId) {
+    if (userId) {
       const entitlements = await getUserEntitlements(userId);
       tier = entitlements.tier;
     }
 
-    // Enforce billing restriction: edges are PREMIUM or ENTERPRISE only
     if (tier !== 'premium' && tier !== 'enterprise') {
       return ApiHelper.response(false, null, 'Access restricted to Premium or Enterprise subscribers.', 403);
     }
@@ -41,13 +35,11 @@ export async function GET(request: Request) {
       return ApiHelper.response(false, null, 'Rate limit exceeded.', 429);
     }
 
-    // Call service layer for a sample match
     const result = await FootballIntelligenceService.getMatchIntelligence('match-1001');
     if (!result) {
       return ApiHelper.response(false, null, 'Failed to fetch edges.', 500);
     }
 
-    // Format output specifically for edges
     const edgesData = result.data.map(r => ({
       match_id: r.match_id,
       market: r.market,
@@ -55,9 +47,9 @@ export async function GET(request: Request) {
       bookmaker_odds: r.market_odds,
       edge_percent: r.edge,
       expected_value: r.expected_value,
-      clv_projection: Number((r.market_odds * 0.02).toFixed(2)), // simulated CLV
-      steam: r.market_odds > 1.80, // simulated steam
-      reverse_line: r.market_odds < 1.90 // simulated reverse line
+      clv_projection: Number((r.market_odds * 0.02).toFixed(2)),
+      steam: r.market_odds > 1.80,
+      reverse_line: r.market_odds < 1.90
     }));
 
     return NextResponse.json({

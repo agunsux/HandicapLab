@@ -1,8 +1,10 @@
+import { sigmoid } from '../math/metrics';
+
 export interface Feature {
   name: string;
-  value: number; // raw value (-1 to 1 usually)
-  weight: number; // importance weight
-  description: string; // for explainability
+  value: number;
+  weight: number;
+  description: string;
 }
 
 export function calculateFeatureScore(features: Feature[]): number {
@@ -15,23 +17,16 @@ export function calculateFeatureScore(features: Feature[]): number {
 
 export function extractExplainability(features: Feature[]): { positive: string[], negative: string[] } {
   const sorted = [...features].sort((a, b) => Math.abs(b.value * b.weight) - Math.abs(a.value * a.weight));
-  
   const positive: string[] = [];
   const negative: string[] = [];
-  
   for (const f of sorted) {
     const contribution = f.value * f.weight;
-    if (Math.abs(contribution) < 0.02) continue; // Skip negligible
+    if (Math.abs(contribution) < 0.02) continue;
     if (contribution > 0) {
       positive.push(f.description);
     } else {
       negative.push(f.description);
     }
   }
-  
   return { positive: positive.slice(0, 3), negative: negative.slice(0, 3) };
-}
-
-export function sigmoid(score: number): number {
-  return 1 / (1 + Math.exp(-score));
 }

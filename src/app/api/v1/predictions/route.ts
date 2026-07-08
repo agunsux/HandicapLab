@@ -1,6 +1,4 @@
 // predictions API route
-// Location: src/app/api/v1/predictions/route.ts
-
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase.server';
 import { getUserEntitlements } from '@/lib/pricing/entitlement';
@@ -19,11 +17,8 @@ export async function GET(request: Request) {
       if (user) userId = user.id;
     }
 
-    // Auth token premium bypass for testing
     let tier = 'free';
-    if (token === 'mock-premium-token') {
-      tier = 'premium';
-    } else if (userId) {
+    if (userId) {
       const entitlements = await getUserEntitlements(userId);
       tier = entitlements.tier;
     }
@@ -36,13 +31,11 @@ export async function GET(request: Request) {
       return ApiHelper.response(false, null, 'Rate limit exceeded.', 429);
     }
 
-    // Call service layer for a sample match
     const result = await FootballIntelligenceService.getMatchIntelligence('match-1001');
     if (!result) {
       return ApiHelper.response(false, null, 'Failed to fetch predictions.', 500);
     }
 
-    // Format output specifically for predictions
     const predictionsData = result.data.map(r => ({
       match_id: r.match_id,
       market: r.market,
