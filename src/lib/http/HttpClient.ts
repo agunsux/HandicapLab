@@ -136,9 +136,9 @@ export class HttpClient {
     try {
       const response = await retry(async () => {
         const res = await fetch(url.toString(), fetchOptions);
-        if (!res.ok) {
-          const errorBody = await res.text().catch(() => '');
-          throw Object.assign(new Error(`HTTP ${res.status}: ${errorBody || res.statusText}`), {
+         if (!res.ok) {
+          const errorBody = typeof res.text === 'function' ? await res.text().catch(() => '') : '';
+          throw Object.assign(new Error(`HTTP ${res.status}: ${errorBody || res.statusText || 'Response error'}`), {
             status: res.status, body: errorBody, code: `HTTP_${res.status}`,
           });
         }
@@ -157,7 +157,26 @@ export class HttpClient {
         },
       });
 
-      const data = await response.json() as T;
+      const responseData: unknown = await response.json();
+      let data: T;
+
+      if (options?.schema) {
+        const validationResult = options.schema.safeParse(responseData);
+        if (!validationResult.success) {
+          this.log.error('schema_validation_failed', {
+            path,
+            errors: validationResult.error.format(),
+          });
+          throw Object.assign(
+            new Error(`Response validation failed for provider ${this.config.provider} on path ${path}: ${validationResult.error.message}`),
+            { code: 'VALIDATION_FAILED', status: response.status, details: validationResult.error.format() }
+          );
+        }
+        data = validationResult.data as T;
+      } else {
+        data = responseData as T;
+      }
+
       const durationMs = Math.round(performance.now() - startTime);
 
       if (method === 'GET' && this.cache) {

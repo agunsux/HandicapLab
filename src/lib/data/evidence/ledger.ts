@@ -106,9 +106,7 @@ export class MemoryEvidenceLedgerStore implements EvidenceLedgerStore {
         return { valid: false, brokenAt: entry.id };
       }
       // Recompute chain hash and verify
-      const base = { ...entry };
-      delete (base as any).chainHash;
-      delete (base as any).id;
+      const { chainHash: _chainHash, id: _id, ...base } = entry;
       const payload = JSON.stringify(base, Object.keys(base).sort());
       const chainHashInput = `${expectedPrev ?? 'genesis'}::${payload}`;
       const expectedHash = crypto.createHash('sha256').update(chainHashInput).digest('hex');

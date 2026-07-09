@@ -37,7 +37,23 @@ export function evaluateBaselines(
 
   const sampleSize = results.length;
   if (sampleSize === 0) {
-    return {} as any;
+    return {
+      marketBeat: false,
+      secondHalfUnderProfitable: false,
+      edgeInsufficient: true,
+      modelMlRoi: 0,
+      modelAhRoi: 0,
+      modelOuRoi: 0,
+      modelShUnderRoi: 0,
+      marketEfficiencyMlRoi: 0,
+      randomBaselineMlRoi: 0,
+      naiveFavMlRoi: 0,
+      heuristicShUnderRoi: 0,
+      heuristicShUnderHitRate: 0,
+      modelBrier: 0,
+      marketBrier: 0,
+      naiveFavBrier: 0,
+    };
   }
 
   for (const { pred, outcome, input } of results) {

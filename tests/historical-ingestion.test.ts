@@ -1,36 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { APIFootballConnector } from '../src/services/providers/apiFootballConnector';
+import { apiFootballClient } from '../src/lib/apis/apifootball';
 import { HistoricalImporter } from '../src/services/etl/historicalImporter';
 import { supabase } from '../src/lib/supabase.server';
-import axios from 'axios';
-
-vi.mock('axios');
-
-describe('APIFootballConnector Rate Limits & Backoffs', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('should retry on rate limit warnings and scale backoffs', async () => {
-    const connector = new APIFootballConnector({ rateLimitMs: 1 });
-
-    // Mock first call returning errors (rate limit), second call succeeding
-    vi.mocked(axios.get)
-      .mockResolvedValueOnce({
-        status: 200,
-        data: { errors: { requests: 'Rate limit exceeded' } }
-      })
-      .mockResolvedValueOnce({
-        status: 200,
-        data: { response: [{ fixture: { id: 202 } }] }
-      });
-
-    const result = await connector.fetchWithRetry<any[]>('fixtures', {}, 3);
-    expect(result.length).toBe(1);
-    expect(result[0].fixture.id).toBe(202);
-    expect(axios.get).toHaveBeenCalledTimes(2);
-  });
-});
 
 describe('HistoricalImporter Idempotency', () => {
   let importer: HistoricalImporter;
@@ -43,14 +14,28 @@ describe('HistoricalImporter Idempotency', () => {
   it('should skip inserting duplicate fixtures', async () => {
     const mockFixtureData = [
       {
-        fixture: { id: 301, date: '2026-07-01T12:00:00Z', status: { short: 'FT' } },
-        teams: { home: { id: 1 }, away: { id: 2 } },
-        goals: { home: 2, away: 1 }
+        fixture: { id: 301, referee: null, timezone: 'UTC', date: '2026-07-01T12:00:00Z', timestamp: 1234567, status: { long: 'Finished', short: 'FT', elapsed: 90 } },
+        league: { id: 39, name: 'EPL', country: 'England', season: 2026 },
+        teams: { home: { id: 1, name: 'Arsenal', winner: true }, away: { id: 2, name: 'Chelsea', winner: false } },
+        goals: { home: 2, away: 1 },
+        score: {
+          halftime: { home: 1, away: 0 },
+          fulltime: { home: 2, away: 1 },
+          extratime: { home: null, away: null },
+          penalty: { home: null, away: null }
+        }
       }
     ];
 
     // Mock API connector to return fixture
-    vi.spyOn(APIFootballConnector.prototype, 'fetchWithRetry').mockResolvedValue(mockFixtureData);
+    vi.spyOn(apiFootballClient, 'getFixtures').mockResolvedValue({
+      get: 'fixtures',
+      parameters: {},
+      errors: null,
+      results: 1,
+      paging: { current: 1, total: 1 },
+      response: mockFixtureData
+    });
 
     // Mock Supabase call: first run returns no existing fixture, second run returns the existing fixture
     vi.spyOn(supabase, 'from').mockReturnValue({

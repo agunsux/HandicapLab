@@ -9,8 +9,8 @@ export interface ModelRegistryRecord {
   version: string;
   description?: string;
   role: 'champion' | 'challenger' | 'shadow' | 'retired';
-  parameters: any;
-  performance_metrics?: any;
+  parameters: Record<string, unknown>;
+  performance_metrics?: Record<string, unknown>;
 }
 
 export class ModelRegistryRepository {

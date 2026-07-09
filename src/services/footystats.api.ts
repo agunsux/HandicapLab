@@ -1,36 +1,42 @@
-export interface FootyStatsMatch {
-  id: number;
-  homeID: number;
-  awayID: number;
-  home_name: string;
-  away_name: string;
-  competition_name: string;
-  date_unix: number; // Unix timestamp
-  status: string;
-  
-  // Odds (pre-match)
-  odds_ft_1: number;
-  odds_ft_x: number;
-  odds_ft_2: number;
-  odds_btts_yes: number;
-  odds_btts_no: number;
-  odds_asian_handicap?: number; // Might need separate fetching, assuming it's here
-  odds_over_under_25?: number; // Simplified assumption
-  
-  // Stats
-  team_a_xg: number;
-  team_b_xg: number;
-  team_a_shots: number;
-  team_b_shots: number;
-  team_a_shotsOnTarget: number;
-  team_b_shotsOnTarget: number;
-  team_a_corners: number;
-  team_b_corners: number;
+import { z } from 'zod';
 
-  // Form
-  team_a_form?: number; // Custom derivation or provided by API
-  team_b_form?: number;
-}
+export const FootyStatsMatchSchema = z.object({
+  id: z.number(),
+  homeID: z.number(),
+  awayID: z.number(),
+  home_name: z.string(),
+  away_name: z.string(),
+  competition_name: z.string(),
+  date_unix: z.number(),
+  status: z.string(),
+  odds_ft_1: z.number(),
+  odds_ft_x: z.number(),
+  odds_ft_2: z.number(),
+  odds_btts_yes: z.number(),
+  odds_btts_no: z.number(),
+  odds_asian_handicap: z.number().optional(),
+  odds_over_under_25: z.number().optional(),
+  team_a_xg: z.number(),
+  team_b_xg: z.number(),
+  team_a_shots: z.number(),
+  team_b_shots: z.number(),
+  team_a_shotsOnTarget: z.number(),
+  team_b_shotsOnTarget: z.number(),
+  team_a_corners: z.number(),
+  team_b_corners: z.number(),
+  team_a_form: z.number().optional(),
+  team_b_form: z.number().optional(),
+});
+
+export const FootyStatsMatchesResponseSchema = z.union([
+  z.array(FootyStatsMatchSchema),
+  z.object({
+    success: z.boolean(),
+    data: z.array(FootyStatsMatchSchema),
+  }),
+]);
+
+export type FootyStatsMatch = z.infer<typeof FootyStatsMatchSchema>;
 
 export class FootyStatsAPI {
   private apiKey: string;
@@ -66,8 +72,15 @@ export class FootyStatsAPI {
         throw new Error(`FootyStats API Error: ${response.statusText}`);
       }
 
-      const data = await response.json();
-      return data;
+      const rawJson: unknown = await response.json();
+      const validationResult = FootyStatsMatchesResponseSchema.safeParse(rawJson);
+      
+      if (!validationResult.success) {
+        console.error('[FootyStatsAPI] Schema validation failed:', validationResult.error.format());
+        throw new Error(`FootyStats API response schema validation failed: ${validationResult.error.message}`);
+      }
+      
+      return validationResult.data;
     } catch (error) {
       clearTimeout(timeoutId);
       if (retries < this.maxRetries) {

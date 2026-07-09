@@ -7,16 +7,26 @@ import { ProbabilityEngine } from '../lib/engines/probability-engine';
 import { MatchFeatures } from '../lib/engines/feature-engine/types';
 import { ExplainabilityFormatter } from '../lib/engine/explainability-formatter';
 
+import { DbMatch } from '../lib/data/match';
+
+export interface PredictionOddsSnapshot {
+  bookmaker?: string;
+  line?: number;
+  homeOdds?: number;
+  drawOdds?: number;
+  awayOdds?: number;
+}
+
 export class PredictionExecutionService {
   /**
    * Runs predictions for both the Champion and active Challenger models on a match,
    * then records their outputs idempotently into the immutable prediction ledger.
    */
   public static async executeAndRecord(
-    match: any,
+    match: DbMatch,
     features: MatchFeatures,
     marketType: 'ML' | 'AH' | 'OU',
-    oddsSnapshot?: any
+    oddsSnapshot?: PredictionOddsSnapshot
   ): Promise<{ championHash: string | null; challengerHashes: string[] }> {
     const challengerHashes: string[] = [];
     let championHash: string | null = null;
@@ -44,7 +54,7 @@ export class PredictionExecutionService {
 
       // 2. Score with each model
       for (const model of activeModels) {
-        const params = model.parameters || {};
+        const params = (model.parameters || {}) as any;
 
         // Run prediction
         const predictionOutput = await ProbabilityEngine.predict(features, {

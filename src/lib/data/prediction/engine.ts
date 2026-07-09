@@ -3,7 +3,7 @@
 // No model logic is modified — only the invocation layer.
 
 import * as crypto from 'crypto';
-import { generatePrediction, type MatchInput } from '../../../services/probability.engine';
+import { generatePrediction, type MatchInput, type PredictionOutput } from '../../../services/probability.engine';
 import { removeVig } from '../../math/metrics';
 import type { Fixture, OddsSnapshot, MarketType, MarketSelection } from '../providers/types';
 import type { PredictionSnapshot, SettlementRecord } from './types';
@@ -25,7 +25,7 @@ function computeModelHash(version: string): string {
   return crypto.createHash('sha256').update(`model:${version}:config:frozen_v0.5`).digest('hex');
 }
 
-function pickSelection(marketType: MarketType, modelOutput: any): MarketSelection {
+function pickSelection(marketType: MarketType, modelOutput: PredictionOutput): MarketSelection {
   switch (marketType) {
     case 'moneyline': return 'home';
     case 'asian_handicap': return 'home';

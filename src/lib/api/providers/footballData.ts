@@ -1,6 +1,29 @@
+import { z } from 'zod';
 import { FootballProvider, NormalizedFixture } from './types';
 import { LeagueConfig } from '@/lib/crons/leagueRegistry';
 import { normalizeTournamentStage } from '@/lib/utils/stageNormalization';
+
+export const FootballDataMatchSchema = z.object({
+  id: z.number(),
+  status: z.string(),
+  utcDate: z.string(),
+  matchday: z.number().nullable().optional(),
+  stage: z.string().nullable().optional(),
+  homeTeam: z.object({ id: z.number(), name: z.string() }),
+  awayTeam: z.object({ id: z.number(), name: z.string() }),
+  score: z.object({
+    fullTime: z.object({ home: z.number().nullable().optional(), away: z.number().nullable().optional() }).optional().nullable(),
+    halfTime: z.object({ home: z.number().nullable().optional(), away: z.number().nullable().optional() }).optional().nullable(),
+  }).optional().nullable(),
+});
+
+export const FootballDataMatchesResponseSchema = z.object({
+  matches: z.array(FootballDataMatchSchema),
+});
+
+export const FootballDataStandingsResponseSchema = z.object({
+  standings: z.array(z.any()).optional().nullable(),
+}).passthrough();
 
 export class FootballDataProvider implements FootballProvider {
   private baseUrl = 'https://api.football-data.org/v4';
@@ -10,7 +33,7 @@ export class FootballDataProvider implements FootballProvider {
     this.apiKey = process.env.FOOTBALL_DATA_API_KEY || '';
   }
 
-  private async request(endpoint: string): Promise<any> {
+  private async request<T>(endpoint: string, schema?: z.ZodSchema<T>): Promise<T> {
     if (!this.apiKey) {
       throw new Error('FOOTBALL_DATA_API_KEY is not configured');
     }
@@ -36,8 +59,18 @@ export class FootballDataProvider implements FootballProvider {
         throw new Error(`Status: ${res.status} ${res.statusText}`);
       }
 
-      const data = await res.json();
-      return data;
+      const rawJson: unknown = await res.json();
+      
+      if (schema) {
+        const validationResult = schema.safeParse(rawJson);
+        if (!validationResult.success) {
+          console.error('[FootballDataProvider] Schema validation failed for', endpoint, validationResult.error.format());
+          throw new Error(`Football-Data API response validation failed: ${validationResult.error.message}`);
+        }
+        return validationResult.data;
+      }
+      
+      return rawJson as T;
     } catch (e: any) {
       clearTimeout(timeoutId);
       console.error(`[FootballDataProvider] ${endpoint} error:`, e.message);
@@ -53,7 +86,7 @@ export class FootballDataProvider implements FootballProvider {
 
     // Example endpoint: competitions/2021/matches?season=2024
     const endpoint = `competitions/${leagueConfig.footballDataId}/matches?season=${season}`;
-    const data = await this.request(endpoint);
+    const data = await this.request(endpoint, FootballDataMatchesResponseSchema);
 
     if (!data.matches) return [];
 
@@ -75,7 +108,7 @@ export class FootballDataProvider implements FootballProvider {
   async getResults(leagueConfig: LeagueConfig, season: number): Promise<NormalizedFixture[]> {
     if (!leagueConfig.footballDataId) return [];
     const endpoint = `competitions/${leagueConfig.footballDataId}/matches?season=${season}&status=FINISHED`;
-    const data = await this.request(endpoint);
+    const data = await this.request(endpoint, FootballDataMatchesResponseSchema);
     if (!data.matches) return [];
 
     return data.matches.map((m: any) => ({
@@ -96,7 +129,7 @@ export class FootballDataProvider implements FootballProvider {
   async getStandings(leagueConfig: LeagueConfig, season: number): Promise<any> {
     if (!leagueConfig.footballDataId) return [];
     const endpoint = `competitions/${leagueConfig.footballDataId}/standings?season=${season}`;
-    const data = await this.request(endpoint);
+    const data = await this.request(endpoint, FootballDataStandingsResponseSchema);
     return data;
   }
 }

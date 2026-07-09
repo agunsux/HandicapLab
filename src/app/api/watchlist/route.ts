@@ -1,5 +1,11 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase.server';
+import { z } from 'zod';
+
+const WatchlistPayloadSchema = z.object({
+  type: z.enum(['league', 'team', 'match']),
+  entity_id: z.string().min(1),
+});
 
 export async function GET(request: Request) {
   try {
@@ -33,12 +39,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
 
-    const body = await request.json();
-    const { type, entity_id } = body;
+    const rawBody: unknown = await request.json();
+    const validationResult = WatchlistPayloadSchema.safeParse(rawBody);
 
-    if (!type || !entity_id) {
-      return NextResponse.json({ success: false, error: 'Missing type or entity_id' }, { status: 400 });
+    if (!validationResult.success) {
+      return NextResponse.json({ success: false, error: `Validation failed: ${validationResult.error.message}` }, { status: 400 });
     }
+
+    const { type, entity_id } = validationResult.data;
 
     const { data: inserted, error } = await supabase
       .from('watchlists')
@@ -71,12 +79,14 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
 
-    const body = await request.json();
-    const { type, entity_id } = body;
+    const rawBody: unknown = await request.json();
+    const validationResult = WatchlistPayloadSchema.safeParse(rawBody);
 
-    if (!type || !entity_id) {
-      return NextResponse.json({ success: false, error: 'Missing type or entity_id' }, { status: 400 });
+    if (!validationResult.success) {
+      return NextResponse.json({ success: false, error: `Validation failed: ${validationResult.error.message}` }, { status: 400 });
     }
+
+    const { type, entity_id } = validationResult.data;
 
     const { error } = await supabase
       .from('watchlists')

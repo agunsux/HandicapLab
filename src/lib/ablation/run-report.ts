@@ -40,8 +40,9 @@ async function runReport() {
     console.log(markdownTable);
 
     console.log('✅ Ablation experiment complete!');
-  } catch (error: any) {
-    console.error('❌ Failed to execute ablation run:', error.message);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('❌ Failed to execute ablation run:', message);
   }
 }
 

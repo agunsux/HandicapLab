@@ -10,6 +10,7 @@ import {
   type SettlementRow,
   type MetricsResult,
   type BootstrapResult,
+  type SeasonBreakdownRow,
 } from '../../research/pipeline';
 import {
   computeRiskMetrics,
@@ -52,7 +53,7 @@ export interface EvaluationResult {
   risk: RiskMetrics;
   regimes: RegimeResult[];
   bootstrap: BootstrapResult;
-  seasonBreakdown: Array<any>;
+  seasonBreakdown: SeasonBreakdownRow[];
   marketBreakdown: MarketBreakdown[];
   meetsMinimum: boolean;
 }

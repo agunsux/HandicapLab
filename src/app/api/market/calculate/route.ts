@@ -1,6 +1,7 @@
 // Calculate Market Discrepancy & Edges API Route
 // Location: src/app/api/market/calculate/route.ts
 
+import { z } from 'zod';
 import { NextRequest } from 'next/server';
 import { PredictionExecutionService } from '@/services/predictionExecutionService';
 import { DiscrepancyService } from '@/services/discrepancyService';
@@ -8,14 +9,33 @@ import { FeatureEngine } from '@/lib/engines/feature-engine';
 import { getMatchById } from '@/lib/data/match';
 import { ApiHelper } from '@/lib/utils/apiHelper';
 
+const CalculateRequestSchema = z.object({
+  matchId: z.string().min(1),
+  marketType: z.enum(['ML', 'AH', 'OU']).default('ML'),
+  oddsSnapshot: z.object({
+    bookmaker: z.string().optional(),
+    line: z.number().optional(),
+    homeOdds: z.number().optional(),
+    drawOdds: z.number().optional(),
+    awayOdds: z.number().optional(),
+  }).optional(),
+});
+
 export async function POST(request: NextRequest) {
   try {
-    const payload = await request.json();
-    const { matchId, marketType = 'ML', oddsSnapshot } = payload;
+    const rawPayload: unknown = await request.json();
+    const validationResult = CalculateRequestSchema.safeParse(rawPayload);
 
-    if (!matchId) {
-      return ApiHelper.response(false, null, 'Missing required parameter: matchId', 400);
+    if (!validationResult.success) {
+      return ApiHelper.response(
+        false,
+        null,
+        `Validation failed: ${validationResult.error.message}`,
+        400
+      );
     }
+
+    const { matchId, marketType, oddsSnapshot } = validationResult.data;
 
     const match = await getMatchById(matchId);
     if (!match) {

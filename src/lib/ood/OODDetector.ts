@@ -9,7 +9,7 @@ export class OODDetector {
    * @returns A score between 0 and 1, where 1 means completely in-distribution
    *          and 0 means completely out-of-distribution.
    */
-  static computeOODScore(features: number[], referenceDistribution?: any): number {
+  static computeOODScore(features: number[], referenceDistribution?: number[]): number {
     // Scaffold implementation
     // For now, we simulate a simple distance-based heuristic.
     if (!features || features.length === 0) return 1.0;

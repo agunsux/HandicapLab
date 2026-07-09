@@ -182,10 +182,40 @@ export class AccuracyCalculator {
       throw new Error(`[AccuracyCalculator] Failed to retrieve historical predictions: ${error?.message || 'Empty set'}`);
     }
 
+    // Define the joined result shape from the Supabase query
+    interface JoinedPredictionResult {
+      id: number;
+      actual_home_score: number | null;
+      actual_away_score: number | null;
+      hit_1x2: boolean | null;
+      hit_ah: boolean | null;
+      hit_ou: boolean | null;
+      profit_1x2: number | null;
+      profit_ah: number | null;
+      profit_ou: number | null;
+      predictions: {
+        id: number;
+        match_id: number;
+        market_type: string;
+        prediction: Record<string, unknown>;
+        odds_snapshot: Record<string, unknown>;
+        closing_odds: Record<string, unknown>;
+        model_version: string;
+        brier_score: number | null;
+        clv: number | null;
+        created_at: string;
+      };
+      matches: {
+        id: number;
+        league: string;
+        kickoff: string;
+      };
+    }
+
     // Filter results locally to handle dynamic filtering criteria safely
-    const filteredResults = results.filter((row: any) => {
-      const pred = (row.predictions as any);
-      const match = (row.matches as any);
+    const filteredResults = (results as JoinedPredictionResult[]).filter((row) => {
+      const pred = row.predictions;
+      const match = row.matches;
       if (!pred || !match) return false;
 
       // Filter by model version
@@ -228,8 +258,8 @@ export class AccuracyCalculator {
     const processedRows: AggregationRow[] = [];
 
     for (const row of filteredResults) {
-      const pred = (row.predictions as any);
-      const match = (row.matches as any);
+      const pred = row.predictions;
+      const match = row.matches;
       const marketType = pred.market_type as 'ML' | 'AH' | 'OU';
 
       uniqueMatchIds.add(String(pred.match_id));

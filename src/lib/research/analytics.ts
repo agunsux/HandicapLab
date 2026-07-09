@@ -29,7 +29,7 @@ export function regimeAnalysis(rows:SettlementRow[]): RegimeResult[] {
     {name:'Low Odds <1.5',f:r=>r.odds<1.5},{name:'Med Odds 1.5-2.5',f:r=>r.odds>=1.5&&r.odds<2.5},{name:'High Odds >=2.5',f:r=>r.odds>=2.5},
     {name:'CLV+',f:r=>r.clv>0},{name:'CLV-',f:r=>r.clv<=0},{name:'High EV >10%',f:r=>r.ev>0.1},{name:'Med EV 5-10%',f:r=>r.ev>=0.05&&r.ev<=0.1},
   ];
-  return R.map(rg=>{const s=rows.filter(rg.f);const m=s.length>0?computeMetrics(s):{roi:0,winRate:0,avgCLV:0,ece:0,totalBets:0}as any;return{regime:rg.name,bets:s.length,wins:s.filter(r=>r.isWin).length,roi:m.roi,clv:m.avgCLV,ece:m.ece};});
+  return R.map(rg=>{const s=rows.filter(rg.f);const emptyMetrics: MetricsResult = {roi:0,yieldPct:0,winRate:0,totalBets:0,totalProfit:0,totalStake:0,avgEV:0,avgCLV:0,clvPValue:1,ece:0,brierScore:0,logLoss:0};const m=s.length>0?computeMetrics(s):emptyMetrics;return{regime:rg.name,bets:s.length,wins:s.filter(r=>r.isWin).length,roi:m.roi,clv:m.avgCLV,ece:m.ece};});
 }
 
 export function leaveOneOut(rows:SettlementRow[], key:(r:SettlementRow)=>string): Array<{group:string;trainMetrics:MetricsResult;testMetrics:MetricsResult}> {

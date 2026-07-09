@@ -22,8 +22,8 @@ export interface PredictionLedgerV3Record {
   kelly_fraction: number;
   risk_adjusted_stake: number;
   feature_version: string;
-  feature_vector_snapshot: any;
-  explainability_json: any;
+  feature_vector_snapshot: Record<string, any>;
+  explainability_json: Record<string, any>;
   prediction_timestamp: string;
 }
 

@@ -1,5 +1,6 @@
 // Team Rating System — Elo-based, Deterministic
 import { MatchRecord } from './loader';
+import type { MatchInput } from '../../services/probability.engine';
 
 export class TeamRatings {
   private elo: Map<string, number> = new Map();
@@ -10,7 +11,7 @@ export class TeamRatings {
 
   getElo(team: string): number { return this.elo.get(team) || TeamRatings.INITIAL_ELO; }
 
-  createMatchInput(match: MatchRecord): any {
+  createMatchInput(match: MatchRecord): MatchInput {
     const eg = this.getExpectedGoals(match.homeTeam, match.awayTeam);
     return {
       odds_home: match.psch || match.psh || 2.0,

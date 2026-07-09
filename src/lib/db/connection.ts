@@ -19,7 +19,7 @@ export function getPool(): Pool {
   return pool;
 }
 
-export async function query(text: string, params?: any[]) {
+export async function query(text: string, params?: unknown[]) {
   const client = await getPool().connect();
   try {
     return await client.query(text, params);
@@ -28,7 +28,7 @@ export async function query(text: string, params?: any[]) {
   }
 }
 
-export async function transaction<T>(fn: (query: (text: string, params?: any[]) => Promise<any>) => Promise<T>): Promise<T> {
+export async function transaction<T>(fn: (query: (text: string, params?: unknown[]) => Promise<unknown>) => Promise<T>): Promise<T> {
   const client = await getPool().connect();
   try {
     await client.query('BEGIN');

@@ -1,4 +1,4 @@
-import { APIFootballConnector } from '../providers/apiFootballConnector';
+import { apiFootballClient } from '@/lib/apis/apifootball';
 import { supabase } from '@/lib/supabase.server';
 
 export interface IngestionReport {
@@ -10,27 +10,18 @@ export interface IngestionReport {
 }
 
 export class HistoricalImporter {
-  private readonly connector: APIFootballConnector;
-
-  constructor() {
-    this.connector = new APIFootballConnector();
-  }
-
   /**
    * Imports fixtures and team stats from API-Football and writes them idempotently.
    */
   public async importSeason(league: string, season: number, leagueId: number): Promise<IngestionReport> {
     try {
       // Query raw data from API provider
-      const response = await this.connector.fetchWithRetry<any[]>('fixtures', {
-        league: leagueId,
-        season
-      });
+      const response = await apiFootballClient.getFixtures(leagueId, season);
 
       let fixturesImported = 0;
       let duplicatesSkipped = 0;
 
-      for (const item of response || []) {
+      for (const item of response.response || []) {
         const fixtureApiId = Number(item.fixture.id);
 
         // Idempotency check: see if we already have this fixture in database

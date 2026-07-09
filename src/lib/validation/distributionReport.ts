@@ -1,4 +1,4 @@
-import { PredictionOutput } from '@/services/probability.engine';
+import { PredictionOutput, type MatchInput } from '@/services/probability.engine';
 import { MatchSimulationResult } from '../simulation/mockMatchGenerator';
 import { calculateBrierScore, createCalibrationBuckets, CalibrationBucket } from './calibration';
 
@@ -22,7 +22,7 @@ export interface ReportMetrics {
 }
 
 export function generateDistributionReport(
-  results: { pred: PredictionOutput; outcome: MatchSimulationResult; input: any }[]
+  results: { pred: PredictionOutput; outcome: MatchSimulationResult; input: MatchInput }[]
 ): ReportMetrics {
   let winCorrect = 0;
   let ahCorrect = 0;

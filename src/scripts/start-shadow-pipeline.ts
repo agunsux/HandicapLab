@@ -19,8 +19,16 @@ const C = {
 
 // Structured Logger
 type LogLevel = 'INFO' | 'WARN' | 'ERROR' | 'DEBUG';
-function log(level: LogLevel, event: string, data?: Record<string, any>): void {
-  const entry = { timestamp: new Date().toISOString(), level, event, ...data };
+
+interface LogPayload {
+  timestamp: string;
+  level: LogLevel;
+  event: string;
+  [key: string]: unknown;
+}
+
+function log(level: LogLevel, event: string, data?: Record<string, unknown>): void {
+  const entry: LogPayload = { timestamp: new Date().toISOString(), level, event, ...data };
   if (level === 'ERROR') console.error(JSON.stringify(entry));
   else console.log(JSON.stringify(entry));
 }
@@ -63,7 +71,7 @@ async function ensureOutputDir(): Promise<string> {
   return dir;
 }
 
-function saveOutput(dir: string, name: string, data: any): void {
+function saveOutput(dir: string, name: string, data: unknown): void {
   fs.writeFileSync(path.join(dir, name), JSON.stringify(data, null, 2), 'utf8');
 }
 

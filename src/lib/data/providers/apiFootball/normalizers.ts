@@ -1,43 +1,47 @@
 // API-Football Response Normalizers — Raw API Response → Normalized Application Objects
 // Location: src/lib/data/providers/apiFootball/normalizers.ts
 
+import { z } from 'zod';
 import type { Fixture } from '../types';
 
-export interface RawApiFootballFixture {
-  fixture: {
-    id: number;
-    date: string;
-    status: { short: string; long: string };
-  };
-  league: {
-    id: number;
-    name: string;
-    season: number;
-  };
-  teams: {
-    home: { id: number; name: string; logo: string };
-    away: { id: number; name: string; logo: string };
-  };
-  goals: {
-    home: number | null;
-    away: number | null;
-  };
-  score: {
-    halftime: { home: number | null; away: number | null };
-    fulltime: { home: number | null; away: number | null };
-    extratime: { home: number | null; away: number | null };
-    penalty: { home: number | null; away: number | null };
-  };
-}
+export const RawApiFootballFixtureSchema = z.object({
+  fixture: z.object({
+    id: z.number(),
+    date: z.string(),
+    status: z.object({ short: z.string(), long: z.string() }),
+  }),
+  league: z.object({
+    id: z.number(),
+    name: z.string(),
+    season: z.number(),
+  }),
+  teams: z.object({
+    home: z.object({ id: z.number(), name: z.string(), logo: z.string().optional().or(z.literal('')) }),
+    away: z.object({ id: z.number(), name: z.string(), logo: z.string().optional().or(z.literal('')) }),
+  }),
+  goals: z.object({
+    home: z.number().nullable(),
+    away: z.number().nullable(),
+  }),
+  score: z.object({
+    halftime: z.object({ home: z.number().nullable(), away: z.number().nullable() }),
+    fulltime: z.object({ home: z.number().nullable(), away: z.number().nullable() }),
+    extratime: z.object({ home: z.number().nullable(), away: z.number().nullable() }),
+    penalty: z.object({ home: z.number().nullable(), away: z.number().nullable() }),
+  }),
+});
 
-export interface RawApiFootballResponse {
-  get: string;
-  parameters: Record<string, string>;
-  errors: any[];
-  results: number;
-  paging: { current: number; total: number };
-  response: RawApiFootballFixture[];
-}
+export const RawApiFootballResponseSchema = z.object({
+  get: z.string(),
+  parameters: z.record(z.string(), z.any()),
+  errors: z.union([z.array(z.any()), z.record(z.string(), z.any())]).optional().nullable(),
+  results: z.number(),
+  paging: z.object({ current: z.number(), total: z.number() }),
+  response: z.array(RawApiFootballFixtureSchema),
+});
+
+export type RawApiFootballFixture = z.infer<typeof RawApiFootballFixtureSchema>;
+export type RawApiFootballResponse = z.infer<typeof RawApiFootballResponseSchema>;
 
 export function normalizeFixtureStatus(apiStatus: string): Fixture['status'] {
   switch (apiStatus) {
@@ -90,6 +94,22 @@ export function normalizeFixtures(raw: RawApiFootballResponse): Fixture[] {
   return (raw.response ?? []).map(normalizeFixture);
 }
 
+export const RawApiFootballTeamItemSchema = z.object({
+  team: z.object({
+    id: z.number(),
+    name: z.string(),
+    code: z.string().nullable().optional(),
+    country: z.string(),
+    logo: z.string(),
+  }),
+});
+
+export const RawApiFootballTeamsResponseSchema = z.object({
+  response: z.array(RawApiFootballTeamItemSchema),
+});
+
+export type RawApiFootballTeamsResponse = z.infer<typeof RawApiFootballTeamsResponseSchema>;
+
 export interface NormalizedTeam {
   teamId: string;
   name: string;
@@ -98,9 +118,9 @@ export interface NormalizedTeam {
   logo: string;
 }
 
-export function normalizeTeams(rawResponse: any): NormalizedTeam[] {
+export function normalizeTeams(rawResponse: RawApiFootballTeamsResponse): NormalizedTeam[] {
   const response = rawResponse?.response ?? [];
-  return response.map((t: any) => ({
+  return response.map((t) => ({
     teamId: `af_${t.team.id}`,
     name: t.team.name,
     code: t.team.code ?? null,

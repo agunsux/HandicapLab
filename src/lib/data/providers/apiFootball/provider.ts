@@ -6,7 +6,7 @@
 import { logger } from '@/lib/logger';
 import { HttpClient } from '@/lib/http';
 import { createApiFootballClient } from './client';
-import { normalizeFixtures, normalizeTeams, type RawApiFootballResponse } from './normalizers';
+import { normalizeFixtures, normalizeTeams, RawApiFootballResponseSchema, RawApiFootballTeamsResponseSchema, type RawApiFootballResponse, type RawApiFootballTeamsResponse } from './normalizers';
 import type { IFixturesProvider, Fixture, ProviderFixtureQuery, HealthStatus } from '../types';
 
 export class ApiFootballProvider implements IFixturesProvider {
@@ -62,6 +62,7 @@ export class ApiFootballProvider implements IFixturesProvider {
       const response = await this.client.get<RawApiFootballResponse>('/fixtures', {
         queryParams,
         cacheTtlMs: 60_000, // 1 min cache for fixtures
+        schema: RawApiFootballResponseSchema,
       });
 
       const fixtures = normalizeFixtures(response.data);
@@ -75,9 +76,10 @@ export class ApiFootballProvider implements IFixturesProvider {
 
   async fetchTeams(leagueId: number, season: number): Promise<any[]> {
     try {
-      const response = await this.client.get<{ response: any[] }>('/teams', {
+      const response = await this.client.get<RawApiFootballTeamsResponse>('/teams', {
         queryParams: { league: String(leagueId), season: String(season) },
         cacheTtlMs: 300_000, // 5 min cache for teams
+        schema: RawApiFootballTeamsResponseSchema,
       });
       return normalizeTeams(response.data);
     } catch (error: any) {

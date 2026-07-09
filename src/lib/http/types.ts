@@ -1,6 +1,8 @@
 // HTTP Abstraction Types — Centralized HTTP Configuration & Response Types
 // Location: src/lib/http/types.ts
 
+import { z } from 'zod';
+
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 export interface HttpRequestOptions {
@@ -16,6 +18,8 @@ export interface HttpRequestOptions {
   cacheTtlMs?: number;
   /** Retry configuration override */
   maxRetries?: number;
+  /** Optional Zod schema for response validation */
+  schema?: z.ZodSchema<any>;
 }
 
 export interface HttpResponse<T = unknown> {

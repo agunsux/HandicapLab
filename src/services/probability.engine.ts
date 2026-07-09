@@ -7,6 +7,8 @@ import { OODDetector } from '../lib/ood/OODDetector';
 import { ConfidenceCalculator } from '../lib/confidence/ConfidenceCalculator';
 
 export interface MatchInput {
+  /** Optional match identifier for traceability */
+  matchId?: string;
   odds_home: number;
   odds_draw: number;
   odds_away: number;
@@ -170,9 +172,10 @@ export function generatePrediction(
   const ou_over_logit = (lambdaHome + lambdaAway - ouBaseLine) * 0.8;
   const ml_home_logit = (lambdaHome - lambdaAway) * 2.0;
 
+  const matchId: string = input.matchId || 'sim_' + Math.random().toString(36).substring(7);
+
   return {
-    matchId: (input as any).matchId || 'sim_' + Math.random().toString(36).substring(7),
-    ml_home_prob: poisson.homeProb,
+    matchId,
     ml_draw_prob: poisson.drawProb,
     ml_away_prob: poisson.awayProb,
     ou_over_prob: poisson.overProb,

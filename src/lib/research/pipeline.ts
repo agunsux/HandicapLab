@@ -25,6 +25,35 @@ export interface MetricsResult {
   ece: number; brierScore: number; logLoss: number;
 }
 export interface BootstrapResult { roiCI: [number,number]; clvCI: [number,number]; roiLower: number; roiUpper: number; }
+
+export interface PredictModelResult {
+  hp: number;
+  dp: number;
+  ap: number;
+  side: 'home' | 'away' | null;
+  ev: number;
+  odds: number | null;
+}
+
+export interface SeasonBreakdownRow {
+  season: string;
+  totalBets: number;
+  winRate: number;
+  roi: number;
+  clv: number;
+  clvPValue: number;
+  ece: number;
+  brierScore: number;
+  logLoss: number;
+  profit: number;
+}
+
+interface BaselineFnResult {
+  side: 'home' | 'away';
+  prob: number;
+  odds: number;
+}
+
 const EV=0.05, SK=1;
 
 export function runWalkForward(matches:MatchRecord[]):PredictionRow[]{
@@ -36,7 +65,7 @@ export function runWalkForward(matches:MatchRecord[]):PredictionRow[]{
     for(let i=0;i<vs;i++) ratings.update(matches[i]);
     for(let i=vs;i<ve;i++){
       const m=matches[i],r=predictModel(m,ratings);
-      const ao:any=m.ftr==='H'?'home':m.ftr==='A'?'away':'draw';
+      const ao=m.ftr==='H'?'home':m.ftr==='A'?'away':'draw';
       const iw=r.side?r.side===ao:null;
       const pft=iw===true?(r.odds||1)-1:iw===false?-SK:null;
       out.push({predictionId:`pred_${out.length}`,timestamp:new Date().toISOString(),matchDate:m.date.toISOString(),
@@ -64,7 +93,7 @@ export function settlePredictions(predictions:PredictionRow[]):SettlementRow[]{
   });
 }
 
-function predictModel(match:MatchRecord,ratings:TeamRatings):any{
+function predictModel(match:MatchRecord,ratings:TeamRatings):PredictModelResult{
   const input=ratings.createMatchInput(match);
   const pred=generatePrediction(input);
   const {homeProb:fh,awayProb:fa}=removeVig(match.psch||2,match.pscd||3.5,match.psca||4);
@@ -95,9 +124,9 @@ export function bootstrapMetrics(rows:SettlementRow[],n:number=10000):BootstrapR
 }
 
 export function runBaselines(matches:MatchRecord[]):Array<{name:string;rows:SettlementRow[]}>{
-  const D:Array<{name:string;fn:(m:MatchRecord)=>any}>=[
-    {name:'Closing Odds',fn:(m)=>{const p=removeVig(m.psch||2,m.pscd||3.5,m.psca||4);const mx=Math.max(p.homeProb,p.drawProb,p.awayProb);const s:any=mx===p.homeProb?'home':mx===p.awayProb?'away':null;if(!s||s==='draw')return null;return {side:s,prob:mx,odds:s==='home'?1/p.homeProb:1/p.awayProb};}},
-    {name:'Opening Odds',fn:(m)=>{const p=removeVig(m.psh||m.psch||2,m.psd||m.pscd||3.5,m.psa||m.psca||4);const mx=Math.max(p.homeProb,p.drawProb,p.awayProb);const s:any=mx===p.homeProb?'home':mx===p.awayProb?'away':null;if(!s||s==='draw')return null;return {side:s,prob:mx,odds:s==='home'?1/p.homeProb:1/p.awayProb};}},
+  const D:Array<{name:string;fn:(m:MatchRecord)=>BaselineFnResult | null}>=[
+    {name:'Closing Odds',fn:(m)=>{const p=removeVig(m.psch||2,m.pscd||3.5,m.psca||4);const mx=Math.max(p.homeProb,p.drawProb,p.awayProb);const s=mx===p.homeProb?'home':mx===p.awayProb?'away':null;if(!s||s==='draw')return null;return {side:s,prob:mx,odds:s==='home'?1/p.homeProb:1/p.awayProb};}},
+    {name:'Opening Odds',fn:(m)=>{const p=removeVig(m.psh||m.psch||2,m.psd||m.pscd||3.5,m.psa||m.psca||4);const mx=Math.max(p.homeProb,p.drawProb,p.awayProb);const s=mx===p.homeProb?'home':mx===p.awayProb?'away':null;if(!s||s==='draw')return null;return {side:s,prob:mx,odds:s==='home'?1/p.homeProb:1/p.awayProb};}},
     {name:'Always Home',fn:()=>({side:'home',prob:0.48,odds:2})},{name:'Always Away',fn:()=>({side:'away',prob:0.48,odds:4})},
     {name:'Market Implied',fn:(m)=>{const p=removeVig(m.psch||2,m.pscd||3.5,m.psca||4);return {side:'home',prob:p.homeProb,odds:1/p.homeProb};}},
     {name:'Flat 50%',fn:(m)=>{const p=removeVig(m.psch||2,m.pscd||3.5,m.psca||4);const f=p.homeProb>=0.5;return {side:f?'home':'away',prob:0.5,odds:f?1/p.homeProb:1/p.awayProb};}},
@@ -105,7 +134,7 @@ export function runBaselines(matches:MatchRecord[]):Array<{name:string;rows:Sett
   return D.map(d=>{const rows:SettlementRow[]=[];for(const m of matches){const r=d.fn(m);if(!r)continue;const ao=m.ftr==='H'?'home':m.ftr==='A'?'away':'draw';if(r.side==='draw')continue;const iw=r.side===ao;const pft=iw?r.odds-1:-1;rows.push({predictionId:'',timestamp:'',season:m.season,league:m.league,homeTeam:m.homeTeam,awayTeam:m.awayTeam,modelProb:r.prob,odds:r.odds,ev:r.prob*r.odds-1,stake:1,closingOdds:r.odds,openingOdds:r.odds,side:r.side,actual:ao,isWin:iw,profit:pft,roi:pft,clv:0,brierScore:B(r.prob,iw?1:0),logLoss:L(r.prob,iw?1:0)});}return {name:d.name,rows};});
 }
 
-export function seasonBreakdown(rows:SettlementRow[]):Array<any>{
+export function seasonBreakdown(rows:SettlementRow[]):SeasonBreakdownRow[]{
   const map=new Map<string,SettlementRow[]>();
   for(const r of rows){if(!map.has(r.season))map.set(r.season,[]);map.get(r.season)!.push(r);}
   return Array.from(map.entries()).map(([s,rs])=>{const m=computeMetrics(rs);return{season:s,totalBets:m.totalBets,winRate:m.winRate,roi:m.roi,clv:m.avgCLV,clvPValue:m.clvPValue,ece:m.ece,brierScore:m.brierScore,logLoss:m.logLoss,profit:m.totalProfit};}).sort((a,b)=>a.season.localeCompare(b.season));

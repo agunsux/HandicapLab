@@ -132,7 +132,7 @@ export function generateMockMatch(
     domain_pressure: domain.pressure,
     ht_home_goals: fhHomeGoals,
     ht_away_goals: fhAwayGoals
-  } as any;
+  };
 
   return { input, outcome, domain };
 }

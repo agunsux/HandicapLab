@@ -1,10 +1,11 @@
+import { z } from 'zod';
 import { rateLimiter } from './rateLimiter';
 import { apiCache } from './cache';
 
 export interface ApiFootballResponse<T> {
   get: string;
   parameters: Record<string, string>;
-  errors: any[] | Record<string, string>;
+  errors: any[] | Record<string, string> | null;
   results: number;
   paging: { current: number; total: number };
   response: T;
@@ -62,7 +63,24 @@ export class ApiFootballClient {
         throw new Error(`API-Football error status: ${res.status} ${res.statusText}`);
       }
 
-      const data = await res.json() as ApiFootballResponse<T>;
+      const rawResponse: unknown = await res.json();
+      
+      const apiFootballEnvelopeSchema = z.object({
+        get: z.string(),
+        parameters: z.record(z.string(), z.any()),
+        errors: z.union([z.array(z.any()), z.record(z.string(), z.any())]).optional().nullable(),
+        results: z.number(),
+        paging: z.object({ current: z.number(), total: z.number() }),
+        response: z.any(),
+      });
+
+      const parsedEnvelope = apiFootballEnvelopeSchema.safeParse(rawResponse);
+      if (!parsedEnvelope.success) {
+        console.error('[ApiFootballClient] Envelope validation failed:', parsedEnvelope.error.format());
+        throw new Error(`API-Football response validation failed: ${parsedEnvelope.error.message}`);
+      }
+
+      const data = parsedEnvelope.data;
       
       // API-Football returns errors in response body under "errors" property
       if (data.errors && (Array.isArray(data.errors) ? data.errors.length > 0 : Object.keys(data.errors).length > 0)) {
@@ -70,7 +88,7 @@ export class ApiFootballClient {
         throw new Error(`API-Football response error: ${JSON.stringify(data.errors)}`);
       }
 
-      const responsePayload = data.response;
+      const responsePayload = data.response as T;
       apiCache.set(endpoint, params, responsePayload);
       return responsePayload;
     } catch (e) {
