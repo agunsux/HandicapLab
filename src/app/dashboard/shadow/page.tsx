@@ -1,3 +1,5 @@
+'use client';
+
 // Shadow Monitoring Dashboard — Realtime Metrics View
 import { useEffect, useState } from 'react';
 

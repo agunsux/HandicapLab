@@ -1,4 +1,6 @@
-import { Feature, calculateFeatureScore, sigmoid } from './features';
+import { Feature, calculateFeatureScore } from './features';
+import { sigmoid } from '../math/metrics';
+
 import { calculateBrierScore } from '../validation/calibration';
 
 export interface AblationResult {

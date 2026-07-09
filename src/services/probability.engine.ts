@@ -1,4 +1,6 @@
-import { Feature, calculateFeatureScore, sigmoid, extractExplainability } from '../lib/model/features';
+import { Feature, calculateFeatureScore, extractExplainability } from '../lib/model/features';
+import { sigmoid } from '../lib/math/metrics';
+
 import { StateWeightResult } from '../lib/calibration/stateWeightLearner';
 import { calculatePoissonProbabilities } from '../lib/model/poisson';
 import { OODDetector } from '../lib/ood/OODDetector';

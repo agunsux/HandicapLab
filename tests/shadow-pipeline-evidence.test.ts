@@ -1,7 +1,8 @@
 // Shadow Pipeline Tests 2/2 — Evidence Chain, Evaluation Metrics
 import { describe, it, expect } from 'vitest';
 import { createEvidenceEntry, MemoryEvidenceLedgerStore } from '../src/lib/data/evidence/ledger';
-import { evaluateEvidence } from '../src/lib/data/evaluation/runner';
+import { evaluateEvidence, evaluateWindows } from '../src/lib/data/evaluation/runner';
+
 
 function pred(id = 'p1') {
   return { id, fixtureId: 'f1', modelVersion: 'v1', modelHash: 'h', marketType: 'moneyline' as const, selection: 'home' as const, line: 0, predictionProb: 0.5, marketProb: 0.45, edge: 0.05, expectedValue: 0, confidence: 0.8, oddsSnapshotId: 'o1', inputDataHash: 'd', featureVersion: 'v1', datasetVersion: 'v1', timestamp: new Date() };
@@ -60,9 +61,9 @@ describe('Evaluation Metrics', () => {
 
   it('multi-window evaluation works', () => {
     const entry = createEvidenceEntry(pred(), settle(), null, 'PREDICTION_CREATED');
-    const { evaluateWindows } = require('../src/lib/data/evaluation/runner');
     const results = evaluateWindows([entry]);
     expect(Array.isArray(results)).toBe(true);
+
     expect(results.length).toBeGreaterThan(0);
   });
 });

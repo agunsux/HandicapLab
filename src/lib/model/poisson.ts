@@ -1,5 +1,6 @@
-import { poissonProb } from '../math/metrics';
-export { poissonProb as poissonProbability };
+import { poissonProb as poissonProbability } from '../math/metrics';
+export { poissonProbability };
+
 
 export interface PoissonOutput {
   homeProb: number;

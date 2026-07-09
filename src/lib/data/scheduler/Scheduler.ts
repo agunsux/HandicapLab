@@ -96,7 +96,8 @@ export class Scheduler {
   private async pollUpcomingFixtures(): Promise<void> {
     const p = this.deps.registry.resolveFixtures();
     const now = new Date();
-    const lookAhead = new Date(now.getTime() + this.deps.config.lookAheadMs);
+    const lookAhead = new Date(now.getTime() + this.deps.config.lookAheadMs!);
+
     try {
       const fixtures = await p.fetchFixtures({ fromDate: now, toDate: lookAhead, status: 'upcoming' });
       for (const f of fixtures) {
@@ -160,17 +161,18 @@ export class Scheduler {
   private async handleTimeouts(): Promise<void> {
     const now = new Date();
     for (const state of this.deps.stateMachine.getFixturesByState('FINISHED')) {
-      if (now.getTime() - state.enteredAt.getTime() >= this.deps.config.autoSettleAfterMs) {
+      if (now.getTime() - state.enteredAt.getTime() >= this.deps.config.autoSettleAfterMs!) {
         this.deps.stateMachine.transition(state.fixtureId, 'SETTLED');
         this.log.info('auto_settle', { fixtureId: state.fixtureId });
       }
     }
     for (const state of this.deps.stateMachine.getFixturesByState('SETTLED')) {
-      if (now.getTime() - state.enteredAt.getTime() >= this.deps.config.autoArchiveAfterMs) {
+      if (now.getTime() - state.enteredAt.getTime() >= this.deps.config.autoArchiveAfterMs!) {
         this.deps.stateMachine.transition(state.fixtureId, 'ARCHIVED');
         this.log.info('auto_archive', { fixtureId: state.fixtureId });
       }
     }
+
   }
 }
 

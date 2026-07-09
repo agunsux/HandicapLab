@@ -4,7 +4,8 @@ import { fitPlattScaling, applyPlattScaling } from '../lib/calibration/plattScal
 import { runHTDecomposition } from '../lib/validation/htDecomposition';
 import { calculateBrierScore } from '../lib/validation/calibration';
 import { generatePrediction, MatchInput } from '../services/probability.engine';
-import { sigmoid } from '../lib/calibration/temperatureScaling';
+import { sigmoid } from '../lib/math/metrics';
+
 import * as fs from 'fs';
 import * as path from 'path';
 

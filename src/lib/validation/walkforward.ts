@@ -2,7 +2,9 @@
 // Location: src/lib/validation/walkforward.ts
 // Integrates: Benchmark → Statistics → Drift → Report pipeline
 
-import { runBenchmarkSuite, BenchmarkInput, BenchmarkResult } from '../benchmark/runner';
+import { runBenchmarkSuite } from '../benchmark/runner';
+import { BenchmarkInput, BenchmarkResult } from '../benchmark/types';
+
 import { bootstrapCI, wilsonInterval, binomialTest, roiConfidenceInterval } from '../stats/confidence';
 import { runDriftDetection, DriftReport } from '../drift/detector';
 import { generateHTMLReport, generateJSONReport, ValidationReportData, BenchmarkReportData } from '../reports/generator';
@@ -141,14 +143,15 @@ export function runWalkForwardValidation(
       expectedValue: bestModel.metrics.expectedValue,
       sampleSize: bestModel.metrics.totalBets,
     },
-    confidence: { lower95: roiCI.lower, upper95: roiCI.upper },
+    confidence: { lower95: roiCI.ci95.lower, upper95: roiCI.ci95.upper },
     passed: qualityReport.passed && driftReport.overallStatus === 'HEALTHY',
   };
 
   return {
     window,
     benchmarkResults,
-    confidence95: { roi: { lower: roiCI.lower, upper: roiCI.upper }, accuracy: { lower: accWilson.lower, upper: accWilson.upper } },
+    confidence95: { roi: { lower: roiCI.ci95.lower, upper: roiCI.ci95.upper }, accuracy: { lower: accWilson.lower, upper: accWilson.upper } },
+
     driftReport,
     qualityReport,
     reportJSON: generateJSONReport(valReportData),

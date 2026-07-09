@@ -1,25 +1,36 @@
-// HandicapLab Decision Engine v1 - Ensemble Engine tests
-// Location: tests/decision-engine-v1/ensemble-engine.test.ts
-
 import { describe, it, expect, beforeEach } from 'vitest';
-import { ModelRegistry, EnsembleSubModel, ModelPrediction } from '../../src/lib/engines/decision-engine-v1/registry';
+import { ModelRegistry } from '../../src/lib/engines/decision-engine-v1/registry';
+
+import { PredictionModel, Prediction, ModelMetadata } from '../../src/lib/engines/decision-engine-v1/models/predictionModel';
 import { EnsembleEngine } from '../../src/lib/engines/decision-engine-v1/ensemble-engine';
 import { MatchFeatures } from '../../src/lib/engines/feature-engine/types';
 
-class MockModel implements EnsembleSubModel {
+class MockModel implements PredictionModel {
   constructor(public id: string, public name: string, private pHome: number, private pDraw: number, private pAway: number) {}
 
-  public async predict(features: MatchFeatures): Promise<ModelPrediction> {
+  public async predict(features: MatchFeatures): Promise<Prediction> {
     return {
-      homeProbability: this.pHome,
-      drawProbability: this.pDraw,
-      awayProbability: this.pAway,
-      confidence: 80,
-      modelName: this.name,
-      version: '1.0.0'
+      pHome: this.pHome,
+      pDraw: this.pDraw,
+      pAway: this.pAway
     };
   }
+
+  public async train(trainData: any[]): Promise<void> {}
+
+  public async predictProbability(features: MatchFeatures): Promise<{ pHome: number; pDraw: number; pAway: number }> {
+    return { pHome: this.pHome, pDraw: this.pDraw, pAway: this.pAway };
+  }
+
+  public async predictScore(features: MatchFeatures): Promise<{ home: number; away: number }> {
+    return { home: 1.5, away: 1.0 };
+  }
+
+  public metadata(): ModelMetadata {
+    return { name: this.name, version: '1.0.0', description: '', isOnline: false };
+  }
 }
+
 
 describe('Ensemble Engine V1 Tests', () => {
   const dummyFeatures: MatchFeatures = {

@@ -1,7 +1,8 @@
 import { MatchSimulationResult } from '../simulation/mockMatchGenerator';
 import { PredictionOutput, MatchInput } from '@/services/probability.engine';
 import { calculateBrierScore } from './calibration';
-import { sigmoid } from '../calibration/temperatureScaling';
+import { sigmoid } from '../math/metrics';
+
 
 export interface InteractionTestResult {
   interactionName: string;

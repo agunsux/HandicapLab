@@ -104,7 +104,9 @@ function computeMarketBreakdown(entries: EvidenceEntry[]): MarketBreakdown[] {
     return { marketType, totalBets: evs.length, wins, losses, pushes, roi: totalProfit / evs.length, avgCLV, avgEdge };
   }).sort((a, b) => b.totalBets - a.totalBets);
 }
- *  Reuses: computeMetrics, bootstrapMetrics, computeRiskMetrics, regimeAnalysis from the research layer. */
+/**
+ * Reuses: computeMetrics, bootstrapMetrics, computeRiskMetrics, regimeAnalysis from the research layer.
+ */
 export function evaluateEvidence(
   entries: EvidenceEntry[],
   label: string,

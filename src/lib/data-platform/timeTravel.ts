@@ -1,7 +1,9 @@
 // HandicapLab Live Data Platform - Time Travel Engine
 // Location: src/lib/data-platform/timeTravel.ts
 
+import * as fs from 'fs';
 import * as path from 'path';
+
 import { ParquetHelper } from './parquetHelper';
 import { GoldDatasetBuilder } from './goldDatasetBuilder';
 import {

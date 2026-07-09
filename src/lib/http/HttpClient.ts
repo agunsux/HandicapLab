@@ -4,7 +4,8 @@
 // Reuses: retry.ts (exponential backoff), logger.ts (structured logging)
 
 import { retry } from '@/lib/retry';
-import { logger } from '@/lib/logger';
+import { logger, IChildLogger } from '@/lib/logger';
+
 import { RateLimiter } from './RateLimiter';
 import { CircuitBreaker } from './CircuitBreaker';
 import { Cache } from './Cache';
@@ -23,7 +24,9 @@ export class HttpClient {
   private rateLimiter?: RateLimiter;
   private circuitBreaker?: CircuitBreaker;
   private cache?: Cache;
-  private log = logger.child(`http:${this.config?.provider ?? 'unknown'}`);
+  private log!: IChildLogger;
+
+
 
   constructor(
     config: HttpClientConfig,

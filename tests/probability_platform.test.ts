@@ -39,7 +39,8 @@ describe('Probability Platform (Phase B)', () => {
       protocol: 'v1',
       ece: 0.05,
       brier: 0.20,
-      log_loss: 0.60
+      log_loss: 0.60,
+      champion: true
     };
 
     const badCandidate: CalibrationRegistryEntry = {
@@ -48,8 +49,10 @@ describe('Probability Platform (Phase B)', () => {
       protocol: 'v1',
       ece: 0.10, // Worse
       brier: 0.25,
-      log_loss: 0.70
+      log_loss: 0.70,
+      champion: false
     };
+
 
     const evaluation = AcceptanceGate.evaluate(badCandidate, baseline);
     expect(evaluation.approved).toBe(false);

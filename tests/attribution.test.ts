@@ -41,13 +41,14 @@ function makeExplanationObject(): ExplanationObject {
       decisionReason: '',
       confidenceReason: '',
       uncertaintyReason: '',
-      evidenceSummary: ''
+      evidenceSummary: '',
+      recommendationSummary: ''
     },
     structured: {
-      recommendation: { decision: 'BET', riskLevel: 'LOW', confidence: 0.82, isBlocked: false },
+      contributingFactors: [],
+      opposingFactors: [],
       dominantSignals: [],
       dominantRisks: [],
-      uncertaintyFactors: [],
       featureContributions: {
         status: 'AVAILABLE',
         factors: [
@@ -57,10 +58,12 @@ function makeExplanationObject(): ExplanationObject {
         ]
       },
       evidenceAgreement: {
-        agreementLevel: 'VERY_HIGH', agreementScore: 1.0, consensusDecision: 'BET',
-        conflictingModules: [], sources: []
+        agreementLevel: 'VERY_HIGH', agreementScore: 1.0,
+        conflictingModules: [], sourceCount: 0, sources: []
       }
     }
+
+
   };
 }
 

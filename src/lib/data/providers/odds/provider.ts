@@ -7,7 +7,8 @@ import { logger } from '@/lib/logger';
 import { HttpClient } from '@/lib/http';
 import { createOddsApiClient } from './client';
 import { normalizeOddsSnapshots } from './normalizers';
-import type { IOddsProvider, OddsSnapshot, ProviderOddsQuery, HealthStatus } from '../types';
+import type { IOddsProvider, OddsSnapshot, ProviderOddsQuery, HealthStatus, NormalizedMarket } from '../types';
+
 
 export class OddsApiProvider implements IOddsProvider {
   readonly name = 'the-odds-api';
@@ -104,7 +105,44 @@ export class OddsApiProvider implements IOddsProvider {
     }
   }
 
+  normalizeMarket(snapshot: OddsSnapshot): NormalizedMarket {
+    const homeOdds = snapshot.priceHome;
+    const awayOdds = snapshot.priceAway;
+    const drawOdds = snapshot.priceDraw;
+
+    let margin = 0;
+    let homeProb = 0;
+    let awayProb = 0;
+    let drawProb: number | null = null;
+
+    if (drawOdds !== null && drawOdds > 0) {
+      margin = (1 / homeOdds) + (1 / awayOdds) + (1 / drawOdds) - 1;
+      const sumInv = (1 / homeOdds) + (1 / awayOdds) + (1 / drawOdds);
+      homeProb = (1 / homeOdds) / sumInv;
+      awayProb = (1 / awayOdds) / sumInv;
+      drawProb = (1 / drawOdds) / sumInv;
+    } else {
+      margin = (1 / homeOdds) + (1 / awayOdds) - 1;
+      const sumInv = (1 / homeOdds) + (1 / awayOdds);
+      homeProb = (1 / homeOdds) / sumInv;
+      awayProb = (1 / awayOdds) / sumInv;
+    }
+
+    return {
+      marketType: snapshot.marketType,
+      line: snapshot.line,
+      homeOdds,
+      awayOdds,
+      drawOdds,
+      homeProb,
+      awayProb,
+      drawProb,
+      vig: margin,
+    };
+  }
+
   private getApiKey(): string {
+
     return process.env.THE_ODDS_API_KEY ?? process.env.ODDSPAPI_KEY ?? '';
   }
 

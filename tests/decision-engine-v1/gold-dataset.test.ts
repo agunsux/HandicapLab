@@ -67,11 +67,12 @@ describe('Sprint 27: Gold Lakehouse Dataset & Time Travel Verification', () => {
       };
 
       const result = FootballDataCSVAdapter.parseCSVRow(mockRow, 0, '2020-2021');
-      expect(result.fixture.homeTeam.name).toBe('Fulham');
-      expect(result.fixture.awayTeam.name).toBe('Arsenal');
-      expect(result.fixture.fullTimeHomeGoals).toBe(0);
-      expect(result.fixture.fullTimeAwayGoals).toBe(3);
-      expect(result.fixture.referee).toBe('C Kavanagh');
+      expect(result.fixture.home_team_id).toBe('fulham');
+      expect(result.fixture.away_team_id).toBe('arsenal');
+      expect(result.fixture.home_goals).toBe(0);
+      expect(result.fixture.away_goals).toBe(3);
+      expect(result.referee.refereeName).toBe('C Kavanagh');
+
 
       // Timeline events check: opened, 6h before, 3h before, 1h before, closed
       expect(result.events).toHaveLength(5);
@@ -86,18 +87,28 @@ describe('Sprint 27: Gold Lakehouse Dataset & Time Travel Verification', () => {
 
   describe('Gold Validator Automatic Quality Scoring', () => {
     const dummyFixture: CanonicalFixture = {
-      id: 'fix-1',
-      providerId: 'csv-0',
+      match_id: 'fix-1',
+      provider_id: 'csv-0',
       provider: 'FootballData',
-      competition: { id: 'EPL', name: 'EPL', region: 'England' },
-      homeTeam: { id: 'arsenal', name: 'Arsenal' },
-      awayTeam: { id: 'chelsea', name: 'Chelsea' },
-      kickoffTime: '2024-09-12T15:00:00Z',
+      competition_id: 'EPL',
+      season: '2023-2024',
+      home_team_id: 'arsenal',
+      away_team_id: 'chelsea',
+      kickoff: '2024-09-12T15:00:00Z',
       status: 'FINISHED',
-      schemaVersion: '1.0.0',
-      fullTimeHomeGoals: 2,
-      fullTimeAwayGoals: 1
+      schema_version: '1.0.0',
+      home_goals: 2,
+      away_goals: 1,
+      home_xg: null,
+      away_xg: null,
+      home_shots: null,
+      away_shots: null,
+      home_shots_on_target: null,
+      away_shots_on_target: null,
+      generated_at: new Date().toISOString(),
+      checksum: ''
     };
+
 
     const dummyOddsOpen: CanonicalOdds[] = [
       { fixtureId: 'fix-1', provider: 'Pinnacle', marketType: 'ML', selection: 'home', oddsDecimal: 2.0, impliedProbability: 0.5, receivedAt: '2024-09-10T15:00:00Z', providerTimestamp: '2024-09-10T15:00:00Z', processedTimestamp: '2024-09-10T15:00:00Z', latencyMs: 5, normalizerVersion: '1.0' },
@@ -114,8 +125,9 @@ describe('Sprint 27: Gold Lakehouse Dataset & Time Travel Verification', () => {
     it('should deduct scores and fail validation on impossible outcomes or mismatched data', () => {
       const corruptFixture: CanonicalFixture = {
         ...dummyFixture,
-        fullTimeHomeGoals: -5 // impossible score
+        home_goals: -5 // impossible score
       };
+
 
       const report = GoldValidator.validate([corruptFixture], dummyOddsOpen, dummyOddsOpen);
       expect(report.score).toBeLessThan(95);
@@ -125,8 +137,9 @@ describe('Sprint 27: Gold Lakehouse Dataset & Time Travel Verification', () => {
     it('should deduct scores on timezone mismatches and duplicate records', () => {
       const nonUtcFixture: CanonicalFixture = {
         ...dummyFixture,
-        kickoffTime: '2024-09-12 15:00:00' // lacks 'Z' or offset
+        kickoff: '2024-09-12 15:00:00' // lacks 'Z' or offset
       };
+
 
       const report = GoldValidator.validate([nonUtcFixture], dummyOddsOpen, dummyOddsOpen);
       expect(report.score).toBeLessThan(100);
@@ -137,9 +150,10 @@ describe('Sprint 27: Gold Lakehouse Dataset & Time Travel Verification', () => {
   describe('Time Travel Leakage Prevention Snapshotting', () => {
     it('should completely mask results of fixtures played at or after cutoff timestamp', () => {
       const fixtures: CanonicalFixture[] = [
-        { id: 'f1', providerId: '0', provider: 'M', competition: { id: '1', name: 'L', region: 'R' }, homeTeam: { id: 'a', name: 'Arsenal' }, awayTeam: { id: 'c', name: 'Chelsea' }, kickoffTime: '2024-09-12T15:00:00Z', status: 'FINISHED', schemaVersion: '1.0.0', fullTimeHomeGoals: 2, fullTimeAwayGoals: 1 },
-        { id: 'f2', providerId: '1', provider: 'M', competition: { id: '1', name: 'L', region: 'R' }, homeTeam: { id: 'm', name: 'Man Utd' }, awayTeam: { id: 'l', name: 'Liverpool' }, kickoffTime: '2024-09-15T15:00:00Z', status: 'FINISHED', schemaVersion: '1.0.0', fullTimeHomeGoals: 0, fullTimeAwayGoals: 3 }
+        { match_id: 'f1', provider_id: '0', provider: 'M', competition_id: '1', season: '2023-2024', home_team_id: 'a', away_team_id: 'c', kickoff: '2024-09-12T15:00:00Z', status: 'FINISHED', schema_version: '1.0.0', home_goals: 2, away_goals: 1, home_xg: null, away_xg: null, home_shots: null, away_shots: null, home_shots_on_target: null, away_shots_on_target: null, generated_at: '', checksum: '' },
+        { match_id: 'f2', provider_id: '1', provider: 'M', competition_id: '1', season: '2023-2024', home_team_id: 'm', away_team_id: 'l', kickoff: '2024-09-15T15:00:00Z', status: 'FINISHED', schema_version: '1.0.0', home_goals: 0, away_goals: 3, home_xg: null, away_xg: null, home_shots: null, away_shots: null, home_shots_on_target: null, away_shots_on_target: null, generated_at: '', checksum: '' }
       ];
+
 
       // Setup temp gold dir
       ParquetHelper.writeSync(path.join(TEST_DIR, 'fixtures.parquet'), fixtures);
@@ -159,11 +173,12 @@ describe('Sprint 27: Gold Lakehouse Dataset & Time Travel Verification', () => {
       expect(resolved).toHaveLength(2);
 
       // Match 1 is before cutoff -> Goals are preserved
-      expect(resolved[0].fullTimeHomeGoals).toBe(2);
+      expect(resolved[0].home_goals).toBe(2);
 
       // Match 2 is after cutoff -> Goals are strictly MASKED to prevent temporal lookahead leakage
-      expect(resolved[1].fullTimeHomeGoals).toBeNull();
+      expect(resolved[1].home_goals).toBeNull();
       expect(resolved[1].status).toBe('SCHEDULED');
+
     });
   });
 

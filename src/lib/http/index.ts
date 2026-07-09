@@ -17,6 +17,7 @@ export type {
   RateLimiterConfig,
   CircuitBreakerConfig,
   CacheConfig,
-  CircuitState,
-  CircuitStatus,
 } from './types';
+
+export type { CircuitState, CircuitStatus } from './CircuitBreaker';
+

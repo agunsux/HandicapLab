@@ -142,3 +142,4 @@ describe('Integration: Full Research Pipeline', () => {
     for (const p of adj.adjustedPValues) expect(p).toBeGreaterThanOrEqual(0);
     for (const p of adj.adjustedPValues) expect(p).toBeLessThanOrEqual(1);
   });
+});

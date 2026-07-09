@@ -1,5 +1,6 @@
 import { FormExtractor } from '../../../src/lib/engines/feature-engine/form';
-import { supabase } from '../../../src/supabase.server';
+import { supabase } from '../../../src/lib/supabase.server';
+
 
 /**
  * ARCH-003: Timezone & Reschedule Point-in-Time Leakage

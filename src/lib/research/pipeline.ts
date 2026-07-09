@@ -61,6 +61,9 @@ export function settlePredictions(predictions:PredictionRow[]):SettlementRow[]{
       closingOdds:cl,openingOdds:op,side:p.selectedSide!,actual:p.actualOutcome||'unknown',
       isWin:p.isWin!,profit:p.profit!,roi:p.profit!/p.stake!,
       clv:op>0&&cl>0?(cl/op)-1:0,brierScore:B(pb,p.isWin?1:0),logLoss:L(pb,p.isWin?1:0)};
+  });
+}
+
 function predictModel(match:MatchRecord,ratings:TeamRatings):any{
   const input=ratings.createMatchInput(match);
   const pred=generatePrediction(input);
@@ -107,5 +110,4 @@ export function seasonBreakdown(rows:SettlementRow[]):Array<any>{
   for(const r of rows){if(!map.has(r.season))map.set(r.season,[]);map.get(r.season)!.push(r);}
   return Array.from(map.entries()).map(([s,rs])=>{const m=computeMetrics(rs);return{season:s,totalBets:m.totalBets,winRate:m.winRate,roi:m.roi,clv:m.avgCLV,clvPValue:m.clvPValue,ece:m.ece,brierScore:m.brierScore,logLoss:m.logLoss,profit:m.totalProfit};}).sort((a,b)=>a.season.localeCompare(b.season));
 }
-
-}
+

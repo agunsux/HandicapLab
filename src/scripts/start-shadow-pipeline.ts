@@ -40,11 +40,12 @@ function setupGracefulShutdown(): void {
   process.on('SIGTERM', () => shutdown('SIGTERM'));
 }
 
-interface ShadowRunMetadata {
 const oddsStore = new MemoryOddsSnapshotStore();
 const evidenceStore = new MemoryEvidenceLedgerStore();
 
 setupGracefulShutdown();
+
+interface ShadowRunMetadata {
   runId: string;
   startedAt: string;
   modelVersion: string;
@@ -156,8 +157,9 @@ async function main() {
     const oddsSnapshot: OddsSnapshot = {
       id: 'odds_dev_1', fixtureId: fixture.fixtureId, bookmaker: 'pinnacle',
       marketType: 'moneyline', line: 0, priceHome: 2.10, priceAway: 3.80, priceDraw: 3.40,
-      capturedAt: new Date(),
+      capturedAt: new Date(), providerName: 'the-odds-api', rawResponseHash: '',
     };
+
     await processFixture(fixture, oddsSnapshot, 'moneyline', 0);
     metadata.fixturesProcessed++;
     metadata.predictionsGenerated++;

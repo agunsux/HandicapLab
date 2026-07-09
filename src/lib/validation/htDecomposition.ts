@@ -1,7 +1,8 @@
 import { MatchSimulationResult } from '../simulation/mockMatchGenerator';
 import { PredictionOutput, MatchInput } from '@/services/probability.engine';
 import { calculateBrierScore } from './calibration';
-import { calculateECE } from '../calibration/marketCalibrator';
+import { calculateECE } from '../math/metrics';
+
 
 export interface HTDecompositionResult {
   htScoreState: string;
@@ -63,7 +64,8 @@ export function runHTDecomposition(
       return { probability: probUnder, actual: actualUnder };
     });
 
-    const ece = calculateECE(probPairs);
+    const ece = calculateECE(probPairs.map(p => p.probability), probPairs.map(p => p.actual ? 1 : 0));
+
     const brier = calculateBrierScore(probPairs.map(p => ({ prob: p.probability, outcome: p.actual })));
     const roi = totalRisk > 0 ? profit / totalRisk : 0;
     const baseRate = hits / data.length;

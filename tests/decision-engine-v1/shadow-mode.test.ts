@@ -11,19 +11,33 @@ import { ModelRegistry } from '../../src/lib/engines/decision-engine-v1/registry
 import { MatchFeatures } from '../../src/lib/engines/feature-engine/types';
 import { PredictionFeatures } from '../../src/lib/market-intelligence/types';
 
-class MockModel {
+import { PredictionModel, Prediction, ModelMetadata } from '../../src/lib/engines/decision-engine-v1/models/predictionModel';
+
+class MockModel implements PredictionModel {
   constructor(public id: string, public name: string, private _pHome: number, private _pDraw: number, private _pAway: number) {}
-  public async predict(): Promise<any> {
+  public async predict(): Promise<Prediction> {
     return {
       pHome: this._pHome,
       pDraw: this._pDraw,
-      pAway: this._pAway,
-      confidence: 85,
-      modelName: this.name,
-      version: '1.0.0'
+      pAway: this._pAway
     };
   }
+
+  public async train(trainData: any[]): Promise<void> {}
+
+  public async predictProbability(features: any): Promise<{ pHome: number; pDraw: number; pAway: number }> {
+    return { pHome: this._pHome, pDraw: this._pDraw, pAway: this._pAway };
+  }
+
+  public async predictScore(features: any): Promise<{ home: number; away: number }> {
+    return { home: 1.5, away: 1.0 };
+  }
+
+  public metadata(): ModelMetadata {
+    return { name: this.name, version: '1.0.0', description: '', isOnline: false };
+  }
 }
+
 
 async function awaitJob(job: JobRecord): Promise<void> {
   while (job.status === 'pending' || job.status === 'processing') {
