@@ -1,0 +1,14 @@
+{
+  "championMetrics": {
+    "method": "BetaCalibration",
+    "dataset": "test_dataset",
+    "protocol": "standard_v1",
+    "ece": 0.025,
+    "brier": 0.18,
+    "log_loss": 0.56,
+    "champion": true,
+    "id": "5iiroa",
+    "created_at": "2026-07-09T01:23:59.032Z",
+    "approved_at": "2026-07-09T01:23:59.033Z"
+  }
+}

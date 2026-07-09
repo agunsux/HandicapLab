@@ -7,17 +7,17 @@ import { SnapshotLocker } from '../../src/lib/paper-trading/snapshotLocker';
 import { PredictionWorker } from '../../src/lib/paper-trading/predictionWorker';
 import { ResultReconciler } from '../../src/lib/paper-trading/resultReconciler';
 import { PredictionLedgerRepository } from '../../src/lib/data/predictionLedgerRepository';
-import { ModelRegistry, EnsembleSubModel } from '../../src/lib/engines/decision-engine-v1/registry';
+import { ModelRegistry } from '../../src/lib/engines/decision-engine-v1/registry';
 import { MatchFeatures } from '../../src/lib/engines/feature-engine/types';
 import { PredictionFeatures } from '../../src/lib/market-intelligence/types';
 
-class MockModel implements EnsembleSubModel {
-  constructor(public id: string, public name: string, private pHome: number, private pDraw: number, private pAway: number) {}
+class MockModel {
+  constructor(public id: string, public name: string, private _pHome: number, private _pDraw: number, private _pAway: number) {}
   public async predict(): Promise<any> {
     return {
-      homeProbability: this.pHome,
-      drawProbability: this.pDraw,
-      awayProbability: this.pAway,
+      pHome: this._pHome,
+      pDraw: this._pDraw,
+      pAway: this._pAway,
       confidence: 85,
       modelName: this.name,
       version: '1.0.0'

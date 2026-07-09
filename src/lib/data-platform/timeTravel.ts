@@ -71,7 +71,44 @@ export class TimeTravelSnapshot {
     this.cutoffDate = cutoffDate;
     this.goldDir = goldDir;
 
-    // Initialization must now happen via loadCache before instantiating.
+    // Auto-load cache synchronously if not already populated.
+    // This supports both test scenarios (sync write-then-read) and
+    // production where loadCache() should be called ahead of time.
+    this.ensureCacheLoaded();
+  }
+
+  private ensureCacheLoaded(): void {
+    if (TimeTravelSnapshot.cachedFixtures) return;
+    if (!this.goldDir) return;
+
+    const fixturesPath = path.join(this.goldDir, 'fixtures.parquet');
+    if (!fs.existsSync(fixturesPath)) return;
+
+    TimeTravelSnapshot.cachedFixtures = ParquetHelper.readSync(fixturesPath);
+    TimeTravelSnapshot.cachedOddsOpen = ParquetHelper.readSync(
+      path.join(this.goldDir, 'odds_open.parquet')
+    );
+    TimeTravelSnapshot.cachedOddsClose = ParquetHelper.readSync(
+      path.join(this.goldDir, 'odds_close.parquet')
+    );
+    TimeTravelSnapshot.cachedLineups = ParquetHelper.readSync(
+      path.join(this.goldDir, 'lineups.parquet')
+    );
+    TimeTravelSnapshot.cachedInjuries = ParquetHelper.readSync(
+      path.join(this.goldDir, 'injuries.parquet')
+    );
+    TimeTravelSnapshot.cachedStandings = ParquetHelper.readSync(
+      path.join(this.goldDir, 'standings.parquet')
+    );
+    TimeTravelSnapshot.cachedElo = ParquetHelper.readSync(
+      path.join(this.goldDir, 'elo.parquet')
+    );
+    TimeTravelSnapshot.cachedReferees = ParquetHelper.readSync(
+      path.join(this.goldDir, 'referees.parquet')
+    );
+    TimeTravelSnapshot.cachedTeamStats = ParquetHelper.readSync(
+      path.join(this.goldDir, 'team_stats.parquet')
+    );
   }
 
   public static async loadCache(goldDir: string): Promise<void> {

@@ -23,7 +23,11 @@
     "validate:sprint2": "tsx src/scripts/run-sprint2-research.ts",
     "validate:sprint3": "tsx src/scripts/run-sprint3-research.ts",
     "validate:sprint4": "tsx src/scripts/validate-sprint4.ts",
-    "validate-architecture": "tsx tests/sprint_32_6/runner.ts"
+    "validate-architecture": "tsx tests/sprint_32_6/runner.ts",
+    "shadow:predict": "tsx src/scripts/start-shadow-pipeline.ts",
+    "shadow:migrate": "tsx -e \"const{migrateStatus}=require('./src/lib/db/migrate');migrateStatus().then(console.log).catch(console.error)\"",
+    "shadow:evaluate": "tsx -e \"fetch('http://localhost:3000/api/shadow/evaluate').then(r=>r.json()).then(console.log).catch(console.error)\"",
+    "test:shadow": "vitest run tests/shadow-pipeline-prediction.test.ts tests/shadow-pipeline-evidence.test.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
