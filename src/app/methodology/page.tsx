@@ -77,7 +77,11 @@ export default function MethodologyPage() {
               3. Edge Calculation & CLV
             </h2>
             <p className="mb-4">
-              A key component of our model is the estimation of the probability edge. An edge is identified when our model's calculated fair probability indicates that the bookmaker's offered odds are statistically mispriced:
+              A key component of our model is the estimation of the probability edge. An edge is identified when our model
+              {'\''}
+              s calculated fair probability indicates that the bookmaker
+              {'\''}
+              s offered odds are statistically mispriced:
             </p>
             <div className="bg-slate-950 border border-slate-850 p-4 rounded mb-4 font-mono text-xs text-slate-400">
               Edge % = (Model Probability * Market Odds) - 1

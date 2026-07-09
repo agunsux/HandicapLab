@@ -113,10 +113,10 @@ export class TeamNormalizer {
     }
     
     // Fuzzy cleanses
-    let matchedName = name.trim();
+    const matchedName = name.trim();
     
     // Strip common football club suffixes across multiple languages (league-agnostic)
-    let stripped = cleaned
+    const stripped = cleaned
       .replace(/\s+fc$/, '')
       .replace(/\s+cf$/, '')
       .replace(/\s+ud$/, '')

@@ -70,7 +70,7 @@ export class Metrics {
   public static prAuc(predictions: { probability: number; outcome: number }[]): number {
     if (predictions.length === 0) return 0;
     const sorted = [...predictions].sort((a, b) => b.probability - a.probability);
-    let numPos = sorted.filter(p => p.outcome === 1).length;
+    const numPos = sorted.filter(p => p.outcome === 1).length;
     if (numPos === 0) return 0;
 
     let auc = 0;

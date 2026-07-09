@@ -30,7 +30,7 @@ export default function AppLayout({
             className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors bg-slate-800/50 text-emerald-400 border border-emerald-500/20 hover:bg-slate-800 hover:text-white"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-layout-dashboard"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="10" rx="1"/><rect width="7" height="5" x="3" y="14" rx="1"/></svg>
-            <span>Today's Value</span>
+            <span>Today&#39;s Value</span>
           </Link>
           
           <Link

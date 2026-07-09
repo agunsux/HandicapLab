@@ -46,12 +46,13 @@ export class BacktestService {
         query = query.in('league', params.leagues);
       }
 
-      let { data: matches, error: matchesErr } = await query.order('kickoff', { ascending: true });
+      const { data: rawMatches, error: matchesErr } = await query.order('kickoff', { ascending: true });
 
       if (matchesErr) {
         console.warn('[BacktestService] Error fetching matches:', matchesErr.message);
       }
 
+      let matches: Record<string, unknown>[] | null = rawMatches as Record<string, unknown>[] | null;
       if (!matches || matches.length === 0) {
         console.log('ℹ️ No finished matches found in database. Using mock matches for simulation.');
         matches = [
@@ -60,7 +61,7 @@ export class BacktestService {
           { id: '1003', home_team: 'Manchester City', away_team: 'Manchester United', league: 'Premier League', kickoff: '2026-06-10T15:00:00Z', status: 'finished', home_goals: 1, away_goals: 1 },
           { id: '1004', home_team: 'Real Madrid', away_team: 'Barcelona', league: 'La Liga', kickoff: '2026-06-15T15:00:00Z', status: 'finished', home_goals: 2, away_goals: 3 },
           { id: '1005', home_team: 'Bayern Munich', away_team: 'Dortmund', league: 'Bundesliga', kickoff: '2026-06-20T15:00:00Z', status: 'finished', home_goals: 4, away_goals: 2 }
-        ] as any;
+        ];
       }
 
       let totalBets = 0;

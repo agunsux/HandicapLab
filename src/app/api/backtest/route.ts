@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     if (tradeErr) throw tradeErr;
 
     // A. Flat Staking ROI calculation from Paper Trades
-    let totalBets = settledTrades?.length ?? 0;
+    const totalBets = settledTrades?.length ?? 0;
     let netProfit = 0;
     let wins = 0;
     

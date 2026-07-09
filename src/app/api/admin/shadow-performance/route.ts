@@ -95,7 +95,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ success: false, error: settledErr.message }, { status: 500 });
     }
 
-    let total = settled ? settled.length : 0;
+    const total = settled ? settled.length : 0;
     let won = 0;
     let lost = 0;
     let voided = 0;

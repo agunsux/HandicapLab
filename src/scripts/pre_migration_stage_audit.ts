@@ -17,7 +17,7 @@ async function main() {
   // Fetch in batches to avoid hitting row limits.
   const batchSize = 5000;
   let from = 0;
-  let allStages: string[] = [];
+  const allStages: string[] = [];
   while (true) {
     const { data, error } = await supabase
       .from('matches')

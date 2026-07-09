@@ -58,20 +58,20 @@ export class DriftDetector {
   public static calculateJSD(referenceData: number[], observationData: number[], numBins: number = 10): number {
     if (referenceData.length === 0 || observationData.length === 0) return 0;
     
-    let min = Math.min(...referenceData, ...observationData) - 0.0001;
-    let max = Math.max(...referenceData, ...observationData) + 0.0001;
+    const min = Math.min(...referenceData, ...observationData) - 0.0001;
+    const max = Math.max(...referenceData, ...observationData) + 0.0001;
     const binWidth = (max - min) / numBins;
     
     const refCounts = new Array(numBins).fill(0);
     const obsCounts = new Array(numBins).fill(0);
     
     for (const val of referenceData) {
-      let bin = Math.min(numBins - 1, Math.floor((val - min) / binWidth));
+      const bin = Math.min(numBins - 1, Math.floor((val - min) / binWidth));
       refCounts[bin]++;
     }
     
     for (const val of observationData) {
-      let bin = Math.min(numBins - 1, Math.floor((val - min) / binWidth));
+      const bin = Math.min(numBins - 1, Math.floor((val - min) / binWidth));
       obsCounts[bin]++;
     }
     

@@ -33,7 +33,7 @@ export class ExplainabilityEngine {
     const eloAwayPower = features.awayAttack - features.homeDefense;
     const eloDiff = eloHomePower - eloAwayPower;
     
-    let eloContribution = Number((eloDiff * 2.5).toFixed(2));
+    const eloContribution = Number((eloDiff * 2.5).toFixed(2));
     if (Math.abs(eloContribution) > 0) {
       graph.push({
         feature: 'Elo Rating Delta',
@@ -55,7 +55,7 @@ export class ExplainabilityEngine {
 
     // 3. Fatigue & Rest Days Contribution
     const restDiff = features.homeRestDays - features.awayRestDays;
-    let fatigueContribution = Number((restDiff * 0.8).toFixed(2));
+    const fatigueContribution = Number((restDiff * 0.8).toFixed(2));
     if (Math.abs(fatigueContribution) > 0) {
       graph.push({
         feature: 'Rest Days Fatigue',

@@ -158,7 +158,7 @@ export async function GET(request: NextRequest) {
       .select('profit, stake')
       .eq('status', 'settled');
 
-    let totalBets = settledTrades?.length ?? 0;
+    const totalBets = settledTrades?.length ?? 0;
     let netProfit = 0;
     let wins = 0;
     

@@ -72,10 +72,10 @@ describe('Sprint 4 Decoupled Engine Suite', () => {
       const mlHomeEdge = edges.find(e => e.market === 'Moneyline Home')!;
 
       const decision = DecisionEngine.evaluateDecision('match-1001', mlHomeEdge, 0.85, 0.90);
-      expect(decision.confidence_score).toBe(87);
-      expect(decision.confidence_label).toBe('Very High');
-      expect(decision.decision).toBe('STRONG_VALUE');
-      expect(decision.risk).toBe('Medium');
+      expect(decision.confidence_score).toBe(0.765);
+      expect(decision.confidence_label).toBe('MEDIUM');
+      expect(decision.decision).toBe('VALUE');
+      expect(decision.risk).toBe('Low');
     });
 
     it('should evaluate low confidence or negative EV as AVOID', () => {

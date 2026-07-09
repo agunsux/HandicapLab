@@ -176,6 +176,7 @@ export function generatePrediction(
 
   return {
     matchId,
+    ml_home_prob: poisson.homeProb,
     ml_draw_prob: poisson.drawProb,
     ml_away_prob: poisson.awayProb,
     ou_over_prob: poisson.overProb,

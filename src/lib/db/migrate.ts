@@ -1,6 +1,7 @@
 // Migration Runner — Migration-First Database Management
 // No direct schema mutation. All changes go through numbered migrations.
 
+import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
 import { query, transaction } from './connection';
@@ -27,7 +28,6 @@ async function ensureMigrationTable(): Promise<void> {
 }
 
 function fileHash(filePath: string): string {
-  const crypto = require('crypto');
   return crypto.createHash('sha256').update(fs.readFileSync(filePath)).digest('hex');
 }
 

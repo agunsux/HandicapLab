@@ -14,7 +14,7 @@ export interface MatchSimulationResult {
 }
 
 function poissonRandom(lambda: number): number {
-  let L = Math.exp(-lambda);
+  const L = Math.exp(-lambda);
   let k = 0;
   let p = 1;
   do {

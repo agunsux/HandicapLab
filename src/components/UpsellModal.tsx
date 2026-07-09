@@ -18,12 +18,6 @@ export default function UpsellModal({ isOpen, onClose, onSuccess }: UpsellModalP
   const [slotsAvailable, setSlotsAvailable] = useState<boolean>(true);
   const [founderCount, setFounderCount] = useState<number>(0);
 
-  useEffect(() => {
-    if (isOpen) {
-      loadDetails();
-    }
-  }, [isOpen]);
-
   async function loadDetails() {
     setLoading(true);
     const data = await checkUserEntitlementsAction();
@@ -33,6 +27,12 @@ export default function UpsellModal({ isOpen, onClose, onSuccess }: UpsellModalP
     setFounderCount(data.founderCount);
     setLoading(false);
   }
+
+  useEffect(() => {
+    if (isOpen) {
+      loadDetails();
+    }
+  }, [isOpen]);
 
   async function handlePurchase(productType: 'LIFETIME' | 'CREDITS') {
     setPurchasing(true);

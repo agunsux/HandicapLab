@@ -56,11 +56,11 @@ export function runHTInteractionTest(
   }
 
   // Evaluate on validation set
-  let baseHits = 0;
+  const baseHits = 0;
   let baseTotalRisk = 0;
   let baseProfit = 0;
   
-  let newHits = 0;
+  const newHits = 0;
   let newTotalRisk = 0;
   let newProfit = 0;
 

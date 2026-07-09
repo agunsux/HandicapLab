@@ -266,7 +266,7 @@ async function runAudit() {
   console.log('\n==================================');
   console.log('3. EDGE FILTER CHECK');
   console.log('==================================');
-  let totalPreds = db.predictions.filter(p => p.match_id.startsWith('m-')).length;
+  const totalPreds = db.predictions.filter(p => p.match_id.startsWith('m-')).length;
   let evPositive = 0;
   let confidenceFiltered = 0;
 

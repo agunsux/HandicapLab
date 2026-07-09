@@ -58,7 +58,7 @@ export async function POST(req: Request) {
 
     // 3. Resolve localized pricing based on PPP Tiers
     const config = PPP_TIERS[ppp_tier] || PPP_TIERS.TIER_1;
-    let priceStr = product_type === 'LIFETIME' ? config.founderPrice : config.creditsPrice;
+    const priceStr = product_type === 'LIFETIME' ? config.founderPrice : config.creditsPrice;
     
     // Strip dollar signs to get numeric value
     const amount = Number(priceStr.replace(/[^0-9.]/g, ''));

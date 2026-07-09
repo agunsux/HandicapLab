@@ -1,13 +1,17 @@
 // Prediction Execution Service
 // Location: src/services/predictionExecutionService.ts
 
-import { ModelRegistryRepository, ModelRegistryRecord } from '../lib/data/modelRegistryRepository';
+import { ModelRegistryRepository } from '../lib/data/modelRegistryRepository';
 import { PredictionLedgerRepository } from '../lib/data/predictionLedgerRepository';
 import { ProbabilityEngine } from '../lib/engines/probability-engine';
 import { MatchFeatures } from '../lib/engines/feature-engine/types';
 import { ExplainabilityFormatter } from '../lib/engine/explainability-formatter';
 
 import { DbMatch } from '../lib/data/match';
+
+interface MatchFeaturesWithVersion extends MatchFeatures {
+  featureVersion?: string;
+}
 
 export interface PredictionOddsSnapshot {
   bookmaker?: string;
@@ -54,13 +58,13 @@ export class PredictionExecutionService {
 
       // 2. Score with each model
       for (const model of activeModels) {
-        const params = (model.parameters || {}) as any;
+        const params = (model.parameters || {}) as Record<string, unknown>;
 
         // Run prediction
         const predictionOutput = await ProbabilityEngine.predict(features, {
-          calibrationMethod: params.calibrationMethod || 'platt',
-          plattA: params.plattA,
-          plattB: params.plattB,
+          calibrationMethod: (params.calibrationMethod as 'platt' | 'isotonic' | 'beta' | 'none' | undefined) || 'platt',
+          plattA: params.plattA as number | undefined,
+          plattB: params.plattB as number | undefined,
           oddsSnapshot
         });
 
@@ -161,7 +165,7 @@ export class PredictionExecutionService {
           expected_value: ev,
           kelly_fraction: rawKelly,
           risk_adjusted_stake: finalWeight,
-          feature_version: (features as any).featureVersion || 'basic-v1',
+          feature_version: (features as MatchFeaturesWithVersion).featureVersion || 'basic-v1',
           feature_vector_snapshot: features,
           explainability_json: explainability,
           prediction_timestamp: match.kickoff
@@ -175,8 +179,9 @@ export class PredictionExecutionService {
           }
         }
       }
-    } catch (err: any) {
-      console.error('[PredictionExecutionService] executeAndRecord failed:', err.message);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.error('[PredictionExecutionService] executeAndRecord failed:', message);
     }
 
     return { championHash, challengerHashes };

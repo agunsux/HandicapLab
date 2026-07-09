@@ -24,9 +24,9 @@ async function audit() {
   console.log(`Total predictions: ${predictions.length}`);
 
   // Calculate stats on predictions
-  let confidenceScores: number[] = [];
-  let marketTypesCount = { AH: 0, OU: 0, ML: 0 };
-  let evList: number[] = [];
+  const confidenceScores: number[] = [];
+  const marketTypesCount = { AH: 0, OU: 0, ML: 0 };
+  const evList: number[] = [];
 
   for (const p of predictions) {
     marketTypesCount[p.market_type as 'AH' | 'OU' | 'ML'] = (marketTypesCount[p.market_type as 'AH' | 'OU' | 'ML'] || 0) + 1;

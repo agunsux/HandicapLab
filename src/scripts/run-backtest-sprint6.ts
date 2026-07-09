@@ -104,7 +104,7 @@ async function generateReport() {
   const report = runSegmentedBacktest(predictions);
 
   // 4. Construct Markdown Report
-  let md = `# Quantitative Edge Backtesting Report (Sprint 6)
+  const md = `# Quantitative Edge Backtesting Report (Sprint 6)
 
 Generated at: ${new Date().toISOString()}
 Total Sample Size: **${predictions.length}** historical predictions

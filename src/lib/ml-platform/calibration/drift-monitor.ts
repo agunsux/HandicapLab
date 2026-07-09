@@ -11,7 +11,7 @@ export class DriftMonitor {
     if (rawProbs.length !== actualOutcomes.length || rawProbs.length === 0) return 0;
     
     const binSize = 1.0 / bins;
-    let totalSamples = rawProbs.length;
+    const totalSamples = rawProbs.length;
     let ece = 0;
     
     for (let i = 0; i < bins; i++) {

@@ -52,7 +52,7 @@ async function main() {
     const dateStr = f.fixture.date;
 
     // Calculate pre-match features based on historical matches before this match date
-    const preMatchFeatures = calculatePreMatchFeatures(homeName, awayName, dateStr, history);
+    const preMatchFeatures = await calculatePreMatchFeatures(homeName, awayName, dateStr, history);
 
     // Prepare match input
     const input: MatchInput = {

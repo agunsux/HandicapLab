@@ -32,7 +32,7 @@ export class BettingPerformance {
     let longestLosingRun = 0;
     
     let totalStaked = 0;
-    let totalReturned = 0;
+    const totalReturned = 0;
 
     const bankrollHistory = [initialBankroll];
     const returns: number[] = [];

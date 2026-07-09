@@ -66,7 +66,7 @@ export class FeatureImportance {
       const shuffledScore = metricFn(shuffledPredictions);
       
       // Calculate importance: Drop in performance (if higher is better: baseline - shuffled)
-      let score = higherIsBetter ? (baselineScore - shuffledScore) : (shuffledScore - baselineScore);
+      const score = higherIsBetter ? (baselineScore - shuffledScore) : (shuffledScore - baselineScore);
       importance.push({ featureName: key, importanceScore: score });
     }
 

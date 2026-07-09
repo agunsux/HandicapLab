@@ -154,7 +154,7 @@ export class PerformanceAggregator {
     // we can calculate sub-model specific wins/losses based on their individual probabilities.
     const models = ['poisson', 'dixonColes', 'elo', 'logistic', 'xg', 'market'];
     const comparison: ModelComparisonStats[] = models.map((modelId) => {
-      let wins = 0;
+      const wins = 0;
       let totalProfit = 0;
       let totalStake = 0;
       let totalLogLoss = 0;

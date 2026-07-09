@@ -17,7 +17,7 @@ export default function CompetitorPositioning() {
             Why HandicapLab is Different
           </h2>
           <p className="text-zinc-400 text-sm md:text-base">
-            We don't sell hot tips or guarantee match outcomes. We provide ensembled probability modeling to expose pricing inefficiencies.
+            We do not sell hot tips or guarantee match outcomes. We provide ensembled probability modeling to expose pricing inefficiencies.
           </p>
         </div>
 

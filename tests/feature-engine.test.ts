@@ -28,6 +28,7 @@ class MockBuilder {
   
   or = vi.fn().mockReturnThis();
   lt = vi.fn().mockReturnThis();
+  lte = vi.fn().mockReturnThis();
   order = vi.fn().mockReturnThis();
   limit = vi.fn().mockReturnThis();
   in = vi.fn().mockReturnThis();

@@ -3,6 +3,7 @@ import { CalibrationError, CalibrationBucket } from './calibration-error';
 import { ReliabilityChecker, ReliabilityResult } from './reliability';
 import { EdgeScanner } from '../engines/edge-scanner';
 import { ConfidenceScanner } from '../engines/edge-scanner/confidence';
+import { ProbabilityOutput } from '../engines/probability-engine/types';
 
 export interface MarketMetrics {
   totalPredictions: number;
@@ -182,8 +183,12 @@ export class AccuracyCalculator {
       throw new Error(`[AccuracyCalculator] Failed to retrieve historical predictions: ${error?.message || 'Empty set'}`);
     }
 
-    // Define the joined result shape from the Supabase query
-    interface JoinedPredictionResult {
+    // Raw shape returned by Supabase PostgREST for FK joins.
+    // Because prediction_results.prediction_id and prediction_results.match_id
+    // lack UNIQUE constraints, PostgREST treats embedded relations as arrays
+    // (one-to-many cardinality), even though at runtime there is exactly one
+    // related row per FK.
+    interface RawPredictionResult {
       id: number;
       actual_home_score: number | null;
       actual_away_score: number | null;
@@ -193,11 +198,42 @@ export class AccuracyCalculator {
       profit_1x2: number | null;
       profit_ah: number | null;
       profit_ou: number | null;
-      predictions: {
+      predictions: Array<{
         id: number;
         match_id: number;
         market_type: string;
-        prediction: Record<string, unknown>;
+        prediction: ProbabilityOutput;
+        odds_snapshot: Record<string, unknown>;
+        closing_odds: Record<string, unknown>;
+        model_version: string;
+        brier_score: number | null;
+        clv: number | null;
+        created_at: string;
+      }>;
+      matches: Array<{
+        id: number;
+        league: string;
+        kickoff: string;
+      }>;
+    }
+
+    // Normalised domain type – each prediction_result correlates to exactly
+    // one prediction and one match, so we collapse the array wrappers.
+    interface NormalisedRow {
+      id: number;
+      actual_home_score: number | null;
+      actual_away_score: number | null;
+      hit_1x2: boolean | null;
+      hit_ah: boolean | null;
+      hit_ou: boolean | null;
+      profit_1x2: number | null;
+      profit_ah: number | null;
+      profit_ou: number | null;
+      prediction: {
+        id: number;
+        match_id: number;
+        market_type: string;
+        prediction: ProbabilityOutput;
         odds_snapshot: Record<string, unknown>;
         closing_odds: Record<string, unknown>;
         model_version: string;
@@ -205,18 +241,44 @@ export class AccuracyCalculator {
         clv: number | null;
         created_at: string;
       };
-      matches: {
+      match: {
         id: number;
         league: string;
         kickoff: string;
       };
     }
 
-    // Filter results locally to handle dynamic filtering criteria safely
-    const filteredResults = (results as JoinedPredictionResult[]).filter((row) => {
-      const pred = row.predictions;
-      const match = row.matches;
-      if (!pred || !match) return false;
+    // Map raw Supabase rows (with array wrappers) into normalised domain rows
+    // (single objects). Each FK join returns exactly one element at runtime.
+    function normaliseRow(raw: RawPredictionResult): NormalisedRow | null {
+      const prediction = raw.predictions?.[0];
+      const match = raw.matches?.[0];
+      if (!prediction || !match) return null;
+      return {
+        id: raw.id,
+        actual_home_score: raw.actual_home_score,
+        actual_away_score: raw.actual_away_score,
+        hit_1x2: raw.hit_1x2,
+        hit_ah: raw.hit_ah,
+        hit_ou: raw.hit_ou,
+        profit_1x2: raw.profit_1x2,
+        profit_ah: raw.profit_ah,
+        profit_ou: raw.profit_ou,
+        prediction,
+        match,
+      };
+    }
+
+    const rawRows = results as RawPredictionResult[];
+    const normalisedRows: NormalisedRow[] = [];
+    for (const raw of rawRows) {
+      const n = normaliseRow(raw);
+      if (n) normalisedRows.push(n);
+    }
+
+    // Filter normalised rows locally to handle dynamic filtering criteria safely
+    const filteredResults = normalisedRows.filter((row) => {
+      const pred = row.prediction;
 
       // Filter by model version
       if (pred.model_version !== modelVersion) return false;
@@ -258,8 +320,8 @@ export class AccuracyCalculator {
     const processedRows: AggregationRow[] = [];
 
     for (const row of filteredResults) {
-      const pred = row.predictions;
-      const match = row.matches;
+      const pred = row.prediction;
+      const match = row.match;
       const marketType = pred.market_type as 'ML' | 'AH' | 'OU';
 
       uniqueMatchIds.add(String(pred.match_id));
@@ -281,18 +343,17 @@ export class AccuracyCalculator {
         stake = picks[0].kellyStake > 0 ? picks[0].kellyStake : 0.05;
         prob = picks[0].modelProbability;
       } else {
-        // Fallback probability mappings
-        const predObj = pred.prediction || {};
+        // Fallback probability mappings using typed ProbabilityOutput fields
         if (marketType === 'ML') {
-          prob = Math.max(predObj.pHome || 0, predObj.pDraw || 0, predObj.pAway || 0);
+          prob = Math.max(pred.prediction.pHome || 0, pred.prediction.pDraw || 0, pred.prediction.pAway || 0);
         } else if (marketType === 'AH') {
-          const line = oddsSnap.line || 0;
+          const line = Number(oddsSnap.line) || 0;
           const lineKey = line > 0 ? `+${line.toFixed(1)}` : line.toFixed(1);
-          prob = predObj.pAhHome?.[lineKey] || 0.5;
+          prob = pred.prediction.pAhHome?.[lineKey] || 0.5;
         } else if (marketType === 'OU') {
-          const line = oddsSnap.line || 2.5;
+          const line = Number(oddsSnap.line) || 2.5;
           const lineKey = line.toFixed(1);
-          prob = predObj.pOver?.[lineKey] || 0.5;
+          prob = pred.prediction.pOver?.[lineKey] || 0.5;
         }
       }
 

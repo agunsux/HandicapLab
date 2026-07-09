@@ -32,7 +32,7 @@ export async function GET(request?: Request) {
     const settledCount = filteredSignals.length;
 
     let profitUnits = 0;
-    let winCount = 0;
+    const winCount = 0;
     let wins = 0;
     let losses = 0;
     let pushes = 0;

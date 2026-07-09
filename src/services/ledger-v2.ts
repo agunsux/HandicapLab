@@ -1,5 +1,63 @@
 import { supabase } from '../lib/supabase.server';
 import crypto from 'crypto';
+import { ProbabilityOutput } from '../lib/engines/probability-engine/types';
+import { MatchFeatures } from '../lib/engines/feature-engine/types';
+
+export interface LedgerMatch {
+  id: string | number;
+  kickoff?: string | Date;
+  kickoff_time?: string | Date;
+  league?: string;
+  season?: string | number;
+  weather?: string | null;
+  stadium?: string | null;
+  timezone?: string | null;
+  formation?: string | null;
+  injuries?: unknown | null;
+  lineups?: unknown | null;
+  elo_snapshot?: unknown | null;
+  xg_snapshot?: unknown | null;
+}
+
+export interface LedgerMarketOdds {
+  line?: string | number;
+  bet365Odds?: number | null;
+  betfairOdds?: number | null;
+  marketAverage?: number | null;
+  marketMedian?: number | null;
+  openingOdds?: number | null;
+}
+
+export interface LedgerTopPick {
+  marketOdds: number | string;
+  expectedValue: number;
+  outcome: string;
+  impliedProbability?: number | null;
+}
+
+export interface LedgerProbabilityOutput extends Omit<ProbabilityOutput, 'expectedGoals' | 'confidence'> {
+  expectedGoals?: number | { home: number; away: number };
+  confidence?: {
+    modelConfidence: number;
+    dataConfidence: number;
+    marketConfidence: number;
+    finalConfidence: number;
+    confidenceScore: number;
+    dataQualityScore: number;
+    recommendationStatus: 'Recommended' | 'Consider' | 'Neutral' | 'Caution' | 'Skip';
+    reasons: string[];
+    uncertaintyPenalties?: unknown[];
+    missingDataLogs?: unknown[];
+  };
+  homeStrength?: number;
+  awayStrength?: number;
+}
+
+export interface LedgerMatchFeatures extends MatchFeatures {
+  pressureFactor?: number;
+  fatigueFactor?: number;
+  [key: string]: unknown;
+}
 
 export interface LedgerV2ExecutionMeta {
   executionTimeMs: number;
@@ -14,12 +72,12 @@ export class LedgerV2Service {
    * Safely writes a prediction snapshot and its associated metadata tables (dual-write).
    */
   static async writePrediction(
-    match: any,
+    match: LedgerMatch,
     marketType: 'ML' | 'AH' | 'OU',
-    probOutput: any,
-    marketOdds: any,
-    topPick: any,
-    features: any,
+    probOutput: LedgerProbabilityOutput,
+    marketOdds: LedgerMarketOdds,
+    topPick: LedgerTopPick | null,
+    features: MatchFeatures | null,
     execMeta: LedgerV2ExecutionMeta
   ): Promise<string | null> {
     const predictionUuid = crypto.randomUUID();
@@ -78,10 +136,10 @@ export class LedgerV2Service {
         probability_home: probOutput.pHome,
         probability_draw: probOutput.pDraw,
         probability_away: probOutput.pAway,
-        expected_goals_home: probOutput.expectedGoals?.home ?? null,
-        expected_goals_away: probOutput.expectedGoals?.away ?? null,
+        expected_goals_home: (typeof probOutput.expectedGoals === 'object' && probOutput.expectedGoals !== null) ? (probOutput.expectedGoals as { home: number; away: number }).home : null,
+        expected_goals_away: (typeof probOutput.expectedGoals === 'object' && probOutput.expectedGoals !== null) ? (probOutput.expectedGoals as { home: number; away: number }).away : null,
         confidence_score: probOutput.confidence ? Number(probOutput.confidence.confidenceScore) : null,
-        data_quality_score: probOutput.confidence ? Number(probOutput.confidence.dataConfidence) : null,
+        data_quality_score: probOutput.confidence ? Number(probOutput.confidence.dataQualityScore) : null,
         recommendation_label: convictionLabel,
         
         model_version: 'prematch-v1',
@@ -139,19 +197,24 @@ export class LedgerV2Service {
       }
 
       // 4. Write Child Tables in parallel
-      const childPromises: PromiseLike<any>[] = [];
+      const childPromises: PromiseLike<unknown>[] = [];
 
       if (features) {
-        const featureRecords = Object.keys(features).map(key => ({
-          snapshot_id: predictionUuid,
-          snapshot_time: snapshotTime,
-          feature_name: key,
-          feature_value: typeof features[key] === 'number' ? features[key] : null,
-          normalized_value: typeof features[key] === 'number' ? features[key] : null,
-          weight: 1.0,
-          importance: 1.0,
-          source_provenance: { engine: 'poisson', provider: 'api-football', latency: execMeta.apiLatencyMs }
-        }));
+        const featRecord = features as LedgerMatchFeatures;
+        const featureRecords = Object.keys(featRecord).map(key => {
+          const val = featRecord[key];
+          const numVal = typeof val === 'number' ? val : null;
+          return {
+            snapshot_id: predictionUuid,
+            snapshot_time: snapshotTime,
+            feature_name: key,
+            feature_value: numVal,
+            normalized_value: numVal,
+            weight: 1.0,
+            importance: 1.0,
+            source_provenance: { engine: 'poisson', provider: 'api-football', latency: execMeta.apiLatencyMs }
+          };
+        });
 
         if (featureRecords.length > 0) {
           childPromises.push(
@@ -185,11 +248,14 @@ export class LedgerV2Service {
       );
 
       // 6. Write Explainability Child Table
+      const featRecordForExp = features as LedgerMatchFeatures | null;
+      const pressure = featRecordForExp ? featRecordForExp.pressureFactor : undefined;
+      const fatigue = featRecordForExp ? featRecordForExp.fatigueFactor : undefined;
       const explainabilityPayload = {
         snapshot_id: predictionUuid,
         snapshot_time: snapshotTime,
-        positive_factors: features.pressureFactor && features.pressureFactor > 0 ? ['High Goal Pressure'] : [],
-        negative_factors: features.fatigueFactor && features.fatigueFactor > 0.5 ? ['High Team Fatigue'] : [],
+        positive_factors: pressure && pressure > 0 ? ['High Goal Pressure'] : [],
+        negative_factors: fatigue && fatigue > 0.5 ? ['High Team Fatigue'] : [],
         uncertainty_factors: probOutput.confidence?.uncertaintyPenalties || [],
         missing_data: probOutput.confidence?.missingDataLogs || [],
         shap_values: { home_strength: probOutput.homeStrength, away_strength: probOutput.awayStrength },
@@ -247,8 +313,9 @@ export class LedgerV2Service {
 
       console.log(`[LedgerV2] Successfully recorded dual-write ledger entry: ${predictionUuid}`);
       return predictionUuid;
-    } catch (err: any) {
-      console.error(`[LedgerV2] Safe write error: ${err.message}`);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      console.error(`[LedgerV2] Safe write error: ${message}`);
       return null;
     }
   }
@@ -352,8 +419,9 @@ export class LedgerV2Service {
       if (feedErr) console.warn(`[LedgerV2] feedback insert failed: ${feedErr.message}`);
 
       return true;
-    } catch (e: any) {
-      console.error(`[LedgerV2] settlement write error: ${e.message}`);
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : String(e);
+      console.error(`[LedgerV2] settlement write error: ${message}`);
       return false;
     }
   }

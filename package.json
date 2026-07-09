@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
+    "lint": "eslint src",
     "simulate": "tsx src/scripts/simulate.ts",
     "validate": "tsx src/scripts/validate.ts",
     "stability": "tsx src/scripts/stabilityTest.ts",

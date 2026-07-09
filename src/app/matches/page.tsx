@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import React from 'react';
 import { supabase } from '@/lib/supabase.server';
 import { MatchCard } from '@/components/MatchCard';
@@ -73,18 +74,18 @@ export default async function MatchesPage() {
             </span>
           </div>
           <nav className="flex items-center gap-6">
-            <a href="/" className="text-xs md:text-sm font-bold text-slate-400 hover:text-white transition-all uppercase tracking-wider">
+            <Link href="/" className="text-xs md:text-sm font-bold text-slate-400 hover:text-white transition-all uppercase tracking-wider">
               Home
-            </a>
-            <a href="/matches" className="text-xs md:text-sm font-bold text-white transition-all border-b border-emerald-500 pb-1 uppercase tracking-wider">
+            </Link>
+            <Link href="/matches" className="text-xs md:text-sm font-bold text-white transition-all border-b border-emerald-500 pb-1 uppercase tracking-wider">
               Matches
-            </a>
-            <a href="/ledger" className="text-xs md:text-sm font-bold text-slate-400 hover:text-white transition-all uppercase tracking-wider">
+            </Link>
+            <Link href="/ledger" className="text-xs md:text-sm font-bold text-slate-400 hover:text-white transition-all uppercase tracking-wider">
               Ledger
-            </a>
-            <a href="/pricing" className="text-xs md:text-sm font-bold text-slate-400 hover:text-white transition-all uppercase tracking-wider">
+            </Link>
+            <Link href="/pricing" className="text-xs md:text-sm font-bold text-slate-400 hover:text-white transition-all uppercase tracking-wider">
               Pricing
-            </a>
+            </Link>
           </nav>
         </div>
       </header>

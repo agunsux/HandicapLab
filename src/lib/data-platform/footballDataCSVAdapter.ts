@@ -73,8 +73,8 @@ export class FootballDataCSVAdapter {
     let kickoffISO = new Date().toISOString();
     if (dateStr) {
       const dateParts = dateStr.includes('-') ? dateStr.split('-') : dateStr.split('/');
-      let day = parseInt(dateParts[0], 10);
-      let month = parseInt(dateParts[1], 10);
+      const day = parseInt(dateParts[0], 10);
+      const month = parseInt(dateParts[1], 10);
       let year = parseInt(dateParts[2], 10);
       if (year < 100) year += 2000;
       

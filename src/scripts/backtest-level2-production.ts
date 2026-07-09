@@ -84,7 +84,7 @@ async function runBacktest() {
     // Cumulative stats
     let totalHomeFor = 0;
     let totalHomeAgainst = 0;
-    let matchesCount = priorHistory.length;
+    const matchesCount = priorHistory.length;
     priorHistory.forEach(h => {
       totalHomeFor += h.goalsFor;
       totalHomeAgainst += h.goalsAgainst;

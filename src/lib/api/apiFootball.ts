@@ -224,7 +224,8 @@ export class ApiFootballClient {
         });
       }
 
-      return mockFixtures as unknown as T;
+      const result: unknown = mockFixtures;
+      return result as T;
     }
 
     if (endpoint === 'fixtures/statistics') {
@@ -277,7 +278,8 @@ export class ApiFootballClient {
           ]
         }
       ];
-      return mockStats as unknown as T;
+      const result: unknown = mockStats;
+      return result as T;
     }
 
     if (endpoint === 'teams/statistics') {
@@ -285,7 +287,7 @@ export class ApiFootballClient {
       const season = Number(params.season || 2024);
       const team = Number(params.team || 1);
 
-      return {
+      const result: unknown = {
         league: { id: league, name: 'League', country: 'Country', season },
         team: { id: team, name: 'Mock Team', logo: '' },
         form: 'WDLWW',
@@ -294,7 +296,8 @@ export class ApiFootballClient {
           for: { total: { home: 12, away: 8, total: 20 } },
           against: { total: { home: 5, away: 7, total: 12 } }
         }
-      } as unknown as T;
+      };
+      return result as T;
     }
 
     return {} as T;

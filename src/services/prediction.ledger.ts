@@ -36,7 +36,7 @@ export async function processAndStorePrediction(matchId: string, input: MatchInp
   const isNew = await checkIsNewSchema();
 
   // 2. Store prediction into Supabase 'predictions' table
-  let insertPayload: any;
+  let insertPayload: Record<string, unknown>;
 
   if (isNew) {
     insertPayload = {

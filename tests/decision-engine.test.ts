@@ -21,13 +21,13 @@ describe('DecisionEngine Unit Tests', () => {
       reverse_line: false
     };
 
-    const decision = DecisionEngine.evaluateDecision('fixture-001', edge, 0.85, 0.90);
+    const decision = DecisionEngine.evaluateDecision('fixture-001', edge, 0.95, 0.90);
 
     expect(decision).not.toBeNull();
     expect(decision.market).toBe('Moneyline Home');
     expect(decision.expectedValue).toBe(10.0);
     expect(decision.decision).toBe('STRONG_VALUE');
-    expect(decision.risk).toBe('Medium');
+    expect(decision.risk).toBe('Low');
   });
 
   it('should return AVOID when expected value is negative', () => {

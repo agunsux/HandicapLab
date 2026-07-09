@@ -217,7 +217,7 @@ async function handleGenerateSignals(request: Request) {
 
   const logId = await CronLogger.start('generate-signals');
   const ctx = new OddsIngestionContext('generate-signals');
-  let recordsProcessed = 0;
+  const recordsProcessed = 0;
 
   const isDryRun = process.env.CRON_DRY_RUN === 'true';
   const now = new Date();

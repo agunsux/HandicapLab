@@ -25,8 +25,8 @@ export class MarketIntelligenceModel implements PredictionModel {
     const marginPerSelection = margin / 3;
 
     let pHome = Math.max(0.01, rawHome - marginPerSelection);
-    let pDraw = Math.max(0.01, rawDraw - marginPerSelection);
-    let pAway = Math.max(0.01, rawAway - marginPerSelection);
+    const pDraw = Math.max(0.01, rawDraw - marginPerSelection);
+    const pAway = Math.max(0.01, rawAway - marginPerSelection);
 
     if (features.marketMomentumHome && features.marketMomentumHome > 1.0) {
       pHome *= 1.02;

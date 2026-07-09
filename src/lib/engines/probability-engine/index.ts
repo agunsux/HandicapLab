@@ -176,9 +176,9 @@ export class ProbabilityEngine {
 
     // Round and normalize to ensure sum is exactly 1.0
     const mlSum = pHomeRaw + pDrawRaw + pAwayRaw;
-    let pHome = Number((pHomeRaw / mlSum).toFixed(4));
-    let pDraw = Number((pDrawRaw / mlSum).toFixed(4));
-    let pAway = Number(Math.max(0, 1.0 - pHome - pDraw).toFixed(4));
+    const pHome = Number((pHomeRaw / mlSum).toFixed(4));
+    const pDraw = Number((pDrawRaw / mlSum).toFixed(4));
+    const pAway = Number(Math.max(0, 1.0 - pHome - pDraw).toFixed(4));
 
     // 7. Derive Over/Under (OU) probabilities for standard lines
     const ouLines = ['0.5', '1.5', '2.5', '3.5', '4.5'];

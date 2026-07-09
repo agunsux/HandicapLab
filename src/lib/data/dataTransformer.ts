@@ -145,12 +145,12 @@ export function transformFixtureData(
   };
 }
 
-export function calculatePreMatchFeatures(
+export async function calculatePreMatchFeatures(
   homeTeam: any,
   awayTeam?: string,
   matchDateStr?: string,
   historicalMatches?: TransformedMatch[]
-): PreMatchFeatures {
+): Promise<PreMatchFeatures> {
   let hTeam = homeTeam;
   let aTeam = awayTeam || '';
   let mDateStr = matchDateStr || '';
@@ -164,9 +164,9 @@ export function calculatePreMatchFeatures(
     
     // Attempt to load quick_sample.json synchronously
     try {
-      const fs = require('fs');
-      const path = require('path');
-      const samplePath = path.join(process.cwd(), 'cache', 'api-football', 'quick_sample.json');
+      const fs = await import('fs').then(m => m.default || m);
+      const pathMod = await import('path').then(m => m.default || m);
+      const samplePath = pathMod.join(process.cwd(), 'cache', 'api-football', 'quick_sample.json');
       if (fs.existsSync(samplePath)) {
         hist = JSON.parse(fs.readFileSync(samplePath, 'utf-8'));
       }
