@@ -71,6 +71,14 @@ Per **Invariant 10**, any change to a frozen interface or invariant after Phase 
 
 ---
 
+## Phase 4 — Platform & Operations
+
+| ADR | Title | Date | Status |
+|---|---|---|---|
+| 037 | Historical Evidence Platform (season/dataset registries, integrity, coverage, leakage, provenance, versioning, diff, import pipeline, evidence ledger, reporting) | 2026-07-11 | ✅ Ratified |
+
+---
+
 ## How to Create a New ADR
 
 When a change requires an ADR (per Invariant 10):

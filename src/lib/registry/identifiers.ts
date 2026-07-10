@@ -32,6 +32,7 @@ export const ID_PREFIX = {
   REPORT: 'rep',
   EXECUTION: 'exec',
   REPLAY: 'repl',
+  EVIDENCE: 'evd',
 } as const;
 
 export type IdPrefix = (typeof ID_PREFIX)[keyof typeof ID_PREFIX];

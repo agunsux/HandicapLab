@@ -18,5 +18,6 @@ export function createReplayContext(overrides?: Partial<IReplayContext>): IRepla
     season: overrides?.season,
     startDate: overrides?.startDate,
     endDate: overrides?.endDate,
+    provenance: overrides?.provenance,
   };
 }

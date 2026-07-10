@@ -9,6 +9,7 @@
  */
 
 import { PredictionLedgerV3Record, PredictionSettlementV3Record } from '../data/predictionLedgerRepository';
+import type { DatasetProvenance } from '../evidence-platform/types';
 
 // ─── Match Data ──────────────────────────────────────────────────────────
 
@@ -123,6 +124,12 @@ export interface ReplayContext {
   season?: string;
   startDate?: string;
   endDate?: string;
+  /**
+   * Optional dataset provenance carried through replay for full auditability
+   * (Historical Evidence Platform, Phase 4). Backward-compatible: existing
+   * callers that omit this continue to work unchanged.
+   */
+  provenance?: DatasetProvenance;
 }
 
 export interface ReplayValidationReport {
