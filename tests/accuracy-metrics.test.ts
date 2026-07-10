@@ -89,7 +89,7 @@ describe('Accuracy and Analytics Metrics', () => {
           profit_1x2: 0.95,
           profit_ah: 0,
           profit_ou: 0,
-          predictions: {
+          predictions: [{
             id: 'pred-1',
             match_id: 'match-1',
             market_type: 'ML',
@@ -100,12 +100,12 @@ describe('Accuracy and Analytics Metrics', () => {
             brier_score: 0.15,
             clv: -0.025,
             created_at: new Date().toISOString()
-          },
-          matches: {
+          }],
+          matches: [{
             id: 'match-1',
             league: 'Premier League',
             kickoff: new Date().toISOString()
-          }
+          }]
         }
       ];
 

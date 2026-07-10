@@ -26,6 +26,69 @@ export interface CalibrationReport {
 
 const BIN_COUNT = 10;
 
+/**
+ * Calculate Brier Score from an array of probability/outcome pairs.
+ * Brier Score = mean((prob - actual)^2)
+ */
+export function calculateBrierScore(
+  pairs: { prob: number; outcome: number }[]
+): number {
+  if (pairs.length === 0) return 0;
+  return pairs.reduce((sum, p) => sum + (p.prob - p.outcome) ** 2, 0) / pairs.length;
+}
+
+export interface CalibrationBucket {
+  binStart: number;
+  binEnd: number;
+  count: number;
+  meanPredicted: number;
+  meanObserved: number;
+  calibrationError: number;
+}
+
+/**
+ * Create calibration buckets from probability/outcome pairs.
+ */
+export function createCalibrationBuckets(
+  pairs: { prob: number; outcome: number }[],
+  binCount: number = 10
+): CalibrationBucket[] {
+  const binSize = 1.0 / binCount;
+  const binCounts = new Array(binCount).fill(0);
+  const binPredSums = new Array(binCount).fill(0);
+  const binObsSums = new Array(binCount).fill(0);
+
+  for (const p of pairs) {
+    const prob = Math.max(0, Math.min(1, p.prob));
+    const binIndex = Math.min(binCount - 1, Math.floor(prob / binSize));
+    binCounts[binIndex]++;
+    binPredSums[binIndex] += prob;
+    binObsSums[binIndex] += p.outcome;
+  }
+
+  const buckets: CalibrationBucket[] = [];
+  for (let i = 0; i < binCount; i++) {
+    const count = binCounts[i];
+    const binStart = i * binSize;
+    const binEnd = (i + 1) * binSize;
+    if (count === 0) {
+      buckets.push({ binStart, binEnd, count: 0, meanPredicted: 0, meanObserved: 0, calibrationError: 0 });
+    } else {
+      const meanPredicted = binPredSums[i] / count;
+      const meanObserved = binObsSums[i] / count;
+      buckets.push({
+        binStart,
+        binEnd,
+        count,
+        meanPredicted: Math.round(meanPredicted * 10000) / 10000,
+        meanObserved: Math.round(meanObserved * 10000) / 10000,
+        calibrationError: Math.abs(meanPredicted - meanObserved),
+      });
+    }
+  }
+  return buckets;
+}
+
 export function computeCalibration(
   predictedProbabilities: number[],
   actualOutcomes: number[]  // 1 = event occurred, 0 = did not occur

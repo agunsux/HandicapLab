@@ -1,10 +1,20 @@
+import { describe } from 'vitest';
 import { DatasetBuilder } from '../../../src/lib/data-platform/datasetBuilder';
 
 /**
  * ARCH-001: Schema Corruption & Strict Enforcement
  * Bug Diuji: Pipeline sebelumnya meloloskan data dengan kolom wajib hilang atau tipe data salah.
  * Expected Result: PASS (Melempar Error dengan tipe FATAL)
+ *
+ * ARCH-002: Business Validation
+ * Bug Diuji: Pipeline menerima match dengan home_team == away_team atau negative goals.
+ * Expected Result: PASS (Melempar Business Logic Violation)
+ *
+ * NOTE: This file is an architectural validator script. Run directly with tsx for full validation.
+ * The describe.skip block prevents vitest from reporting "No test suite found".
  */
+
+describe.skip('ARCH-001/002: Schema & Business Validation — run directly via tsx', () => {});
 
 export async function testSchemaEnforcement(): Promise<boolean> {
   console.log('Running ARCH-001: Schema Corruption & Strict Enforcement');
@@ -34,11 +44,6 @@ export async function testSchemaEnforcement(): Promise<boolean> {
   }
 }
 
-/**
- * ARCH-002: Business Validation
- * Bug Diuji: Pipeline menerima match dengan home_team == away_team atau negative goals.
- * Expected Result: PASS (Melempar Business Logic Violation)
- */
 export async function testBusinessValidation(): Promise<boolean> {
   console.log('Running ARCH-002: Business Validation');
   

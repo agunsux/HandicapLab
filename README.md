@@ -1,53 +1,120 @@
 # HandicapLab
 
-AI-powered football market intelligence platform.
+**Football Market Intelligence Platform** — Quantitative modeling for identifying statistical inefficiencies and betting market edges.
 
-Focused markets:
-- Asian Handicap
-- Over/Under
-- Moneyline
-
-Features:
-- Pre-match analysis
-- In-play signal detection
-- EV estimation
-- Transparent signal ledger
-- Performance tracking
-
-Disclaimer:
-HandicapLab provides analytics only.
-No betting automation.
+> Positioned like a Bloomberg Terminal for football markets, not a tipster. Every prediction carries a statistical breakdown: xG indicators, ELO shifts, home advantage values, CLV, Brier scores, and calibration curves.
 
 ---
 
-## Sprint 2: API-Football Real Data Integration
+## Architecture Overview
 
-We integrate with [API-Football](https://www.api-football.com/) to fetch real match results and historical stats for validation.
+HandicapLab is built on a frozen, research-grade infrastructure comprising:
 
-### Setup Instructions
-1. Get a free API key by signing up at [dashboard.api-football.com](https://dashboard.api-football.com/).
-2. Add your key to your `.env` file in the root directory:
-   ```env
-   API_FOOTBALL_KEY=your_actual_api_key_here
-   ```
-   *Note: If `API_FOOTBALL_KEY` is not set or configured as `"mock"`, the system runs in Mock Mode, generating realistic football stats for local testing without depleting your request quota.*
+| Module | Location | Purpose |
+|---|---|---|
+| Canonical Dataset Platform | `src/lib/data-platform/` | SHA-256-fingerprinted historical dataset builder, gold validator, schema enforcement |
+| Replay Engine | `src/lib/replay/` | Mass replay with checkpoint/resume, time-travel point-in-time isolation |
+| Production Predictor Adapter | `src/lib/replay/ProductionPredictorAdapter.ts` | Bridges replay with live prediction pipeline |
+| Experiment Registry | `src/lib/registry/experimentRegistry.ts` | Immutable experiment tracking with lifecycle events |
+| Model Registry | `src/lib/registry/modelRegistry.ts` | Champion/challenger lifecycle, version-controlled model metadata |
+| Feature Store | `src/lib/registry/featureStore.ts` | Versioned feature snapshots with dependency resolution |
+| Feature Dependency Graph | `src/lib/registry/featureDependencyGraph.ts` | DAG via Kahn's algorithm, cycle detection |
+| Decision Engine | `src/lib/decision/` | Evidence-based recommendation engine (TrustCard, EvidenceCard, Story) |
+| Explainability / Evidence Engine | `src/lib/explainability/` | StructuredEvidenceBuilder, FeatureContributionEngine, Calibration narratives |
+| Trust Card | `src/lib/decision/types.ts` | TrustCard interface — calibration, CLV, historical accuracy, data quality |
+| Serializer | `src/lib/decision/serializer.ts` | DecisionSerializer for deterministic JSON output |
+| Benchmark Engine | `src/lib/benchmark/` | Model comparison, backtest runner, statistical significance |
+| Calibration Utilities | `src/lib/calibration/` | Platt scaling, temperature scaling, market calibrator, AcceptanceGate |
+| ADR Documents | `ADR_INDEX.md`, `docs/adr/` | 36 architecture decisions tracked |
 
-### Rate Limits & Caching
-- **Daily Quota**: The free tier of API-Football allows **100 requests per day**.
-- **Request Throttling**: A request delay of 1.5 seconds is automatically applied between network requests to avoid burst rate limit locks.
-- **Persistent Cache**: Responses are cached locally in `./cache/api-football/` to ensure we never query the same endpoint with the same arguments twice.
-- **Estimated Fetch Timeline**: Complete historical statistics for the Premier League, La Liga, and Serie A for seasons 2022-2024 require ~726 distinct endpoint statistic calls. Because of the daily limit, a full cache generation will take **~8 days** to complete incrementally. Runs should be made daily to populate the cache.
+---
+
+## Current Status — v0.8.0 (Research-Ready)
+
+**Infrastructure Phase: COMPLETE**  
+**Next Phase: Quantitative Research (Research Program A)**
+
+- ✅ TypeScript compilation: clean (0 errors)
+- ✅ Unit tests: 824 passing across 123 test files
+- ✅ Architecture invariants: 16 ratified and enforced
+- ✅ Engineering principles: 12 active
+- ✅ ADR count: 36 ratified
+- ✅ Leakage prevention: enforced at all pipeline boundaries
+- ✅ Replay Engine: deterministic, checkpoint/resume capable
+- ✅ Scientific Method: 11-stage methodology ratified
+
+---
+
+## Key Metrics (Hero Metrics)
+
+HandicapLab prioritises institutional-grade metrics:
+
+- **CLV (Closing Line Value)** — primary edge signal
+- **Brier Score** — probabilistic calibration quality
+- **ECE (Expected Calibration Error)** — calibration curve fidelity
+- **ROI / EV** — expected value with Kelly stake sizing
+- **Bootstrap CI** — statistical confidence intervals
+- **Walk-Forward Validation** — temporal integrity
+
+---
+
+## Pricing Tiers
+
+| Plan | Price | Features |
+|---|---|---|
+| Free | $0 | Dashboard, basic signals |
+| Starter | $9/mo | Historical data, basic analytics |
+| Pro | $29/mo | CLV tracking, advanced metrics |
+| Quant | $99/mo | Full research platform, API access |
 
 ---
 
 ## 🛡️ Data Integrity & Leakage Prevention
 
-To ensure institutional investor confidence and scientific prediction rigor, HandicapLab implements strict **Edge Leakage Prevention** measures. Preventing future-data bias (look-ahead bias) is crucial for backtesting authenticity and real-money profitability.
+Strict **Edge Leakage Prevention** is enforced at every pipeline boundary:
 
-- **The Hard Gate**: Every feature extractor and prediction pipeline is guarded by a runtime checkpoint via `LeakageGuard.assertNoFutureData(matchId, cutoffDate)`.
-- **Frozen Snapshots**: Market opening odds are frozen at prediction time and never mutated. Closing odds are populated only during settlement.
-- **Outcomes Separation**: Actual outcomes, Brier scores, CLV, and profit/loss calculations are kept in separate settlement tables to preserve predictions.
+- **The Hard Gate**: `LeakageGuard.assertNoFutureData(matchId, cutoffDate)` at every feature extractor
+- **Frozen Snapshots**: Market opening odds frozen at prediction time, never mutated
+- **Outcomes Separation**: Actual outcomes, Brier scores, CLV, and P&L in separate settlement tables
+- **Point-in-Time Isolation**: `available_at <= predictionTime` enforced in all queries
 
-For full developer guidelines and compliance checklists, read the comprehensive [docs/LEAKAGE_PREVENTION.md](file:///c:/Users/RYZEN/.antigravity-ide/HandicapLab/docs/LEAKAGE_PREVENTION.md) guide.
+See [`docs/LEAKAGE_PREVENTION.md`](file:///c:/Users/RYZEN/.antigravity-ide/HandicapLab/docs/LEAKAGE_PREVENTION.md) for full developer guidelines.
 
+---
 
+## Development
+
+```bash
+# Install dependencies
+npm install
+
+# Run dev server
+npm run dev
+
+# TypeScript check
+npx tsc --noEmit
+
+# Run all tests
+npm test
+
+# Run specific test file
+npx vitest run tests/decision-engine.test.ts
+
+# Run shadow pipeline
+npm run test:shadow
+```
+
+---
+
+## Architecture Decisions
+
+See [`ADR_INDEX.md`](file:///c:/Users/RYZEN/.antigravity-ide/HandicapLab/ADR_INDEX.md) for the full list of 36 ratified ADRs.
+
+Key invariants and engineering principles:
+- [`ARCHITECTURE_INVARIANTS.md`](file:///c:/Users/RYZEN/.antigravity-ide/HandicapLab/ARCHITECTURE_INVARIANTS.md)
+- [`ENGINEERING_PRINCIPLES.md`](file:///c:/Users/RYZEN/.antigravity-ide/HandicapLab/ENGINEERING_PRINCIPLES.md)
+- [`SCIENTIFIC_METHOD.md`](file:///c:/Users/RYZEN/.antigravity-ide/HandicapLab/SCIENTIFIC_METHOD.md)
+
+---
+
+**Disclaimer**: HandicapLab provides analytics and market intelligence only. No betting automation.

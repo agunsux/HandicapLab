@@ -123,7 +123,7 @@ describe('Ablation Framework', () => {
           profit_1x2: 1.0,
           profit_ah: 0,
           profit_ou: 0,
-          predictions: {
+          predictions: [{
             id: 'pred-1',
             match_id: 'match-1',
             market_type: 'ML',
@@ -134,12 +134,12 @@ describe('Ablation Framework', () => {
             brier_score: 0.15,
             clv: 0.05,
             created_at: new Date().toISOString()
-          },
-          matches: {
+          }],
+          matches: [{
             id: 'match-1',
             league: 'Premier League',
             kickoff: new Date().toISOString()
-          }
+          }]
         }
       ];
 

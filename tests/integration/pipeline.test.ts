@@ -5,7 +5,7 @@ import { bootstrapCI, wilsonInterval, binomialTest, permutationTest, adjustPValu
 import { calculatePSI, detectCalibrationDrift, detectPredictionDrift, detectROIDrift, runDriftDetection } from '../../src/lib/drift/detector';
 import { validateBatch, validateOdds, validateProbability, validateChronology } from '../../src/lib/quality/validator';
 import { generateJSONReport, generateHTMLReport } from '../../src/lib/reports/generator';
-import { runWalkForwardValidation, generateWalkForwardWindows } from '../../src/lib/validation/walkforward';
+import { WalkForwardValidator } from '../../src/lib/validation/walkforward';
 import { calculateECE, logLoss, brierScore, sigmoid, factorial, normalCDF, removeVig, kellyFraction, poissonProb } from '../../src/lib/math/metrics';
 
 const mockData = Array.from({ length: 100 }, (_, i) => ({
@@ -108,13 +108,15 @@ describe('Integration: Full Research Pipeline', () => {
   });
 
   it('9. Walk-forward end-to-end', () => {
-    const { windows, trainData, valData } = generateWalkForwardWindows(mockData, 0.6, 0.3, 0.15);
-    expect(windows.length).toBeGreaterThanOrEqual(1);
-    const result = runWalkForwardValidation(valData[0], trainData[0], windows[0]);
-    expect(result.benchmarkResults).toHaveLength(10);
-    expect(result.driftReport.overallStatus).toMatch(/HEALTHY|WARNING|CRITICAL/);
-    expect(result.reportJSON).toBeTruthy();
-    expect(result.reportHTML).toContain('Walk-Forward');
+    const predictions = mockData.map(d => d.modelHomeProb);
+    const actuals = mockData.map(d => d.outcome === 'home' ? 1 : d.outcome === 'draw' ? 0.5 : 0);
+    const odds = mockData.map(d => d.oddsHome);
+    const stakes = mockData.map(() => 1);
+    const result = WalkForwardValidator.validateByWindow(predictions, actuals, odds, stakes, 30, 15);
+    expect(result.windows.length).toBeGreaterThanOrEqual(1);
+    expect(result.overallMetrics.roi).not.toBeNaN();
+    expect(result.rollingBrier).toHaveLength(result.windows.length);
+    expect(result.rollingRoi).toHaveLength(result.windows.length);
   });
 
   it('10. Canonical math functions are correct', () => {

@@ -1,1 +1,0 @@
-require("fs").writeFileSync("test.txt","hello")

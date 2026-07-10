@@ -1,3 +1,4 @@
+import { describe } from 'vitest';
 import { FormExtractor } from '../../../src/lib/engines/feature-engine/form';
 import { supabase } from '../../../src/lib/supabase.server';
 
@@ -6,7 +7,12 @@ import { supabase } from '../../../src/lib/supabase.server';
  * ARCH-003: Timezone & Reschedule Point-in-Time Leakage
  * Bug Diuji: Feature engine membocorkan fitur masa depan karena hanya menggunakan filter date atau kickoff timezone yang salah.
  * Expected Result: PASS (Hanya menggunakan match dengan available_at <= predictionTime)
+ *
+ * NOTE: This file is an architectural validator script. Run directly with tsx for full validation.
+ * The describe.skip block prevents vitest from reporting "No test suite found".
  */
+
+describe.skip('ARCH-003: Point-in-Time Leakage — run directly via tsx', () => {});
 
 export async function testPointInTimeLeakage(): Promise<boolean> {
   console.log('Running ARCH-003: Timezone & Reschedule Point-in-Time Leakage');

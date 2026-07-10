@@ -1,0 +1,14 @@
+{
+  "championMetrics": {
+    "method": "BetaCalibration",
+    "dataset": "test_dataset",
+    "protocol": "standard_v1",
+    "ece": 0.025,
+    "brier": 0.18,
+    "log_loss": 0.56,
+    "champion": true,
+    "id": "4x1boq",
+    "created_at": "2026-07-10T19:50:18.652Z",
+    "approved_at": "2026-07-10T19:50:18.653Z"
+  }
+}

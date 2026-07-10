@@ -48,6 +48,33 @@ next-env.d.ts
 .gemini/
 response.txt
 
+# Temp / debug / generated files
+_gen.*
+_gen.js
+_gen.ps1
+_gens.ps1
+__temp_*
+__w.*
+__write_all.py
+_pyw.py
+_pywrite.py
+_build.js
+_final.js
+_simple.js
+_write*
+_x.js
+gen.cjs
+gen.js
+genall.js
+sum
+test_out.txt
+test.txt
+clean_runner.mjs
+test_write.mjs
+tmp-gen.js
+truncate_script.js
+write_exec.py
+
 # Supabase
 supabase/.temp/
 

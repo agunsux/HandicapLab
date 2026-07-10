@@ -107,16 +107,20 @@ When a change requires an ADR (per Invariant 10):
 
 ---
 
-## Future ADRs (Reserved)
+## Research Phase ADRs (Reserved — Research Program A+)
+
+The following ADRs are reserved for the Quantitative Research phase (v0.8.0+):
 
 | ADR | Title | Status |
 |---|---|---|
-| 034 | Feature Factory plugin architecture | 🔮 Planned |
-| 035 | Model Zoo plugin architecture | 🔮 Planned |
-| 036 | Odds Intelligence framework | 🔮 Planned |
-| 037 | Simulation Laboratory | 🔮 Planned |
-| 038 | Explainability & Confidence engine | 🔮 Planned |
-| 039 | Production Intelligence / Drift Detection | 🔮 Planned |
-| 040 | Live Engine architecture | 🔮 Planned |
-| 041 | Evidence Over Outcome promotion criteria implementation | 🔮 Planned |
-| 042 | Research Readiness Gate automation | 🔮 Planned |
+| 037 | Feature Factory plugin architecture | 🔮 Planned |
+| 038 | Model Zoo plugin architecture | 🔮 Planned |
+| 039 | Odds Intelligence framework | 🔮 Planned |
+| 040 | Simulation Laboratory | 🔮 Planned |
+| 041 | Production Intelligence / Drift Detection expansion | 🔮 Planned |
+| 042 | Live Engine architecture | 🔮 Planned |
+| 043 | Research Program A — Quantitative results protocol | 🔮 Planned |
+
+---
+
+*ADR 034–036 are ratified in Phase 3 above. This section tracks only reserved future ADRs.*
