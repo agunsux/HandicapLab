@@ -3,7 +3,18 @@
  *
  * All interfaces used across the monitoring pipeline live here.
  * No implementation logic. Pure contracts.
+ *
+ * NOTE: HealthStatus and HealthScoreBreakdown are imported from
+ * health-score-types.ts to break a circular dependency chain:
+ *   monitoring/types.ts ↔ attribution/types.ts
+ *   monitoring/types.ts ↔ explainability/types.ts
+ * Those two modules import HealthScoreBreakdown from the shared file.
+ * For ExplanationMetrics and AttributionMetrics, we use generic
+ * Record fields since importing their types would re-introduce the cycle.
+ * Callers must cast at usage sites.
  */
+
+import type { HealthStatus, HealthScoreBreakdown } from './health-score-types';
 
 // ─── Real-time Metrics ───────────────────────────────────────────────────────
 
@@ -38,27 +49,15 @@ export interface HealthSnapshot {
   skipRate: number;
   healthScore: number;            // Aggregate 0-100 score
   healthStatus: HealthStatus;
-  explanationMetrics?: import('../explainability/types').ExplanationMetrics;
-  attributionMetrics?: import('../attribution/types').AttributionMetrics;
+  explanationMetrics?: Record<string, unknown>;
+  attributionMetrics?: Record<string, unknown>;
 }
 
 // ─── Health Score ─────────────────────────────────────────────────────────────
-
-export type HealthStatus = 'HEALTHY' | 'DEGRADED' | 'CRITICAL' | 'INSUFFICIENT_DATA';
-
-export interface HealthScoreBreakdown {
-  score: number;                  // 0-100
-  status: HealthStatus;
-  components: {
-    predictionQuality: number;    // weight: 25%
-    calibration: number;          // weight: 20%
-    decisionQuality: number;      // weight: 20%
-    dataQuality: number;          // weight: 15%
-    drift: number;                // weight: 10%
-    latency: number;              // weight: 5%
-    coverage: number;             // weight: 5%
-  };
-}
+// NOTE: HealthStatus and HealthScoreBreakdown are now in ./health-score-types.ts
+// to break circular dependency with attribution and explainability.
+// These types are re-exported here for backward compatibility.
+export type { HealthStatus, HealthScoreBreakdown } from './health-score-types';
 
 // ─── Golden Baseline ──────────────────────────────────────────────────────────
 

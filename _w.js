@@ -1,0 +1,1 @@
+const fs=require("fs");const p=(n,c)=>fs.writeFileSync("src/lib/execution/"+n,c,"utf8");console.log("helper ready");

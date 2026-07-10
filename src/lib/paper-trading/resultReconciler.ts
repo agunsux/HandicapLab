@@ -1,7 +1,7 @@
 // HandicapLab Result Reconciler & Settlement Engine
 // Location: src/lib/paper-trading/resultReconciler.ts
 
-import { JobRecord } from './eventSystem';
+import { JobRecord } from './types';
 import { PredictionLedgerRepository } from '../data/predictionLedgerRepository';
 
 export class ResultReconciler {

@@ -2,7 +2,8 @@
 // Location: tests/decision-engine-v1/shadow-mode.test.ts
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { EventQueue, JobRecord } from '../../src/lib/paper-trading/eventSystem';
+import { EventQueue } from '../../src/lib/paper-trading/eventSystem';
+import { JobRecord } from '../../src/lib/paper-trading/types';
 import { SnapshotLocker } from '../../src/lib/paper-trading/snapshotLocker';
 import { PredictionWorker } from '../../src/lib/paper-trading/predictionWorker';
 import { ResultReconciler } from '../../src/lib/paper-trading/resultReconciler';

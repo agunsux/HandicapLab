@@ -1,0 +1,1 @@
+var fs=require("fs");var d="src/lib/registry";function w(fn,l){fs.writeFileSync(d+"/"+fn,l.join("\n")+"\n","utf8");var c=fs.readFileSync(d+"/"+fn,"utf8");console.log(fn+": "+c.length+" chars, "+c.split("\n").length+" lines");}

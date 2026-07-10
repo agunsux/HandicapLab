@@ -1,66 +1,112 @@
-export interface CalibrationBucket {
-  bucket: string;
-  predictionMean: number;
-  actualRate: number;
-  sampleSize: number;
-  calibrationError: number;
+/**
+ * HandicapLab Calibration Analysis
+ * =================================
+ * Reliability diagrams, calibration curves, ECE, MCE, sharpness.
+ *
+ * All functions are pure — no side effects.
+ * No production code is modified.
+ */
+
+export interface CalibrationBin {
+  binStart: number;
+  binEnd: number;
+  count: number;
+  meanPredicted: number;
+  meanObserved: number;
+  confidence: number; // 1 / sqrt(count)
 }
 
-export function calculateBrierScore(predictions: { prob: number; outcome: number }[]): number {
-  if (predictions.length === 0) return 0;
-  let sum = 0;
-  for (const { prob, outcome } of predictions) {
-    sum += Math.pow(prob - outcome, 2);
-  }
-  return sum / predictions.length;
+export interface CalibrationReport {
+  bins: CalibrationBin[];
+  ece: number;         // Expected Calibration Error
+  mce: number;         // Maximum Calibration Error
+  sharpness: number;
+  confidenceHistogram: Array<{ binStart: number; binEnd: number; count: number }>;
 }
 
-export function createCalibrationBuckets(predictions: { prob: number; outcome: number }[]): CalibrationBucket[] {
-  const buckets: { [key: string]: { probs: number[]; outcomes: number[] } } = {};
-  
-  for (let i = 0; i < 10; i++) {
-    const min = i * 10;
-    const max = (i + 1) * 10;
-    buckets[`${min}-${max}%`] = { probs: [], outcomes: [] };
+const BIN_COUNT = 10;
+
+export function computeCalibration(
+  predictedProbabilities: number[],
+  actualOutcomes: number[]  // 1 = event occurred, 0 = did not occur
+): CalibrationReport {
+  if (predictedProbabilities.length === 0) {
+    throw new Error('Cannot compute calibration on empty input');
   }
 
-  for (const { prob, outcome } of predictions) {
-    const probPercent = prob * 100;
-    const bucketIndex = probPercent >= 100 ? 9 : Math.floor(probPercent / 10);
-    const min = bucketIndex * 10;
-    const max = (bucketIndex + 1) * 10;
-    const bucketKey = `${min}-${max}%`;
-    
-    if (buckets[bucketKey]) {
-      buckets[bucketKey].probs.push(prob);
-      buckets[bucketKey].outcomes.push(outcome);
-    }
+  const n = predictedProbabilities.length;
+  const binSize = 1.0 / BIN_COUNT;
+
+  // Initialize bins
+  const binCounts = new Array(BIN_COUNT).fill(0);
+  const binPredSums = new Array(BIN_COUNT).fill(0);
+  const binObsSums = new Array(BIN_COUNT).fill(0);
+
+  // Assign each prediction to a bin
+  for (let i = 0; i < n; i++) {
+    const p = Math.max(0, Math.min(1, predictedProbabilities[i]));
+    const binIndex = Math.min(BIN_COUNT - 1, Math.floor(p / binSize));
+    binCounts[binIndex]++;
+    binPredSums[binIndex] += p;
+    binObsSums[binIndex] += actualOutcomes[i];
   }
 
-  return Object.keys(buckets).map(key => {
-    const { probs, outcomes } = buckets[key];
-    const sampleSize = probs.length;
-    
-    if (sampleSize === 0) {
-      return {
-        bucket: key,
-        predictionMean: 0,
-        actualRate: 0,
-        sampleSize: 0,
-        calibrationError: 0
-      };
+  const bins: CalibrationBin[] = [];
+  let ece = 0;
+  let mce = 0;
+
+  for (let i = 0; i < BIN_COUNT; i++) {
+    const count = binCounts[i];
+    const binStart = i * binSize;
+    const binEnd = (i + 1) * binSize;
+
+    if (count === 0) {
+      bins.push({ binStart, binEnd, count: 0, meanPredicted: 0, meanObserved: 0, confidence: 0 });
+      continue;
     }
-    
-    const predictionMean = probs.reduce((a, b) => a + b, 0) / sampleSize;
-    const actualRate = outcomes.reduce((a, b) => a + b, 0) / sampleSize;
-    const calibrationError = Math.abs(predictionMean - actualRate);
-    
-    return {
-      bucket: key,
-      predictionMean,
-      actualRate,
-      sampleSize,
-      calibrationError
-    };
-  });
+
+    const meanPredicted = binPredSums[i] / count;
+    const meanObserved = binObsSums[i] / count;
+    const diff = Math.abs(meanPredicted - meanObserved);
+    const binEce = diff * (count / n);
+
+    bins.push({
+      binStart,
+      binEnd,
+      count,
+      meanPredicted: Math.round(meanPredicted * 10000) / 10000,
+      meanObserved: Math.round(meanObserved * 10000) / 10000,
+      confidence: Math.round((1 / Math.sqrt(count)) * 10000) / 10000,
+    });
+
+    ece += binEce;
+    if (diff > mce) mce = diff;
+  }
+
+  // Sharpness: average width of confidence intervals
+  const sharpness = bins.reduce((sum, b) => {
+    if (b.count === 0) return sum;
+    return sum + (b.meanPredicted * (1 - b.meanPredicted)) / b.count;
+  }, 0) / bins.filter((b) => b.count > 0).length;
+
+  // Confidence histogram
+  const histBinSize = 1.0 / BIN_COUNT;
+  const histCounts = new Array(BIN_COUNT).fill(0);
+  for (const p of predictedProbabilities) {
+    const idx = Math.min(BIN_COUNT - 1, Math.floor(Math.max(0, Math.min(1, p)) / histBinSize));
+    histCounts[idx]++;
+  }
+  const confidenceHistogram = histCounts.map((count, i) => ({
+    binStart: i * histBinSize,
+    binEnd: (i + 1) * histBinSize,
+    count,
+  }));
+
+  return {
+    bins,
+    ece: Math.round(ece * 10000) / 10000,
+    mce: Math.round(mce * 10000) / 10000,
+    sharpness: Math.round(sharpness * 10000) / 10000,
+    confidenceHistogram,
+  };
 }

@@ -178,8 +178,8 @@ export class CaptureMonitor {
         totalMatchesTracked,
         totalCapturesToday,
       };
-    } catch (error: any) {
-      this.log.error('get_health_metrics_failed', { error: error.message });
+    } catch (error: unknown) {
+      this.log.error('get_health_metrics_failed', { error: error instanceof Error ? error.message : String(error) });
       return {
         closingOddsCoverage: 0,
         missingClosingOdds: 0,
@@ -216,25 +216,25 @@ export class CaptureMonitor {
         ORDER BY m.league
       `);
 
-      return result.rows.map((row: any) => ({
-        league: row.league,
-        totalFixtures: parseInt(row.total_fixtures),
-        withOpeningOdds: parseInt(row.with_opening),
-        withClosingOdds: parseInt(row.with_closing),
-        withFullMovement: parseInt(row.with_any_movement),
-        openingOddsPct: row.total_fixtures > 0
-          ? Math.round((parseInt(row.with_opening) / parseInt(row.total_fixtures)) * 10000) / 100
+      return result.rows.map((row: Record<string, unknown>) => ({
+        league: String(row.league),
+        totalFixtures: parseInt(String(row.total_fixtures)),
+        withOpeningOdds: parseInt(String(row.with_opening)),
+        withClosingOdds: parseInt(String(row.with_closing)),
+        withFullMovement: parseInt(String(row.with_any_movement)),
+        openingOddsPct: Number(row.total_fixtures) > 0
+          ? Math.round((parseInt(String(row.with_opening)) / parseInt(String(row.total_fixtures))) * 10000) / 100
           : 0,
-        closingOddsPct: row.total_fixtures > 0
-          ? Math.round((parseInt(row.with_closing) / parseInt(row.total_fixtures)) * 10000) / 100
+        closingOddsPct: Number(row.total_fixtures) > 0
+          ? Math.round((parseInt(String(row.with_closing)) / parseInt(String(row.total_fixtures))) * 10000) / 100
           : 0,
-        movementPct: row.total_fixtures > 0
-          ? Math.round((parseInt(row.with_any_movement) / parseInt(row.total_fixtures)) * 10000) / 100
+        movementPct: Number(row.total_fixtures) > 0
+          ? Math.round((parseInt(String(row.with_any_movement)) / parseInt(String(row.total_fixtures))) * 10000) / 100
           : 0,
-        avgCaptureDelay: Math.round(parseFloat(row.avg_delay)),
+        avgCaptureDelay: Math.round(parseFloat(String(row.avg_delay))),
       }));
-    } catch (error: any) {
-      this.log.error('get_league_coverage_failed', { error: error.message });
+    } catch (error: unknown) {
+      this.log.error('get_league_coverage_failed', { error: error instanceof Error ? error.message : String(error) });
       return [];
     }
   }
@@ -259,20 +259,20 @@ export class CaptureMonitor {
       `);
 
       const totalFixtures = result.rows.length > 0
-        ? parseInt(result.rows[0].total_fixtures)
+        ? parseInt(String(result.rows[0].total_fixtures))
         : 0;
 
-      return result.rows.map((row: any) => ({
-        marketType: row.market_type,
+      return result.rows.map((row: Record<string, unknown>) => ({
+        marketType: String(row.market_type),
         totalFixtures,
-        fixturesCovered: parseInt(row.fixtures_covered),
+        fixturesCovered: parseInt(String(row.fixtures_covered)),
         coveragePct: totalFixtures > 0
-          ? Math.round((parseInt(row.fixtures_covered) / totalFixtures) * 10000) / 100
+          ? Math.round((parseInt(String(row.fixtures_covered)) / totalFixtures) * 10000) / 100
           : 0,
-        avgOddsMovement: Math.round(parseFloat(row.avg_movement) * 10000) / 100,
+        avgOddsMovement: Math.round(parseFloat(String(row.avg_movement)) * 10000) / 100,
       }));
-    } catch (error: any) {
-      this.log.error('get_market_coverage_failed', { error: error.message });
+    } catch (error: unknown) {
+      this.log.error('get_market_coverage_failed', { error: error instanceof Error ? error.message : String(error) });
       return [];
     }
   }
@@ -295,18 +295,18 @@ export class CaptureMonitor {
         ORDER BY provider
       `);
 
-      return result.rows.map((row: any) => ({
-        provider: row.provider,
-        capturesToday: parseInt(row.captures_today),
-        successful: parseInt(row.successful),
-        failed: parseInt(row.failed),
-        successRate: parseInt(row.captures_today) > 0
-          ? Math.round((parseInt(row.successful) / parseInt(row.captures_today)) * 10000) / 100
+      return result.rows.map((row: Record<string, unknown>) => ({
+        provider: String(row.provider),
+        capturesToday: parseInt(String(row.captures_today)),
+        successful: parseInt(String(row.successful)),
+        failed: parseInt(String(row.failed)),
+        successRate: parseInt(String(row.captures_today)) > 0
+          ? Math.round((parseInt(String(row.successful)) / parseInt(String(row.captures_today))) * 10000) / 100
           : 0,
-        avgLatencyMs: Math.round(parseFloat(row.avg_latency)),
+        avgLatencyMs: Math.round(parseFloat(String(row.avg_latency))),
       }));
-    } catch (error: any) {
-      this.log.error('get_provider_coverage_failed', { error: error.message });
+    } catch (error: unknown) {
+      this.log.error('get_provider_coverage_failed', { error: error instanceof Error ? error.message : String(error) });
       return [];
     }
   }
@@ -345,21 +345,21 @@ export class CaptureMonitor {
       `);
 
       const totalMatches = result.rows.length > 0
-        ? parseInt(result.rows[0].total_matches)
+        ? parseInt(String(result.rows[0].total_matches))
         : 0;
 
-      return result.rows.map((row: any) => ({
-        capturePhase: row.capture_phase,
+      return result.rows.map((row: Record<string, unknown>) => ({
+        capturePhase: String(row.capture_phase),
         totalMatches,
-        withOdds: parseInt(row.matches_with_odds),
+        withOdds: parseInt(String(row.matches_with_odds)),
         coveragePct: totalMatches > 0
-          ? Math.round((parseInt(row.matches_with_odds) / totalMatches) * 10000) / 100
+          ? Math.round((parseInt(String(row.matches_with_odds)) / totalMatches) * 10000) / 100
           : 0,
-        avgHomeOdds: Math.round(parseFloat(row.avg_home_odds) * 100) / 100,
-        avgVig: Math.round(parseFloat(row.avg_vig) * 10000) / 100,
+        avgHomeOdds: Math.round(parseFloat(String(row.avg_home_odds)) * 100) / 100,
+        avgVig: Math.round(parseFloat(String(row.avg_vig)) * 10000) / 100,
       }));
-    } catch (error: any) {
-      this.log.error('get_timeline_stats_failed', { error: error.message });
+    } catch (error: unknown) {
+      this.log.error('get_timeline_stats_failed', { error: error instanceof Error ? error.message : String(error) });
       return [];
     }
   }
@@ -374,7 +374,6 @@ export class CaptureMonitor {
     status: '✅' | '⚠️' | '❌';
   }[]> {
     const health = await this.getHealthMetrics();
-    const now = new Date();
 
     return [
       {

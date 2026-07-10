@@ -1,0 +1,12 @@
+{
+  "method": "BetaCalibration",
+  "dataset": "test_dataset",
+  "protocol": "standard_v1",
+  "ece": 0.025,
+  "brier": 0.18,
+  "log_loss": 0.56,
+  "champion": true,
+  "id": "lmulir",
+  "created_at": "2026-07-10T07:23:06.530Z",
+  "approved_at": "2026-07-10T07:23:06.531Z"
+}

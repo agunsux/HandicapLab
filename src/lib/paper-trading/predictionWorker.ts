@@ -1,7 +1,7 @@
 // HandicapLab Prediction Worker
 // Location: src/lib/paper-trading/predictionWorker.ts
 
-import { JobRecord } from './eventSystem';
+import { JobRecord } from './types';
 import { PredictionLedgerRepository } from '../data/predictionLedgerRepository';
 import { SnapshotLocker } from './snapshotLocker';
 import { EnsembleEngine } from '../engines/decision-engine-v1/ensemble-engine';

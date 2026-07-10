@@ -138,7 +138,7 @@ export interface ExplanationInput {
    * HealthScoreBreakdown from Module 3. Optional.
    * Used for contextual explanation of model health at decision time.
    */
-  healthScore?: import('../monitoring/types').HealthScoreBreakdown;
+  healthScore?: import('../monitoring/health-score-types').HealthScoreBreakdown;
 
   /**
    * Optional explicit list of evidence sources.

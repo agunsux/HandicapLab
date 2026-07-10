@@ -1,6 +1,4 @@
 import { supabase } from '@/lib/supabase.server';
-import { slugify } from './leagues';
-import { getMatches as getMockMatches, getPredictionsForMatch as getMockPredictions } from '@/lib/mock-data';
 import { MatchPrediction } from './leagues';
 
 export interface TeamCache {
@@ -112,7 +110,7 @@ export async function getAllTeams(): Promise<TeamCache[]> {
         stats: item.stats_json
       }));
     }
-  } catch (err) {
+  } catch {
     console.warn('[Teams Service] DB query failed, using static fallback');
   }
 
@@ -138,7 +136,7 @@ export async function getTeamBySlug(slug: string): Promise<TeamCache | undefined
         stats: data.stats_json
       };
     }
-  } catch (err) {
+  } catch {
     console.warn('[Teams Service] DB query for slug failed, using static lookup');
   }
 
@@ -148,11 +146,11 @@ export async function getTeamBySlug(slug: string): Promise<TeamCache | undefined
 export async function getTeamMatches(teamApiId: number, slug: string): Promise<MatchPrediction[]> {
   try {
     // 1. Resolve team from STATIC_TEAMS or matches query
-    const teamConfig = STATIC_TEAMS.find(t => t.api_id === teamApiId);
+    const teamConfig = STATIC_TEAMS.find(t => t.api_id === teamApiId) ?? STATIC_TEAMS.find(t => t.slug === slug);
     const teamName = teamConfig ? teamConfig.name : null;
 
     if (!teamName) {
-      console.warn(`[Teams Service] Team not found for API ID ${teamApiId}`);
+      console.warn(`[Teams Service] Team not found for API ID ${teamApiId} or slug ${slug}`);
       return [];
     }
 
@@ -173,7 +171,7 @@ export async function getTeamMatches(teamApiId: number, slug: string): Promise<M
     }
 
     // 3. Query predictions for those matches
-    const matchIds = matches.map((m: any) => m.id);
+    const matchIds = matches.map((m: { id: number }) => m.id);
     const { data: preds, error: predError } = await supabase
       .from('predictions')
       .select('*')
@@ -184,7 +182,7 @@ export async function getTeamMatches(teamApiId: number, slug: string): Promise<M
     }
 
     // 4. Pivot predictions in-memory
-    const matchPreds: Record<string, any> = {};
+    const matchPreds: Record<string, Record<string, number>> = {};
     if (preds && preds.length > 0) {
       for (const p of preds) {
         const mId = p.match_id;
@@ -230,10 +228,11 @@ export async function getTeamMatches(teamApiId: number, slug: string): Promise<M
     }
 
     // 5. Map matches to MatchPrediction structure
-    return matches.map((item: any) => {
-      const pred = matchPreds[item.id] || {};
+    return matches.map((item: { id: number; kickoff: string; home_team: string; away_team: string }) => {
+      const matchId = String(item.id);
+      const pred = matchPreds[matchId] || {};
       return {
-        matchId: item.id,
+        matchId: matchId,
         kickoffTime: item.kickoff,
         homeTeamName: item.home_team || 'Home Team',
         awayTeamName: item.away_team || 'Away Team',
@@ -255,8 +254,8 @@ export async function getTeamMatches(teamApiId: number, slug: string): Promise<M
       };
     });
 
-  } catch (err: any) {
-    console.error('[Teams Service] Error in getTeamMatches:', err.message);
+  } catch (err: unknown) {
+    console.error('[Teams Service] Error in getTeamMatches:', err instanceof Error ? err.message : err);
     return [];
   }
 }

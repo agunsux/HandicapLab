@@ -194,7 +194,7 @@ export interface AttributionInput {
   decisionObject: import('../decision/DecisionObject').DecisionObject;
   explanationObject: import('../explainability/types').ExplanationObject;
   probabilityObject?: import('../probability/ProbabilityObject').ProbabilityObject;
-  healthScore?: import('../monitoring/types').HealthScoreBreakdown;
+  healthScore?: import('../monitoring/health-score-types').HealthScoreBreakdown;
 }
 
 // ─── Module 3 Integration — Attribution Metrics ───────────────────────────────

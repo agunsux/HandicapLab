@@ -16,6 +16,21 @@ const SPORT_MAP: Record<number, string> = {
   848: 'soccer_france_ligue2'
 };
 
+interface AuditEvent {
+  teams: string;
+  kickoff: string;
+  oddsMatchFound: boolean;
+  bookmakerCount: number;
+  sharpAvailable: boolean;
+  markets: string[];
+}
+
+interface AuditResult {
+  competitionName: string;
+  upcomingFixturesCount: number;
+  events: AuditEvent[];
+}
+
 export async function GET(request: Request) {
   try {
     const secret = request.headers.get('x-admin-secret');
@@ -34,42 +49,51 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'No active matching competition config found.' }, { status: 404 });
     }
 
-    const auditResults: any[] = [];
+    const auditResults: AuditResult[] = [];
 
     for (const config of leagueConfigs) {
       const sportKey = SPORT_MAP[config.apiFootballId] || 'soccer_epl';
-      let fixtures: any[] = [];
-      let oddsList: any[] = [];
+      let fixtures: unknown[] = [];
+      let oddsList: unknown[] = [];
 
       // 1. Query API Football
       try {
         const res = await apiFootballClient.getFixtures(config.apiFootballId, 2026);
         fixtures = res.response || [];
-      } catch (err: any) {
+      } catch {
         // Suppress error details to protect provider info
       }
 
       // 2. Query The Odds API
       try {
         oddsList = await oddsApiClient.getOdds(sportKey);
-      } catch (err: any) {
+      } catch {
         // Suppress error details to protect provider info
       }
 
       // Map details
-      const upcomingFixtures = fixtures.filter(f => {
-        const kTime = new Date(f.fixture.date);
-        return kTime > new Date() && f.fixture.status.short === 'NS';
+      const fixtureArr = fixtures as Array<Record<string, unknown>>;
+      const oddsArr = oddsList as Array<Record<string, unknown>>;
+
+      const upcomingFixtures = fixtureArr.filter(f => {
+        const fixture = f.fixture as Record<string, unknown>;
+        const kTime = new Date(fixture.date as string);
+        const status = fixture.status as Record<string, unknown>;
+        return kTime > new Date() && status.short === 'NS';
       });
 
-      const eventsAudit = upcomingFixtures.map(f => {
-        const homeTeam = f.teams.home.name;
-        const awayTeam = f.teams.away.name;
-        
+      const eventsAudit: AuditEvent[] = upcomingFixtures.map(f => {
+        const teams = f.teams as Record<string, unknown>;
+        const fixture = f.fixture as Record<string, unknown>;
+        const homeTeam = teams.home as Record<string, unknown>;
+        const awayTeam = teams.away as Record<string, unknown>;
+        const homeTeamName = homeTeam.name as string;
+        const awayTeamName = awayTeam.name as string;
+
         // Find corresponding event in Odds API
-        const matchOdds = oddsList.find(o => 
-          o.home_team.toLowerCase().replace(/[\s-_]/g, '').includes(homeTeam.toLowerCase().replace(/[\s-_]/g, '')) ||
-          homeTeam.toLowerCase().replace(/[\s-_]/g, '').includes(o.home_team.toLowerCase().replace(/[\s-_]/g, ''))
+        const matchOdds = oddsArr.find(o => 
+          (o.home_team as string || '').toLowerCase().replace(/[\s-_]/g, '').includes(homeTeamName.toLowerCase().replace(/[\s-_]/g, '')) ||
+          homeTeamName.toLowerCase().replace(/[\s-_]/g, '').includes((o.home_team as string || '').toLowerCase().replace(/[\s-_]/g, ''))
         );
 
         let bookmakerCount = 0;
@@ -77,18 +101,19 @@ export async function GET(request: Request) {
         let markets: string[] = [];
 
         if (matchOdds) {
-          bookmakerCount = matchOdds.bookmakers?.length || 0;
-          const pinnacle = matchOdds.bookmakers?.find((b: any) => b.key === 'pinnacle');
+          const bmakers = matchOdds.bookmakers as Array<Record<string, unknown>> || [];
+          bookmakerCount = bmakers.length;
+          const pinnacle = bmakers.find((b: Record<string, unknown>) => b.key === 'pinnacle');
           sharpAvailable = !!pinnacle;
           
           if (pinnacle) {
-            markets = pinnacle.markets?.map((m: any) => m.key) || [];
+            markets = (pinnacle.markets as Array<Record<string, unknown>> || []).map((m: Record<string, unknown>) => m.key as string);
           }
         }
 
         return {
-          teams: `${homeTeam} vs ${awayTeam}`,
-          kickoff: f.fixture.date,
+          teams: `${homeTeamName} vs ${awayTeamName}`,
+          kickoff: fixture.date as string,
           oddsMatchFound: !!matchOdds,
           bookmakerCount,
           sharpAvailable,
@@ -99,7 +124,7 @@ export async function GET(request: Request) {
       auditResults.push({
         competitionName: config.name,
         upcomingFixturesCount: upcomingFixtures.length,
-        events: eventsAudit.slice(0, 10) // Show first 10 for readability
+        events: eventsAudit.slice(0, 10)
       });
     }
 
@@ -108,7 +133,7 @@ export async function GET(request: Request) {
       timestamp: new Date().toISOString(),
       audit: auditResults
     });
-  } catch (error: any) {
+  } catch {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

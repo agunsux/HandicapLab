@@ -30,7 +30,7 @@ export async function GET(request: Request) {
     const lastOddsUpdate = oddsOk ? new Date(oddsData.created_at) : null;
 
     // 3️⃣ Settlement backlog (unsettled signals older than 24h)
-    const { data: unsettled, error: unsettledErr } = await supabase
+    const { data: unsettled } = await supabase
       .from('signals')
       .select('id')
       .is('settled_at', null)
@@ -41,7 +41,7 @@ export async function GET(request: Request) {
     const settlementBacklogPct = totalSignals > 0 ? (settlementBacklogCount / totalSignals) * 100 : 0;
 
     // 4️⃣ CLV calculation failures (signals settled but clv_percentage NULL)
-    const { data: clvFails, error: clvErr } = await supabase
+    const { data: clvFails } = await supabase
       .from('signals')
       .select('id')
       .not('settled_at', 'is', null)
@@ -50,7 +50,7 @@ export async function GET(request: Request) {
     const clvFailPct = totalSignals > 0 ? (clvFailCount / totalSignals) * 100 : 0;
 
     // 5️⃣ Payment issues (payments not succeeded)
-    const { data: badPayments, error: payErr } = await supabase
+    const { data: badPayments } = await supabase
       .from('payments')
       .select('id')
       .neq('status', 'succeeded');
@@ -58,7 +58,7 @@ export async function GET(request: Request) {
 
     // 6️⃣ Signals today and validation quality
     const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
-    const { data: todaySignals, error: todayErr } = await supabase
+    const { data: todaySignals } = await supabase
       .from('signals')
       .select('id, status, odds, reference_book')
       .gte('created_at', startOfDay);
@@ -117,7 +117,7 @@ export async function GET(request: Request) {
     };
 
     return NextResponse.json({ success: true, data: payload });
-  } catch (err: any) {
-    return NextResponse.json({ success: false, error: err.message }, { status: 500 });
+  } catch (err: unknown) {
+    return NextResponse.json({ success: false, error: err instanceof Error ? err.message : 'Unknown error' }, { status: 500 });
   }
 }

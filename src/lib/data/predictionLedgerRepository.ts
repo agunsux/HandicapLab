@@ -54,7 +54,7 @@ export class PredictionLedgerRepository {
       if (fs.existsSync(this.localLedgerPath)) {
         return JSON.parse(fs.readFileSync(this.localLedgerPath, 'utf-8'));
       }
-    } catch (e) {
+    } catch {
       // Return empty on parse fail
     }
     return [];
@@ -65,8 +65,8 @@ export class PredictionLedgerRepository {
       const dir = path.dirname(this.localLedgerPath);
       if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
       fs.writeFileSync(this.localLedgerPath, JSON.stringify(ledger, null, 2));
-    } catch (e) {
-      console.error('[PredictionLedgerRepository] saveLocalLedger failed:', e);
+    } catch (err: unknown) {
+      console.error('[PredictionLedgerRepository] saveLocalLedger failed:', err);
     }
   }
 
@@ -75,7 +75,7 @@ export class PredictionLedgerRepository {
       if (fs.existsSync(this.localSettlementsPath)) {
         return JSON.parse(fs.readFileSync(this.localSettlementsPath, 'utf-8'));
       }
-    } catch (e) {
+    } catch {
       // Return empty
     }
     return [];
@@ -86,8 +86,8 @@ export class PredictionLedgerRepository {
       const dir = path.dirname(this.localSettlementsPath);
       if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
       fs.writeFileSync(this.localSettlementsPath, JSON.stringify(settlements, null, 2));
-    } catch (e) {
-      console.error('[PredictionLedgerRepository] saveLocalSettlements failed:', e);
+    } catch (err: unknown) {
+      console.error('[PredictionLedgerRepository] saveLocalSettlements failed:', err);
     }
   }
 
@@ -104,7 +104,7 @@ export class PredictionLedgerRepository {
         .maybeSingle();
 
       if (!error && data) return data.prediction_hash;
-    } catch (e) {
+    } catch {
       // Fallback to local
     }
 
@@ -148,7 +148,7 @@ export class PredictionLedgerRepository {
       if (!error) {
         dbSuccess = true;
       }
-    } catch (e) {
+    } catch {
       // Fail over to local
     }
 
@@ -180,7 +180,7 @@ export class PredictionLedgerRepository {
       if (!error) {
         dbSuccess = true;
       }
-    } catch (e) {
+    } catch {
       // Fallback
     }
 
@@ -215,7 +215,7 @@ export class PredictionLedgerRepository {
         .maybeSingle();
 
       if (!error && data) return data;
-    } catch (e) {
+    } catch {
       // Fallback to local
     }
 
@@ -254,7 +254,7 @@ export class PredictionLedgerRepository {
         .eq('match_id', matchId);
 
       if (!error && data) return data;
-    } catch (e) {
+    } catch {
       // Fallback
     }
 
@@ -291,7 +291,7 @@ export class PredictionLedgerRepository {
         `);
 
       if (!error && data) return data;
-    } catch (e) {
+    } catch {
       // Fallback
     }
 
@@ -314,7 +314,7 @@ export class PredictionLedgerRepository {
     try {
       if (fs.existsSync(this.localLedgerPath)) fs.unlinkSync(this.localLedgerPath);
       if (fs.existsSync(this.localSettlementsPath)) fs.unlinkSync(this.localSettlementsPath);
-    } catch (e) {
+    } catch {
       // Ignore
     }
   }

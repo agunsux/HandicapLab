@@ -229,7 +229,6 @@ export class ApiFootballClient {
     }
 
     if (endpoint === 'fixtures/statistics') {
-      const fixtureId = Number(params.fixture || 0);
       
       // Return statistics for home and away
       const mockStats = [

@@ -1,4 +1,4 @@
-import { IBenchmarkModel, PredictionVector } from './BaseModel';
+import { PredictionVector } from './BaseModel';
 import { PoissonModel } from './PoissonModel';
 
 export class DixonColesModel extends PoissonModel {
@@ -7,28 +7,37 @@ export class DixonColesModel extends PoissonModel {
   private readonly RHO = -0.13; // Empirical rho for EPL (draws are more common than pure Poisson expects)
 
   // We override the predict method to apply the bivariate correction factor
-  async predict(match: any): Promise<PredictionVector | null> {
+  async predict(match: Record<string, unknown>): Promise<PredictionVector | null> {
     const basePrediction = await super.predict(match);
     if (!basePrediction) return null;
 
     // We need the raw expected goals to apply the tau correction
     // We can recalculate them quickly since PoissonModel's logic is deterministic
-    const home = match.HomeTeam;
-    const away = match.AwayTeam;
+    const home = match.HomeTeam as string;
+    const away = match.AwayTeam as string;
 
-    const hAtt = (this as any).homeAttack[home] || 1.0;
-    const hDef = (this as any).homeDefense[home] || 1.0;
-    const aAtt = (this as any).awayAttack[away] || 1.0;
-    const aDef = (this as any).awayDefense[away] || 1.0;
+    const self = this as unknown as {
+      homeAttack: Record<string, number>;
+      homeDefense: Record<string, number>;
+      awayAttack: Record<string, number>;
+      awayDefense: Record<string, number>;
+      LEAGUE_AVG_HG: number;
+      LEAGUE_AVG_AG: number;
+      poisson: (k: number, lambda: number) => number;
+    };
+    const hAtt = self.homeAttack[home] || 1.0;
+    const hDef = self.homeDefense[home] || 1.0;
+    const aAtt = self.awayAttack[away] || 1.0;
+    const aDef = self.awayDefense[away] || 1.0;
 
-    const expHG = hAtt * aDef * (this as any).LEAGUE_AVG_HG;
-    const expAG = aAtt * hDef * (this as any).LEAGUE_AVG_AG;
+    const expHG = hAtt * aDef * self.LEAGUE_AVG_HG;
+    const expAG = aAtt * hDef * self.LEAGUE_AVG_AG;
 
     // Calculate raw poisson matrix again
     let pHome = 0, pDraw = 0, pAway = 0;
     for (let h = 0; h <= 5; h++) {
       for (let a = 0; a <= 5; a++) {
-        let prob = (this as any).poisson(h, expHG) * (this as any).poisson(a, expAG);
+        let prob = self.poisson(h, expHG) * self.poisson(a, expAG);
         
         // Apply Dixon-Coles Tau adjustment
         if (h === 0 && a === 0) {

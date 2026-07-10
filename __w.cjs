@@ -1,0 +1,1 @@
+const fs=require("fs");const n=String.fromCharCode(10);const l=["line1"];console.log(l.length);
