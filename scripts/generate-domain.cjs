@@ -621,8 +621,10 @@ writeFile('events/ReportEvents.ts', makeEventClass('ReportGeneratedEvent', 'REPO
   { name: 'reportType', type: 'string' }, { name: 'period', type: 'string' }
 ]));
 
-writeFile('events/index.ts', `export { DomainEvent, EVENT_TYPES, EventType } from './DomainEvent';
-export { DomainEventBus, EventHandler } from './DomainEventBus';
+writeFile('events/index.ts', `export type { DomainEvent, EventType } from './DomainEvent';
+export { EVENT_TYPES } from './DomainEvent';
+export { DomainEventBus } from './DomainEventBus';
+export type { EventHandler } from './DomainEventBus';
 export { FixtureCreatedEvent, FixtureUpdatedEvent } from './FixtureEvents';
 export { OddsCapturedEvent } from './OddsEvents';
 export { PredictionGeneratedEvent } from './PredictionEvents';
@@ -851,7 +853,8 @@ writeFile('aggregates/index.ts', `export { AggregateRoot } from './AggregateRoot
 export { FixtureAggregate, FixtureStatus } from './FixtureAggregate';
 export { PredictionAggregate, PredictionState } from './PredictionAggregate';
 export { DecisionAggregate, DecisionState } from './DecisionAggregate';
-export { PortfolioAggregate, PortfolioAllocation } from './PortfolioAggregate';
+export { PortfolioAggregate } from './PortfolioAggregate';
+export type { PortfolioAllocation } from './PortfolioAggregate';
 `);
 
 // ===== GRAPH =====
