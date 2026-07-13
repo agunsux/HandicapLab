@@ -7,6 +7,7 @@ export type ModelType = 'poisson' | 'dixonColes' | 'elo' | 'gradientBoosting' | 
 export type ModelStatus = 'training' | 'ready' | 'deprecated' | 'retired' | 'failed';
 
 export interface ModelDTO {
+  id: string;
   name: string;
   version: string;
   modelType: ModelType;
@@ -16,7 +17,7 @@ export interface ModelDTO {
   trainingDatasetId: string;
   metrics: Record<string, number>;
   status: ModelStatus;
-  deployedAt?: string
+  deployedAt?: string;
 }
 
 export class Model {
@@ -30,7 +31,7 @@ export class Model {
   readonly _trainingDatasetId: string;
   readonly _metrics: Record<string, number>;
   readonly _status: ModelStatus;
-  readonly _deployedAt: string;
+  readonly _deployedAt?: string;
 
   private constructor(
     id: string,
@@ -94,6 +95,17 @@ export class Model {
       deployedAt: this._deployedAt
     };
   }
+
+  get name(): string { return this._name; }
+  get version(): string { return this._version; }
+  get modelType(): ModelType { return this._modelType; }
+  get algorithm(): string { return this._algorithm; }
+  get hyperparameters(): Record<string, unknown> { return this._hyperparameters; }
+  get features(): string[] { return this._features; }
+  get trainingDatasetId(): string { return this._trainingDatasetId; }
+  get metrics(): Record<string, number> { return this._metrics; }
+  get status(): ModelStatus { return this._status; }
+  get deployedAt(): string | undefined { return this._deployedAt; }
 
   equals(other: Model): boolean {
     return this.id === other.id &&

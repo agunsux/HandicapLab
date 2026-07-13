@@ -6,6 +6,7 @@ import { generateId, ID_PREFIX } from '../shared/Identifier';
 export interface CalibrationBin { binLow: number; binHigh: number; accuracy: number; confidence: number; count: number; }
 
 export interface CalibrationDTO {
+  id: string;
   modelId: string;
   datasetId: string;
   ece: number;
@@ -14,7 +15,7 @@ export interface CalibrationDTO {
   logLoss: number;
   reliabilityDiagram: CalibrationBin[];
   calibratedAt: string;
-  calibrationMethod: string
+  calibrationMethod: string;
 }
 
 export class Calibration {
@@ -87,6 +88,16 @@ export class Calibration {
       calibrationMethod: this._calibrationMethod
     };
   }
+
+  get modelId(): string { return this._modelId; }
+  get datasetId(): string { return this._datasetId; }
+  get ece(): number { return this._ece; }
+  get mce(): number { return this._mce; }
+  get brierScore(): number { return this._brierScore; }
+  get logLoss(): number { return this._logLoss; }
+  get reliabilityDiagram(): CalibrationBin[] { return this._reliabilityDiagram; }
+  get calibratedAt(): string { return this._calibratedAt; }
+  get calibrationMethod(): string { return this._calibrationMethod; }
 
   equals(other: Calibration): boolean {
     return this.id === other.id &&

@@ -1,9 +1,10 @@
+import { describe, test } from 'vitest';
 import { DomainEventBus } from '../events/DomainEventBus';
 import { FixtureCreatedEvent } from '../events/FixtureEvents';
 
-function assert(cond: boolean, msg: string) { if (!cond) throw new Error('FAIL: ' + msg); console.log('  ✅ ' + msg); }
+function assert(cond: boolean, msg: string) { if (!cond) throw new Error('FAIL: ' + msg); }
 
-async function test() {
+test('events and message dispatching', async () => {
   const bus = new DomainEventBus();
   let received: string | null = null;
 
@@ -12,7 +13,11 @@ async function test() {
   await bus.publish(event);
   assert(received === 'fixture.created', 'EventBus subscribe + publish');
 
-  bus.subscribe('fixture.created', async () => {});
+  bus.clear();
+
+  const handler = async () => {};
+  bus.subscribe('fixture.created', handler);
+  bus.subscribe('fixture.created', handler);
   assert(bus.subscriberCount('fixture.created') === 1, 'EventBus subscriberCount');
 
   bus.clear();
@@ -21,7 +26,4 @@ async function test() {
   assert(event.eventType === 'fixture.created', 'FixtureCreatedEvent type');
   assert(event.aggregateType === 'Fixture', 'FixtureCreatedEvent aggregateType');
   assert(event.payload.fixtureId === 'fxt_000001', 'FixtureCreatedEvent payload');
-
-  console.log('\n✅ All event tests passed!');
-}
-test().catch(console.error);
+});

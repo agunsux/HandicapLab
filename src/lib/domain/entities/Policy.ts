@@ -6,6 +6,7 @@ import { generateId, ID_PREFIX } from '../shared/Identifier';
 export type PolicyType = 'staking' | 'risk' | 'selection' | 'validation' | 'calibration';
 
 export interface PolicyDTO {
+  id: string;
   name: string;
   description: string;
   policyType: PolicyType;
@@ -13,7 +14,7 @@ export interface PolicyDTO {
   priority: number;
   enabled: boolean;
   effectiveFrom: string;
-  effectiveTo?: string
+  effectiveTo?: string;
 }
 
 export class Policy {
@@ -25,7 +26,7 @@ export class Policy {
   readonly _priority: number;
   readonly _enabled: boolean;
   readonly _effectiveFrom: string;
-  readonly _effectiveTo: string;
+  readonly _effectiveTo?: string;
 
   private constructor(
     id: string,
@@ -81,6 +82,15 @@ export class Policy {
       effectiveTo: this._effectiveTo
     };
   }
+
+  get name(): string { return this._name; }
+  get description(): string { return this._description; }
+  get policyType(): PolicyType { return this._policyType; }
+  get rules(): Record<string, unknown> { return this._rules; }
+  get priority(): number { return this._priority; }
+  get enabled(): boolean { return this._enabled; }
+  get effectiveFrom(): string { return this._effectiveFrom; }
+  get effectiveTo(): string | undefined { return this._effectiveTo; }
 
   equals(other: Policy): boolean {
     return this.id === other.id &&

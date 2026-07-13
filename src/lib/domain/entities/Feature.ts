@@ -7,13 +7,14 @@ export type FeatureCategory = 'derived' | 'raw' | 'computed' | 'external';
 export type FeatureDataType = 'numerical' | 'categorical' | 'boolean' | 'vector';
 
 export interface FeatureDTO {
+  id: string;
   name: string;
   version: string;
   category: FeatureCategory;
   description: string;
   dataType: FeatureDataType;
   computationType: string;
-  dependencies: string[]
+  dependencies: string[];
 }
 
 export class Feature {
@@ -76,6 +77,14 @@ export class Feature {
       dependencies: this._dependencies
     };
   }
+
+  get name(): string { return this._name; }
+  get version(): string { return this._version; }
+  get category(): FeatureCategory { return this._category; }
+  get description(): string { return this._description; }
+  get dataType(): FeatureDataType { return this._dataType; }
+  get computationType(): string { return this._computationType; }
+  get dependencies(): string[] { return this._dependencies; }
 
   equals(other: Feature): boolean {
     return this.id === other.id &&

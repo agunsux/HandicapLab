@@ -36,21 +36,21 @@ export class Confidence {
     this._score = score;
     Object.freeze(this);
   }
-  static fromScore(score) { return new Confidence(score); }
-  static fromPercentage(pct) { return new Confidence(pct / 100); }
+  static fromScore(score: number) { return new Confidence(score); }
+  static fromPercentage(pct: number) { return new Confidence(pct / 100); }
   static LOW = new Confidence(0.15);
   static MEDIUM = new Confidence(0.5);
   static HIGH = new Confidence(0.8);
   static VERY_HIGH = new Confidence(0.95);
-  get score() { return this._score; }
-  getLevel() {
+  get score(): number { return this._score; }
+  getLevel(): ConfidenceLevel {
     if (this._score >= 0.9) return ConfidenceLevel.VERY_HIGH;
     if (this._score >= 0.7) return ConfidenceLevel.HIGH;
     if (this._score >= 0.3) return ConfidenceLevel.MEDIUM;
     return ConfidenceLevel.LOW;
   }
-  combine(other) { return new Confidence(this._score * other._score); }
-  equals(other) { return this._score === other._score; }
+  combine(other: Confidence): Confidence { return new Confidence(this._score * other._score); }
+  equals(other: Confidence): boolean { return this._score === other._score; }
 }
 `);
 
@@ -59,11 +59,11 @@ writeFile('shared/Severity.ts', `/**
  */
 export enum SeverityLevel { LOW = 0, MEDIUM = 1, HIGH = 2, CRITICAL = 3, EMERGENCY = 4 }
 export class Severity {
-  private readonly _level;
-  constructor(level) { this._level = level; Object.freeze(this); }
-  static fromLevel(level) { return new Severity(level); }
-  static fromString(s) {
-    const map = { low: SeverityLevel.LOW, medium: SeverityLevel.MEDIUM, high: SeverityLevel.HIGH, critical: SeverityLevel.CRITICAL, emergency: SeverityLevel.EMERGENCY };
+  private readonly _level: SeverityLevel;
+  constructor(level: SeverityLevel) { this._level = level; Object.freeze(this); }
+  static fromLevel(level: SeverityLevel) { return new Severity(level); }
+  static fromString(s: string) {
+    const map: Record<string, SeverityLevel> = { low: SeverityLevel.LOW, medium: SeverityLevel.MEDIUM, high: SeverityLevel.HIGH, critical: SeverityLevel.CRITICAL, emergency: SeverityLevel.EMERGENCY };
     const level = map[s.toLowerCase()];
     if (level === undefined) throw new Error('Invalid severity: ' + s);
     return new Severity(level);
@@ -73,12 +73,12 @@ export class Severity {
   static HIGH = new Severity(SeverityLevel.HIGH);
   static CRITICAL = new Severity(SeverityLevel.CRITICAL);
   static EMERGENCY = new Severity(SeverityLevel.EMERGENCY);
-  get level() { return this._level; }
-  isAtLeast(other) { return this._level >= other._level; }
-  isLessThan(other) { return this._level < other._level; }
-  static max(a, b) { return a._level >= b._level ? a : b; }
-  static min(a, b) { return a._level <= b._level ? a : b; }
-  toString() { return SeverityLevel[this._level].toLowerCase(); }
+  get level(): SeverityLevel { return this._level; }
+  isAtLeast(other: Severity): boolean { return this._level >= other._level; }
+  isLessThan(other: Severity): boolean { return this._level < other._level; }
+  static max(a: Severity, b: Severity): Severity { return a._level >= b._level ? a : b; }
+  static min(a: Severity, b: Severity): Severity { return a._level <= b._level ? a : b; }
+  toString(): string { return SeverityLevel[this._level].toLowerCase(); }
 }
 `);
 
@@ -87,24 +87,24 @@ writeFile('shared/QualityScore.ts', `/**
  */
 export type QualityLabel = 'EXCELLENT' | 'GOOD' | 'FAIR' | 'POOR';
 export class QualityScore {
-  private readonly _score;
-  private constructor(score) {
+  private readonly _score: number;
+  private constructor(score: number) {
     if (!Number.isFinite(score)) throw new Error('Invalid quality score: ' + score);
     if (score < 0 || score > 100) throw new Error('Quality score out of range [0,100]: ' + score);
     this._score = Math.round(score);
     Object.freeze(this);
   }
-  static fromScore(score) { return new QualityScore(score); }
-  get score() { return this._score; }
-  getLabel() {
+  static fromScore(score: number) { return new QualityScore(score); }
+  get score(): number { return this._score; }
+  getLabel(): QualityLabel {
     if (this._score >= 90) return 'EXCELLENT';
     if (this._score >= 70) return 'GOOD';
     if (this._score >= 50) return 'FAIR';
     return 'POOR';
   }
-  isPassable(threshold) { threshold = threshold || 70; return this._score >= threshold; }
-  combine(weight, other) { return new QualityScore(this._score * weight + other._score * (1 - weight)); }
-  equals(other) { return this._score === other._score; }
+  isPassable(threshold?: number): boolean { threshold = threshold || 70; return this._score >= threshold; }
+  combine(weight: number, other: QualityScore): QualityScore { return new QualityScore(this._score * weight + other._score * (1 - weight)); }
+  equals(other: QualityScore): boolean { return this._score === other._score; }
 }
 `);
 
@@ -112,27 +112,27 @@ writeFile('shared/Percentage.ts', `/**
  * HandicapLab Domain-Driven Design — Shared Kernel: Percentage
  */
 export class Percentage {
-  private readonly _value;
-  private constructor(value) {
+  private readonly _value: number;
+  private constructor(value: number) {
     if (!Number.isFinite(value)) throw new Error('Invalid percentage: ' + value);
     if (value < 0 || value > 1) throw new Error('Percentage out of range [0,1]: ' + value);
     this._value = value;
     Object.freeze(this);
   }
-  static fromDecimal(value) { return new Percentage(value); }
-  static fromRatio(numerator, denominator) {
+  static fromDecimal(value: number) { return new Percentage(value); }
+  static fromRatio(numerator: number, denominator: number) {
     if (denominator === 0) throw new Error('Division by zero');
     return new Percentage(numerator / denominator);
   }
-  static fromFraction(value) { return new Percentage(value); }
-  get value() { return this._value; }
-  add(other) { return new Percentage(this._value + other._value); }
-  subtract(other) { return new Percentage(this._value - other._value); }
-  multiply(factor) { return new Percentage(this._value * factor); }
-  compare(other) { return this._value - other._value; }
-  equals(other) { return this._value === other._value; }
-  toString() { return (this._value * 100).toFixed(1) + '%'; }
-  toDTO() { return this._value; }
+  static fromFraction(value: number) { return new Percentage(value); }
+  get value(): number { return this._value; }
+  add(other: Percentage): Percentage { return new Percentage(this._value + other._value); }
+  subtract(other: Percentage): Percentage { return new Percentage(this._value - other._value); }
+  multiply(factor: number): Percentage { return new Percentage(this._value * factor); }
+  compare(other: Percentage): number { return this._value - other._value; }
+  equals(other: Percentage): boolean { return this._value === other._value; }
+  toString(): string { return (this._value * 100).toFixed(1) + '%'; }
+  toDTO(): number { return this._value; }
 }
 `);
 
@@ -140,18 +140,18 @@ writeFile('shared/Probability.ts', `/**
  * HandicapLab Domain-Driven Design — Shared Kernel: Probability
  */
 export class Probability {
-  private readonly _value;
-  private constructor(value) {
+  private readonly _value: number;
+  private constructor(value: number) {
     if (!Number.isFinite(value)) throw new Error('Invalid probability: ' + value);
     if (value < 0 || value > 1) throw new Error('Probability out of range [0,1]: ' + value);
     this._value = value;
     Object.freeze(this);
   }
-  static fromValue(value) { return new Probability(value); }
-  get value() { return this._value; }
-  isValid() { return Number.isFinite(this._value) && this._value >= 0 && this._value <= 1; }
-  toDecimalOdds() { return this._value === 0 ? Infinity : 1 / this._value; }
-  toFractionalOdds() {
+  static fromValue(value: number) { return new Probability(value); }
+  get value(): number { return this._value; }
+  isValid(): boolean { return Number.isFinite(this._value) && this._value >= 0 && this._value <= 1; }
+  toDecimalOdds(): number { return this._value === 0 ? Infinity : 1 / this._value; }
+  toFractionalOdds(): string {
     if (this._value === 0) return 'Infinity';
     const decimal = this.toDecimalOdds();
     const frac = decimal - 1;
@@ -159,10 +159,10 @@ export class Probability {
     const num = Math.round(frac * denom);
     return Math.round(num) + '/' + denom;
   }
-  toImpliedProbability() { return this._value; }
-  toLogOdds() { return Math.log(this._value / (1 - this._value + 1e-10)); }
-  equals(other) { return this._value === other._value; }
-  toString() { return (this._value * 100).toFixed(2) + '%'; }
+  toImpliedProbability(): number { return this._value; }
+  toLogOdds(): number { return Math.log(this._value / (1 - this._value + 1e-10)); }
+  equals(other: Probability): boolean { return this._value === other._value; }
+  toString(): string { return (this._value * 100).toFixed(2) + '%'; }
 }
 `);
 
@@ -170,27 +170,27 @@ writeFile('shared/Timestamp.ts', `/**
  * HandicapLab Domain-Driven Design — Shared Kernel: Timestamp
  */
 export class Timestamp {
-  private readonly _iso;
-  private readonly _ms;
-  private constructor(iso, ms) { this._iso = iso; this._ms = ms; Object.freeze(this); }
+  private readonly _iso: string;
+  private readonly _ms: number;
+  private constructor(iso: string, ms: number) { this._iso = iso; this._ms = ms; Object.freeze(this); }
   static now() { const d = new Date(); return new Timestamp(d.toISOString(), d.getTime()); }
-  static fromISO(iso) {
+  static fromISO(iso: string) {
     const ms = Date.parse(iso);
     if (isNaN(ms)) throw new Error('Invalid ISO timestamp: ' + iso);
     return new Timestamp(iso, ms);
   }
-  static fromUnix(unix) {
+  static fromUnix(unix: number) {
     const d = new Date(unix * 1000);
     return new Timestamp(d.toISOString(), d.getTime());
   }
-  toISO() { return this._iso; }
-  toUnix() { return Math.floor(this._ms / 1000); }
-  isBefore(other) { return this._ms < other._ms; }
-  isAfter(other) { return this._ms > other._ms; }
-  diffMs(other) { return this._ms - other._ms; }
-  plus(durationMs) { const t = this._ms + durationMs; return new Timestamp(new Date(t).toISOString(), t); }
-  minus(durationMs) { const t = this._ms - durationMs; return new Timestamp(new Date(t).toISOString(), t); }
-  equals(other) { return this._ms === other._ms; }
+  toISO(): string { return this._iso; }
+  toUnix(): number { return Math.floor(this._ms / 1000); }
+  isBefore(other: Timestamp): boolean { return this._ms < other._ms; }
+  isAfter(other: Timestamp): boolean { return this._ms > other._ms; }
+  diffMs(other: Timestamp): number { return this._ms - other._ms; }
+  plus(durationMs: number): Timestamp { const t = this._ms + durationMs; return new Timestamp(new Date(t).toISOString(), t); }
+  minus(durationMs: number): Timestamp { const t = this._ms - durationMs; return new Timestamp(new Date(t).toISOString(), t); }
+  equals(other: Timestamp): boolean { return this._ms === other._ms; }
 }
 `);
 
@@ -198,28 +198,31 @@ writeFile('shared/Version.ts', `/**
  * HandicapLab Domain-Driven Design — Shared Kernel: Version
  */
 export class Version {
-  constructor(major, minor, patch) {
+  readonly major: number;
+  readonly minor: number;
+  readonly patch: number;
+  constructor(major: number, minor: number, patch: number) {
     if (major < 0 || minor < 0 || patch < 0) throw new Error('Invalid version: ' + major + '.' + minor + '.' + patch);
     this.major = major; this.minor = minor; this.patch = patch;
     Object.freeze(this);
   }
-  static create(major, minor, patch) { return new Version(major, minor, patch); }
-  static fromString(s) {
+  static create(major: number, minor: number, patch: number) { return new Version(major, minor, patch); }
+  static fromString(s: string) {
     const parts = s.split('.');
     if (parts.length !== 3) throw new Error('Invalid version string: ' + s);
     return new Version(parseInt(parts[0], 10), parseInt(parts[1], 10), parseInt(parts[2], 10));
   }
-  isGreaterThan(other) {
+  isGreaterThan(other: Version): boolean {
     if (this.major !== other.major) return this.major > other.major;
     if (this.minor !== other.minor) return this.minor > other.minor;
     return this.patch > other.patch;
   }
-  isCompatible(other) { return this.major === other.major; }
-  bumpMajor() { return new Version(this.major + 1, 0, 0); }
-  bumpMinor() { return new Version(this.major, this.minor + 1, 0); }
-  bumpPatch() { return new Version(this.major, this.minor, this.patch + 1); }
-  equals(other) { return this.major === other.major && this.minor === other.minor && this.patch === other.patch; }
-  toString() { return this.major + '.' + this.minor + '.' + this.patch; }
+  isCompatible(other: Version): boolean { return this.major === other.major; }
+  bumpMajor(): Version { return new Version(this.major + 1, 0, 0); }
+  bumpMinor(): Version { return new Version(this.major, this.minor + 1, 0); }
+  bumpPatch(): Version { return new Version(this.major, this.minor, this.patch + 1); }
+  equals(other: Version): boolean { return this.major === other.major && this.minor === other.minor && this.patch === other.patch; }
+  toString(): string { return this.major + '.' + this.minor + '.' + this.patch; }
 }
 `);
 
@@ -227,17 +230,17 @@ writeFile('shared/Metadata.ts', `/**
  * HandicapLab Domain-Driven Design — Shared Kernel: Metadata
  */
 export class Metadata {
-  private readonly _data;
-  private constructor(data) { this._data = Object.freeze(Object.assign({}, data)); Object.freeze(this); }
-  static fromRecord(data) { return new Metadata(data); }
+  private readonly _data: Record<string, unknown>;
+  private constructor(data: Record<string, unknown>) { this._data = Object.freeze(Object.assign({}, data)); Object.freeze(this); }
+  static fromRecord(data: Record<string, unknown>) { return new Metadata(data); }
   static empty() { return new Metadata({}); }
-  get(key) { return this._data[key]; }
-  set(key, value) { const copy = Object.assign({}, this._data, { [key]: value }); return new Metadata(copy); }
-  has(key) { return key in this._data; }
-  keys() { return Object.keys(this._data); }
-  merge(other) { return new Metadata(Object.assign({}, this._data, other._data)); }
-  toRecord() { return Object.assign({}, this._data); }
-  equals(other) {
+  get(key: string): unknown { return this._data[key]; }
+  set(key: string, value: unknown): Metadata { const copy = Object.assign({}, this._data, { [key]: value }); return new Metadata(copy); }
+  has(key: string): boolean { return key in this._data; }
+  keys(): string[] { return Object.keys(this._data); }
+  merge(other: Metadata): Metadata { return new Metadata(Object.assign({}, this._data, other._data)); }
+  toRecord(): Record<string, unknown> { return Object.assign({}, this._data); }
+  equals(other: Metadata): boolean {
     const k1 = this.keys();
     const k2 = other.keys();
     if (k1.length !== k2.length) return false;
@@ -261,12 +264,14 @@ export * from './QualityScore';
 // ===== ENTITIES =====
 
 // Entity template helper
-function makeEntity(name, prefix, fields, extraTypes) {
-  const dtoFields = fields.map(f => '  ' + f.name + (f.optional ? '?' : '') + ': ' + f.type).join(';\n');
+function makeEntity(name, prefix, fieldsInput, extraTypes) {
+  const fields = [...fieldsInput].sort((a, b) => (a.optional ? 1 : 0) - (b.optional ? 1 : 0));
+  const dtoFields = fields.map(f => '  ' + f.name + (f.optional ? '?' : '') + ': ' + f.type + ';').join('\n');
   const createParams = fields.map((f, i) => '    ' + f.name + (f.optional ? '?' : '') + ': ' + f.type).join(',\n');
   const assignFields = fields.map(f => '    this._' + f.name + ' = ' + f.name + ';').join('\n');
   const returnFields = fields.map(f => '      ' + f.name + ': this._' + f.name).join(',\n');
   const equalsCheck = fields.map(f => '      this._' + f.name + ' === other._' + f.name).join(' &&\n');
+  const getters = fields.map(f => '  get ' + f.name + '(): ' + f.type + (f.optional ? ' | undefined' : '') + ' { return this._' + f.name + '; }').join('\n');
 
   return `/**
  * HandicapLab Domain-Driven Design — ${name} Entity
@@ -276,12 +281,13 @@ import { generateId, ID_PREFIX } from '../shared/Identifier';
 ${extraTypes}
 
 export interface ${name}DTO {
+  id: string;
 ${dtoFields}
 }
 
 export class ${name} {
   readonly id: string;
-${fields.map(f => '  readonly _' + f.name + ': ' + f.type + ';').join('\n')}
+${fields.map(f => '  readonly _' + f.name + (f.optional ? '?' : '') + ': ' + f.type + ';').join('\n')}
 
   private constructor(
     id: string,
@@ -310,6 +316,8 @@ ${returnFields}
     };
   }
 
+${getters}
+
   equals(other: ${name}): boolean {
     return this.id === other.id &&
 ${equalsCheck};
@@ -319,8 +327,97 @@ ${equalsCheck};
 `;
 }
 
+
 // Create entities
 const entities = [
+  { name: 'Competition', prefix: 'COMPETITION', fields: [
+    { name: 'name', type: 'string' },
+    { name: 'country', type: 'string' },
+    { name: 'sport', type: 'CompetitionSport' },
+    { name: 'tier', type: 'number' },
+    { name: 'startDate', type: 'string' },
+    { name: 'endDate', type: 'string' },
+    { name: 'status', type: 'CompetitionStatus' }
+  ], extra: `export type CompetitionStatus = 'ACTIVE' | 'INACTIVE' | 'UPCOMING' | 'COMPLETED' | 'active' | 'inactive' | 'upcoming' | 'completed';\nexport type CompetitionSport = 'FOOTBALL' | 'BASKETBALL' | 'TENNIS' | 'OTHER' | 'Football' | 'Basketball' | 'Tennis' | 'Other';` },
+  { name: 'Season', prefix: 'SEASON', fields: [
+    { name: 'competitionId', type: 'string' },
+    { name: 'label', type: 'string' },
+    { name: 'startDate', type: 'string' },
+    { name: 'endDate', type: 'string' },
+    { name: 'currentMatchday', type: 'number' },
+    { name: 'stages', type: 'Stage[]' }
+  ], extra: `export interface Stage { name: string; startDate: string; endDate: string; }` },
+  { name: 'League', prefix: 'LEAGUE', fields: [
+    { name: 'name', type: 'string' },
+    { name: 'country', type: 'string' },
+    { name: 'logo', type: 'string' },
+    { name: 'status', type: 'string' }
+  ], extra: '' },
+  { name: 'Fixture', prefix: 'FIXTURE', fields: [
+    { name: 'leagueId', type: 'string' },
+    { name: 'seasonId', type: 'string' },
+    { name: 'homeTeamId', type: 'string' },
+    { name: 'awayTeamId', type: 'string' },
+    { name: 'venueId', type: 'string' },
+    { name: 'kickoffTime', type: 'string' },
+    { name: 'status', type: 'string' },
+    { name: 'round', type: 'string' },
+    { name: 'matchday', type: 'number' },
+    { name: 'homeScore', type: 'number | null', optional: true },
+    { name: 'awayScore', type: 'number | null', optional: true }
+  ], extra: '' },
+  { name: 'Team', prefix: 'TEAM', fields: [
+    { name: 'name', type: 'string' },
+    { name: 'code', type: 'string' },
+    { name: 'country', type: 'string' },
+    { name: 'logo', type: 'string' },
+    { name: 'venueName', type: 'string' },
+    { name: 'founded', type: 'number' }
+  ], extra: '' },
+  { name: 'Player', prefix: 'PLAYER', fields: [
+    { name: 'name', type: 'string' },
+    { name: 'position', type: 'string' },
+    { name: 'nationality', type: 'string' },
+    { name: 'birthDate', type: 'string', optional: true },
+    { name: 'height', type: 'string', optional: true },
+    { name: 'weight', type: 'string', optional: true }
+  ], extra: '' },
+  { name: 'Venue', prefix: 'VENUE', fields: [
+    { name: 'name', type: 'string' },
+    { name: 'city', type: 'string' },
+    { name: 'capacity', type: 'number', optional: true },
+    { name: 'surface', type: 'string', optional: true },
+    { name: 'address', type: 'string', optional: true }
+  ], extra: '' },
+  { name: 'Odds', prefix: 'ODDS', fields: [
+    { name: 'fixtureId', type: 'string' },
+    { name: 'providerId', type: 'string' },
+    { name: 'marketType', type: 'string' },
+    { name: 'line', type: 'number' },
+    { name: 'homeOdds', type: 'number' },
+    { name: 'awayOdds', type: 'number' },
+    { name: 'drawOdds', type: 'number | null', optional: true },
+    { name: 'capturedAt', type: 'string' }
+  ], extra: '' },
+  { name: 'Market', prefix: 'MARKET', fields: [
+    { name: 'name', type: 'string' },
+    { name: 'marketType', type: 'string' },
+    { name: 'description', type: 'string' },
+    { name: 'status', type: 'string' }
+  ], extra: '' },
+  { name: 'Prediction', prefix: 'PREDICTION', fields: [
+    { name: 'fixtureId', type: 'string' },
+    { name: 'modelId', type: 'string' },
+    { name: 'marketType', type: 'string' },
+    { name: 'line', type: 'number' },
+    { name: 'homeProb', type: 'number' },
+    { name: 'awayProb', type: 'number' },
+    { name: 'drawProb', type: 'number | null', optional: true },
+    { name: 'entropy', type: 'number' },
+    { name: 'confidence', type: 'number' },
+    { name: 'calibratedAt', type: 'string' },
+    { name: 'status', type: 'string' }
+  ], extra: '' },
   { name: 'Probability', prefix: 'PROBABILITY', fields: [
     { name: 'fixtureId', type: 'string' }, { name: 'modelId', type: 'string' },
     { name: 'homeProb', type: 'number' }, { name: 'awayProb', type: 'number' },
@@ -387,6 +484,15 @@ const entities = [
     { name: 'calibrationError', type: 'number' }, { name: 'timestamp', type: 'string' },
     { name: 'chainHash', type: 'string' }, { name: 'previousHash', type: 'string' }
   ], extra: '' },
+  { name: 'Experiment', prefix: 'EXPERIMENT', fields: [
+    { name: 'name', type: 'string' },
+    { name: 'description', type: 'string' },
+    { name: 'hypothesis', type: 'string' },
+    { name: 'modelId', type: 'string' },
+    { name: 'datasetId', type: 'string' },
+    { name: 'status', type: 'string' },
+    { name: 'metricsSummary', type: 'Record<string, number>' }
+  ], extra: '' },
   { name: 'Model', prefix: 'MODEL', fields: [
     { name: 'name', type: 'string' }, { name: 'version', type: 'string' },
     { name: 'modelType', type: 'ModelType' }, { name: 'algorithm', type: 'string' },
@@ -414,6 +520,14 @@ const entities = [
     { name: 'sharpe', type: 'number' }, { name: 'sortino', type: 'number' },
     { name: 'maxDrawdown', type: 'number' }, { name: 'accuracy', type: 'number' }, { name: 'sampleSize', type: 'number' }
   ], extra: 'export type PerformancePeriod = \'daily\' | \'weekly\' | \'monthly\' | \'all\';\nexport type PerformanceWindow = 30 | 60 | 90 | 180 | 365;' },
+  { name: 'Drift', prefix: 'DRIFT', fields: [
+    { name: 'modelId', type: 'string' },
+    { name: 'driftType', type: 'string' },
+    { name: 'metric', type: 'string' },
+    { name: 'deviation', type: 'number' },
+    { name: 'severity', type: 'string' },
+    { name: 'detectedAt', type: 'string' }
+  ], extra: '' },
   { name: 'Risk', prefix: 'RISK', fields: [
     { name: 'portfolioId', type: 'string' }, { name: 'riskType', type: 'RiskType' },
     { name: 'value', type: 'number' }, { name: 'limit', type: 'number' },
@@ -490,8 +604,12 @@ export class DomainEventBus {
   private handlers: Map<string, Set<EventHandler>> = new Map();
 
   subscribe(eventType: string, handler: EventHandler): void {
-    if (!this.handlers.has(eventType)) this.handlers.set(eventType, new Set());
-    this.handlers.get(eventType).add(handler);
+    let handlers = this.handlers.get(eventType);
+    if (!handlers) {
+      handlers = new Set();
+      this.handlers.set(eventType, handlers);
+    }
+    handlers.add(handler);
   }
 
   async publish(event: DomainEvent): Promise<void> {
@@ -1019,7 +1137,9 @@ export type { GraphNode, GraphEdge } from './DomainGraph';
 // ===== POLICIES =====
 console.log('\nCreating policies...');
 
-writeFile('policies/DomainPolicies.ts', `export class NamingPolicy {
+writeFile('policies/DomainPolicies.ts', `import { DomainEvent } from '../events/DomainEvent';
+
+export class NamingPolicy {
   static validateEntityName(name: string): boolean { return /^[A-Z][a-zA-Z0-9]*$/.test(name); }
   static validateMethodName(name: string): boolean { return /^[a-z][a-zA-Z0-9]*$/.test(name); }
   static validateConstantName(name: string): boolean { return /^[A-Z][A-Z0-9_]*$/.test(name); }
@@ -1055,30 +1175,30 @@ export class ValidationPolicy {
 }
 
 export class StateTransitionPolicy {
-  static isValidTransition(current, next, validTransitions) {
+  static isValidTransition(current: string, next: string, validTransitions: Map<string, string[]>): boolean {
     const valid = validTransitions.get(current);
     if (!valid) return false;
     return valid.includes(next);
   }
-  static getValidTransitions(state, transitions) { return transitions.get(state) ?? []; }
+  static getValidTransitions(state: string, transitions: Map<string, string[]>): string[] { return transitions.get(state) ?? []; }
 }
 
 export class VersionCompatibilityPolicy {
-  static isBackwardCompatible(oldVersion, newVersion) {
+  static isBackwardCompatible(oldVersion: string, newVersion: string): boolean {
     return parseInt(oldVersion.split('.')[0], 10) === parseInt(newVersion.split('.')[0], 10);
   }
-  static canMigrate(from, to) { return VersionCompatibilityPolicy.isBackwardCompatible(from, to); }
+  static canMigrate(from: string, to: string): boolean { return VersionCompatibilityPolicy.isBackwardCompatible(from, to); }
 }
 
 export class ConsistencyPolicy {
-  static validateEventConsistency(event) {
+  static validateEventConsistency(event: DomainEvent): string[] {
     const violations = [];
     if (!event.eventId) violations.push('Event missing eventId');
     if (!event.eventType) violations.push('Event missing eventType');
     if (!event.timestamp) violations.push('Event missing timestamp');
     return violations;
   }
-  static checkInvariants(entity) { return ImmutabilityPolicy.validateEntity(entity); }
+  static checkInvariants(entity: Record<string, unknown>): string[] { return ImmutabilityPolicy.validateEntity(entity); }
 }
 `);
 
@@ -1173,12 +1293,15 @@ export * from './aggregates';
 export * from './graph';
 export * from './policies';
 export * from './registry';
+export { Probability } from './entities/Probability';
+export { Probability as ProbabilityValue } from './shared/Probability';
 `);
 
 // ===== TESTS =====
 console.log('\nCreating tests...');
 
-writeFile('__tests__/shared.test.ts', `import { Money } from '../shared/Money';
+writeFile('__tests__/shared.test.ts', `import { describe, test } from 'vitest';
+import { Money } from '../shared/Money';
 import { Percentage } from '../shared/Percentage';
 import { Probability } from '../shared/Probability';
 import { Timestamp } from '../shared/Timestamp';
@@ -1186,93 +1309,95 @@ import { Version } from '../shared/Version';
 import { Confidence, ConfidenceLevel } from '../shared/Confidence';
 import { QualityScore } from '../shared/QualityScore';
 
-function assert(cond: boolean, msg: string) { if (!cond) throw new Error('FAIL: ' + msg); console.log('  \u2705 ' + msg); }
+function assert(cond: boolean, msg: string) { if (!cond) throw new Error('FAIL: ' + msg); }
 
-// Money
-const m100 = Money.create(100, 'USD'), m50 = Money.create(50, 'USD');
-assert(m100.add(m50).amount === 150, 'Money.add');
-assert(m100.subtract(m50).amount === 50, 'Money.subtract');
-assert(m50.multiply(2).amount === 100, 'Money.multiply');
-assert(m100.divide(2).amount === 50, 'Money.divide');
-assert(m100.isGreaterThan(m50), 'Money.isGreaterThan');
-assert(m50.isLessThan(m100), 'Money.isLessThan');
-assert(m100.equals(Money.create(100, 'USD')), 'Money.equals');
-try { m100.add(Money.create(100, 'EUR')); assert(false, 'Money.currencyMismatch'); } catch { assert(true, 'Money.currencyMismatch'); }
+test('shared kernel DDD primitives', () => {
+  // Money
+  const m100 = Money.create(100, 'USD'), m50 = Money.create(50, 'USD');
+  assert(m100.add(m50).amount === 150, 'Money.add');
+  assert(m100.subtract(m50).amount === 50, 'Money.subtract');
+  assert(m50.multiply(2).amount === 100, 'Money.multiply');
+  assert(m100.divide(2).amount === 50, 'Money.divide');
+  assert(m100.isGreaterThan(m50), 'Money.isGreaterThan');
+  assert(m50.isLessThan(m100), 'Money.isLessThan');
+  assert(m100.equals(Money.create(100, 'USD')), 'Money.equals');
+  try { m100.add(Money.create(100, 'EUR')); assert(false, 'Money.currencyMismatch'); } catch { assert(true, 'Money.currencyMismatch'); }
 
-// Percentage
-const p50 = Percentage.fromDecimal(0.5), p25 = Percentage.fromDecimal(0.25);
-assert(Math.abs(p50.add(p25).value - 0.75) < 0.001, 'Percentage.add');
-assert(Math.abs(p50.subtract(p25).value - 0.25) < 0.001, 'Percentage.subtract');
-assert(Math.abs(Percentage.fromRatio(1, 4).value - 0.25) < 0.001, 'Percentage.fromRatio');
-assert(p50.toString() === '50.0%', 'Percentage.toString');
-try { Percentage.fromDecimal(1.5); assert(false, 'Percentage.range'); } catch { assert(true, 'Percentage.range'); }
+  // Percentage
+  const p50 = Percentage.fromDecimal(0.5), p25 = Percentage.fromDecimal(0.25);
+  assert(Math.abs(p50.add(p25).value - 0.75) < 0.001, 'Percentage.add');
+  assert(Math.abs(p50.subtract(p25).value - 0.25) < 0.001, 'Percentage.subtract');
+  assert(Math.abs(Percentage.fromRatio(1, 4).value - 0.25) < 0.001, 'Percentage.fromRatio');
+  assert(p50.toString() === '50.0%', 'Percentage.toString');
+  try { Percentage.fromDecimal(1.5); assert(false, 'Percentage.range'); } catch { assert(true, 'Percentage.range'); }
 
-// Probability
-const prob70 = Probability.fromValue(0.7);
-assert(Math.abs(prob70.toDecimalOdds() - 1.4286) < 0.01, 'Probability.toDecimalOdds');
-assert(prob70.isValid(), 'Probability.isValid');
-try { Probability.fromValue(1.5); assert(false, 'Probability.range'); } catch { assert(true, 'Probability.range'); }
+  // Probability
+  const prob70 = Probability.fromValue(0.7);
+  assert(Math.abs(prob70.toDecimalOdds() - 1.4286) < 0.01, 'Probability.toDecimalOdds');
+  assert(prob70.isValid(), 'Probability.isValid');
+  try { Probability.fromValue(1.5); assert(false, 'Probability.range'); } catch { assert(true, 'Probability.range'); }
 
-// Timestamp
-const now1 = Timestamp.now(), later = now1.plus(1000);
-assert(later.isAfter(now1), 'Timestamp.isAfter');
-assert(now1.isBefore(later), 'Timestamp.isBefore');
-assert(later.diffMs(now1) === 1000, 'Timestamp.diffMs');
+  // Timestamp
+  const now1 = Timestamp.now(), later = now1.plus(1000);
+  assert(later.isAfter(now1), 'Timestamp.isAfter');
+  assert(now1.isBefore(later), 'Timestamp.isBefore');
+  assert(later.diffMs(now1) === 1000, 'Timestamp.diffMs');
 
-// Version
-const v1 = Version.create(1, 2, 3);
-assert(v1.toString() === '1.2.3', 'Version.toString');
-assert(v1.isCompatible(Version.create(1, 5, 0)), 'Version.isCompatible');
-assert(!v1.isCompatible(Version.create(2, 0, 0)), 'Version.notCompatible');
+  // Version
+  const v1 = Version.create(1, 2, 3);
+  assert(v1.toString() === '1.2.3', 'Version.toString');
+  assert(v1.isCompatible(Version.create(1, 5, 0)), 'Version.isCompatible');
+  assert(!v1.isCompatible(Version.create(2, 0, 0)), 'Version.notCompatible');
 
-// Confidence
-const cHigh = Confidence.fromScore(0.85);
-assert(cHigh.getLevel() === ConfidenceLevel.HIGH, 'Confidence.getLevel HIGH');
-const combined = cHigh.combine(Confidence.fromScore(0.9));
-assert(Math.abs(combined.score - 0.765) < 0.001, 'Confidence.combine');
+  // Confidence
+  const cHigh = Confidence.fromScore(0.85);
+  assert(cHigh.getLevel() === ConfidenceLevel.HIGH, 'Confidence.getLevel HIGH');
+  const combined = cHigh.combine(Confidence.fromScore(0.9));
+  assert(Math.abs(combined.score - 0.765) < 0.001, 'Confidence.combine');
 
-// QualityScore
-const qGood = QualityScore.fromScore(85);
-assert(qGood.getLabel() === 'GOOD', 'QualityScore.GOOD');
-assert(qGood.isPassable(), 'QualityScore.isPassable');
-const qPoor = QualityScore.fromScore(45);
-assert(!qPoor.isPassable(), 'QualityScore.notPassable');
-
-console.log('\\n\u2705 All shared kernel tests passed!');
+  // QualityScore
+  const qGood = QualityScore.fromScore(85);
+  assert(qGood.getLabel() === 'GOOD', 'QualityScore.GOOD');
+  assert(qGood.isPassable(), 'QualityScore.isPassable');
+  const qPoor = QualityScore.fromScore(45);
+  assert(!qPoor.isPassable(), 'QualityScore.notPassable');
+});
 `);
 
-writeFile('__tests__/entities.test.ts', `import { Competition } from '../entities/Competition';
+writeFile('__tests__/entities.test.ts', `import { describe, test } from 'vitest';
+import { Competition } from '../entities/Competition';
 import { Fixture } from '../entities/Fixture';
 import { Team } from '../entities/Team';
 import { Prediction } from '../entities/Prediction';
 
-function assert(cond: boolean, msg: string) { if (!cond) throw new Error('FAIL: ' + msg); console.log('  \u2705 ' + msg); }
+function assert(cond: boolean, msg: string) { if (!cond) throw new Error('FAIL: ' + msg); }
 
-const comp = Competition.create('Premier League', 'England', 'Football', 1, '2026-01-01', '2026-12-31', 'active');
-assert(comp.name === 'Premier League', 'Competition.create');
-assert(comp.id.startsWith('comp_'), 'Competition ID prefix');
-const compDTO = comp.toDTO();
-assert(compDTO.name === 'Premier League', 'Competition.toDTO');
+test('entities lifecycle and mapping', () => {
+  const comp = Competition.create('Premier League', 'England', 'Football', 1, '2026-01-01', '2026-12-31', 'active');
+  assert(comp.name === 'Premier League', 'Competition.create');
+  assert(comp.id.startsWith('comp_'), 'Competition ID prefix');
+  const compDTO = comp.toDTO();
+  assert(compDTO.name === 'Premier League', 'Competition.toDTO');
 
-const team = Team.create('Arsenal FC', 'ARS', 'England', 'arsenal.png', 'Emirates Stadium', 1886);
-assert(team.name === 'Arsenal FC', 'Team.create');
-assert(team.id.startsWith('team_'), 'Team ID prefix');
+  const team = Team.create('Arsenal FC', 'ARS', 'England', 'arsenal.png', 'Emirates Stadium', 1886);
+  assert(team.name === 'Arsenal FC', 'Team.create');
+  assert(team.id.startsWith('team_'), 'Team ID prefix');
 
-const fixture = Fixture.create('lea_000001', 'seas_000001', 'team_000001', 'team_000002', 'ven_000001', '2026-08-15T15:00:00Z', 'SCHEDULED', '1', 1, null, null);
-assert(fixture.id.startsWith('fxt_'), 'Fixture ID prefix');
+  const fixture = Fixture.create('lea_000001', 'seas_000001', 'team_000001', 'team_000002', 'ven_000001', '2026-08-15T15:00:00Z', 'SCHEDULED', '1', 1, null, null);
+  assert(fixture.id.startsWith('fxt_'), 'Fixture ID prefix');
 
-const pred = Prediction.create('fxt_000001', 'mdl_000001', 'MATCH_RESULT', 0, 0.52, 0.25, 0.23, 0.03, 0.72, '2026-08-14T12:00:00Z', 'PENDING');
-assert(pred.id.startsWith('pred_'), 'Prediction ID prefix');
-
-console.log('\\n\u2705 All entity tests passed!');
+  const pred = Prediction.create('fxt_000001', 'mdl_000001', 'MATCH_RESULT', 0, 0.52, 0.25, 0.03, 0.72, '2026-08-14T12:00:00Z', 'PENDING', 0.23);
+  assert(pred.id.startsWith('pred_'), 'Prediction ID prefix');
+});
 `);
 
-writeFile('__tests__/events.test.ts', `import { DomainEventBus } from '../events/DomainEventBus';
+writeFile('__tests__/events.test.ts', `import { describe, test } from 'vitest';
+import { DomainEventBus } from '../events/DomainEventBus';
 import { FixtureCreatedEvent } from '../events/FixtureEvents';
 
-function assert(cond: boolean, msg: string) { if (!cond) throw new Error('FAIL: ' + msg); console.log('  \u2705 ' + msg); }
+function assert(cond: boolean, msg: string) { if (!cond) throw new Error('FAIL: ' + msg); }
 
-async function test() {
+test('events and message dispatching', async () => {
   const bus = new DomainEventBus();
   let received: string | null = null;
 
@@ -1281,7 +1406,11 @@ async function test() {
   await bus.publish(event);
   assert(received === 'fixture.created', 'EventBus subscribe + publish');
 
-  bus.subscribe('fixture.created', async () => {});
+  bus.clear();
+
+  const handler = async () => {};
+  bus.subscribe('fixture.created', handler);
+  bus.subscribe('fixture.created', handler);
   assert(bus.subscriberCount('fixture.created') === 1, 'EventBus subscriberCount');
 
   bus.clear();
@@ -1290,109 +1419,110 @@ async function test() {
   assert(event.eventType === 'fixture.created', 'FixtureCreatedEvent type');
   assert(event.aggregateType === 'Fixture', 'FixtureCreatedEvent aggregateType');
   assert(event.payload.fixtureId === 'fxt_000001', 'FixtureCreatedEvent payload');
-
-  console.log('\\n\u2705 All event tests passed!');
-}
-test().catch(console.error);
+});
 `);
 
-writeFile('__tests__/aggregates.test.ts', `import { FixtureAggregate, FixtureStatus } from '../aggregates/FixtureAggregate';
+writeFile('__tests__/aggregates.test.ts', `import { describe, test } from 'vitest';
+import { FixtureAggregate, FixtureStatus } from '../aggregates/FixtureAggregate';
 import { PredictionAggregate, PredictionState } from '../aggregates/PredictionAggregate';
 import { DecisionAggregate, DecisionState } from '../aggregates/DecisionAggregate';
 import { PortfolioAggregate } from '../aggregates/PortfolioAggregate';
 
-function assert(cond: boolean, msg: string) { if (!cond) throw new Error('FAIL: ' + msg); console.log('  \u2705 ' + msg); }
+function assert(cond: boolean, msg: string) { if (!cond) throw new Error('FAIL: ' + msg); }
 
-const fixture = new FixtureAggregate('fxt_000001', 'team_000001', 'team_000002');
-assert(fixture.status === FixtureStatus.SCHEDULED, 'FixtureAggregate initial');
-fixture.startMatch(); assert(fixture.status === FixtureStatus.LIVE, 'FixtureAggregate start');
-fixture.finish(2, 1); assert(fixture.status === FixtureStatus.FINISHED, 'FixtureAggregate finish');
-assert(fixture.homeScore === 2 && fixture.awayScore === 1, 'FixtureAggregate scores');
+test('aggregates state transitions', () => {
+  const fixture = new FixtureAggregate('fxt_000001', 'team_000001', 'team_000002');
+  assert(fixture.status === FixtureStatus.SCHEDULED, 'FixtureAggregate initial');
+  fixture.startMatch(); assert(fixture.status === FixtureStatus.LIVE, 'FixtureAggregate start');
+  fixture.finish(2, 1); assert(fixture.status === FixtureStatus.FINISHED, 'FixtureAggregate finish');
+  assert(fixture.homeScore === 2 && fixture.awayScore === 1, 'FixtureAggregate scores');
 
-try { const f2 = new FixtureAggregate('x', 'a', 'b'); f2.finish(1, 0); assert(false, 'fail guard'); } catch { assert(true, 'finish guard'); }
-try { const f3 = new FixtureAggregate('x', 'a', 'b'); f3.startMatch(); f3.startMatch(); assert(false, 'double start'); } catch { assert(true, 'double start guard'); }
+  try { const f2 = new FixtureAggregate('x', 'a', 'b'); f2.finish(1, 0); assert(false, 'fail guard'); } catch { assert(true, 'finish guard'); }
+  try { const f3 = new FixtureAggregate('x', 'a', 'b'); f3.startMatch(); f3.startMatch(); assert(false, 'double start'); } catch { assert(true, 'double start guard'); }
 
-const pred = new PredictionAggregate('pred_000001', 'fxt_000001', 'mdl_000001');
-pred.generate(0.52, 0.25, 0.23, 0.72); assert(pred.state === PredictionState.GENERATED, 'Prediction generate');
-pred.settle(1); assert(pred.state === PredictionState.SETTLED, 'Prediction settle');
-try { pred.settle(2); assert(false, 'double settle'); } catch { assert(true, 'double settle guard'); }
+  const pred = new PredictionAggregate('pred_000001', 'fxt_000001', 'mdl_000001');
+  pred.generate(0.52, 0.25, 0.23, 0.72); assert(pred.state === PredictionState.GENERATED, 'Prediction generate');
+  pred.settle(1); assert(pred.state === PredictionState.SETTLED, 'Prediction settle');
+  try { pred.settle(2); assert(false, 'double settle'); } catch { assert(true, 'double settle guard'); }
 
-const dec = new DecisionAggregate('dec_000001', 'fxt_000001', 'pred_000001');
-dec.evaluate(0.05); assert(dec.state === DecisionState.EVALUATED, 'Decision evaluate');
-dec.approve(); assert(dec.state === DecisionState.APPROVED, 'Decision approve');
-dec.execute(); assert(dec.state === DecisionState.EXECUTED, 'Decision execute');
-try { const d2 = new DecisionAggregate('x', 'f', 'p'); d2.execute(); assert(false, 'execute guard'); } catch { assert(true, 'execute guard'); }
+  const dec = new DecisionAggregate('dec_000001', 'fxt_000001', 'pred_000001');
+  dec.evaluate(0.05); assert(dec.state === DecisionState.EVALUATED, 'Decision evaluate');
+  dec.approve(); assert(dec.state === DecisionState.APPROVED, 'Decision approve');
+  dec.execute(); assert(dec.state === DecisionState.EXECUTED, 'Decision execute');
+  try { const d2 = new DecisionAggregate('x', 'f', 'p'); d2.execute(); assert(false, 'execute guard'); } catch { assert(true, 'execute guard'); }
 
-const port = new PortfolioAggregate('port_000001', 10000, 5000);
-port.allocate('stk_000001', 2000); assert(port.cashBalance === 8000, 'Portfolio allocate');
-assert(port.riskCheck().passed, 'Portfolio riskCheck');
-try { port.allocate('stk_000002', 10000); assert(false, 'over-balance'); } catch { assert(true, 'over-balance guard'); }
-
-console.log('\\n\u2705 All aggregate tests passed!');
+  const port = new PortfolioAggregate('port_000001', 10000, 5000);
+  port.allocate('stk_000001', 2000); assert(port.cashBalance === 8000, 'Portfolio allocate');
+  assert(port.riskCheck().passed, 'Portfolio riskCheck');
+  try { port.allocate('stk_000002', 10000); assert(false, 'over-balance'); } catch { assert(true, 'over-balance guard'); }
+});
 `);
 
-writeFile('__tests__/graph.test.ts', `import { DomainGraph } from '../graph/DomainGraph';
+writeFile('__tests__/graph.test.ts', `import { describe, test } from 'vitest';
+import { DomainGraph } from '../graph/DomainGraph';
 
-function assert(cond: boolean, msg: string) { if (!cond) throw new Error('FAIL: ' + msg); console.log('  \u2705 ' + msg); }
+function assert(cond: boolean, msg: string) { if (!cond) throw new Error('FAIL: ' + msg); }
 
-const graph = new DomainGraph();
-const g = graph.getGraph();
+test('graph validation and topological sorting', () => {
+  const graph = new DomainGraph();
+  const g = graph.getGraph();
 
-assert(g.nodes.length === 28, 'Graph has 28 nodes, got ' + g.nodes.length);
-assert(g.edges.length > 25, 'Graph has 30+ edges, got ' + g.edges.length);
-assert(graph.validate(), 'Graph validate');
-assert(graph.detectOrphans().length === 0, 'Graph no orphans');
+  assert(g.nodes.length === 28, 'Graph has 28 nodes, got ' + g.nodes.length);
+  assert(g.edges.length > 25, 'Graph has 30+ edges, got ' + g.edges.length);
+  assert(graph.validate(), 'Graph validate');
+  assert(graph.detectOrphans().length === 0, 'Graph no orphans');
 
-const path = graph.getPath('Competition', 'Fixture');
-assert(path !== null, 'Graph path Competition->Fixture');
-assert(graph.findCycles().length === 0, 'Graph no cycles');
-assert(graph.toTopologicalOrder().length === 28, 'Topological order 28 items');
-assert(graph.getNeighbors('Fixture').length >= 4, 'Fixture has neighbors');
-
-console.log('\\n\u2705 All graph tests passed!');
+  const path = graph.getPath('Competition', 'Fixture');
+  assert(path !== null, 'Graph path Competition->Fixture');
+  assert(graph.findCycles().length === 0, 'Graph no cycles');
+  assert(graph.toTopologicalOrder().length === 28, 'Topological order 28 items');
+  assert(graph.getNeighbors('Fixture').length >= 4, 'Fixture has neighbors');
+});
 `);
 
-writeFile('__tests__/policies.test.ts', `import { NamingPolicy, ImmutabilityPolicy, ValidationPolicy, StateTransitionPolicy, VersionCompatibilityPolicy } from '../policies/DomainPolicies';
+writeFile('__tests__/policies.test.ts', `import { describe, test } from 'vitest';
+import { NamingPolicy, ImmutabilityPolicy, ValidationPolicy, StateTransitionPolicy, VersionCompatibilityPolicy } from '../policies/DomainPolicies';
 import { Money } from '../shared/Money';
 
-function assert(cond: boolean, msg: string) { if (!cond) throw new Error('FAIL: ' + msg); console.log('  \u2705 ' + msg); }
+function assert(cond: boolean, msg: string) { if (!cond) throw new Error('FAIL: ' + msg); }
 
-assert(NamingPolicy.validateEntityName('Competition'), 'PascalCase valid');
-assert(!NamingPolicy.validateEntityName('competition'), 'PascalCase invalid');
-assert(NamingPolicy.validateMethodName('createFixture'), 'camelCase valid');
-assert(!NamingPolicy.validateMethodName('CreateFixture'), 'camelCase invalid');
+test('policies rule checking', () => {
+  assert(NamingPolicy.validateEntityName('Competition'), 'PascalCase valid');
+  assert(!NamingPolicy.validateEntityName('competition'), 'PascalCase invalid');
+  assert(NamingPolicy.validateMethodName('createFixture'), 'camelCase valid');
+  assert(!NamingPolicy.validateMethodName('CreateFixture'), 'camelCase invalid');
 
-const frozen = Money.create(100, 'USD');
-assert(ImmutabilityPolicy.isImmutable(frozen), 'ImmutabilityPolicy frozen');
+  const frozen = Money.create(100, 'USD');
+  assert(ImmutabilityPolicy.isImmutable(frozen), 'ImmutabilityPolicy frozen');
 
-ValidationPolicy.validateRequired('test', 'test');
-try { ValidationPolicy.validateRequired(null, 'test'); assert(false, 'null'); } catch { assert(true, 'required null'); }
+  ValidationPolicy.validateRequired('test', 'test');
+  try { ValidationPolicy.validateRequired(null, 'test'); assert(false, 'null'); } catch { assert(true, 'required null'); }
 
-const t = new Map([['PENDING', ['GENERATED']]]);
-assert(StateTransitionPolicy.isValidTransition('PENDING', 'GENERATED', t), 'state valid');
-assert(!StateTransitionPolicy.isValidTransition('PENDING', 'SETTLED', t), 'state invalid');
+  const t = new Map([['PENDING', ['GENERATED']]]);
+  assert(StateTransitionPolicy.isValidTransition('PENDING', 'GENERATED', t), 'state valid');
+  assert(!StateTransitionPolicy.isValidTransition('PENDING', 'SETTLED', t), 'state invalid');
 
-assert(VersionCompatibilityPolicy.isBackwardCompatible('1.2.3', '1.5.0'), 'version compatible');
-assert(!VersionCompatibilityPolicy.isBackwardCompatible('1.2.3', '2.0.0'), 'version incompatible');
-
-console.log('\\n\u2705 All policy tests passed!');
+  assert(VersionCompatibilityPolicy.isBackwardCompatible('1.2.3', '1.5.0'), 'version compatible');
+  assert(!VersionCompatibilityPolicy.isBackwardCompatible('1.2.3', '2.0.0'), 'version incompatible');
+});
 `);
 
-writeFile('__tests__/registry.test.ts', `import { DomainRegistry } from '../registry/DomainRegistry';
+writeFile('__tests__/registry.test.ts', `import { describe, test } from 'vitest';
+import { DomainRegistry } from '../registry/DomainRegistry';
 
-function assert(cond: boolean, msg: string) { if (!cond) throw new Error('FAIL: ' + msg); console.log('  \u2705 ' + msg); }
+function assert(cond: boolean, msg: string) { if (!cond) throw new Error('FAIL: ' + msg); }
 
-const reg = DomainRegistry.getInstance();
-const reg2 = DomainRegistry.getInstance();
-assert(reg === reg2, 'DomainRegistry singleton');
+test('registry schema validation', () => {
+  const reg = DomainRegistry.getInstance();
+  const reg2 = DomainRegistry.getInstance();
+  assert(reg === reg2, 'DomainRegistry singleton');
 
-assert(reg.listDomains().length === 28, 'Registry has 28 domains, got ' + reg.listDomains().length);
-assert(reg.getEntity('Fixture') !== undefined, 'Registry Fixture entity');
-assert(reg.getEvents('Fixture') !== undefined, 'Registry Fixture events');
-assert(reg.getAggregate('Fixture') !== undefined, 'Registry Fixture aggregate');
-assert(reg.validate().length === 0, 'Registry validate no issues');
-
-console.log('\\n\u2705 All registry tests passed!');
+  assert(reg.listDomains().length === 28, 'Registry has 28 domains, got ' + reg.listDomains().length);
+  assert(reg.getEntity('Fixture') !== undefined, 'Registry Fixture entity');
+  assert(reg.getEvents('Fixture') !== undefined, 'Registry Fixture events');
+  assert(reg.getAggregate('Fixture') !== undefined, 'Registry Fixture aggregate');
+  assert(reg.validate().length === 0, 'Registry validate no issues');
+});
 `);
 
 console.log('\n✅ Domain Intelligence Platform generated successfully!');

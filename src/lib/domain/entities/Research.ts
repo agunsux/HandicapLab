@@ -6,6 +6,7 @@ import { generateId, ID_PREFIX } from '../shared/Identifier';
 export type ResearchStatus = 'draft' | 'running' | 'completed' | 'failed' | 'published';
 
 export interface ResearchDTO {
+  id: string;
   name: string;
   description: string;
   hypothesis: string;
@@ -15,7 +16,7 @@ export interface ResearchDTO {
   status: ResearchStatus;
   startedAt?: string;
   completedAt?: string;
-  conclusion?: string
+  conclusion?: string;
 }
 
 export class Research {
@@ -27,9 +28,9 @@ export class Research {
   readonly _datasetId: string;
   readonly _modelIds: string[];
   readonly _status: ResearchStatus;
-  readonly _startedAt: string;
-  readonly _completedAt: string;
-  readonly _conclusion: string;
+  readonly _startedAt?: string;
+  readonly _completedAt?: string;
+  readonly _conclusion?: string;
 
   private constructor(
     id: string,
@@ -93,6 +94,17 @@ export class Research {
       conclusion: this._conclusion
     };
   }
+
+  get name(): string { return this._name; }
+  get description(): string { return this._description; }
+  get hypothesis(): string { return this._hypothesis; }
+  get methodology(): string { return this._methodology; }
+  get datasetId(): string { return this._datasetId; }
+  get modelIds(): string[] { return this._modelIds; }
+  get status(): ResearchStatus { return this._status; }
+  get startedAt(): string | undefined { return this._startedAt; }
+  get completedAt(): string | undefined { return this._completedAt; }
+  get conclusion(): string | undefined { return this._conclusion; }
 
   equals(other: Research): boolean {
     return this.id === other.id &&

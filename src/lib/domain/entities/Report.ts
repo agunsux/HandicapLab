@@ -7,12 +7,13 @@ export type ReportType = 'daily' | 'weekly' | 'monthly' | 'onDemand';
 export interface ReportSection { title: string; content: Record<string, unknown>; order: number; }
 
 export interface ReportDTO {
+  id: string;
   type: ReportType;
   period: string;
   generatedAt: string;
   metricsSummary: Record<string, number>;
   sections: ReportSection[];
-  format: string
+  format: string;
 }
 
 export class Report {
@@ -70,6 +71,13 @@ export class Report {
       format: this._format
     };
   }
+
+  get type(): ReportType { return this._type; }
+  get period(): string { return this._period; }
+  get generatedAt(): string { return this._generatedAt; }
+  get metricsSummary(): Record<string, number> { return this._metricsSummary; }
+  get sections(): ReportSection[] { return this._sections; }
+  get format(): string { return this._format; }
 
   equals(other: Report): boolean {
     return this.id === other.id &&

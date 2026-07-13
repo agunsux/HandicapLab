@@ -6,6 +6,7 @@ import { generateId, ID_PREFIX } from '../shared/Identifier';
 export type DecisionType = 'HOME' | 'AWAY' | 'DRAW' | 'OVER' | 'UNDER' | 'PASS' | 'SKIP';
 
 export interface DecisionDTO {
+  id: string;
   fixtureId: string;
   predictionId: string;
   marketType: string;
@@ -15,7 +16,7 @@ export interface DecisionDTO {
   expectedValue: number;
   edge: number;
   reasoning: string;
-  madeAt: string
+  madeAt: string;
 }
 
 export class Decision {
@@ -93,6 +94,17 @@ export class Decision {
       madeAt: this._madeAt
     };
   }
+
+  get fixtureId(): string { return this._fixtureId; }
+  get predictionId(): string { return this._predictionId; }
+  get marketType(): string { return this._marketType; }
+  get line(): number { return this._line; }
+  get decision(): DecisionType { return this._decision; }
+  get confidence(): number { return this._confidence; }
+  get expectedValue(): number { return this._expectedValue; }
+  get edge(): number { return this._edge; }
+  get reasoning(): string { return this._reasoning; }
+  get madeAt(): string { return this._madeAt; }
 
   equals(other: Decision): boolean {
     return this.id === other.id &&

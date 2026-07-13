@@ -6,13 +6,14 @@ import { generateId, ID_PREFIX } from '../shared/Identifier';
 export type RiskType = 'concentration' | 'drawdown' | 'liquidity' | 'model' | 'counterparty' | 'operational';
 
 export interface RiskDTO {
+  id: string;
   portfolioId: string;
   riskType: RiskType;
   value: number;
   limit: number;
   exceeded: boolean;
   detectedAt: string;
-  mitigations: string[]
+  mitigations: string[];
 }
 
 export class Risk {
@@ -75,6 +76,14 @@ export class Risk {
       mitigations: this._mitigations
     };
   }
+
+  get portfolioId(): string { return this._portfolioId; }
+  get riskType(): RiskType { return this._riskType; }
+  get value(): number { return this._value; }
+  get limit(): number { return this._limit; }
+  get exceeded(): boolean { return this._exceeded; }
+  get detectedAt(): string { return this._detectedAt; }
+  get mitigations(): string[] { return this._mitigations; }
 
   equals(other: Risk): boolean {
     return this.id === other.id &&

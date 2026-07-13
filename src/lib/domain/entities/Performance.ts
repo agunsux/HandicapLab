@@ -7,6 +7,7 @@ export type PerformancePeriod = 'daily' | 'weekly' | 'monthly' | 'all';
 export type PerformanceWindow = 30 | 60 | 90 | 180 | 365;
 
 export interface PerformanceDTO {
+  id: string;
   modelId: string;
   period: PerformancePeriod;
   window: PerformanceWindow;
@@ -18,7 +19,7 @@ export interface PerformanceDTO {
   sortino: number;
   maxDrawdown: number;
   accuracy: number;
-  sampleSize: number
+  sampleSize: number;
 }
 
 export class Performance {
@@ -106,6 +107,19 @@ export class Performance {
       sampleSize: this._sampleSize
     };
   }
+
+  get modelId(): string { return this._modelId; }
+  get period(): PerformancePeriod { return this._period; }
+  get window(): PerformanceWindow { return this._window; }
+  get roi(): number { return this._roi; }
+  get clv(): number { return this._clv; }
+  get brierScore(): number { return this._brierScore; }
+  get ece(): number { return this._ece; }
+  get sharpe(): number { return this._sharpe; }
+  get sortino(): number { return this._sortino; }
+  get maxDrawdown(): number { return this._maxDrawdown; }
+  get accuracy(): number { return this._accuracy; }
+  get sampleSize(): number { return this._sampleSize; }
 
   equals(other: Performance): boolean {
     return this.id === other.id &&

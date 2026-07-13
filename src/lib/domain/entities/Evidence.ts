@@ -6,6 +6,7 @@ import { generateId, ID_PREFIX } from '../shared/Identifier';
 
 
 export interface EvidenceDTO {
+  id: string;
   replayId: string;
   fixtureId: string;
   predictionId: string;
@@ -15,7 +16,7 @@ export interface EvidenceDTO {
   calibrationError: number;
   timestamp: string;
   chainHash: string;
-  previousHash: string
+  previousHash: string;
 }
 
 export class Evidence {
@@ -93,6 +94,17 @@ export class Evidence {
       previousHash: this._previousHash
     };
   }
+
+  get replayId(): string { return this._replayId; }
+  get fixtureId(): string { return this._fixtureId; }
+  get predictionId(): string { return this._predictionId; }
+  get actualOutcome(): number { return this._actualOutcome; }
+  get predictedProb(): number { return this._predictedProb; }
+  get clv(): number { return this._clv; }
+  get calibrationError(): number { return this._calibrationError; }
+  get timestamp(): string { return this._timestamp; }
+  get chainHash(): string { return this._chainHash; }
+  get previousHash(): string { return this._previousHash; }
 
   equals(other: Evidence): boolean {
     return this.id === other.id &&

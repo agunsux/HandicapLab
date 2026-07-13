@@ -8,6 +8,7 @@ export type ProviderStatus = 'active' | 'inactive' | 'error' | 'rateLimited';
 export type ProviderHealth = 'healthy' | 'degraded' | 'down';
 
 export interface ProviderDTO {
+  id: string;
   name: string;
   providerType: ProviderType;
   baseUrl: string;
@@ -16,7 +17,7 @@ export interface ProviderDTO {
   status: ProviderStatus;
   priority: number;
   health: ProviderHealth;
-  lastCheckedAt: string
+  lastCheckedAt: string;
 }
 
 export class Provider {
@@ -89,6 +90,16 @@ export class Provider {
       lastCheckedAt: this._lastCheckedAt
     };
   }
+
+  get name(): string { return this._name; }
+  get providerType(): ProviderType { return this._providerType; }
+  get baseUrl(): string { return this._baseUrl; }
+  get apiVersion(): string { return this._apiVersion; }
+  get supportedDataTypes(): string[] { return this._supportedDataTypes; }
+  get status(): ProviderStatus { return this._status; }
+  get priority(): number { return this._priority; }
+  get health(): ProviderHealth { return this._health; }
+  get lastCheckedAt(): string { return this._lastCheckedAt; }
 
   equals(other: Provider): boolean {
     return this.id === other.id &&

@@ -6,6 +6,7 @@ import { generateId, ID_PREFIX } from '../shared/Identifier';
 export type StakeType = 'kelly' | 'flat' | 'variable' | 'proportional';
 
 export interface StakeDTO {
+  id: string;
   decisionId: string;
   fixtureId: string;
   amount: number;
@@ -14,7 +15,7 @@ export interface StakeDTO {
   stakeType: StakeType;
   fraction: number;
   expectedValue: number;
-  maxRisk: number
+  maxRisk: number;
 }
 
 export class Stake {
@@ -87,6 +88,16 @@ export class Stake {
       maxRisk: this._maxRisk
     };
   }
+
+  get decisionId(): string { return this._decisionId; }
+  get fixtureId(): string { return this._fixtureId; }
+  get amount(): number { return this._amount; }
+  get currency(): string { return this._currency; }
+  get odds(): number { return this._odds; }
+  get stakeType(): StakeType { return this._stakeType; }
+  get fraction(): number { return this._fraction; }
+  get expectedValue(): number { return this._expectedValue; }
+  get maxRisk(): number { return this._maxRisk; }
 
   equals(other: Stake): boolean {
     return this.id === other.id &&
