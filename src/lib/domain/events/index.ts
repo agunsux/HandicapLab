@@ -1,5 +1,7 @@
-export { DomainEvent, EVENT_TYPES, EventType } from './DomainEvent';
-export { DomainEventBus, EventHandler } from './DomainEventBus';
+export type { DomainEvent, EventType } from './DomainEvent';
+export { EVENT_TYPES } from './DomainEvent';
+export { DomainEventBus } from './DomainEventBus';
+export type { EventHandler } from './DomainEventBus';
 export { FixtureCreatedEvent, FixtureUpdatedEvent } from './FixtureEvents';
 export { OddsCapturedEvent } from './OddsEvents';
 export { PredictionGeneratedEvent } from './PredictionEvents';
