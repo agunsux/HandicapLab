@@ -1,0 +1,16 @@
+{
+  "datasetVersion": 6,
+  "schemaVersion": 1,
+  "fixtureCount": 2350,
+  "providerCount": 3,
+  "providerVersions": {
+    "football-data.co.uk": "v1.2",
+    "understat": "v1.0",
+    "football-data.org": "v1.0"
+  },
+  "qualityScore": 83.36,
+  "checksum": "0a3718a8f09c13f7bd0aea75f2cc4b5d1988ee801dea04c5bf6cc9aedf775549",
+  "createdAt": "2026-07-15T16:32:18.207Z",
+  "gitCommit": "829d2b1df4b5",
+  "state": "FROZEN"
+}

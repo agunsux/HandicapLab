@@ -1,0 +1,27 @@
+{
+  "datasetVersion": 8,
+  "schemaVersion": 1,
+  "fixtureCount": 1900,
+  "providerCount": 3,
+  "providerVersions": {
+    "football-data.co.uk": "v1.2",
+    "understat": "v1.0",
+    "football-data.org": "v1.0"
+  },
+  "qualityScore": 89.96,
+  "checksum": "b288eef3f19442654158abf84a936d54dd308a33d9b56c597708db273494792e",
+  "createdAt": "2026-07-15T16:35:03.194Z",
+  "gitCommit": "829d2b1df4b5",
+  "state": "FROZEN",
+  "executionMode": "available-only",
+  "requestedSeasons": 10,
+  "processedSeasons": 5,
+  "skippedSeasons": [
+    "2015-2016",
+    "2016-2017",
+    "2017-2018",
+    "2018-2019",
+    "2019-2020"
+  ],
+  "datasetCompleteness": 50
+}

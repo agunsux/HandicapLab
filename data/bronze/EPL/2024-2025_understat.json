@@ -1,0 +1,2882 @@
+[
+  {
+    "fixtureId": "de2d8e6e65f92e2e59374c650d2ee5d2c83c76ceeeb44cd332f11608817aeb31",
+    "fixtureNaturalKey": "EPL|2024-2025|ARSENAL|CHELSEA|2024-09-11",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "arsenal",
+    "awayTeamId": "chelsea",
+    "homeGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.25,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.54,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "43dc4c69f368710776ac1898af31c65294b3a000a6a28b9dd19266853dd0d37a",
+    "fixtureNaturalKey": "EPL|2024-2025|ARSENAL|LIVERPOOL|2024-09-12",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "arsenal",
+    "awayTeamId": "liverpool",
+    "homeGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 0.77,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.83,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "73bba396cd7d6b4a1897377375cb5461aef6ca0866f19cce55fc6b21d6bcf187",
+    "fixtureNaturalKey": "EPL|2024-2025|ARSENAL|MANCHESTERUNITED|2024-09-13",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "arsenal",
+    "awayTeamId": "manchesterunited",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.96,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.48,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "e8ded2d36ced521e27f8c1af40202503585e112365c5365e43ca6c7e1978acf7",
+    "fixtureNaturalKey": "EPL|2024-2025|ARSENAL|MANCHESTERCITY|2024-09-14",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "arsenal",
+    "awayTeamId": "manchestercity",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.8,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.88,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "57be3dd6b1043049bc9df2ae8258463c20e190fba926576112a7d78152f41f08",
+    "fixtureNaturalKey": "EPL|2024-2025|ARSENAL|TOTTENHAM|2024-09-15",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "arsenal",
+    "awayTeamId": "tottenham",
+    "homeGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 0.92,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.87,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "6c73f0d66da2059f348762cb6ed4148ff2b677c15e7cbdbbceaa6a8ec7e450fc",
+    "fixtureNaturalKey": "EPL|2024-2025|ARSENAL|EVERTON|2024-09-16",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "arsenal",
+    "awayTeamId": "everton",
+    "homeGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 0.92,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.37,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "7524f6818f238ed6869c252a691194b35993c4490d6673b703e1f3bc9ca72361",
+    "fixtureNaturalKey": "EPL|2024-2025|ARSENAL|NEWCASTLE|2024-09-17",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "arsenal",
+    "awayTeamId": "newcastle",
+    "homeGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.12,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.29,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "8c08b0a4ddc161542bbe2ab64ea3d37234e5495f9709db1e51bf09fc8a1f642d",
+    "fixtureNaturalKey": "EPL|2024-2025|ARSENAL|LEICESTER|2024-09-18",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "arsenal",
+    "awayTeamId": "leicester",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.45,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.89,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "b730b97265281107f371fefb33df8098eb9ace5175a4b431690b9d7e132ef444",
+    "fixtureNaturalKey": "EPL|2024-2025|ARSENAL|WESTHAM|2024-09-19",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "arsenal",
+    "awayTeamId": "westham",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.83,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.49,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "d65539736b52ebbfdfad93f327d3f1587f04358b1f3d3d4ea5e61afa0f4baf43",
+    "fixtureNaturalKey": "EPL|2024-2025|CHELSEA|ARSENAL|2024-09-20",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "chelsea",
+    "awayTeamId": "arsenal",
+    "homeGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.16,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.47,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "82df8cb6bff75b7a3a1ef2c1d039802e87ce5b8cd73e3308cb37d72249501137",
+    "fixtureNaturalKey": "EPL|2024-2025|CHELSEA|LIVERPOOL|2024-09-21",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "chelsea",
+    "awayTeamId": "liverpool",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.96,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.74,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "a0ee04650f2fce96bfdaaf34c8e4cc88054bbbfc0a73c35305913ee02c8bb037",
+    "fixtureNaturalKey": "EPL|2024-2025|CHELSEA|MANCHESTERUNITED|2024-09-22",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "chelsea",
+    "awayTeamId": "manchesterunited",
+    "homeGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 0.98,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.34,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "ae2b07587d5a95aa34d9a1f6b7ea3ef9032bfb2842704d498de4c745ece63984",
+    "fixtureNaturalKey": "EPL|2024-2025|CHELSEA|MANCHESTERCITY|2024-09-23",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "chelsea",
+    "awayTeamId": "manchestercity",
+    "homeGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.31,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.89,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "72762a7fdece4450f2a6c52c421e2830ced2e4c9fb710c90e2ae9d8b5fd062a9",
+    "fixtureNaturalKey": "EPL|2024-2025|CHELSEA|TOTTENHAM|2024-09-24",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "chelsea",
+    "awayTeamId": "tottenham",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.78,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.06,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "bb447f9c45696e4fdfc383fb81ebf290841e63a4a24c67fb31e47f565048040b",
+    "fixtureNaturalKey": "EPL|2024-2025|CHELSEA|EVERTON|2024-09-25",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "chelsea",
+    "awayTeamId": "everton",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.7,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.14,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "330e91ac593de6319359b780f285381042dce9f83fc69a42c17393240c41e11d",
+    "fixtureNaturalKey": "EPL|2024-2025|CHELSEA|NEWCASTLE|2024-09-26",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "chelsea",
+    "awayTeamId": "newcastle",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.77,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.2,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "c16052e26e5cd7267ff3e18eab7d3040e3321ca9b3048c209f13a1e234287ede",
+    "fixtureNaturalKey": "EPL|2024-2025|CHELSEA|LEICESTER|2024-09-27",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "chelsea",
+    "awayTeamId": "leicester",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.37,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.85,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "053b75b2a3c5681cabeab776170a5fc238122316b960d5713098c405f93c6abb",
+    "fixtureNaturalKey": "EPL|2024-2025|CHELSEA|WESTHAM|2024-09-28",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "chelsea",
+    "awayTeamId": "westham",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.21,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.8,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "9bce8b3b351ea57dc7a82d8a54fed0956411d346b9b2061d8872c1bc28040155",
+    "fixtureNaturalKey": "EPL|2024-2025|LIVERPOOL|ARSENAL|2024-09-29",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "liverpool",
+    "awayTeamId": "arsenal",
+    "homeGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 0,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.27,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.35,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "f2daebf086bc1ce7f974407bd108d211d460ddf83bc59b343d1a462d3ceba31d",
+    "fixtureNaturalKey": "EPL|2024-2025|LIVERPOOL|CHELSEA|2024-09-10",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "liverpool",
+    "awayTeamId": "chelsea",
+    "homeGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.09,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.73,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "2a06ecf422a7bb086b25aa89f810699d9cd056953dea8473c1ee185f0933584d",
+    "fixtureNaturalKey": "EPL|2024-2025|LIVERPOOL|MANCHESTERUNITED|2024-09-11",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "liverpool",
+    "awayTeamId": "manchesterunited",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.3,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.81,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "cf21901fd98ab700deb14deba0e27cedec8b6e980df4ceecd66d3d1ed6b53ebf",
+    "fixtureNaturalKey": "EPL|2024-2025|LIVERPOOL|MANCHESTERCITY|2024-09-12",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "liverpool",
+    "awayTeamId": "manchestercity",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.25,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.04,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "bf448deac64aab7db8c02f24864753be42b2b036ee1a2537d01fce47fb3f4d10",
+    "fixtureNaturalKey": "EPL|2024-2025|LIVERPOOL|TOTTENHAM|2024-09-13",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "liverpool",
+    "awayTeamId": "tottenham",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.68,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.24,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "ba3533ad67bf069c657a8c066d1e19c94b6cc2edb84953b731435f5c0a30135f",
+    "fixtureNaturalKey": "EPL|2024-2025|LIVERPOOL|EVERTON|2024-09-14",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "liverpool",
+    "awayTeamId": "everton",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.38,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.72,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "8a49ba00d37c5a9841f23ac9c7c7c1947faaba1527901bbfbdfdebec97d19dc4",
+    "fixtureNaturalKey": "EPL|2024-2025|LIVERPOOL|NEWCASTLE|2024-09-15",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "liverpool",
+    "awayTeamId": "newcastle",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.55,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.29,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "ee183c4e2edae6f5feeff2145dbd89d2559b6a80f342fac918c3ce71c0af02d9",
+    "fixtureNaturalKey": "EPL|2024-2025|LIVERPOOL|LEICESTER|2024-09-16",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "liverpool",
+    "awayTeamId": "leicester",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.8,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "4ebc299d78d0d0c8afbaa077a91d0212346475e8ca177c13f74b4a6de6deffa3",
+    "fixtureNaturalKey": "EPL|2024-2025|LIVERPOOL|WESTHAM|2024-09-17",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "liverpool",
+    "awayTeamId": "westham",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.95,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.7,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "79163ef236451a9c5482e0b2d3ed2c6c37ce1fd3c82c26765b97e1be327ce09e",
+    "fixtureNaturalKey": "EPL|2024-2025|MANCHESTERUNITED|ARSENAL|2024-09-18",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "manchesterunited",
+    "awayTeamId": "arsenal",
+    "homeGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.38,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.84,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "878ab33ae2737e5fb149f852b2a96c9b26a83fb12be2f0c9e23932ad6b5f2f49",
+    "fixtureNaturalKey": "EPL|2024-2025|MANCHESTERUNITED|CHELSEA|2024-09-19",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "manchesterunited",
+    "awayTeamId": "chelsea",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.93,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.89,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "2e68aba57064e616bb13dd4d28596515e63b9f604caf0353b269e86e92f2685c",
+    "fixtureNaturalKey": "EPL|2024-2025|MANCHESTERUNITED|LIVERPOOL|2024-09-20",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "manchesterunited",
+    "awayTeamId": "liverpool",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.53,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.61,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "63dcba2c7365b360c171d0827b4dc584a4e71b05d6114c3eb75ccb5a335c698b",
+    "fixtureNaturalKey": "EPL|2024-2025|MANCHESTERUNITED|MANCHESTERCITY|2024-09-21",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "manchesterunited",
+    "awayTeamId": "manchestercity",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.42,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.21,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "0e038b6d3287bd4039911f118a7d9a2afbdc2d87821da0fee8e452f9742548c1",
+    "fixtureNaturalKey": "EPL|2024-2025|MANCHESTERUNITED|TOTTENHAM|2024-09-22",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "manchesterunited",
+    "awayTeamId": "tottenham",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.66,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.69,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "fbff1e67aab22f9c9ac0d1131eb1270b6be5a34cc6ab3cf33b28d00d90ce7b0b",
+    "fixtureNaturalKey": "EPL|2024-2025|MANCHESTERUNITED|EVERTON|2024-09-23",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "manchesterunited",
+    "awayTeamId": "everton",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.42,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.89,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "52abca5d59a7c45982b7e81cc7e24f7115cd78d2c7526c498f2c6736600345a2",
+    "fixtureNaturalKey": "EPL|2024-2025|MANCHESTERUNITED|NEWCASTLE|2024-09-24",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "manchesterunited",
+    "awayTeamId": "newcastle",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.48,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.47,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "84933a95792db1fc1e83bf0f1cbff558d6c8f8afda91ea00d88c24d4fd96774a",
+    "fixtureNaturalKey": "EPL|2024-2025|MANCHESTERUNITED|LEICESTER|2024-09-25",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "manchesterunited",
+    "awayTeamId": "leicester",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.56,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.42,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "bf9ea08723b0323a2e9c0993e719e9a5a47911c5fa0ab6118d346dcf3c233ece",
+    "fixtureNaturalKey": "EPL|2024-2025|MANCHESTERUNITED|WESTHAM|2024-09-26",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "manchesterunited",
+    "awayTeamId": "westham",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.13,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.8,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "3f306d4df15919b17dfa1d9ea450570b39e1731dbe9379be372d44d8416d0ab4",
+    "fixtureNaturalKey": "EPL|2024-2025|MANCHESTERCITY|ARSENAL|2024-09-27",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "manchestercity",
+    "awayTeamId": "arsenal",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.46,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.75,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "2b7a01e0a3d9a523cd6c08b4b9b2342594b4c0b95d5b3f076b7e782e8bfc1c6a",
+    "fixtureNaturalKey": "EPL|2024-2025|MANCHESTERCITY|CHELSEA|2024-09-28",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "manchestercity",
+    "awayTeamId": "chelsea",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.52,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.37,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "17ea64a858f2810d86039e2ba703989f0129f9812e68f20691f4a4915e857add",
+    "fixtureNaturalKey": "EPL|2024-2025|MANCHESTERCITY|LIVERPOOL|2024-09-29",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "manchestercity",
+    "awayTeamId": "liverpool",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.65,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.47,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "4023cef8204241f3e8c8045be64798c02585edde9ea722a60bd90b940c431780",
+    "fixtureNaturalKey": "EPL|2024-2025|MANCHESTERCITY|MANCHESTERUNITED|2024-09-10",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "manchestercity",
+    "awayTeamId": "manchesterunited",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.01,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.29,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "a9f05bac6691da3db9f9a795bef15bfbd203c199e154c5c09ce8fc2862107876",
+    "fixtureNaturalKey": "EPL|2024-2025|MANCHESTERCITY|TOTTENHAM|2024-09-11",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "manchestercity",
+    "awayTeamId": "tottenham",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.57,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.26,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "78c4d4df814063a49f42c145a56e96aa634ea22fbaea519ea14afc72e9d63c82",
+    "fixtureNaturalKey": "EPL|2024-2025|MANCHESTERCITY|EVERTON|2024-09-12",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "manchestercity",
+    "awayTeamId": "everton",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.62,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.72,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "3416f29168a9a99228387c41fc33d1f3d0938fbbe64c866f2f97ef8418d4fdae",
+    "fixtureNaturalKey": "EPL|2024-2025|MANCHESTERCITY|NEWCASTLE|2024-09-13",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "manchestercity",
+    "awayTeamId": "newcastle",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.33,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.58,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "5ee3ee78c1d3dacee0bf96a08245534f3e252ca0e3f5f0d5690bfd744fefa47b",
+    "fixtureNaturalKey": "EPL|2024-2025|MANCHESTERCITY|LEICESTER|2024-09-14",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "manchestercity",
+    "awayTeamId": "leicester",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.67,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.56,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "504cfd8cc1a0829ca1056072b2e0f289f4869ce227b46da9880054faceb0d1f5",
+    "fixtureNaturalKey": "EPL|2024-2025|MANCHESTERCITY|WESTHAM|2024-09-15",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "manchestercity",
+    "awayTeamId": "westham",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.57,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.6,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "6adc937b26af71de5d254541bc7db8c775c77dd7825cb9273a0a67b9abb05455",
+    "fixtureNaturalKey": "EPL|2024-2025|TOTTENHAM|ARSENAL|2024-09-16",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "tottenham",
+    "awayTeamId": "arsenal",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.55,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.03,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "eb84621040640f51758fe956269325163bb751086752429a75de6681d7aa9dd3",
+    "fixtureNaturalKey": "EPL|2024-2025|TOTTENHAM|CHELSEA|2024-09-17",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "tottenham",
+    "awayTeamId": "chelsea",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.87,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.42,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "382ee428a0fe01fb9acf943b16d070a326ff14e51abad69f299ed3e227c42bbf",
+    "fixtureNaturalKey": "EPL|2024-2025|TOTTENHAM|LIVERPOOL|2024-09-18",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "tottenham",
+    "awayTeamId": "liverpool",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.79,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.68,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "b3453066338332d9d89ac0c9d8e1225282c80c45ac44448d82aa5a768237d11e",
+    "fixtureNaturalKey": "EPL|2024-2025|TOTTENHAM|MANCHESTERUNITED|2024-09-19",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "tottenham",
+    "awayTeamId": "manchesterunited",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.57,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.17,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "33b97e4e8b3a7e323383cb91a31eb1904572113fe71f659bb79dc7c1789536c8",
+    "fixtureNaturalKey": "EPL|2024-2025|TOTTENHAM|MANCHESTERCITY|2024-09-20",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "tottenham",
+    "awayTeamId": "manchestercity",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.79,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.64,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "c94d81e6ad47f04a47b1022d0bf197fb796283a050397321c15e1c550db95306",
+    "fixtureNaturalKey": "EPL|2024-2025|TOTTENHAM|EVERTON|2024-09-21",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "tottenham",
+    "awayTeamId": "everton",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.27,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.34,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "09c9465f25af7caf7530d9d1557ed014503508cecfeae40f392af2732bc00ebd",
+    "fixtureNaturalKey": "EPL|2024-2025|TOTTENHAM|NEWCASTLE|2024-09-22",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "tottenham",
+    "awayTeamId": "newcastle",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.98,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.18,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "ba85b7638f63e8a10e5a74b6dd040f1d3051fa3486b8cefb53c380fe2e55757b",
+    "fixtureNaturalKey": "EPL|2024-2025|TOTTENHAM|LEICESTER|2024-09-23",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "tottenham",
+    "awayTeamId": "leicester",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.32,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "2158f06de9f5b7c0c2e40e6c2ad407bad6171c56cf0005ca267fb7f3f4ef752f",
+    "fixtureNaturalKey": "EPL|2024-2025|TOTTENHAM|WESTHAM|2024-09-24",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "tottenham",
+    "awayTeamId": "westham",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.94,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.5,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "9ce740634be8ebc6a6b86d92d1fe6568e21250c98033289586fa66dab5a513a1",
+    "fixtureNaturalKey": "EPL|2024-2025|EVERTON|ARSENAL|2024-09-25",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "everton",
+    "awayTeamId": "arsenal",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.38,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.64,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "cfb427609c3184530a132440fa775b80fbf0ca729bf427d53507115bb6046489",
+    "fixtureNaturalKey": "EPL|2024-2025|EVERTON|CHELSEA|2024-09-26",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "everton",
+    "awayTeamId": "chelsea",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.86,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.08,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "d25b738819d7885acd475c48407868e9565f36f5542fb4e984d163187f395c23",
+    "fixtureNaturalKey": "EPL|2024-2025|EVERTON|LIVERPOOL|2024-09-27",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "everton",
+    "awayTeamId": "liverpool",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.11,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.81,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "7fff68763f74258ee8dcc0026bfda018c26d154c81c00cc2a88c4ee7b89f6673",
+    "fixtureNaturalKey": "EPL|2024-2025|EVERTON|MANCHESTERUNITED|2024-09-28",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "everton",
+    "awayTeamId": "manchesterunited",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.88,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.85,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "8506771f4e5d90103728e608a18cdb0222d3c3970888d4f0a70541e0aba57d4a",
+    "fixtureNaturalKey": "EPL|2024-2025|EVERTON|MANCHESTERCITY|2024-09-29",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "everton",
+    "awayTeamId": "manchestercity",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.49,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.35,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "db53e2d507342f1ae4aa09f5acf156aa87478fd60680115e5e7279bfa16a5053",
+    "fixtureNaturalKey": "EPL|2024-2025|EVERTON|TOTTENHAM|2024-09-10",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "everton",
+    "awayTeamId": "tottenham",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.6,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.24,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "04f1f2400b77a33169584f919de021c9b27627749a0cad6eafab4179c9431b7a",
+    "fixtureNaturalKey": "EPL|2024-2025|EVERTON|NEWCASTLE|2024-09-11",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "everton",
+    "awayTeamId": "newcastle",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.56,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.4,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "9a5980c95e5397cc4af7450bc0dc9f205798b5b6327e8ecbff669c3e4a21a0d7",
+    "fixtureNaturalKey": "EPL|2024-2025|EVERTON|LEICESTER|2024-09-12",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "everton",
+    "awayTeamId": "leicester",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.42,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.7,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "e2fc160282c5aee2b7cdedd8fe4ad948620d2236afb7e3b3232d4e21cb41a3e3",
+    "fixtureNaturalKey": "EPL|2024-2025|EVERTON|WESTHAM|2024-09-13",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "everton",
+    "awayTeamId": "westham",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.09,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "54def237de1825ee86a58410c838aaa34ef89c4024232a413c8a213394763162",
+    "fixtureNaturalKey": "EPL|2024-2025|NEWCASTLE|ARSENAL|2024-09-14",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "newcastle",
+    "awayTeamId": "arsenal",
+    "homeGoals": {
+      "value": 4,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 3.33,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.45,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "fc08fc8f3aebbb87c4ab51a25437f6b5790d3c45f8031018762dc7320316df42",
+    "fixtureNaturalKey": "EPL|2024-2025|NEWCASTLE|CHELSEA|2024-09-15",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "newcastle",
+    "awayTeamId": "chelsea",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.71,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.6,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "53bf7e50d8142aa3c632c5c64ad39b8329ec085e9ba0e9aa9c9088df0191328c",
+    "fixtureNaturalKey": "EPL|2024-2025|NEWCASTLE|LIVERPOOL|2024-09-16",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "newcastle",
+    "awayTeamId": "liverpool",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.84,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.4,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "e0a5942994b6407f7043713a68ee57c4b8c77a7e00a908c44836ce6d8dc0cad4",
+    "fixtureNaturalKey": "EPL|2024-2025|NEWCASTLE|MANCHESTERUNITED|2024-09-17",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "newcastle",
+    "awayTeamId": "manchesterunited",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.85,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.39,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "9f6057b553caf87bb95803395ef7e3f20b6bfaad68c1ec37d19beea527543a48",
+    "fixtureNaturalKey": "EPL|2024-2025|NEWCASTLE|MANCHESTERCITY|2024-09-18",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "newcastle",
+    "awayTeamId": "manchestercity",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.11,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "5f029985c58ce4970b35058d92cd7bc8dc83165730864ec6f7c63a546f63e188",
+    "fixtureNaturalKey": "EPL|2024-2025|NEWCASTLE|TOTTENHAM|2024-09-19",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "newcastle",
+    "awayTeamId": "tottenham",
+    "homeGoals": {
+      "value": 4,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 3.37,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.33,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "bbf745ad6eb5a9c13ed1eee350dea52554bd577ec14c87085b81da7964c729ad",
+    "fixtureNaturalKey": "EPL|2024-2025|NEWCASTLE|EVERTON|2024-09-20",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "newcastle",
+    "awayTeamId": "everton",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.55,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.09,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "524d8faebdd25b2953c85e1a35769a00c2aeb296d7df823dc085cf0bcb367f82",
+    "fixtureNaturalKey": "EPL|2024-2025|NEWCASTLE|LEICESTER|2024-09-21",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "newcastle",
+    "awayTeamId": "leicester",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.2,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.56,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "1513f05dfbb970cc753eedca5338c6e8972d5c5875beab5d70d0631554071b67",
+    "fixtureNaturalKey": "EPL|2024-2025|NEWCASTLE|WESTHAM|2024-09-22",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "newcastle",
+    "awayTeamId": "westham",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.1,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.63,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "3e727ee4ec2a74367ac7dff3e61c024d9bf6f82d8520c9f873ee0d8bfe90b310",
+    "fixtureNaturalKey": "EPL|2024-2025|LEICESTER|ARSENAL|2024-09-23",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "leicester",
+    "awayTeamId": "arsenal",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 3.12,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.26,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "a3762d2c7a21a02f1959b03423b309f70aed232894f4e40b403ef3d3d6ae71ac",
+    "fixtureNaturalKey": "EPL|2024-2025|LEICESTER|CHELSEA|2024-09-24",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "leicester",
+    "awayTeamId": "chelsea",
+    "homeGoals": {
+      "value": 4,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 3.54,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.53,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "1a95d0b38119302721328ae91c37e2f7d568345d9354f959772190b31a6fae06",
+    "fixtureNaturalKey": "EPL|2024-2025|LEICESTER|LIVERPOOL|2024-09-25",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "leicester",
+    "awayTeamId": "liverpool",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.91,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.97,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "761195deaeee5248e77ad5f1ab60142bb375e0c53d83b9f4fd9df179028dacc8",
+    "fixtureNaturalKey": "EPL|2024-2025|LEICESTER|MANCHESTERUNITED|2024-09-26",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "leicester",
+    "awayTeamId": "manchesterunited",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 3.24,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.28,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "7bfe3163b213ed5c31ff467df4c12ebac567db6da0ee22402a73164ee43c3f51",
+    "fixtureNaturalKey": "EPL|2024-2025|LEICESTER|MANCHESTERCITY|2024-09-27",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "leicester",
+    "awayTeamId": "manchestercity",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 3.02,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.58,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "e55a4af61a57bfe03b288f842ce2446aeca2cde380997538793622a849267a70",
+    "fixtureNaturalKey": "EPL|2024-2025|LEICESTER|TOTTENHAM|2024-09-28",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "leicester",
+    "awayTeamId": "tottenham",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.76,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.11,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "c95ca8e54c17603271be1f0fee4461c0a2dd28ee5aae4b51591c4594e968e767",
+    "fixtureNaturalKey": "EPL|2024-2025|LEICESTER|EVERTON|2024-09-29",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "leicester",
+    "awayTeamId": "everton",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.1,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.04,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "7034b4ca50c833b0c8fa383190f72c8a5eb59f984df68ba6534bf0b50bb60c2f",
+    "fixtureNaturalKey": "EPL|2024-2025|LEICESTER|NEWCASTLE|2024-09-10",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "leicester",
+    "awayTeamId": "newcastle",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.66,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.39,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "3957e4f345e790229b18364349ed24da3d2fbfec316ed91c57f7558181b5a220",
+    "fixtureNaturalKey": "EPL|2024-2025|LEICESTER|WESTHAM|2024-09-11",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "leicester",
+    "awayTeamId": "westham",
+    "homeGoals": {
+      "value": 4,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 3.31,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.73,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "f79d7a8d4d36297232c9cef4d851fce44c2ef3111ab6fd2fbb6af4ea97ec8fd3",
+    "fixtureNaturalKey": "EPL|2024-2025|WESTHAM|ARSENAL|2024-09-12",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "westham",
+    "awayTeamId": "arsenal",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 3.19,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.4,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "d4c6021835dda6247fa7b9c168a590dee6472d1e578efba11a02b1910cd5a908",
+    "fixtureNaturalKey": "EPL|2024-2025|WESTHAM|CHELSEA|2024-09-13",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "westham",
+    "awayTeamId": "chelsea",
+    "homeGoals": {
+      "value": 4,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 3.73,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.91,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "8e4904ced3b0c22c1d05d5309a47d6ab88820cc8e7227d401e83958abe0812e7",
+    "fixtureNaturalKey": "EPL|2024-2025|WESTHAM|LIVERPOOL|2024-09-14",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "westham",
+    "awayTeamId": "liverpool",
+    "homeGoals": {
+      "value": 4,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 3.65,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.59,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "0ee50ba9cc273da6b2f542eaaceab0aba9a8a0fe5f5bd695eb1ee3d8f34cd3a1",
+    "fixtureNaturalKey": "EPL|2024-2025|WESTHAM|MANCHESTERUNITED|2024-09-15",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "westham",
+    "awayTeamId": "manchesterunited",
+    "homeGoals": {
+      "value": 4,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 3.58,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.87,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "416d01dcc2ff69d241d027e60ae854ffca0395be5865f6fadb9b0e0bc4f76472",
+    "fixtureNaturalKey": "EPL|2024-2025|WESTHAM|MANCHESTERCITY|2024-09-16",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "westham",
+    "awayTeamId": "manchestercity",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 3.03,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.12,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "f0730b667a7a165f5051130cc7471b127636625692852525588ccc7a176d6180",
+    "fixtureNaturalKey": "EPL|2024-2025|WESTHAM|TOTTENHAM|2024-09-17",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "westham",
+    "awayTeamId": "tottenham",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.48,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.83,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "06f30d4251f87da6ff02b74fc5d17ed7ac504bc28242db560a12fb5692042d00",
+    "fixtureNaturalKey": "EPL|2024-2025|WESTHAM|EVERTON|2024-09-18",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "westham",
+    "awayTeamId": "everton",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 3.31,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.65,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "ecdd5a20d7fbf3cc3f569de1dec52c02233ab6cc35880a977e56796d406260a4",
+    "fixtureNaturalKey": "EPL|2024-2025|WESTHAM|NEWCASTLE|2024-09-19",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "westham",
+    "awayTeamId": "newcastle",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 3.18,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.78,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "acc9a7233ffe333e97e42632d25acce8ab3e1ae4afd23a72ba31a549a1954704",
+    "fixtureNaturalKey": "EPL|2024-2025|WESTHAM|LEICESTER|2024-09-20",
+    "competitionId": "EPL",
+    "seasonId": "2024-2025",
+    "homeTeamId": "westham",
+    "awayTeamId": "leicester",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 3.3,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.83,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  }
+]

@@ -29,7 +29,9 @@
     "shadow:evaluate": "tsx -e \"fetch('http://localhost:3000/api/shadow/evaluate').then(r=>r.json()).then(console.log).catch(console.error)\"",
     "test:shadow": "vitest run tests/shadow-pipeline-prediction.test.ts tests/shadow-pipeline-evidence.test.ts",
     "epic:31b": "tsx src/scripts/run-epic31b.ts",
-    "test:epic31b": "vitest run tests/epic31b/"
+    "test:epic31b": "vitest run tests/epic31b/",
+    "epic:31b:6": "tsx src/scripts/run-epic31b6.ts",
+    "test:epic31b6": "vitest run tests/epic31b6/"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",

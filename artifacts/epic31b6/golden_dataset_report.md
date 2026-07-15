@@ -1,0 +1,13 @@
+# Golden Dataset Report
+- **Total Selected Fixtures:** 100
+- **Unique Fixtures Check:** PASSED
+- **Regime Balance Matrix:**
+  - Home Favorite: 10
+  - Away Favorite: 10
+  - Draw: 10
+  - COVID Closed Door: 10
+  - VAR Era matches: 10
+  - Congested Fixtures: 10
+  - Big Six Matchups: 10
+  - Relegation Battles: 10
+  - Mid Table Matchups: 20

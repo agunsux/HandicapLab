@@ -1,0 +1,41 @@
+[
+  {
+    "fixtureNaturalKey": "EPL|2020-2021|ARSENAL|WESTHAM|2020-09-19",
+    "field": "goals",
+    "providerA": "football-data.co.uk",
+    "valueA": 1,
+    "confidenceA": 0.999,
+    "providerB": "understat",
+    "valueB": 2,
+    "confidenceB": 0.8,
+    "selectedValue": 1,
+    "selectedProvider": "football-data.co.uk",
+    "reason": "Value conflict: selected football-data.co.uk over understat due to higher confidence."
+  },
+  {
+    "fixtureNaturalKey": "EPL|2023-2024|WESTHAM|MANCHESTERCITY|2023-09-16",
+    "field": "goals",
+    "providerA": "football-data.co.uk",
+    "valueA": 1,
+    "confidenceA": 0.999,
+    "providerB": "understat",
+    "valueB": 4,
+    "confidenceB": 0.8,
+    "selectedValue": 1,
+    "selectedProvider": "football-data.co.uk",
+    "reason": "Value conflict: selected football-data.co.uk over understat due to higher confidence."
+  },
+  {
+    "fixtureNaturalKey": "EPL|2023-2024|WESTHAM|MANCHESTERCITY|2023-09-16",
+    "field": "goals",
+    "providerA": "football-data.co.uk",
+    "valueA": 3,
+    "confidenceA": 0.999,
+    "providerB": "understat",
+    "valueB": 2,
+    "confidenceB": 0.8,
+    "selectedValue": 3,
+    "selectedProvider": "football-data.co.uk",
+    "reason": "Value conflict: selected football-data.co.uk over understat due to higher confidence."
+  }
+]

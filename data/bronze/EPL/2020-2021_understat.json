@@ -1,0 +1,2882 @@
+[
+  {
+    "fixtureId": "49529d71b7a383b348d161c499a679cef71e78a6e6d365dcafd47f7a2d091e78",
+    "fixtureNaturalKey": "EPL|2020-2021|ARSENAL|CHELSEA|2020-09-11",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "arsenal",
+    "awayTeamId": "chelsea",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.4,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.13,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "7bb67ac8695d30ee7ff617af616913cda3144c66cc827cda31fa3d3dcdf69e41",
+    "fixtureNaturalKey": "EPL|2020-2021|ARSENAL|LIVERPOOL|2020-09-12",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "arsenal",
+    "awayTeamId": "liverpool",
+    "homeGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 0.66,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.04,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "d7bf9e30badcb78219bad7db3d287d71d49eef40130940144b1cada54fde8b96",
+    "fixtureNaturalKey": "EPL|2020-2021|ARSENAL|MANCHESTERUNITED|2020-09-13",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "arsenal",
+    "awayTeamId": "manchesterunited",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.6,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "455deb08fb794659ae73cdc3df4dc12eb0d6e67d7fcfe4550db834d0ea62dfdc",
+    "fixtureNaturalKey": "EPL|2020-2021|ARSENAL|MANCHESTERCITY|2020-09-14",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "arsenal",
+    "awayTeamId": "manchestercity",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.45,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.15,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "fb50c6af3f55e6deb529f80199984ab2e4ad13d70f9bfdf837ab9ce021544483",
+    "fixtureNaturalKey": "EPL|2020-2021|ARSENAL|TOTTENHAM|2020-09-15",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "arsenal",
+    "awayTeamId": "tottenham",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.63,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.85,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "7f1fff0a6a1bd2a2aca3396f1dd0ba1b27f52df6cea9c033cd8d908f7f06987b",
+    "fixtureNaturalKey": "EPL|2020-2021|ARSENAL|EVERTON|2020-09-16",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "arsenal",
+    "awayTeamId": "everton",
+    "homeGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 0.82,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.39,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "20c92d9b4f253694355bf4f127e5a8be4fd431fea88f8b5ebc5e7b115212662b",
+    "fixtureNaturalKey": "EPL|2020-2021|ARSENAL|NEWCASTLE|2020-09-17",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "arsenal",
+    "awayTeamId": "newcastle",
+    "homeGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.1,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.38,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "9690120d1d5533e8a5134151b7a6c7b09e61762ca0586e131a3ab0ce2c2b1057",
+    "fixtureNaturalKey": "EPL|2020-2021|ARSENAL|LEICESTER|2020-09-18",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "arsenal",
+    "awayTeamId": "leicester",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.28,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "eba32b97d4c4da849b7d781571a7b4e8185efb7e23201dfe3cedf56152f17f55",
+    "fixtureNaturalKey": "EPL|2020-2021|ARSENAL|WESTHAM|2020-09-19",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "arsenal",
+    "awayTeamId": "westham",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.6,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.16,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "225875153625ced6b624b91b3cff361fc9f8044cf830ab2afe0698ac81f910e9",
+    "fixtureNaturalKey": "EPL|2020-2021|CHELSEA|ARSENAL|2020-09-20",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "chelsea",
+    "awayTeamId": "arsenal",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.08,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.7,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "6b871d1f29a5f2a1e53b48cb913f4e91228ab3d7181aac02046ed804e49ee73b",
+    "fixtureNaturalKey": "EPL|2020-2021|CHELSEA|LIVERPOOL|2020-09-21",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "chelsea",
+    "awayTeamId": "liverpool",
+    "homeGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.18,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.72,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "f853bed520c001d7f9cc2cdcd7c4ae05f4199fcc63d1e81cb748e91ad573d2a5",
+    "fixtureNaturalKey": "EPL|2020-2021|CHELSEA|MANCHESTERUNITED|2020-09-22",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "chelsea",
+    "awayTeamId": "manchesterunited",
+    "homeGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.23,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.47,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "2ff16f1ef1b84d6cf4f6b067599c199b0f9fecb97239e17500ecb36a265a590f",
+    "fixtureNaturalKey": "EPL|2020-2021|CHELSEA|MANCHESTERCITY|2020-09-23",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "chelsea",
+    "awayTeamId": "manchestercity",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.54,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "a964be001b9324d94b7727c212c2f435bace0e202d1e9265a50fbb64c20f313d",
+    "fixtureNaturalKey": "EPL|2020-2021|CHELSEA|TOTTENHAM|2020-09-24",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "chelsea",
+    "awayTeamId": "tottenham",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.44,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.31,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "8843db5947a44416bfd201491492bf8a1d5f4c96441d4aa70975bd1121a2d1eb",
+    "fixtureNaturalKey": "EPL|2020-2021|CHELSEA|EVERTON|2020-09-25",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "chelsea",
+    "awayTeamId": "everton",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.5,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.3,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "611253182bbbbb8be6a136621fa1cc702388301c32af16421aaa2a33e0cad71b",
+    "fixtureNaturalKey": "EPL|2020-2021|CHELSEA|NEWCASTLE|2020-09-26",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "chelsea",
+    "awayTeamId": "newcastle",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.37,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.54,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "5232b479303550c8d2f3af3bb025d0becfbd17d93117052434f25a3a203c79d8",
+    "fixtureNaturalKey": "EPL|2020-2021|CHELSEA|LEICESTER|2020-09-27",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "chelsea",
+    "awayTeamId": "leicester",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.83,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.63,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "4b485f0cf0a617576a67f958632c03bd99387d4a5ff5ffa3cdd5652dc7a805dc",
+    "fixtureNaturalKey": "EPL|2020-2021|CHELSEA|WESTHAM|2020-09-28",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "chelsea",
+    "awayTeamId": "westham",
+    "homeGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 0.79,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.25,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "cb78ed7d6f6b4dbed7fb829fe5650f859a76b02999619827a40529e454ebc07f",
+    "fixtureNaturalKey": "EPL|2020-2021|LIVERPOOL|ARSENAL|2020-09-29",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "liverpool",
+    "awayTeamId": "arsenal",
+    "homeGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.2,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.07,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "1b0836c3304b9c509f2f7f5d4c607e9f85314783778d362c3d88ccf05dc89fb0",
+    "fixtureNaturalKey": "EPL|2020-2021|LIVERPOOL|CHELSEA|2020-09-10",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "liverpool",
+    "awayTeamId": "chelsea",
+    "homeGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.1,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.49,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "526e71d906a63334d927827d5ed1197311e4c719e3551d2ba20193306d2b375d",
+    "fixtureNaturalKey": "EPL|2020-2021|LIVERPOOL|MANCHESTERUNITED|2020-09-11",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "liverpool",
+    "awayTeamId": "manchesterunited",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.28,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.62,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "d9002e969a02b6792f2a8749695e063ac24e471b821e26966e4ffdce85ee2486",
+    "fixtureNaturalKey": "EPL|2020-2021|LIVERPOOL|MANCHESTERCITY|2020-09-12",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "liverpool",
+    "awayTeamId": "manchestercity",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.59,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.9,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "17e1e63f8f30261c2fa8f82a8f7bc4083a4e7d38d5c4ccf3452ec20ddaec4ef3",
+    "fixtureNaturalKey": "EPL|2020-2021|LIVERPOOL|TOTTENHAM|2020-09-13",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "liverpool",
+    "awayTeamId": "tottenham",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.35,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.77,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "24eafa74c15a353983d26b609c1ae0f22816d47cadbde76edfe3e5f887f852d0",
+    "fixtureNaturalKey": "EPL|2020-2021|LIVERPOOL|EVERTON|2020-09-14",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "liverpool",
+    "awayTeamId": "everton",
+    "homeGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 0.99,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.25,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "bc057c478d857ac7bfcbabb0145ccc73a51bba57624861eac83faa47e83e522c",
+    "fixtureNaturalKey": "EPL|2020-2021|LIVERPOOL|NEWCASTLE|2020-09-15",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "liverpool",
+    "awayTeamId": "newcastle",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.85,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.31,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "5cf9debc5cbbabcb6f7c671f64ea11101510c8700b32d47db1e5e703fbd039da",
+    "fixtureNaturalKey": "EPL|2020-2021|LIVERPOOL|LEICESTER|2020-09-16",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "liverpool",
+    "awayTeamId": "leicester",
+    "homeGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.05,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.35,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "67169b010d715c921e3f64c5addfaa47ef2a89439859ba33fd27d1f3b2f0a3d8",
+    "fixtureNaturalKey": "EPL|2020-2021|LIVERPOOL|WESTHAM|2020-09-17",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "liverpool",
+    "awayTeamId": "westham",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.51,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.17,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "44e13a6878c408143bfc07db4aa731cadc0607b4d26e6b75ffb6347c89a1550d",
+    "fixtureNaturalKey": "EPL|2020-2021|MANCHESTERUNITED|ARSENAL|2020-09-18",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "manchesterunited",
+    "awayTeamId": "arsenal",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.35,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.42,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "c4dd0fb823e5b701674b0c7a249230074e7c4a7bb3d7b0e286a830ccdcd872aa",
+    "fixtureNaturalKey": "EPL|2020-2021|MANCHESTERUNITED|CHELSEA|2020-09-19",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "manchesterunited",
+    "awayTeamId": "chelsea",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.95,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.55,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "58dd9a2b2718e109acfb68dfbd02bebafbd2c2544f2a491a490111c365cb7cf8",
+    "fixtureNaturalKey": "EPL|2020-2021|MANCHESTERUNITED|LIVERPOOL|2020-09-20",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "manchesterunited",
+    "awayTeamId": "liverpool",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.54,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.79,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "cf75398102d59fdd7472f42b9242f3d3672560f71fadf00ed3099c4f87195434",
+    "fixtureNaturalKey": "EPL|2020-2021|MANCHESTERUNITED|MANCHESTERCITY|2020-09-21",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "manchesterunited",
+    "awayTeamId": "manchestercity",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.11,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "aaed94379dd7819e8966cb16e2392409d482a74bbd16117607a7ca769d4a8d1d",
+    "fixtureNaturalKey": "EPL|2020-2021|MANCHESTERUNITED|TOTTENHAM|2020-09-22",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "manchesterunited",
+    "awayTeamId": "tottenham",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.03,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.13,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "827c655f99b296df5465e41296a1a2b7acf3e9b1c83240ff7efe5a490fd6d0ce",
+    "fixtureNaturalKey": "EPL|2020-2021|MANCHESTERUNITED|EVERTON|2020-09-23",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "manchesterunited",
+    "awayTeamId": "everton",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.25,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.75,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "4e30453a0328c2f171f1318e09b53fd3743c4b1f1d1d769a65b72ad6f0c0ec14",
+    "fixtureNaturalKey": "EPL|2020-2021|MANCHESTERUNITED|NEWCASTLE|2020-09-24",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "manchesterunited",
+    "awayTeamId": "newcastle",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.13,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.73,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "9505851dd51283a5deea764faf4f2188f8f752d9aee43ad9b79ae67116212075",
+    "fixtureNaturalKey": "EPL|2020-2021|MANCHESTERUNITED|LEICESTER|2020-09-25",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "manchesterunited",
+    "awayTeamId": "leicester",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.56,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.63,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "03ca8f6598b52c05c7dc6c99ef363b4cad96883d7044b050a76d18ba33f3232a",
+    "fixtureNaturalKey": "EPL|2020-2021|MANCHESTERUNITED|WESTHAM|2020-09-26",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "manchesterunited",
+    "awayTeamId": "westham",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.44,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.97,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "021851d0a9a57d58fe1349d94478cee6f3c3a150202c23a332eb65fe539d8623",
+    "fixtureNaturalKey": "EPL|2020-2021|MANCHESTERCITY|ARSENAL|2020-09-27",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "manchestercity",
+    "awayTeamId": "arsenal",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.71,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.43,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "b659f48172c45878629eb6baddfe99013db4b8f3c2f86131257105e68993093f",
+    "fixtureNaturalKey": "EPL|2020-2021|MANCHESTERCITY|CHELSEA|2020-09-28",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "manchestercity",
+    "awayTeamId": "chelsea",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.47,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.22,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "a2a19f037b88ecf7ef5aa4a8d9dbd179a38df6ff5cd3f1e87fa319e00978c948",
+    "fixtureNaturalKey": "EPL|2020-2021|MANCHESTERCITY|LIVERPOOL|2020-09-29",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "manchestercity",
+    "awayTeamId": "liverpool",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.85,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.04,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "067a983addef6634d06024b21081a5ae603d2938e4f75dfcb795eea7c15885f0",
+    "fixtureNaturalKey": "EPL|2020-2021|MANCHESTERCITY|MANCHESTERUNITED|2020-09-10",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "manchestercity",
+    "awayTeamId": "manchesterunited",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.81,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.38,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "66c628b0d609852e6da32a3c575d1d24cbdfd0d816fab93f9b16a84517132fc8",
+    "fixtureNaturalKey": "EPL|2020-2021|MANCHESTERCITY|TOTTENHAM|2020-09-11",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "manchestercity",
+    "awayTeamId": "tottenham",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.29,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.86,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "48fca676350b764df3c99bbf7ef118bf67ee4a6775582553a64aac72aa0c8369",
+    "fixtureNaturalKey": "EPL|2020-2021|MANCHESTERCITY|EVERTON|2020-09-12",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "manchestercity",
+    "awayTeamId": "everton",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.56,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.41,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "8e733e4031002bca4fe09309d76609b7b1506e99f607ab29f992c0811c1f79f0",
+    "fixtureNaturalKey": "EPL|2020-2021|MANCHESTERCITY|NEWCASTLE|2020-09-13",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "manchestercity",
+    "awayTeamId": "newcastle",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.43,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.46,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "aa9f7287f38ed20f1a229ce57502dc3233ff5da1efebc3e789cf5dbdf8217c44",
+    "fixtureNaturalKey": "EPL|2020-2021|MANCHESTERCITY|LEICESTER|2020-09-14",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "manchestercity",
+    "awayTeamId": "leicester",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.31,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.98,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "b3ca97dba591c07a505df6eb6d34d38104eba01f96c05143685a04742a0f3abf",
+    "fixtureNaturalKey": "EPL|2020-2021|MANCHESTERCITY|WESTHAM|2020-09-15",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "manchestercity",
+    "awayTeamId": "westham",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.61,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.01,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "25677f78b98442e895e58bb946aa614f9fb480dd6ebfb95733ba6189140d3e9f",
+    "fixtureNaturalKey": "EPL|2020-2021|TOTTENHAM|ARSENAL|2020-09-16",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "tottenham",
+    "awayTeamId": "arsenal",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.59,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.51,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "f93bf7a7608f32f7a8eba252d28cd055f07c686d1935135a6be50b5a7a34d5f8",
+    "fixtureNaturalKey": "EPL|2020-2021|TOTTENHAM|CHELSEA|2020-09-17",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "tottenham",
+    "awayTeamId": "chelsea",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.91,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.15,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "c9e7c854540d748d81d25806f46eb137dcfd44b44856355f2400fd6b5e6bebef",
+    "fixtureNaturalKey": "EPL|2020-2021|TOTTENHAM|LIVERPOOL|2020-09-18",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "tottenham",
+    "awayTeamId": "liverpool",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.75,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.74,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "68388a12764d694dbc7c47053bd802d599cdd9743305d25f932cce53caad079c",
+    "fixtureNaturalKey": "EPL|2020-2021|TOTTENHAM|MANCHESTERUNITED|2020-09-19",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "tottenham",
+    "awayTeamId": "manchesterunited",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.92,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.29,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "83e09ab054bda2e7d5259e44d2c0423c0600b86a13342c70bd1295f3c18db2fe",
+    "fixtureNaturalKey": "EPL|2020-2021|TOTTENHAM|MANCHESTERCITY|2020-09-20",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "tottenham",
+    "awayTeamId": "manchestercity",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.18,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.19,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "3ae11b5ef6c3d7d67dd55313dadc2b6d96cecd6ac0afcab74b4f27babe7685d2",
+    "fixtureNaturalKey": "EPL|2020-2021|TOTTENHAM|EVERTON|2020-09-21",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "tottenham",
+    "awayTeamId": "everton",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.05,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.86,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "32844ed3d88292a1ea463fffd55421563e8e0364c3c8f733b3e9686c6ed602a2",
+    "fixtureNaturalKey": "EPL|2020-2021|TOTTENHAM|NEWCASTLE|2020-09-22",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "tottenham",
+    "awayTeamId": "newcastle",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.66,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.23,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "1d571cbb3a07fd5ba52462a075b1e525a6d75cb8b002a596810e5e462ce3e427",
+    "fixtureNaturalKey": "EPL|2020-2021|TOTTENHAM|LEICESTER|2020-09-23",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "tottenham",
+    "awayTeamId": "leicester",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.78,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.4,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "b788a9e377aaab64fc7525ceb6aecc0c6fbd066aa03f910eb2dea568b5133a7d",
+    "fixtureNaturalKey": "EPL|2020-2021|TOTTENHAM|WESTHAM|2020-09-24",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "tottenham",
+    "awayTeamId": "westham",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.8,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.46,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "0e88d65e3ad36630ca64e7010dfe3186ccfa8a70e418f01213d5804c70074ea6",
+    "fixtureNaturalKey": "EPL|2020-2021|EVERTON|ARSENAL|2020-09-25",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "everton",
+    "awayTeamId": "arsenal",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.99,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.12,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "da41f1d224657ad1ccd133afdfdc437dde15a28f76a544333f9f0516bc049d74",
+    "fixtureNaturalKey": "EPL|2020-2021|EVERTON|CHELSEA|2020-09-26",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "everton",
+    "awayTeamId": "chelsea",
+    "homeGoals": {
+      "value": 4,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 3.09,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.59,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "4eb18c1dc111bf04e0b255ca10ed82d8073a8de087ad92d92789eb5ffa2312be",
+    "fixtureNaturalKey": "EPL|2020-2021|EVERTON|LIVERPOOL|2020-09-27",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "everton",
+    "awayTeamId": "liverpool",
+    "homeGoals": {
+      "value": 4,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 3.15,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.79,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "7ae9089090ff1985dbb1705de69ad197fa2dabb2ef37622ed784da288cc1d07b",
+    "fixtureNaturalKey": "EPL|2020-2021|EVERTON|MANCHESTERUNITED|2020-09-28",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "everton",
+    "awayTeamId": "manchesterunited",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.66,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.91,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "638055a30fadbc0d450e820c0dbdf3b4474ba563fd5ef99dd9629b8b23faa09c",
+    "fixtureNaturalKey": "EPL|2020-2021|EVERTON|MANCHESTERCITY|2020-09-29",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "everton",
+    "awayTeamId": "manchestercity",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.92,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.61,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "ed4943b8407c4f8d6f52ca068058e4a7c7030de5ed5aa636a3bab9420491f98d",
+    "fixtureNaturalKey": "EPL|2020-2021|EVERTON|TOTTENHAM|2020-09-10",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "everton",
+    "awayTeamId": "tottenham",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.69,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.25,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "342b15e70995485ed5c7b1442d0069e73877cce2997322f9ce635eb38e9b7f99",
+    "fixtureNaturalKey": "EPL|2020-2021|EVERTON|NEWCASTLE|2020-09-11",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "everton",
+    "awayTeamId": "newcastle",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.21,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.6,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "88f4971dce0886f7210e97539154b99153b6b13d3c5dc02890308b92194e7490",
+    "fixtureNaturalKey": "EPL|2020-2021|EVERTON|LEICESTER|2020-09-12",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "everton",
+    "awayTeamId": "leicester",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.95,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.44,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "cbd6b107c96690ba3b8f82139863f44884631d10e7314f2e057a222be62a7631",
+    "fixtureNaturalKey": "EPL|2020-2021|EVERTON|WESTHAM|2020-09-13",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "everton",
+    "awayTeamId": "westham",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.9,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "793774fe9ec7da11cb1ed52d68e5844336fb6015134ebd890f07c0f45ad2a77d",
+    "fixtureNaturalKey": "EPL|2020-2021|NEWCASTLE|ARSENAL|2020-09-14",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "newcastle",
+    "awayTeamId": "arsenal",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.29,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.38,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "3f9adb2d1b0848645fdd9c0e47fcfc7c100eca918035a9447baae575449c6403",
+    "fixtureNaturalKey": "EPL|2020-2021|NEWCASTLE|CHELSEA|2020-09-15",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "newcastle",
+    "awayTeamId": "chelsea",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.29,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.63,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "d7cc87612a8ceb4c3931fa88a7ac753bf1ec511f874f7330699c1b06644c4ad8",
+    "fixtureNaturalKey": "EPL|2020-2021|NEWCASTLE|LIVERPOOL|2020-09-16",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "newcastle",
+    "awayTeamId": "liverpool",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.54,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.48,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "1f3b6c06beac2b84d0f6bb57264e1b42e31ffb8de42db8c08f003d97e96f72e6",
+    "fixtureNaturalKey": "EPL|2020-2021|NEWCASTLE|MANCHESTERUNITED|2020-09-17",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "newcastle",
+    "awayTeamId": "manchesterunited",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.41,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.93,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "bc42695bfdb3d9415d954d06de66d22a51a10187f0afd15b7a238ca038401fea",
+    "fixtureNaturalKey": "EPL|2020-2021|NEWCASTLE|MANCHESTERCITY|2020-09-18",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "newcastle",
+    "awayTeamId": "manchestercity",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.23,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.05,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "1129fd407442882c13d5a65f0bc52ca6b55ceb540119974d216beb69accf0195",
+    "fixtureNaturalKey": "EPL|2020-2021|NEWCASTLE|TOTTENHAM|2020-09-19",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "newcastle",
+    "awayTeamId": "tottenham",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.5,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.23,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "0b97d6cd244cbf8f91e70b59ff701c72001f01382f9504bc4070874788cf9175",
+    "fixtureNaturalKey": "EPL|2020-2021|NEWCASTLE|EVERTON|2020-09-20",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "newcastle",
+    "awayTeamId": "everton",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 3.19,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.37,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "39a403d1b1cb16f56840adebbb44352d25e2008be7e8bb0743fabe9ceddba338",
+    "fixtureNaturalKey": "EPL|2020-2021|NEWCASTLE|LEICESTER|2020-09-21",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "newcastle",
+    "awayTeamId": "leicester",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.87,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.37,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "c33f55efbe2f9ebda2ff175772d6637d9d7c04856d3c9d745b8c6294556f62e0",
+    "fixtureNaturalKey": "EPL|2020-2021|NEWCASTLE|WESTHAM|2020-09-22",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "newcastle",
+    "awayTeamId": "westham",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.21,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.33,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "5590645013162219ec88e602e65b23e2e6534ef500dcc4a23d1d9b2032929593",
+    "fixtureNaturalKey": "EPL|2020-2021|LEICESTER|ARSENAL|2020-09-23",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "leicester",
+    "awayTeamId": "arsenal",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.37,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.46,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "90fa21b1d7d43f921d3e827ea4bf5a55b8d39fb705617c508878a7abcdd71ddf",
+    "fixtureNaturalKey": "EPL|2020-2021|LEICESTER|CHELSEA|2020-09-24",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "leicester",
+    "awayTeamId": "chelsea",
+    "homeGoals": {
+      "value": 4,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 3.27,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.29,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "437e5b8f94b729a454baf1ec5a975620885e2c0d92ffef2989a7f0b2bb90e992",
+    "fixtureNaturalKey": "EPL|2020-2021|LEICESTER|LIVERPOOL|2020-09-25",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "leicester",
+    "awayTeamId": "liverpool",
+    "homeGoals": {
+      "value": 4,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 3.13,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.72,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "2a28b9a03f3d89fceab1aebff6992cc88bade9f2d668b74652563778b44c04d3",
+    "fixtureNaturalKey": "EPL|2020-2021|LEICESTER|MANCHESTERUNITED|2020-09-26",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "leicester",
+    "awayTeamId": "manchesterunited",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 3.07,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.72,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "4869ed951924af90d6e9b735b9aa5a5b97786f859d1e3caa894d4807f2fc1e0e",
+    "fixtureNaturalKey": "EPL|2020-2021|LEICESTER|MANCHESTERCITY|2020-09-27",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "leicester",
+    "awayTeamId": "manchestercity",
+    "homeGoals": {
+      "value": 4,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 3.5,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.88,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "e8f8479602b7ea48c10275fa906e23e34759a568bc01ac7bd5deb6f1bca6ebf5",
+    "fixtureNaturalKey": "EPL|2020-2021|LEICESTER|TOTTENHAM|2020-09-28",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "leicester",
+    "awayTeamId": "tottenham",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.21,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.2,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "9dc639b6cb106b2b39cec2cef81c9f888a82ae1504eb5ceaf5425139cd1f5b90",
+    "fixtureNaturalKey": "EPL|2020-2021|LEICESTER|EVERTON|2020-09-29",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "leicester",
+    "awayTeamId": "everton",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 3.32,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.94,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "d783b108a96ece3992dbc5b39aefa8b15ab7ab22444ca390506975f1b1392e18",
+    "fixtureNaturalKey": "EPL|2020-2021|LEICESTER|NEWCASTLE|2020-09-10",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "leicester",
+    "awayTeamId": "newcastle",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.31,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.55,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "4f96015f0a74a64ad87c021a58f8477902b4bbfc8c97727af3752d7879f0ee97",
+    "fixtureNaturalKey": "EPL|2020-2021|LEICESTER|WESTHAM|2020-09-11",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "leicester",
+    "awayTeamId": "westham",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.52,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.49,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "c44f9c6d6d9462ddc4bf04b83f953ea2cbf914ae0413e3c5ab5ff3f82886fafb",
+    "fixtureNaturalKey": "EPL|2020-2021|WESTHAM|ARSENAL|2020-09-12",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "westham",
+    "awayTeamId": "arsenal",
+    "homeGoals": {
+      "value": 4,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 0,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 3.64,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.37,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "90a8115839e10d457963780c0b0acf794d348d08850572fd3c36f24a4c84d179",
+    "fixtureNaturalKey": "EPL|2020-2021|WESTHAM|CHELSEA|2020-09-13",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "westham",
+    "awayTeamId": "chelsea",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.7,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.95,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "130e8a74773f38fdd8c8713b6248b9b34e9a13b4930dcd22fd73a67e8be59c48",
+    "fixtureNaturalKey": "EPL|2020-2021|WESTHAM|LIVERPOOL|2020-09-14",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "westham",
+    "awayTeamId": "liverpool",
+    "homeGoals": {
+      "value": 4,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 3.48,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.02,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "b0b31100e4919db7a29e4349faffa074aee8a2b9234e229aa75fa68f89c17c23",
+    "fixtureNaturalKey": "EPL|2020-2021|WESTHAM|MANCHESTERUNITED|2020-09-15",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "westham",
+    "awayTeamId": "manchesterunited",
+    "homeGoals": {
+      "value": 4,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 3.64,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.76,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "1e06d0cdfc43a9ecc3832d9bcadeefbfcee67cfb043cee1644dc504117dd27d8",
+    "fixtureNaturalKey": "EPL|2020-2021|WESTHAM|MANCHESTERCITY|2020-09-16",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "westham",
+    "awayTeamId": "manchestercity",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.76,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.77,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "65615ec00afde7b1c56dc2b80f270645785fa534834ec5744fca15800fbff4b3",
+    "fixtureNaturalKey": "EPL|2020-2021|WESTHAM|TOTTENHAM|2020-09-17",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "westham",
+    "awayTeamId": "tottenham",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.92,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.08,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "d7594b1a28cfd7e7ea6c3164095388f3d352c9700c718764681610c038d5d8b9",
+    "fixtureNaturalKey": "EPL|2020-2021|WESTHAM|EVERTON|2020-09-18",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "westham",
+    "awayTeamId": "everton",
+    "homeGoals": {
+      "value": 4,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 3.1,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.03,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "f877e62d07b58f649c4e33ddee96340d91316fc38813867723cb5cbd32deeb4f",
+    "fixtureNaturalKey": "EPL|2020-2021|WESTHAM|NEWCASTLE|2020-09-19",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "westham",
+    "awayTeamId": "newcastle",
+    "homeGoals": {
+      "value": 4,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 3.71,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.92,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "df0d23ec872b6770ad30af112b1cba2d05fc3734cdd4bf383d86c5f3a4e8da1e",
+    "fixtureNaturalKey": "EPL|2020-2021|WESTHAM|LEICESTER|2020-09-20",
+    "competitionId": "EPL",
+    "seasonId": "2020-2021",
+    "homeTeamId": "westham",
+    "awayTeamId": "leicester",
+    "homeGoals": {
+      "value": 4,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 3.36,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.08,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  }
+]

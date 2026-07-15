@@ -1,0 +1,273 @@
+[
+  {
+    "id": "arsenal",
+    "name": "Arsenal",
+    "aliases": [
+      "Arsenal",
+      "Arsenal FC"
+    ]
+  },
+  {
+    "id": "astonvilla",
+    "name": "Aston Villa",
+    "aliases": [
+      "Aston Villa",
+      "Aston Villa FC"
+    ]
+  },
+  {
+    "id": "chelsea",
+    "name": "Chelsea",
+    "aliases": [
+      "Chelsea",
+      "Chelsea FC"
+    ]
+  },
+  {
+    "id": "liverpool",
+    "name": "Liverpool",
+    "aliases": [
+      "Liverpool",
+      "Liverpool FC"
+    ]
+  },
+  {
+    "id": "manchestercity",
+    "name": "Manchester City",
+    "aliases": [
+      "Man City",
+      "Manchester City",
+      "Manchester City FC",
+      "Man City FC"
+    ]
+  },
+  {
+    "id": "manchesterunited",
+    "name": "Manchester United",
+    "aliases": [
+      "Man Utd",
+      "Manchester United",
+      "Man United",
+      "Manchester United FC",
+      "Man Utd FC"
+    ]
+  },
+  {
+    "id": "tottenham",
+    "name": "Tottenham",
+    "aliases": [
+      "Tottenham Hotspur",
+      "Spurs",
+      "Tottenham",
+      "Tottenham FC"
+    ]
+  },
+  {
+    "id": "leicester",
+    "name": "Leicester",
+    "aliases": [
+      "Leicester City",
+      "Leicester"
+    ]
+  },
+  {
+    "id": "everton",
+    "name": "Everton",
+    "aliases": [
+      "Everton FC",
+      "Everton"
+    ]
+  },
+  {
+    "id": "newcastle",
+    "name": "Newcastle",
+    "aliases": [
+      "Newcastle United",
+      "Newcastle",
+      "Newcastle Utd"
+    ]
+  },
+  {
+    "id": "westham",
+    "name": "West Ham",
+    "aliases": [
+      "West Ham United",
+      "West Ham",
+      "West Ham Utd"
+    ]
+  },
+  {
+    "id": "crystalpalace",
+    "name": "Crystal Palace",
+    "aliases": [
+      "Crystal Palace FC",
+      "Crystal Palace"
+    ]
+  },
+  {
+    "id": "southampton",
+    "name": "Southampton",
+    "aliases": [
+      "Southampton FC",
+      "Southampton"
+    ]
+  },
+  {
+    "id": "wolves",
+    "name": "Wolves",
+    "aliases": [
+      "Wolverhampton Wanderers",
+      "Wolves",
+      "Wolverhampton"
+    ]
+  },
+  {
+    "id": "leeds",
+    "name": "Leeds",
+    "aliases": [
+      "Leeds United",
+      "Leeds",
+      "Leeds Utd"
+    ]
+  },
+  {
+    "id": "burnley",
+    "name": "Burnley",
+    "aliases": [
+      "Burnley FC",
+      "Burnley"
+    ]
+  },
+  {
+    "id": "watford",
+    "name": "Watford",
+    "aliases": [
+      "Watford FC",
+      "Watford"
+    ]
+  },
+  {
+    "id": "norwich",
+    "name": "Norwich",
+    "aliases": [
+      "Norwich City",
+      "Norwich"
+    ]
+  },
+  {
+    "id": "bournemouth",
+    "name": "Bournemouth",
+    "aliases": [
+      "AFC Bournemouth",
+      "Bournemouth"
+    ]
+  },
+  {
+    "id": "brighton",
+    "name": "Brighton",
+    "aliases": [
+      "Brighton & Hove Albion",
+      "Brighton",
+      "Brighton Albion"
+    ]
+  },
+  {
+    "id": "fulham",
+    "name": "Fulham",
+    "aliases": [
+      "Fulham FC",
+      "Fulham"
+    ]
+  },
+  {
+    "id": "sheffieldunited",
+    "name": "Sheffield United",
+    "aliases": [
+      "Sheffield Utd",
+      "Sheffield United",
+      "Sheffield Utd FC"
+    ]
+  },
+  {
+    "id": "brentford",
+    "name": "Brentford",
+    "aliases": [
+      "Brentford FC",
+      "Brentford"
+    ]
+  },
+  {
+    "id": "nottinghamforest",
+    "name": "Nottingham Forest",
+    "aliases": [
+      "Nottingham Forest FC",
+      "Nottingham Forest",
+      "Nottingham"
+    ]
+  },
+  {
+    "id": "luton",
+    "name": "Luton",
+    "aliases": [
+      "Luton Town",
+      "Luton"
+    ]
+  },
+  {
+    "id": "middlesbrough",
+    "name": "Middlesbrough",
+    "aliases": [
+      "Middlesbrough FC",
+      "Middlesbrough"
+    ]
+  },
+  {
+    "id": "sunderland",
+    "name": "Sunderland",
+    "aliases": [
+      "Sunderland AFC",
+      "Sunderland"
+    ]
+  },
+  {
+    "id": "hull",
+    "name": "Hull",
+    "aliases": [
+      "Hull City",
+      "Hull"
+    ]
+  },
+  {
+    "id": "swansea",
+    "name": "Swansea",
+    "aliases": [
+      "Swansea City",
+      "Swansea"
+    ]
+  },
+  {
+    "id": "westbrom",
+    "name": "West Brom",
+    "aliases": [
+      "West Bromwich Albion",
+      "West Brom",
+      "West Bromwich"
+    ]
+  },
+  {
+    "id": "stoke",
+    "name": "Stoke",
+    "aliases": [
+      "Stoke City",
+      "Stoke"
+    ]
+  },
+  {
+    "id": "ipswich",
+    "name": "Ipswich",
+    "aliases": [
+      "Ipswich Town",
+      "Ipswich"
+    ]
+  }
+]

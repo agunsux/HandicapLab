@@ -1,0 +1,39 @@
+{
+  "runId": "run-d624e275",
+  "gitCommit": "829d2b1df4b5",
+  "durationMs": 22045,
+  "cpuTimeMs": 22045,
+  "rowsProcessed": 1900,
+  "rowsPerSecond": 86,
+  "peakMemoryMB": 39.01,
+  "mergeConflictsCount": 3,
+  "skippedFixturesCount": 0,
+  "qualityReport": {
+    "overallScore": 89.96,
+    "missingPct": 19.98,
+    "conflictPct": 0.16,
+    "mergedPct": 0.11,
+    "aliasPct": 100,
+    "duplicatePct": 0,
+    "coveragePct": 0.11,
+    "conflictCount": 3,
+    "duplicateCount": 0,
+    "missingOddsCount": 0,
+    "missingXgCount": 1898,
+    "issues": [
+      "Found 1898 fixtures with missing expected goals (xG).",
+      "Detected 3 field-level provider conflicts."
+    ]
+  },
+  "executionMode": "available-only",
+  "requestedSeasons": 10,
+  "processedSeasons": 5,
+  "skippedSeasons": [
+    "2015-2016",
+    "2016-2017",
+    "2017-2018",
+    "2018-2019",
+    "2019-2020"
+  ],
+  "datasetCompleteness": 50
+}

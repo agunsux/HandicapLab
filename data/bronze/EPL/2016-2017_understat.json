@@ -1,0 +1,2882 @@
+[
+  {
+    "fixtureId": "20bcdcc0023a4e0ac75c4fb468fb26ee333a7cb79045749d8e49ac15fb4b1bf3",
+    "fixtureNaturalKey": "EPL|2016-2017|ARSENAL|CHELSEA|2016-09-11",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "arsenal",
+    "awayTeamId": "chelsea",
+    "homeGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 0.79,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.5,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "b7b25e2348841a81292d45ed8ca7dfef2187f4383eaacf7c6dbe7ee8864234ec",
+    "fixtureNaturalKey": "EPL|2016-2017|ARSENAL|LIVERPOOL|2016-09-12",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "arsenal",
+    "awayTeamId": "liverpool",
+    "homeGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 0.63,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.66,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "d36fae9d0e28eec8863c43f8a56b4c04041cbeb40eb0ed5e2cd0307c628f1b18",
+    "fixtureNaturalKey": "EPL|2016-2017|ARSENAL|MANCHESTERUNITED|2016-09-13",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "arsenal",
+    "awayTeamId": "manchesterunited",
+    "homeGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.2,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.32,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "7d0f14e55de429226e079bb4f7b3412478ba1a1aa36dc6f2fa6ce0f1a17227c8",
+    "fixtureNaturalKey": "EPL|2016-2017|ARSENAL|MANCHESTERCITY|2016-09-14",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "arsenal",
+    "awayTeamId": "manchestercity",
+    "homeGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.16,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.96,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "767aadbbbe3190227a6bfb8652a2d0be02121cea963ebcfbd118712278777851",
+    "fixtureNaturalKey": "EPL|2016-2017|ARSENAL|TOTTENHAM|2016-09-15",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "arsenal",
+    "awayTeamId": "tottenham",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.72,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.13,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "118125f65a90a3315ba60549e49856606cbe1562186bbabbdfd7d18244380508",
+    "fixtureNaturalKey": "EPL|2016-2017|ARSENAL|EVERTON|2016-09-16",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "arsenal",
+    "awayTeamId": "everton",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.19,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.27,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "8b1e03560175c27baef5cf2c0de0f6dac0a4a96fb39490ccd09d7119630c266f",
+    "fixtureNaturalKey": "EPL|2016-2017|ARSENAL|NEWCASTLE|2016-09-17",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "arsenal",
+    "awayTeamId": "newcastle",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.83,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.25,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "7b8101a05c17c28a18e5c421d783a06d6d1d67fdb87951a828c65faef15eb6c5",
+    "fixtureNaturalKey": "EPL|2016-2017|ARSENAL|LEICESTER|2016-09-18",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "arsenal",
+    "awayTeamId": "leicester",
+    "homeGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 0.79,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.61,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "073e8982a190378a6c0d47d19df8e290767c397f5d9f15d1aa758f733c728c47",
+    "fixtureNaturalKey": "EPL|2016-2017|ARSENAL|WESTHAM|2016-09-19",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "arsenal",
+    "awayTeamId": "westham",
+    "homeGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 0.55,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.87,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "f433c91ee12b462d07a62a6b0a46519db414bffa30053fed894bb9fbf1822674",
+    "fixtureNaturalKey": "EPL|2016-2017|CHELSEA|ARSENAL|2016-09-20",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "chelsea",
+    "awayTeamId": "arsenal",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.34,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.68,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "c11ae6b82bde0cbaf211c325e83885c6d51c281bbdc7f7a41fdda28020ff8e77",
+    "fixtureNaturalKey": "EPL|2016-2017|CHELSEA|LIVERPOOL|2016-09-21",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "chelsea",
+    "awayTeamId": "liverpool",
+    "homeGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 0.82,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.27,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "b46469d5566074fa3f56bc7228ac989f3af8d58c5878cd5b9a8bc79079f2a969",
+    "fixtureNaturalKey": "EPL|2016-2017|CHELSEA|MANCHESTERUNITED|2016-09-22",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "chelsea",
+    "awayTeamId": "manchesterunited",
+    "homeGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 0.99,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.17,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "91cf6d86fdbf51623320b59f79ea5dcff5cb6c28b9e346eb9bbe14dad1741e6f",
+    "fixtureNaturalKey": "EPL|2016-2017|CHELSEA|MANCHESTERCITY|2016-09-23",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "chelsea",
+    "awayTeamId": "manchestercity",
+    "homeGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 0.92,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "a6168ae18594919f26fb2daee2b85d1092e6aa9a9d7069d91de1be21ec739184",
+    "fixtureNaturalKey": "EPL|2016-2017|CHELSEA|TOTTENHAM|2016-09-24",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "chelsea",
+    "awayTeamId": "tottenham",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.83,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.4,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "fab3316cf56aae1d9df7f0f57da7041c21c0b0a441874d4e343ab854c84a072b",
+    "fixtureNaturalKey": "EPL|2016-2017|CHELSEA|EVERTON|2016-09-25",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "chelsea",
+    "awayTeamId": "everton",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.03,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.43,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "9336b588ef41761651990a8fa3f9bc643721e1264ecbfc37ddb1ab1a12a3833e",
+    "fixtureNaturalKey": "EPL|2016-2017|CHELSEA|NEWCASTLE|2016-09-26",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "chelsea",
+    "awayTeamId": "newcastle",
+    "homeGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.09,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.75,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "bccd5284ebb10ef1c9ea82c55760c6913f958082e1f1ce3ea4652b2d21350eef",
+    "fixtureNaturalKey": "EPL|2016-2017|CHELSEA|LEICESTER|2016-09-27",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "chelsea",
+    "awayTeamId": "leicester",
+    "homeGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.08,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.44,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "f7549544372f8fdf18aa4b5fec14490bc216d3318206a1d460e7e240b7f82a34",
+    "fixtureNaturalKey": "EPL|2016-2017|CHELSEA|WESTHAM|2016-09-28",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "chelsea",
+    "awayTeamId": "westham",
+    "homeGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 0.8,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.51,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "d213f5d85c82401084b313aecc7b4243c4b5d22cc166a3be13fc6a1274ed0c0a",
+    "fixtureNaturalKey": "EPL|2016-2017|LIVERPOOL|ARSENAL|2016-09-29",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "liverpool",
+    "awayTeamId": "arsenal",
+    "homeGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.03,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.77,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "b8975120d94d90611a113781588f98ebf1f233c54f0cd98c212cdb8bcbd8ec2b",
+    "fixtureNaturalKey": "EPL|2016-2017|LIVERPOOL|CHELSEA|2016-09-10",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "liverpool",
+    "awayTeamId": "chelsea",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.75,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.58,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "dfee83a61bd6483da0093e54efa1c10d228b35d7cfd015a114b996250053cf0c",
+    "fixtureNaturalKey": "EPL|2016-2017|LIVERPOOL|MANCHESTERUNITED|2016-09-11",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "liverpool",
+    "awayTeamId": "manchesterunited",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.58,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.47,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "56bdc74a19b01b60f106f3ec519a4bb4a3ec7492c6b90f10c8acb603b911839e",
+    "fixtureNaturalKey": "EPL|2016-2017|LIVERPOOL|MANCHESTERCITY|2016-09-12",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "liverpool",
+    "awayTeamId": "manchestercity",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.01,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.68,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "4461f3f424edfb251914d9dbb4c05a1f6be54c8ed714f1a04d9390688b7872f5",
+    "fixtureNaturalKey": "EPL|2016-2017|LIVERPOOL|TOTTENHAM|2016-09-13",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "liverpool",
+    "awayTeamId": "tottenham",
+    "homeGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.34,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.94,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "4e1d20836b3853309530af2fba25644033c304f83da6d53f5508c39bbd2c3a8b",
+    "fixtureNaturalKey": "EPL|2016-2017|LIVERPOOL|EVERTON|2016-09-14",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "liverpool",
+    "awayTeamId": "everton",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.39,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.23,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "6c80d9c2dbee3da4cbd7a36d6d7b0facb7b6be3a725ae1b4359a4bf5e24870ce",
+    "fixtureNaturalKey": "EPL|2016-2017|LIVERPOOL|NEWCASTLE|2016-09-15",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "liverpool",
+    "awayTeamId": "newcastle",
+    "homeGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.04,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.51,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "81c184087a2b8d81b45aa29191604dbd445e8002b2c3ba2c18b04501d3642c82",
+    "fixtureNaturalKey": "EPL|2016-2017|LIVERPOOL|LEICESTER|2016-09-16",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "liverpool",
+    "awayTeamId": "leicester",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.65,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.75,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "22a5a67be98b0800ff19eb260c7fa3b5c72ded880d96459f297d717f5c802684",
+    "fixtureNaturalKey": "EPL|2016-2017|LIVERPOOL|WESTHAM|2016-09-17",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "liverpool",
+    "awayTeamId": "westham",
+    "homeGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 0.98,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.54,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "c4701cb1c1276836f6d5bbe5094c066c84f33f2116aff9a15a866a5b5a3808fc",
+    "fixtureNaturalKey": "EPL|2016-2017|MANCHESTERUNITED|ARSENAL|2016-09-18",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "manchesterunited",
+    "awayTeamId": "arsenal",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.34,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.55,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "7014706f8457c967039ebc92c634e69c20fdc0921eca91ea75810006f8df1331",
+    "fixtureNaturalKey": "EPL|2016-2017|MANCHESTERUNITED|CHELSEA|2016-09-19",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "manchesterunited",
+    "awayTeamId": "chelsea",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.27,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.29,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "8bfa6ce4f04fd5231b8c32f134f3cafa5703808bdf2817bbb060383c212912d1",
+    "fixtureNaturalKey": "EPL|2016-2017|MANCHESTERUNITED|LIVERPOOL|2016-09-20",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "manchesterunited",
+    "awayTeamId": "liverpool",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.97,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.13,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "0353f6c0df943092733c0b171b362b3578a647b7d7a84070830baf12c0594288",
+    "fixtureNaturalKey": "EPL|2016-2017|MANCHESTERUNITED|MANCHESTERCITY|2016-09-21",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "manchesterunited",
+    "awayTeamId": "manchestercity",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.54,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.03,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "fc1556b7c57a4a975c53af33de5f8aa6f822598907153db14780a8b3f7b9bfba",
+    "fixtureNaturalKey": "EPL|2016-2017|MANCHESTERUNITED|TOTTENHAM|2016-09-22",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "manchesterunited",
+    "awayTeamId": "tottenham",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.42,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.89,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "a601d86798278c9e6f5f52634e5ec4f0f71183dbb8d5f9c2ee86637a508b93e8",
+    "fixtureNaturalKey": "EPL|2016-2017|MANCHESTERUNITED|EVERTON|2016-09-23",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "manchesterunited",
+    "awayTeamId": "everton",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.56,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.18,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "246a905871530dd7d72d32b7bc7a775b5ae9fa4bbee42c01df6ec995b34f5129",
+    "fixtureNaturalKey": "EPL|2016-2017|MANCHESTERUNITED|NEWCASTLE|2016-09-24",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "manchesterunited",
+    "awayTeamId": "newcastle",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.19,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.85,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "fbed10987d2774d20b1872dfc83860393bdff36d033e0509904f6a6e632ae7e5",
+    "fixtureNaturalKey": "EPL|2016-2017|MANCHESTERUNITED|LEICESTER|2016-09-25",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "manchesterunited",
+    "awayTeamId": "leicester",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.41,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.76,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "e00d79bb5e301ba98220e179ff4af3aa2793451fef222ee3f633326b5572e80e",
+    "fixtureNaturalKey": "EPL|2016-2017|MANCHESTERUNITED|WESTHAM|2016-09-26",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "manchesterunited",
+    "awayTeamId": "westham",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.07,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.23,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "97451203e3f8a64b2de51b0298323ee8c835c8d518d5517a412a9091c57197ac",
+    "fixtureNaturalKey": "EPL|2016-2017|MANCHESTERCITY|ARSENAL|2016-09-27",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "manchestercity",
+    "awayTeamId": "arsenal",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 0,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.65,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.31,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "2928b4c21128c7b66e88e11d00068153e77a5ba7f448ef7cdff85f5bd8aba15b",
+    "fixtureNaturalKey": "EPL|2016-2017|MANCHESTERCITY|CHELSEA|2016-09-28",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "manchestercity",
+    "awayTeamId": "chelsea",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.51,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.01,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "800447a1fc359a2a3ffe70e3aa574e66eff5d2026b6bb8e0dd6671d2e591a486",
+    "fixtureNaturalKey": "EPL|2016-2017|MANCHESTERCITY|LIVERPOOL|2016-09-29",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "manchestercity",
+    "awayTeamId": "liverpool",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.38,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.79,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "31596fcfc98ddd7681e04682250d337014a1200fb57e65902134165165aa50e6",
+    "fixtureNaturalKey": "EPL|2016-2017|MANCHESTERCITY|MANCHESTERUNITED|2016-09-10",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "manchestercity",
+    "awayTeamId": "manchesterunited",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.8,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.88,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "0ffac2fd12af8a7ba12b05e04ec935e5b850306f24621f3f74b262edf04c1de3",
+    "fixtureNaturalKey": "EPL|2016-2017|MANCHESTERCITY|TOTTENHAM|2016-09-11",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "manchestercity",
+    "awayTeamId": "tottenham",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.9,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.23,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "dfbfbb6f1bc7cede55001d6258221bcaae5a2d5838d4a5d4e238da94b9b3e33c",
+    "fixtureNaturalKey": "EPL|2016-2017|MANCHESTERCITY|EVERTON|2016-09-12",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "manchestercity",
+    "awayTeamId": "everton",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.65,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.62,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "eea30c2bee941f15117331ccec1f9d5550eadd9b00bd27ac063475764b981ad7",
+    "fixtureNaturalKey": "EPL|2016-2017|MANCHESTERCITY|NEWCASTLE|2016-09-13",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "manchestercity",
+    "awayTeamId": "newcastle",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.73,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.61,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "4b8744363d822c28c2048730e9045b30ad980a1ae915ae6c1e7af6ab6ff4ce2d",
+    "fixtureNaturalKey": "EPL|2016-2017|MANCHESTERCITY|LEICESTER|2016-09-14",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "manchestercity",
+    "awayTeamId": "leicester",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.31,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.01,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "cdba4a702fe3a1dddb7df9168cfa37a79309abbb50afe769949ffa134b18895b",
+    "fixtureNaturalKey": "EPL|2016-2017|MANCHESTERCITY|WESTHAM|2016-09-15",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "manchestercity",
+    "awayTeamId": "westham",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.47,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.31,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "175058aea7777f8289b949f4a3f81d47ddb77146f4d30b239be8d372e3b20a5f",
+    "fixtureNaturalKey": "EPL|2016-2017|TOTTENHAM|ARSENAL|2016-09-16",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "tottenham",
+    "awayTeamId": "arsenal",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.63,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.89,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "9fafd5c8174e49e2c996c22af846b20ba030c6bb93adf9134a56d330a871ac1c",
+    "fixtureNaturalKey": "EPL|2016-2017|TOTTENHAM|CHELSEA|2016-09-17",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "tottenham",
+    "awayTeamId": "chelsea",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.85,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.02,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "519cb67d125ba7e1830a7962e7cba9e554364807fb8ad5d028b5956f2358adc9",
+    "fixtureNaturalKey": "EPL|2016-2017|TOTTENHAM|LIVERPOOL|2016-09-18",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "tottenham",
+    "awayTeamId": "liverpool",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.55,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.64,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "93d6d9870a86899b2c2599182aa4e663be8bebeb645bd5a1fc8777a6ef86fb7b",
+    "fixtureNaturalKey": "EPL|2016-2017|TOTTENHAM|MANCHESTERUNITED|2016-09-19",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "tottenham",
+    "awayTeamId": "manchesterunited",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.9,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.71,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "0f28614ec0f610389e2217effc76babe45fa79bdc6e0d4ee5ac42366f295a1c9",
+    "fixtureNaturalKey": "EPL|2016-2017|TOTTENHAM|MANCHESTERCITY|2016-09-20",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "tottenham",
+    "awayTeamId": "manchestercity",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.31,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.08,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "724cbd73546e8683bdc9dd8bc0829d704276ec3d13a72b92432cc6f138be1f24",
+    "fixtureNaturalKey": "EPL|2016-2017|TOTTENHAM|EVERTON|2016-09-21",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "tottenham",
+    "awayTeamId": "everton",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.54,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.48,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "9f151ad91cfe9c2637606e143a5e27b5d2ac9721167689b3bcd08731e312cb18",
+    "fixtureNaturalKey": "EPL|2016-2017|TOTTENHAM|NEWCASTLE|2016-09-22",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "tottenham",
+    "awayTeamId": "newcastle",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.69,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.38,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "e7c5ecd9b1302ebc34acba11d027f9363ed40f1b6514639c5c59b99c17b45bf4",
+    "fixtureNaturalKey": "EPL|2016-2017|TOTTENHAM|LEICESTER|2016-09-23",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "tottenham",
+    "awayTeamId": "leicester",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.6,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.02,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "64f35e1f6a68b03624f1376ad74a610b2e77b3ba9ff4582cb72552b471714814",
+    "fixtureNaturalKey": "EPL|2016-2017|TOTTENHAM|WESTHAM|2016-09-24",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "tottenham",
+    "awayTeamId": "westham",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.51,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.34,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "fe68a0b20ad11e9b2d308b27488a614a7642ec48c1ba3b74687ac7c7767ce6e0",
+    "fixtureNaturalKey": "EPL|2016-2017|EVERTON|ARSENAL|2016-09-25",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "everton",
+    "awayTeamId": "arsenal",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 0,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.75,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.38,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "5cdcce66e1aca39dfd564c1269ed7e1eb1abf3eca050ecc0eac3b89088de4cc3",
+    "fixtureNaturalKey": "EPL|2016-2017|EVERTON|CHELSEA|2016-09-26",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "everton",
+    "awayTeamId": "chelsea",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.23,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.56,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "39f01dc68e9c265dcc657969c4978d84a3357a22766e83e75adcf2187444673e",
+    "fixtureNaturalKey": "EPL|2016-2017|EVERTON|LIVERPOOL|2016-09-27",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "everton",
+    "awayTeamId": "liverpool",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.82,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.74,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "d0b05b1100c24ed073086ec99302cb11ace3047298f18b2c49572743560543a5",
+    "fixtureNaturalKey": "EPL|2016-2017|EVERTON|MANCHESTERUNITED|2016-09-28",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "everton",
+    "awayTeamId": "manchesterunited",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.48,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.61,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "993cb1e209e63a9070a826a151dc4cd1086181145795368dff4dbd0b4804888e",
+    "fixtureNaturalKey": "EPL|2016-2017|EVERTON|MANCHESTERCITY|2016-09-29",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "everton",
+    "awayTeamId": "manchestercity",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.23,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.96,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "059f125ec6b41709c3d19c573171ec2c28118eb4bf3f9e3ef238d3f3837525f9",
+    "fixtureNaturalKey": "EPL|2016-2017|EVERTON|TOTTENHAM|2016-09-10",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "everton",
+    "awayTeamId": "tottenham",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.93,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.71,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "3498d3ddbefed028160066707c5118c1727a8d16853448179bcafc720807fac0",
+    "fixtureNaturalKey": "EPL|2016-2017|EVERTON|NEWCASTLE|2016-09-11",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "everton",
+    "awayTeamId": "newcastle",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.36,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.52,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "4e721e96287cd4a63565131f92527761cde430aa37e93e927e40e016e8acd969",
+    "fixtureNaturalKey": "EPL|2016-2017|EVERTON|LEICESTER|2016-09-12",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "everton",
+    "awayTeamId": "leicester",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.74,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.87,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "dffba8876936417cf57e4b49c438af01f931d3db3a74e080857c7546213048d1",
+    "fixtureNaturalKey": "EPL|2016-2017|EVERTON|WESTHAM|2016-09-13",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "everton",
+    "awayTeamId": "westham",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 1.96,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.06,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "e4e00d3ed65e48bbdde9c10c748214c5766a14d0a93cfb7fd70503c95eb996b2",
+    "fixtureNaturalKey": "EPL|2016-2017|NEWCASTLE|ARSENAL|2016-09-14",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "newcastle",
+    "awayTeamId": "arsenal",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.11,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.46,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "f8d1cb619a389a00ea56e76cd11b05deabb9598c1b94c65672f72d94c7ba805d",
+    "fixtureNaturalKey": "EPL|2016-2017|NEWCASTLE|CHELSEA|2016-09-15",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "newcastle",
+    "awayTeamId": "chelsea",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.28,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.6,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "f181d8ec8b5fa22ad78b3e7ffbfbcfedbeb172e18b8603a1f3f501882712b1c1",
+    "fixtureNaturalKey": "EPL|2016-2017|NEWCASTLE|LIVERPOOL|2016-09-16",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "newcastle",
+    "awayTeamId": "liverpool",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.77,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.69,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "cce676642cd4d617698548ce86d7e063403ccedb897cf108a8144aa47e4c57e7",
+    "fixtureNaturalKey": "EPL|2016-2017|NEWCASTLE|MANCHESTERUNITED|2016-09-17",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "newcastle",
+    "awayTeamId": "manchesterunited",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.98,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.85,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "49dd88cd95b88aeb5bb0c6d7fb5e62c6b54a362892fd97750894bf8c692d4564",
+    "fixtureNaturalKey": "EPL|2016-2017|NEWCASTLE|MANCHESTERCITY|2016-09-18",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "newcastle",
+    "awayTeamId": "manchestercity",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.91,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.05,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "31180640f098aca65371fbc2121a5f897038ac00c25539e6de84d83d0e3d7436",
+    "fixtureNaturalKey": "EPL|2016-2017|NEWCASTLE|TOTTENHAM|2016-09-19",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "newcastle",
+    "awayTeamId": "tottenham",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.12,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.69,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "d47e84aca57e54d9ee14c6b7cbed363f20d6ce3d37cd07fbccf0e0d9e37dbf94",
+    "fixtureNaturalKey": "EPL|2016-2017|NEWCASTLE|EVERTON|2016-09-20",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "newcastle",
+    "awayTeamId": "everton",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.03,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.2,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "607f2d1d775f39cb58ca675654e0b50aa4669d9330dd6698e3236b83ffb12343",
+    "fixtureNaturalKey": "EPL|2016-2017|NEWCASTLE|LEICESTER|2016-09-21",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "newcastle",
+    "awayTeamId": "leicester",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.7,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.69,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "fb67caf3b3d7b6c259c6a5db487a64ff8bc11795710b5acd5cee5c864d2657fb",
+    "fixtureNaturalKey": "EPL|2016-2017|NEWCASTLE|WESTHAM|2016-09-22",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "newcastle",
+    "awayTeamId": "westham",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.05,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.08,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "b758fb2819d630c91f2c42e6667c81a12d5a4798ec727e8558c4caf5dd18230f",
+    "fixtureNaturalKey": "EPL|2016-2017|LEICESTER|ARSENAL|2016-09-23",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "leicester",
+    "awayTeamId": "arsenal",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.5,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.52,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "f67d01a53c4f5da5da17234abe5f3dc3b25721243943af72f8533e684b84c2a6",
+    "fixtureNaturalKey": "EPL|2016-2017|LEICESTER|CHELSEA|2016-09-24",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "leicester",
+    "awayTeamId": "chelsea",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.26,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.4,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "44ef9be4d6bf00382878e5689b43294fb3f904a3a2de201b470a8fc88354120a",
+    "fixtureNaturalKey": "EPL|2016-2017|LEICESTER|LIVERPOOL|2016-09-25",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "leicester",
+    "awayTeamId": "liverpool",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.72,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.76,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "fd0d1cf725236960d92a08eb999d523448ab5d17505c9f804fd75c6e4334ebe9",
+    "fixtureNaturalKey": "EPL|2016-2017|LEICESTER|MANCHESTERUNITED|2016-09-26",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "leicester",
+    "awayTeamId": "manchesterunited",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 3.03,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.47,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "7c02d1d4eabb303f5c4123b52eccb8133d2f67e0bd0b450514b72266d09d6327",
+    "fixtureNaturalKey": "EPL|2016-2017|LEICESTER|MANCHESTERCITY|2016-09-27",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "leicester",
+    "awayTeamId": "manchestercity",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.59,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.81,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "b30dbe63ffff6115278c354315f26e204c5751757963435ef75a3911b47d59e9",
+    "fixtureNaturalKey": "EPL|2016-2017|LEICESTER|TOTTENHAM|2016-09-28",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "leicester",
+    "awayTeamId": "tottenham",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.37,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.7,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "bdc230ba564710d7a09db2a34c269190acf9d4bc705a183a804bda39444c3075",
+    "fixtureNaturalKey": "EPL|2016-2017|LEICESTER|EVERTON|2016-09-29",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "leicester",
+    "awayTeamId": "everton",
+    "homeGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.41,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.39,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "35b69bbab841e3c426c58c3683ba3427f30939b2805272527591628259885fab",
+    "fixtureNaturalKey": "EPL|2016-2017|LEICESTER|NEWCASTLE|2016-09-10",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "leicester",
+    "awayTeamId": "newcastle",
+    "homeGoals": {
+      "value": 4,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 3.22,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.37,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "756aa34a3bcb451fd7523426bf97c0632530382b509262c68fff2c2782840d0d",
+    "fixtureNaturalKey": "EPL|2016-2017|LEICESTER|WESTHAM|2016-09-11",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "leicester",
+    "awayTeamId": "westham",
+    "homeGoals": {
+      "value": 4,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 3.59,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.32,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "b28cd1f9a9b78d8d311415ba0ab65a73c81c91e82bc3063f7798cca28fb7bd76",
+    "fixtureNaturalKey": "EPL|2016-2017|WESTHAM|ARSENAL|2016-09-12",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "westham",
+    "awayTeamId": "arsenal",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.62,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.84,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "d23cf3b54661bc1c5b70021a76e48fc4d84c72ac05756bf94f3ea095abf05b07",
+    "fixtureNaturalKey": "EPL|2016-2017|WESTHAM|CHELSEA|2016-09-13",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "westham",
+    "awayTeamId": "chelsea",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.58,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.73,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "9eaec89b7cb5218f5ecf8be87a727b36be4e0c7e840cfe82aed19cd6055d66a5",
+    "fixtureNaturalKey": "EPL|2016-2017|WESTHAM|LIVERPOOL|2016-09-14",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "westham",
+    "awayTeamId": "liverpool",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.96,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.35,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "1b34925f462769fdf6dc3377a49e9b0a8391a802f9bb47a5bf707774f5b98bec",
+    "fixtureNaturalKey": "EPL|2016-2017|WESTHAM|MANCHESTERUNITED|2016-09-15",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "westham",
+    "awayTeamId": "manchesterunited",
+    "homeGoals": {
+      "value": 4,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 3.75,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.13,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "2279d4db151744a6d2d69bfc654459f11bc3e39371a9ad81262722639679e3f1",
+    "fixtureNaturalKey": "EPL|2016-2017|WESTHAM|MANCHESTERCITY|2016-09-16",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "westham",
+    "awayTeamId": "manchestercity",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 1,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 3.24,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 0.99,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "e784c764621776a6d3a5c22bfea44659dd3d84ebd6b09ff690a3e23e6f43b5f0",
+    "fixtureNaturalKey": "EPL|2016-2017|WESTHAM|TOTTENHAM|2016-09-17",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "westham",
+    "awayTeamId": "tottenham",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.71,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.57,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "3f616ff895afb14f0c9a2c465e1402da44fb7ac3d2b7529622ac0ca3ef523416",
+    "fixtureNaturalKey": "EPL|2016-2017|WESTHAM|EVERTON|2016-09-18",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "westham",
+    "awayTeamId": "everton",
+    "homeGoals": {
+      "value": 4,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 3.49,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 1.82,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "4db34b23925eaca907932f27fe17af668a82fe5fe5266cf4855e33afa44050a8",
+    "fixtureNaturalKey": "EPL|2016-2017|WESTHAM|NEWCASTLE|2016-09-19",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "westham",
+    "awayTeamId": "newcastle",
+    "homeGoals": {
+      "value": 4,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 3.63,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.01,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  },
+  {
+    "fixtureId": "4dbd15ae9cf1dd07f73b6f6ba2452c22825023ef0ea41eb9a82c6cc1c9beddd2",
+    "fixtureNaturalKey": "EPL|2016-2017|WESTHAM|LEICESTER|2016-09-20",
+    "competitionId": "EPL",
+    "seasonId": "2016-2017",
+    "homeTeamId": "westham",
+    "awayTeamId": "leicester",
+    "homeGoals": {
+      "value": 3,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "awayGoals": {
+      "value": 2,
+      "source": "understat",
+      "confidence": 0.8,
+      "mergeReason": "highest_confidence"
+    },
+    "homeXg": {
+      "value": 2.94,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    },
+    "awayXg": {
+      "value": 2.2,
+      "source": "understat",
+      "confidence": 0.995,
+      "mergeReason": "highest_confidence"
+    }
+  }
+]
