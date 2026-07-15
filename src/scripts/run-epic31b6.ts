@@ -45,6 +45,8 @@ async function main() {
     console.log(`  Seasons Processed:    ${runResult.processedSeasons}/${runResult.requestedSeasons}`);
     console.log(`  Completeness Rate:    ${runResult.datasetCompleteness}%`);
     console.log(`  Skipped Seasons:      ${runResult.skippedSeasons.join(', ') || 'None'}`);
+    console.log(`  Research Eligible:    ${runResult.researchEligibility.eligible} (${runResult.researchEligibility.reasons.join(', ') || 'None'})`);
+    console.log(`  Usage Level:          ${runResult.researchEligibility.usageLevel}`);
     console.log(`  Total Fixtures:       ${runResult.rowsProcessed}`);
     console.log(`  Ingestion Speed:      ${runResult.rowsPerSecond} rows/sec`);
     console.log(`  Duration:             ${runResult.durationMs}ms`);

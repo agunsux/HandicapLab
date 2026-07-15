@@ -79,12 +79,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.261Z",
+        "importTimestamp": "2026-07-15T16:37:40.024Z",
         "checksum": "2c8986f31e459b6d2c16537a54a9497d2a0864bf7b3ea5464b2d1bd847327648",
         "rawJsonString": "{\"fixtureId\":\"3f8e53150eddf4486e731efa322a4faa7d6d7d6a01375b1054196fc2cca87b8e\",\"fixtureNaturalKey\":\"EPL|2020-2021|CRYSTALPALACE|SOUTHAMPTON|2020-09-12\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"crystalpalace\",\"awayTeamId\":\"southampton\",\"kickoff\":{\"value\":\"2020-09-12T15:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":5,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":9,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":5,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"J Moss\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.261Z"
+    "generatedAt": "2026-07-15T16:37:40.024Z"
   },
   {
     "fixtureId": "58c7ce806a08cf89d68b2182b296e000f1ccd117c288643c596d167e5e25cbcb",
@@ -166,12 +166,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.291Z",
+        "importTimestamp": "2026-07-15T16:37:40.077Z",
         "checksum": "5a68159e13ab078ebe7c4b7d2ff653ab1f1881199a4d004dc5b1312ad4f9f08f",
         "rawJsonString": "{\"fixtureId\":\"58c7ce806a08cf89d68b2182b296e000f1ccd117c288643c596d167e5e25cbcb\",\"fixtureNaturalKey\":\"EPL|2020-2021|LIVERPOOL|LEEDS|2020-09-12\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"liverpool\",\"awayTeamId\":\"leeds\",\"kickoff\":{\"value\":\"2020-09-12T17:30:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":4,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":22,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":6,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":6,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"M Oliver\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.291Z"
+    "generatedAt": "2026-07-15T16:37:40.077Z"
   },
   {
     "fixtureId": "c79c9d7dcae1a0f816fc337e40cf072d28bc0375e019ae6a74d569487370fa49",
@@ -253,12 +253,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.296Z",
+        "importTimestamp": "2026-07-15T16:37:40.095Z",
         "checksum": "0476704ae334687cf13fc63006b49bfd356b3aa4106e115fe273d882be4260ea",
         "rawJsonString": "{\"fixtureId\":\"c79c9d7dcae1a0f816fc337e40cf072d28bc0375e019ae6a74d569487370fa49\",\"fixtureNaturalKey\":\"EPL|2020-2021|EVERTON|WESTBROM|2020-09-19\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"everton\",\"awayTeamId\":\"westbrom\",\"kickoff\":{\"value\":\"2020-09-19T12:30:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":5,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":17,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":6,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":7,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":4,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"M Dean\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.296Z"
+    "generatedAt": "2026-07-15T16:37:40.095Z"
   },
   {
     "fixtureId": "36308bbe456d6527b543a6a9a98ac13c7bcd1e7133259af2fad40ae725825685",
@@ -340,12 +340,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.298Z",
+        "importTimestamp": "2026-07-15T16:37:40.096Z",
         "checksum": "18705e081a26264856b810d2ed77821cfd95ff2643b5094ab932c606299a3eb0",
         "rawJsonString": "{\"fixtureId\":\"36308bbe456d6527b543a6a9a98ac13c7bcd1e7133259af2fad40ae725825685\",\"fixtureNaturalKey\":\"EPL|2020-2021|LEEDS|FULHAM|2020-09-19\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"leeds\",\"awayTeamId\":\"fulham\",\"kickoff\":{\"value\":\"2020-09-19T15:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":4,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":10,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":14,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":7,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":6,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"A Taylor\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.298Z"
+    "generatedAt": "2026-07-15T16:37:40.096Z"
   },
   {
     "fixtureId": "eba32b97d4c4da849b7d781571a7b4e8185efb7e23201dfe3cedf56152f17f55",
@@ -427,19 +427,19 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.299Z",
+        "importTimestamp": "2026-07-15T16:37:40.098Z",
         "checksum": "b781f3f3fc4bb1fb5b666db1f45a2bea5dbd1c8a68d7664ddca94440e0e0fc2d",
         "rawJsonString": "{\"fixtureId\":\"eba32b97d4c4da849b7d781571a7b4e8185efb7e23201dfe3cedf56152f17f55\",\"fixtureNaturalKey\":\"EPL|2020-2021|ARSENAL|WESTHAM|2020-09-19\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"arsenal\",\"awayTeamId\":\"westham\",\"kickoff\":{\"value\":\"2020-09-19T20:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":7,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":14,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"M Oliver\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       },
       {
         "provider": "understat",
         "providerVersion": "v1.0",
-        "importTimestamp": "2026-07-15T16:34:41.299Z",
+        "importTimestamp": "2026-07-15T16:37:40.098Z",
         "checksum": "4beb6757e5fdf5b25e5bb052ada404fd9d563a6f0599b271c8055c3aa59ffa25",
         "rawJsonString": "{\"fixtureId\":\"eba32b97d4c4da849b7d781571a7b4e8185efb7e23201dfe3cedf56152f17f55\",\"fixtureNaturalKey\":\"EPL|2020-2021|ARSENAL|WESTHAM|2020-09-19\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"arsenal\",\"awayTeamId\":\"westham\",\"homeGoals\":{\"value\":2,\"source\":\"understat\",\"confidence\":0.8,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":2,\"source\":\"understat\",\"confidence\":0.8,\"mergeReason\":\"highest_confidence\"},\"homeXg\":{\"value\":1.6,\"source\":\"understat\",\"confidence\":0.995,\"mergeReason\":\"highest_confidence\"},\"awayXg\":{\"value\":2.16,\"source\":\"understat\",\"confidence\":0.995,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.299Z"
+    "generatedAt": "2026-07-15T16:37:40.098Z"
   },
   {
     "fixtureId": "e6e147e1cd63221e4aefcdfa2a2f22b56590f3cfabf6f874a8aa3e63cdc7b166",
@@ -521,12 +521,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.302Z",
+        "importTimestamp": "2026-07-15T16:37:40.102Z",
         "checksum": "c9d5eb6ca00bde060f8e638071c1c9d850ede2713c6728d8bc223699e92f7e8f",
         "rawJsonString": "{\"fixtureId\":\"e6e147e1cd63221e4aefcdfa2a2f22b56590f3cfabf6f874a8aa3e63cdc7b166\",\"fixtureNaturalKey\":\"EPL|2020-2021|LEICESTER|BURNLEY|2020-09-20\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"leicester\",\"awayTeamId\":\"burnley\",\"kickoff\":{\"value\":\"2020-09-20T19:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":4,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":14,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":16,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":6,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":5,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"L Mason\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.302Z"
+    "generatedAt": "2026-07-15T16:37:40.102Z"
   },
   {
     "fixtureId": "48884348b8f20d638d1be5308d620fcc21052fba08a1b22597dc2acb5528605b",
@@ -608,12 +608,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.303Z",
+        "importTimestamp": "2026-07-15T16:37:40.103Z",
         "checksum": "a50a8cbd8d0885130a2d06d5c3a0ec2f069081e050d0fde774a31b24dd8a2127",
         "rawJsonString": "{\"fixtureId\":\"48884348b8f20d638d1be5308d620fcc21052fba08a1b22597dc2acb5528605b\",\"fixtureNaturalKey\":\"EPL|2020-2021|ASTONVILLA|SHEFFIELDUNITED|2020-09-21\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"astonvilla\",\"awayTeamId\":\"sheffieldunited\",\"kickoff\":{\"value\":\"2020-09-21T18:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":18,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":4,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"G Scott\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.303Z"
+    "generatedAt": "2026-07-15T16:37:40.103Z"
   },
   {
     "fixtureId": "78dea80c8c662c23054bc240e43221d30843bb2b206a89c4605f415eef57c5ec",
@@ -695,12 +695,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.314Z",
+        "importTimestamp": "2026-07-15T16:37:40.113Z",
         "checksum": "3507b133b4e56cc63a1ae2ec7d896fed935576c3726bde6881f0ffe2adef164c",
         "rawJsonString": "{\"fixtureId\":\"78dea80c8c662c23054bc240e43221d30843bb2b206a89c4605f415eef57c5ec\",\"fixtureNaturalKey\":\"EPL|2020-2021|WESTHAM|WOLVES|2020-09-27\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"westham\",\"awayTeamId\":\"wolves\",\"kickoff\":{\"value\":\"2020-09-27T19:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":4,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":15,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":11,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":7,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"M Atkinson\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.314Z"
+    "generatedAt": "2026-07-15T16:37:40.113Z"
   },
   {
     "fixtureId": "d1936241217adfa9dbb3a366595e95b364172ff0c150acdfdba2e178550f6d08",
@@ -782,12 +782,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.316Z",
+        "importTimestamp": "2026-07-15T16:37:40.115Z",
         "checksum": "abedb380dcfd94a495eb58f5172af0f3c8f0b2886c6768b93d8ebca41a425539",
         "rawJsonString": "{\"fixtureId\":\"d1936241217adfa9dbb3a366595e95b364172ff0c150acdfdba2e178550f6d08\",\"fixtureNaturalKey\":\"EPL|2020-2021|LIVERPOOL|ARSENAL|2020-09-28\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"liverpool\",\"awayTeamId\":\"arsenal\",\"kickoff\":{\"value\":\"2020-09-28T20:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":21,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":4,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":8,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"C Pawson\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.316Z"
+    "generatedAt": "2026-07-15T16:37:40.115Z"
   },
   {
     "fixtureId": "1338b71adf1ab66e5beb39fc79cffd43d6003e77e7ea4942cd55294810413145",
@@ -869,12 +869,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.318Z",
+        "importTimestamp": "2026-07-15T16:37:40.116Z",
         "checksum": "d5d103b51699e73751a99230c8d9c2f9e8cb647447d15ac193bb94b7aad702c2",
         "rawJsonString": "{\"fixtureId\":\"1338b71adf1ab66e5beb39fc79cffd43d6003e77e7ea4942cd55294810413145\",\"fixtureNaturalKey\":\"EPL|2020-2021|CHELSEA|CRYSTALPALACE|2020-10-03\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"chelsea\",\"awayTeamId\":\"crystalpalace\",\"kickoff\":{\"value\":\"2020-10-03T12:30:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":4,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":17,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":4,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":6,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"M Oliver\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.318Z"
+    "generatedAt": "2026-07-15T16:37:40.116Z"
   },
   {
     "fixtureId": "bafe9c7eaa01267553194114c7be7576ea392d390b15bb238fa39dc504297e0a",
@@ -956,12 +956,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.187Z",
+        "importTimestamp": "2026-07-15T16:37:39.962Z",
         "checksum": "7071a15b33c35d90e7d30106f78d8a6ab0ac39366c55b43f59b07dc71233212b",
         "rawJsonString": "{\"fixtureId\":\"bafe9c7eaa01267553194114c7be7576ea392d390b15bb238fa39dc504297e0a\",\"fixtureNaturalKey\":\"EPL|2020-2021|FULHAM|ARSENAL|2020-09-12\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"fulham\",\"awayTeamId\":\"arsenal\",\"kickoff\":{\"value\":\"2020-09-12T12:30:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":5,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":13,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":6,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"C Kavanagh\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.187Z"
+    "generatedAt": "2026-07-15T16:37:39.962Z"
   },
   {
     "fixtureId": "507302e342978688e4a234383aa51e11a83d549d06ceb89adc91889fc2cc35ea",
@@ -1043,12 +1043,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.292Z",
+        "importTimestamp": "2026-07-15T16:37:40.092Z",
         "checksum": "687bd5725e9e8c45157468ab7cf62b0ad50e4c2acf53904db9bc8f2c9c8cec5e",
         "rawJsonString": "{\"fixtureId\":\"507302e342978688e4a234383aa51e11a83d549d06ceb89adc91889fc2cc35ea\",\"fixtureNaturalKey\":\"EPL|2020-2021|WESTHAM|NEWCASTLE|2020-09-12\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"westham\",\"awayTeamId\":\"newcastle\",\"kickoff\":{\"value\":\"2020-09-12T20:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":15,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":15,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"S Attwell\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.292Z"
+    "generatedAt": "2026-07-15T16:37:40.092Z"
   },
   {
     "fixtureId": "ff458cf6de21bd81b3ea9d4a5445ed759af5ccc444ee8f85bbe5b7c3cd9e70ce",
@@ -1130,12 +1130,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.293Z",
+        "importTimestamp": "2026-07-15T16:37:40.093Z",
         "checksum": "1cf7d97a404c64b025f0989b922983b53f87da418cf90260d8b5b334984ad870",
         "rawJsonString": "{\"fixtureId\":\"ff458cf6de21bd81b3ea9d4a5445ed759af5ccc444ee8f85bbe5b7c3cd9e70ce\",\"fixtureNaturalKey\":\"EPL|2020-2021|WESTBROM|LEICESTER|2020-09-13\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"westbrom\",\"awayTeamId\":\"leicester\",\"kickoff\":{\"value\":\"2020-09-13T14:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":7,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":13,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":7,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"A Taylor\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.293Z"
+    "generatedAt": "2026-07-15T16:37:40.093Z"
   },
   {
     "fixtureId": "3159a41bd0663a5f2849cec76a58040ea096b1bb6471ce20a83b88130c798615",
@@ -1217,12 +1217,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.294Z",
+        "importTimestamp": "2026-07-15T16:37:40.093Z",
         "checksum": "773d980decae60dcd9d7817ce91431d46863d01831d1168d9a2bb93d07de261c",
         "rawJsonString": "{\"fixtureId\":\"3159a41bd0663a5f2849cec76a58040ea096b1bb6471ce20a83b88130c798615\",\"fixtureNaturalKey\":\"EPL|2020-2021|TOTTENHAM|EVERTON|2020-09-13\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"tottenham\",\"awayTeamId\":\"everton\",\"kickoff\":{\"value\":\"2020-09-13T16:30:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":9,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":15,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":5,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":4,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"M Atkinson\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.294Z"
+    "generatedAt": "2026-07-15T16:37:40.093Z"
   },
   {
     "fixtureId": "e668651535e0afd004275a092f46bdd6ca34713026dacbd939cfd44e2fdc0d50",
@@ -1304,12 +1304,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.294Z",
+        "importTimestamp": "2026-07-15T16:37:40.094Z",
         "checksum": "b2c220c76082982f07943d6d9bfb1684718492f2ee4ba0b8cb11545b3d6770f8",
         "rawJsonString": "{\"fixtureId\":\"e668651535e0afd004275a092f46bdd6ca34713026dacbd939cfd44e2fdc0d50\",\"fixtureNaturalKey\":\"EPL|2020-2021|BRIGHTON|CHELSEA|2020-09-14\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"brighton\",\"awayTeamId\":\"chelsea\",\"kickoff\":{\"value\":\"2020-09-14T20:15:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":13,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":10,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":5,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"C Pawson\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.294Z"
+    "generatedAt": "2026-07-15T16:37:40.094Z"
   },
   {
     "fixtureId": "9c1c4c8d9870209591223b2298ac3f5867a223c944016c7c0b0c05aa8109c0f0",
@@ -1391,12 +1391,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.295Z",
+        "importTimestamp": "2026-07-15T16:37:40.095Z",
         "checksum": "2a3840a91e1000b79599c581f76ebcac3a506196a090939375037d96b3ec7be7",
         "rawJsonString": "{\"fixtureId\":\"9c1c4c8d9870209591223b2298ac3f5867a223c944016c7c0b0c05aa8109c0f0\",\"fixtureNaturalKey\":\"EPL|2020-2021|SHEFFIELDUNITED|WOLVES|2020-09-14\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"sheffieldunited\",\"awayTeamId\":\"wolves\",\"kickoff\":{\"value\":\"2020-09-14T18:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":9,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":11,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":4,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"M Dean\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.295Z"
+    "generatedAt": "2026-07-15T16:37:40.095Z"
   },
   {
     "fixtureId": "c24e651b663d07128c6b19f406afad3c4bfb477129d25bc6f76d8382ebc81772",
@@ -1478,12 +1478,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.298Z",
+        "importTimestamp": "2026-07-15T16:37:40.097Z",
         "checksum": "702e1e49b10be36005c6dcbd745adef652d73dc086cd099e423a5d2a7e471995",
         "rawJsonString": "{\"fixtureId\":\"c24e651b663d07128c6b19f406afad3c4bfb477129d25bc6f76d8382ebc81772\",\"fixtureNaturalKey\":\"EPL|2020-2021|MANCHESTERUNITED|CRYSTALPALACE|2020-09-19\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"manchesterunited\",\"awayTeamId\":\"crystalpalace\",\"kickoff\":{\"value\":\"2020-09-19T17:30:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":13,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":14,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":4,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":5,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"M Atkinson\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.298Z"
+    "generatedAt": "2026-07-15T16:37:40.097Z"
   },
   {
     "fixtureId": "38b080567ca937b06f17519011ea28847b4c50db25a00ee7ac6e0103a2e188fc",
@@ -1565,12 +1565,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.300Z",
+        "importTimestamp": "2026-07-15T16:37:40.100Z",
         "checksum": "0b27cc1b5bfcb3c92f446252fe445b5c78c09c0d6483ec5227fc7a6e087f343f",
         "rawJsonString": "{\"fixtureId\":\"38b080567ca937b06f17519011ea28847b4c50db25a00ee7ac6e0103a2e188fc\",\"fixtureNaturalKey\":\"EPL|2020-2021|SOUTHAMPTON|TOTTENHAM|2020-09-20\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"southampton\",\"awayTeamId\":\"tottenham\",\"kickoff\":{\"value\":\"2020-09-20T12:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":5,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":14,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":9,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":7,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":6,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"D Coote\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.300Z"
+    "generatedAt": "2026-07-15T16:37:40.100Z"
   },
   {
     "fixtureId": "7aa7b576117b3e47f9b44370681def693c810f989686f708cdfe14a047c0a0b1",
@@ -1652,12 +1652,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.301Z",
+        "importTimestamp": "2026-07-15T16:37:40.101Z",
         "checksum": "3088fdb432f35888ce32f39db370f9df2d8e6a5738a4d7360370efcd943db07e",
         "rawJsonString": "{\"fixtureId\":\"7aa7b576117b3e47f9b44370681def693c810f989686f708cdfe14a047c0a0b1\",\"fixtureNaturalKey\":\"EPL|2020-2021|NEWCASTLE|BRIGHTON|2020-09-20\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"newcastle\",\"awayTeamId\":\"brighton\",\"kickoff\":{\"value\":\"2020-09-20T14:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":6,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":13,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":6,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"K Friend\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.301Z"
+    "generatedAt": "2026-07-15T16:37:40.101Z"
   },
   {
     "fixtureId": "fff9cf647a99a7137587b28171286ce45e2097d371ae37c8ab1b096d68b4bdd8",
@@ -1739,12 +1739,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.302Z",
+        "importTimestamp": "2026-07-15T16:37:40.101Z",
         "checksum": "c5520a50f56c939989bfc6fed19417d580dfc8034dbcfd791b7963ef44300fe5",
         "rawJsonString": "{\"fixtureId\":\"fff9cf647a99a7137587b28171286ce45e2097d371ae37c8ab1b096d68b4bdd8\",\"fixtureNaturalKey\":\"EPL|2020-2021|CHELSEA|LIVERPOOL|2020-09-20\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"chelsea\",\"awayTeamId\":\"liverpool\",\"kickoff\":{\"value\":\"2020-09-20T16:30:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":5,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":18,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":6,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"P Tierney\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.302Z"
+    "generatedAt": "2026-07-15T16:37:40.101Z"
   },
   {
     "fixtureId": "c32363f5eb7c45e1c28faae287549a9e1120b3d05cd0969a3306d22b13615e95",
@@ -1826,12 +1826,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.308Z",
+        "importTimestamp": "2026-07-15T16:37:40.107Z",
         "checksum": "8d25636963e4e663743e55c3c285154a5489431a22ab6fdb3d0dc2ee50379d82",
         "rawJsonString": "{\"fixtureId\":\"c32363f5eb7c45e1c28faae287549a9e1120b3d05cd0969a3306d22b13615e95\",\"fixtureNaturalKey\":\"EPL|2020-2021|WESTBROM|CHELSEA|2020-09-26\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"westbrom\",\"awayTeamId\":\"chelsea\",\"kickoff\":{\"value\":\"2020-09-26T17:30:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":9,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":22,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":10,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"J Moss\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.308Z"
+    "generatedAt": "2026-07-15T16:37:40.107Z"
   },
   {
     "fixtureId": "f9cd4a938dd31f5c351ddb3a46c97cecf32b34c106fba922f7a8928bd86e3d25",
@@ -1913,12 +1913,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.311Z",
+        "importTimestamp": "2026-07-15T16:37:40.111Z",
         "checksum": "14369848a49b0a05922c2e46859c5914277a8dc867a8fdae7068735f283cce08",
         "rawJsonString": "{\"fixtureId\":\"f9cd4a938dd31f5c351ddb3a46c97cecf32b34c106fba922f7a8928bd86e3d25\",\"fixtureNaturalKey\":\"EPL|2020-2021|TOTTENHAM|NEWCASTLE|2020-09-27\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"tottenham\",\"awayTeamId\":\"newcastle\",\"kickoff\":{\"value\":\"2020-09-27T14:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":23,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":6,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":12,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"P Bankes\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.311Z"
+    "generatedAt": "2026-07-15T16:37:40.111Z"
   },
   {
     "fixtureId": "5f1e086df828db5bc1bfaa69593831405c7c3d53dc803e923833895c04f05a25",
@@ -2000,12 +2000,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.320Z",
+        "importTimestamp": "2026-07-15T16:37:40.117Z",
         "checksum": "a46c13f9457b72acf7a907c5db32dd205a4d03c3c37434ee00499c8cd840cd90",
         "rawJsonString": "{\"fixtureId\":\"5f1e086df828db5bc1bfaa69593831405c7c3d53dc803e923833895c04f05a25\",\"fixtureNaturalKey\":\"EPL|2020-2021|LEEDS|MANCHESTERCITY|2020-10-03\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"leeds\",\"awayTeamId\":\"manchestercity\",\"kickoff\":{\"value\":\"2020-10-03T17:30:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":12,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":23,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":7,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"M Dean\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.320Z"
+    "generatedAt": "2026-07-15T16:37:40.117Z"
   },
   {
     "fixtureId": "bae2b02e58b1e0e209c031b8713fa6d93502a16384cc505e96459fc9fb0718d7",
@@ -2087,12 +2087,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.404Z",
+        "importTimestamp": "2026-07-15T16:37:40.125Z",
         "checksum": "7e54bc35f699840bc43cc6b94fc7b8e5bfdb726732ba4dde401ca99d8598e59d",
         "rawJsonString": "{\"fixtureId\":\"bae2b02e58b1e0e209c031b8713fa6d93502a16384cc505e96459fc9fb0718d7\",\"fixtureNaturalKey\":\"EPL|2020-2021|EVERTON|LIVERPOOL|2020-10-17\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"everton\",\"awayTeamId\":\"liverpool\",\"kickoff\":{\"value\":\"2020-10-17T12:30:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":11,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":22,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":5,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":8,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"M Oliver\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.404Z"
+    "generatedAt": "2026-07-15T16:37:40.125Z"
   },
   {
     "fixtureId": "39f82758b6ee598dfb7e9262bb7610401ec49559612741d64d2f170705258518",
@@ -2174,12 +2174,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.406Z",
+        "importTimestamp": "2026-07-15T16:37:40.126Z",
         "checksum": "1eb09f4aff2a19511a35eecb369ced127c9782a9837d1522002ba649f0d0c972",
         "rawJsonString": "{\"fixtureId\":\"39f82758b6ee598dfb7e9262bb7610401ec49559612741d64d2f170705258518\",\"fixtureNaturalKey\":\"EPL|2020-2021|CHELSEA|SOUTHAMPTON|2020-10-17\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"chelsea\",\"awayTeamId\":\"southampton\",\"kickoff\":{\"value\":\"2020-10-17T15:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":11,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":13,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":5,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":6,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"P Bankes\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.406Z"
+    "generatedAt": "2026-07-15T16:37:40.126Z"
   },
   {
     "fixtureId": "5aa923498705c661f2438d805f67bd205cbd322c8e2c453251af8c8d65b666cb",
@@ -2261,12 +2261,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.408Z",
+        "importTimestamp": "2026-07-15T16:37:40.129Z",
         "checksum": "efc8afebe4a575209f0db4a43e5e5ca01d73b336b14e2087c6457f0fc3e3fdb5",
         "rawJsonString": "{\"fixtureId\":\"5aa923498705c661f2438d805f67bd205cbd322c8e2c453251af8c8d65b666cb\",\"fixtureNaturalKey\":\"EPL|2020-2021|SHEFFIELDUNITED|FULHAM|2020-10-18\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"sheffieldunited\",\"awayTeamId\":\"fulham\",\"kickoff\":{\"value\":\"2020-10-18T12:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":10,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":15,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":6,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":6,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"A Marriner\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.408Z"
+    "generatedAt": "2026-07-15T16:37:40.129Z"
   },
   {
     "fixtureId": "fd6743c3bb5fac04fe60f213cb7868e44803459a918e7b61e2f785f3a3a308d9",
@@ -2348,12 +2348,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.409Z",
+        "importTimestamp": "2026-07-15T16:37:40.130Z",
         "checksum": "6452b89c70714afa0e1e7bb6775081d0bb668db74d78fb3385326bffe78ab26e",
         "rawJsonString": "{\"fixtureId\":\"fd6743c3bb5fac04fe60f213cb7868e44803459a918e7b61e2f785f3a3a308d9\",\"fixtureNaturalKey\":\"EPL|2020-2021|CRYSTALPALACE|BRIGHTON|2020-10-18\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"crystalpalace\",\"awayTeamId\":\"brighton\",\"kickoff\":{\"value\":\"2020-10-18T14:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":20,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"S Attwell\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.409Z"
+    "generatedAt": "2026-07-15T16:37:40.130Z"
   },
   {
     "fixtureId": "4c4735d3196ebc27b6f37fe9526d82ff4163b055dc19f533051fe33ea9ed9bf4",
@@ -2435,12 +2435,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.410Z",
+        "importTimestamp": "2026-07-15T16:37:40.132Z",
         "checksum": "d3d0558762797c7010eba0dcd57830da5191aa54176b7b0b7aff4c0d91e4dbef",
         "rawJsonString": "{\"fixtureId\":\"4c4735d3196ebc27b6f37fe9526d82ff4163b055dc19f533051fe33ea9ed9bf4\",\"fixtureNaturalKey\":\"EPL|2020-2021|TOTTENHAM|WESTHAM|2020-10-18\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"tottenham\",\"awayTeamId\":\"westham\",\"kickoff\":{\"value\":\"2020-10-18T16:30:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":11,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":13,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":6,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":4,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"P Tierney\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.410Z"
+    "generatedAt": "2026-07-15T16:37:40.132Z"
   },
   {
     "fixtureId": "6d2fb303332f30dd7fdd98eafb77dfeddfcbfcd62d58cd89344afdc90383652a",
@@ -2522,12 +2522,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.411Z",
+        "importTimestamp": "2026-07-15T16:37:40.134Z",
         "checksum": "7d8f1e0f22167af9bef128e39e84ce9a0237b9e39a508d3abb50adb81b1ae69b",
         "rawJsonString": "{\"fixtureId\":\"6d2fb303332f30dd7fdd98eafb77dfeddfcbfcd62d58cd89344afdc90383652a\",\"fixtureNaturalKey\":\"EPL|2020-2021|WESTBROM|BURNLEY|2020-10-19\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"westbrom\",\"awayTeamId\":\"burnley\",\"kickoff\":{\"value\":\"2020-10-19T17:30:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":13,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":9,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":6,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":4,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"A Taylor\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.411Z"
+    "generatedAt": "2026-07-15T16:37:40.134Z"
   },
   {
     "fixtureId": "949e924948008a675e50445712d69240db8a5cb2e48055ce27abc599a54ac347",
@@ -2609,12 +2609,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.414Z",
+        "importTimestamp": "2026-07-15T16:37:40.139Z",
         "checksum": "cf575824275705c06882af4a474c85a5188d3f33f9d416b83c51c558e46c72fe",
         "rawJsonString": "{\"fixtureId\":\"949e924948008a675e50445712d69240db8a5cb2e48055ce27abc599a54ac347\",\"fixtureNaturalKey\":\"EPL|2020-2021|WESTHAM|MANCHESTERCITY|2020-10-24\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"westham\",\"awayTeamId\":\"manchestercity\",\"kickoff\":{\"value\":\"2020-10-24T12:30:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":6,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":14,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":7,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"A Taylor\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.414Z"
+    "generatedAt": "2026-07-15T16:37:40.139Z"
   },
   {
     "fixtureId": "74f24df1d3009cfe13b9d19ee706734136b3b665d9f17f340042443982280476",
@@ -2696,12 +2696,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.304Z",
+        "importTimestamp": "2026-07-15T16:37:40.104Z",
         "checksum": "bf664e74e3f93f08047313998966e9ab9fe1bff21a624409bdf0360c6c40674b",
         "rawJsonString": "{\"fixtureId\":\"74f24df1d3009cfe13b9d19ee706734136b3b665d9f17f340042443982280476\",\"fixtureNaturalKey\":\"EPL|2020-2021|WOLVES|MANCHESTERCITY|2020-09-21\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"wolves\",\"awayTeamId\":\"manchestercity\",\"kickoff\":{\"value\":\"2020-09-21T20:15:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":10,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":14,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":9,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"A Marriner\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.304Z"
+    "generatedAt": "2026-07-15T16:37:40.104Z"
   },
   {
     "fixtureId": "90543bfa8f88f744a11e63be66c6659aa92b9ad35c595b9e2964d1e0652039df",
@@ -2783,12 +2783,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.306Z",
+        "importTimestamp": "2026-07-15T16:37:40.105Z",
         "checksum": "d29775c9ed9399b51155f0c95e67551de2f8ad6f1a3681b22dccd5681d59a20a",
         "rawJsonString": "{\"fixtureId\":\"90543bfa8f88f744a11e63be66c6659aa92b9ad35c595b9e2964d1e0652039df\",\"fixtureNaturalKey\":\"EPL|2020-2021|BRIGHTON|MANCHESTERUNITED|2020-09-26\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"brighton\",\"awayTeamId\":\"manchesterunited\",\"kickoff\":{\"value\":\"2020-09-26T12:30:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":18,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":7,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":5,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"C Kavanagh\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.306Z"
+    "generatedAt": "2026-07-15T16:37:40.105Z"
   },
   {
     "fixtureId": "54f249a44e52ee572e5ddabaab0c46a045c97e5641bdc0d667c39c802f769a4f",
@@ -2870,12 +2870,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.307Z",
+        "importTimestamp": "2026-07-15T16:37:40.106Z",
         "checksum": "e523074b985a65e142305b01f34521737ce8fc01c79d31e9c60ba0316bea3256",
         "rawJsonString": "{\"fixtureId\":\"54f249a44e52ee572e5ddabaab0c46a045c97e5641bdc0d667c39c802f769a4f\",\"fixtureNaturalKey\":\"EPL|2020-2021|CRYSTALPALACE|EVERTON|2020-09-26\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"crystalpalace\",\"awayTeamId\":\"everton\",\"kickoff\":{\"value\":\"2020-09-26T15:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":8,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":10,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":5,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"K Friend\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.307Z"
+    "generatedAt": "2026-07-15T16:37:40.106Z"
   },
   {
     "fixtureId": "27ba0c01ca47b9d31e1d54806b55d821e825473c7fbf5f061352595083cf2ea8",
@@ -2957,12 +2957,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.309Z",
+        "importTimestamp": "2026-07-15T16:37:40.109Z",
         "checksum": "3f460174188edfad18109e3ac95c7b0f3921df25d53854f9b09a855256d5b26c",
         "rawJsonString": "{\"fixtureId\":\"27ba0c01ca47b9d31e1d54806b55d821e825473c7fbf5f061352595083cf2ea8\",\"fixtureNaturalKey\":\"EPL|2020-2021|BURNLEY|SOUTHAMPTON|2020-09-26\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"burnley\",\"awayTeamId\":\"southampton\",\"kickoff\":{\"value\":\"2020-09-26T20:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":10,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":5,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"A Marriner\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.309Z"
+    "generatedAt": "2026-07-15T16:37:40.109Z"
   },
   {
     "fixtureId": "18f42ecf69e0c3a9d1d34c239469c4be5ba3f294b1beea8d8c08fb1619b1af48",
@@ -3044,12 +3044,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.310Z",
+        "importTimestamp": "2026-07-15T16:37:40.110Z",
         "checksum": "8169c8b5f5ec1dd50e6e1eec8a12e50b2043905d6d30624fbe928348b023efd5",
         "rawJsonString": "{\"fixtureId\":\"18f42ecf69e0c3a9d1d34c239469c4be5ba3f294b1beea8d8c08fb1619b1af48\",\"fixtureNaturalKey\":\"EPL|2020-2021|SHEFFIELDUNITED|LEEDS|2020-09-27\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"sheffieldunited\",\"awayTeamId\":\"leeds\",\"kickoff\":{\"value\":\"2020-09-27T12:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":14,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":17,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":4,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":9,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"P Tierney\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.310Z"
+    "generatedAt": "2026-07-15T16:37:40.110Z"
   },
   {
     "fixtureId": "3090171403d6503c715f5d6da1227c3b3367018ff580091d5a7560a7a854b7b9",
@@ -3131,12 +3131,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.312Z",
+        "importTimestamp": "2026-07-15T16:37:40.112Z",
         "checksum": "eed84680361eca8a65b5deba1a55dff5def540277ec17dfe23db7e737e7de633",
         "rawJsonString": "{\"fixtureId\":\"3090171403d6503c715f5d6da1227c3b3367018ff580091d5a7560a7a854b7b9\",\"fixtureNaturalKey\":\"EPL|2020-2021|MANCHESTERCITY|LEICESTER|2020-09-27\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"manchestercity\",\"awayTeamId\":\"leicester\",\"kickoff\":{\"value\":\"2020-09-27T16:30:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":5,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":16,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":7,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":5,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":7,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"M Oliver\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.312Z"
+    "generatedAt": "2026-07-15T16:37:40.112Z"
   },
   {
     "fixtureId": "1290488c2d296c00072297fba0eaa9e18e0f624e89cc008a88a5522900894bd6",
@@ -3218,12 +3218,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.315Z",
+        "importTimestamp": "2026-07-15T16:37:40.114Z",
         "checksum": "a31bfc04fc4d53b5bf80d3d31f2fe07fa997d4f7bdd0dce82b4f92b516131bf7",
         "rawJsonString": "{\"fixtureId\":\"1290488c2d296c00072297fba0eaa9e18e0f624e89cc008a88a5522900894bd6\",\"fixtureNaturalKey\":\"EPL|2020-2021|FULHAM|ASTONVILLA|2020-09-28\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"fulham\",\"awayTeamId\":\"astonvilla\",\"kickoff\":{\"value\":\"2020-09-28T17:45:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":16,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":12,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":5,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"S Attwell\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.315Z"
+    "generatedAt": "2026-07-15T16:37:40.114Z"
   },
   {
     "fixtureId": "f03a0a532936fb04fa4b03cf383f2fa471b19d9d6b848e4540aeaac2c2b060f3",
@@ -3305,12 +3305,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.319Z",
+        "importTimestamp": "2026-07-15T16:37:40.116Z",
         "checksum": "4e97fc9a6723c5387ad9510128af34d35f374993ed2a1ad00f443a351bb812bb",
         "rawJsonString": "{\"fixtureId\":\"f03a0a532936fb04fa4b03cf383f2fa471b19d9d6b848e4540aeaac2c2b060f3\",\"fixtureNaturalKey\":\"EPL|2020-2021|EVERTON|BRIGHTON|2020-10-03\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"everton\",\"awayTeamId\":\"brighton\",\"kickoff\":{\"value\":\"2020-10-03T15:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":4,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":11,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":11,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":6,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"S Hooper\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.319Z"
+    "generatedAt": "2026-07-15T16:37:40.116Z"
   },
   {
     "fixtureId": "dc799f5b4da2fa5970fc231f287667f124f7f65712aac1985149f2da1ae3b9ae",
@@ -3392,12 +3392,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.322Z",
+        "importTimestamp": "2026-07-15T16:37:40.118Z",
         "checksum": "f4ec4680fe97b94dfef22230347b5336e584f3712e5a98950d99c239d8d20b0a",
         "rawJsonString": "{\"fixtureId\":\"dc799f5b4da2fa5970fc231f287667f124f7f65712aac1985149f2da1ae3b9ae\",\"fixtureNaturalKey\":\"EPL|2020-2021|NEWCASTLE|BURNLEY|2020-10-03\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"newcastle\",\"awayTeamId\":\"burnley\",\"kickoff\":{\"value\":\"2020-10-03T20:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":10,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":7,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":5,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"D Coote\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.322Z"
+    "generatedAt": "2026-07-15T16:37:40.118Z"
   },
   {
     "fixtureId": "cbb9f7b5d5d21617419de972f5ca6b4d93d86a8d88adc187720f4942afa25bfa",
@@ -3479,12 +3479,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.323Z",
+        "importTimestamp": "2026-07-15T16:37:40.119Z",
         "checksum": "c9684679fec36bd31e8a8e88b148d116f892207022a0c1e8326b435f4eac3906",
         "rawJsonString": "{\"fixtureId\":\"cbb9f7b5d5d21617419de972f5ca6b4d93d86a8d88adc187720f4942afa25bfa\",\"fixtureNaturalKey\":\"EPL|2020-2021|LEICESTER|WESTHAM|2020-10-04\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"leicester\",\"awayTeamId\":\"westham\",\"kickoff\":{\"value\":\"2020-10-04T12:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":4,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":14,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":6,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"A Madley\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.324Z"
+    "generatedAt": "2026-07-15T16:37:40.119Z"
   },
   {
     "fixtureId": "4a3cf1906d4bb429dfffc7c6f450a0fa5c800fe915fabc8bdfcb04e5f9c0a190",
@@ -3566,12 +3566,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.325Z",
+        "importTimestamp": "2026-07-15T16:37:40.120Z",
         "checksum": "d65d424fe58ae6d4c80ab29208072e3a7a56f7b99ee29bc9d61cfa8dc64a8e1b",
         "rawJsonString": "{\"fixtureId\":\"4a3cf1906d4bb429dfffc7c6f450a0fa5c800fe915fabc8bdfcb04e5f9c0a190\",\"fixtureNaturalKey\":\"EPL|2020-2021|SOUTHAMPTON|WESTBROM|2020-10-04\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"southampton\",\"awayTeamId\":\"westbrom\",\"kickoff\":{\"value\":\"2020-10-04T12:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":13,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":5,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":7,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"C Kavanagh\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.325Z"
+    "generatedAt": "2026-07-15T16:37:40.120Z"
   },
   {
     "fixtureId": "55384b9f606a40bbfe37a287fbcda2c0a11e1006c05c6fbaba6d9b14f22cdd5c",
@@ -3653,12 +3653,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.327Z",
+        "importTimestamp": "2026-07-15T16:37:40.121Z",
         "checksum": "834028ac140771c3b7235b4822783318bb4bd6c8e4e37309e3e87dea5e8188d1",
         "rawJsonString": "{\"fixtureId\":\"55384b9f606a40bbfe37a287fbcda2c0a11e1006c05c6fbaba6d9b14f22cdd5c\",\"fixtureNaturalKey\":\"EPL|2020-2021|ARSENAL|SHEFFIELDUNITED|2020-10-04\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"arsenal\",\"awayTeamId\":\"sheffieldunited\",\"kickoff\":{\"value\":\"2020-10-04T14:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":6,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":6,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":5,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"L Mason\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.327Z"
+    "generatedAt": "2026-07-15T16:37:40.121Z"
   },
   {
     "fixtureId": "eb7c8cf5476dc56c6da69d0c74f660a862ce84d57af6238db089339b92251239",
@@ -3740,12 +3740,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.328Z",
+        "importTimestamp": "2026-07-15T16:37:40.122Z",
         "checksum": "21dc372a8bdc038640b0d19450418c9c40a94685612a251cd0ec215d77d0e155",
         "rawJsonString": "{\"fixtureId\":\"eb7c8cf5476dc56c6da69d0c74f660a862ce84d57af6238db089339b92251239\",\"fixtureNaturalKey\":\"EPL|2020-2021|WOLVES|FULHAM|2020-10-04\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"wolves\",\"awayTeamId\":\"fulham\",\"kickoff\":{\"value\":\"2020-10-04T14:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":14,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":10,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":5,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"D England\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.328Z"
+    "generatedAt": "2026-07-15T16:37:40.122Z"
   },
   {
     "fixtureId": "c9d0bd178c9c83674101af4d813aa97677e30ee55b1d17a2f334898b5506bace",
@@ -3827,12 +3827,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.330Z",
+        "importTimestamp": "2026-07-15T16:37:40.123Z",
         "checksum": "bd4245dbb93ba2f59204939aa819f4c7d09bd8d170652952d68de78f9ef2a3b8",
         "rawJsonString": "{\"fixtureId\":\"c9d0bd178c9c83674101af4d813aa97677e30ee55b1d17a2f334898b5506bace\",\"fixtureNaturalKey\":\"EPL|2020-2021|MANCHESTERUNITED|TOTTENHAM|2020-10-04\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"manchesterunited\",\"awayTeamId\":\"tottenham\",\"kickoff\":{\"value\":\"2020-10-04T16:30:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":6,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":5,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":22,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":8,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"A Taylor\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.330Z"
+    "generatedAt": "2026-07-15T16:37:40.123Z"
   },
   {
     "fixtureId": "bf54d5b276f6a30d72b985731195528d9ca78ff5b6c32fc9ace5192f20cf2c05",
@@ -3914,12 +3914,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.334Z",
+        "importTimestamp": "2026-07-15T16:37:40.124Z",
         "checksum": "65629715c8e28b7bd12db26622d6651608b11b0d1986a1415c1a2b8bc23947d3",
         "rawJsonString": "{\"fixtureId\":\"bf54d5b276f6a30d72b985731195528d9ca78ff5b6c32fc9ace5192f20cf2c05\",\"fixtureNaturalKey\":\"EPL|2020-2021|ASTONVILLA|LIVERPOOL|2020-10-04\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"astonvilla\",\"awayTeamId\":\"liverpool\",\"kickoff\":{\"value\":\"2020-10-04T19:15:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":7,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":18,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":14,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":11,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":8,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"M Atkinson\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.334Z"
+    "generatedAt": "2026-07-15T16:37:40.124Z"
   },
   {
     "fixtureId": "4fd123710081c45274934e05ccb4f59859394702426775bd67a00c7c0ae2fe08",
@@ -4001,12 +4001,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.407Z",
+        "importTimestamp": "2026-07-15T16:37:40.127Z",
         "checksum": "d24ae344511c4472888f9b54d14631591d640a87f6a9602b5c072a74280defc1",
         "rawJsonString": "{\"fixtureId\":\"4fd123710081c45274934e05ccb4f59859394702426775bd67a00c7c0ae2fe08\",\"fixtureNaturalKey\":\"EPL|2020-2021|MANCHESTERCITY|ARSENAL|2020-10-17\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"manchestercity\",\"awayTeamId\":\"arsenal\",\"kickoff\":{\"value\":\"2020-10-17T17:30:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":13,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":11,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":5,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"C Kavanagh\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.407Z"
+    "generatedAt": "2026-07-15T16:37:40.127Z"
   },
   {
     "fixtureId": "5ac6b542d44795b3f6fb05cecb613dc66bdc0aeaab5e9f465022a7a3558f2f18",
@@ -4088,12 +4088,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.408Z",
+        "importTimestamp": "2026-07-15T16:37:40.128Z",
         "checksum": "c1c25de7468ebcae242c050d398127718bd6b1883c7bca0253ce1e16c7ba22d7",
         "rawJsonString": "{\"fixtureId\":\"5ac6b542d44795b3f6fb05cecb613dc66bdc0aeaab5e9f465022a7a3558f2f18\",\"fixtureNaturalKey\":\"EPL|2020-2021|NEWCASTLE|MANCHESTERUNITED|2020-10-17\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"newcastle\",\"awayTeamId\":\"manchesterunited\",\"kickoff\":{\"value\":\"2020-10-17T20:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":4,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":7,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":28,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":4,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":14,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"C Pawson\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.408Z"
+    "generatedAt": "2026-07-15T16:37:40.128Z"
   },
   {
     "fixtureId": "5e94f8fbc5030c682c0afdc478b198d8f8cb7fdc999700373c356ee62bada41f",
@@ -4175,12 +4175,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.411Z",
+        "importTimestamp": "2026-07-15T16:37:40.133Z",
         "checksum": "4828de233a18a7d0d34168a75c5effc85a6e37a43a4f9fdabfe6edbb3f0a0d6d",
         "rawJsonString": "{\"fixtureId\":\"5e94f8fbc5030c682c0afdc478b198d8f8cb7fdc999700373c356ee62bada41f\",\"fixtureNaturalKey\":\"EPL|2020-2021|LEICESTER|ASTONVILLA|2020-10-18\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"leicester\",\"awayTeamId\":\"astonvilla\",\"kickoff\":{\"value\":\"2020-10-18T19:15:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":11,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":10,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":5,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":4,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"J Moss\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.411Z"
+    "generatedAt": "2026-07-15T16:37:40.133Z"
   },
   {
     "fixtureId": "463bf1b5d830f9eb042122cd2b80a92f4f1991204842eceef9e6877552cc0a8f",
@@ -4262,12 +4262,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.412Z",
+        "importTimestamp": "2026-07-15T16:37:40.136Z",
         "checksum": "d52f0ccbfec65122c8a0885dcdb857d4fee913e9bbff4c06a5cb5310bd6e088e",
         "rawJsonString": "{\"fixtureId\":\"463bf1b5d830f9eb042122cd2b80a92f4f1991204842eceef9e6877552cc0a8f\",\"fixtureNaturalKey\":\"EPL|2020-2021|LEEDS|WOLVES|2020-10-19\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"leeds\",\"awayTeamId\":\"wolves\",\"kickoff\":{\"value\":\"2020-10-19T20:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":13,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":7,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"D Coote\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.412Z"
+    "generatedAt": "2026-07-15T16:37:40.136Z"
   },
   {
     "fixtureId": "53d40b081d9c9a2a6327c98083abda7e6e5b45ee8a0a521d46fd6bd4dd4867de",
@@ -4349,12 +4349,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.413Z",
+        "importTimestamp": "2026-07-15T16:37:40.137Z",
         "checksum": "6e5ac72107840e5d44d4c85093109eccc1b67c556a6fb6a6cdeb9554b915dacc",
         "rawJsonString": "{\"fixtureId\":\"53d40b081d9c9a2a6327c98083abda7e6e5b45ee8a0a521d46fd6bd4dd4867de\",\"fixtureNaturalKey\":\"EPL|2020-2021|ASTONVILLA|LEEDS|2020-10-23\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"astonvilla\",\"awayTeamId\":\"leeds\",\"kickoff\":{\"value\":\"2020-10-23T20:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":12,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":27,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":4,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":9,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"P Tierney\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.413Z"
+    "generatedAt": "2026-07-15T16:37:40.137Z"
   },
   {
     "fixtureId": "d2b6b53c2ae37b363a382853670d5b9d2273b445baa2d5e6039872d7625018cf",
@@ -4436,12 +4436,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.416Z",
+        "importTimestamp": "2026-07-15T16:37:40.143Z",
         "checksum": "183fcd6b64bd16afc56930543bfb44855a8a315131cbef4b9abb3e658a3be067",
         "rawJsonString": "{\"fixtureId\":\"d2b6b53c2ae37b363a382853670d5b9d2273b445baa2d5e6039872d7625018cf\",\"fixtureNaturalKey\":\"EPL|2020-2021|LIVERPOOL|SHEFFIELDUNITED|2020-10-24\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"liverpool\",\"awayTeamId\":\"sheffieldunited\",\"kickoff\":{\"value\":\"2020-10-24T20:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":17,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":13,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":5,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"M Dean\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.416Z"
+    "generatedAt": "2026-07-15T16:37:40.143Z"
   },
   {
     "fixtureId": "fc628a4ebd009693c650fd7059a5c281136361c151125115101af1de3731cec6",
@@ -4523,12 +4523,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.422Z",
+        "importTimestamp": "2026-07-15T16:37:40.152Z",
         "checksum": "95460157101493ba6a81344ca7758907b0b8c49a143401d7790afa208d54edb4",
         "rawJsonString": "{\"fixtureId\":\"fc628a4ebd009693c650fd7059a5c281136361c151125115101af1de3731cec6\",\"fixtureNaturalKey\":\"EPL|2020-2021|WOLVES|CRYSTALPALACE|2020-10-30\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"wolves\",\"awayTeamId\":\"crystalpalace\",\"kickoff\":{\"value\":\"2020-10-30T20:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":15,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":11,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":5,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"M Atkinson\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.422Z"
+    "generatedAt": "2026-07-15T16:37:40.152Z"
   },
   {
     "fixtureId": "70a173d5c2148e7f7fc457724dd8d3a4ea1493b699c3ff91216d41ed96003cae",
@@ -4610,12 +4610,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.447Z",
+        "importTimestamp": "2026-07-15T16:37:40.193Z",
         "checksum": "8c22e22ca15ea0575cbada44747548609abafc704fe6715fc74c925ca1c225d8",
         "rawJsonString": "{\"fixtureId\":\"70a173d5c2148e7f7fc457724dd8d3a4ea1493b699c3ff91216d41ed96003cae\",\"fixtureNaturalKey\":\"EPL|2020-2021|WOLVES|SOUTHAMPTON|2020-11-23\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"wolves\",\"awayTeamId\":\"southampton\",\"kickoff\":{\"value\":\"2020-11-23T20:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":20,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":7,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":9,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"A Marriner\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.447Z"
+    "generatedAt": "2026-07-15T16:37:40.193Z"
   },
   {
     "fixtureId": "1db967f8510b95d1bf21c7d6051f65b079df8eb63c3eb6a10e567ed787e5db0d",
@@ -4697,12 +4697,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.452Z",
+        "importTimestamp": "2026-07-15T16:37:40.198Z",
         "checksum": "f4aca912deeb9b149e8a822d1c6999a0883caf9a37317f058e211e20de1f5774",
         "rawJsonString": "{\"fixtureId\":\"1db967f8510b95d1bf21c7d6051f65b079df8eb63c3eb6a10e567ed787e5db0d\",\"fixtureNaturalKey\":\"EPL|2020-2021|WESTBROM|SHEFFIELDUNITED|2020-11-28\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"westbrom\",\"awayTeamId\":\"sheffieldunited\",\"kickoff\":{\"value\":\"2020-11-28T20:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":17,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":21,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":6,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":5,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"M Dean\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.452Z"
+    "generatedAt": "2026-07-15T16:37:40.198Z"
   },
   {
     "fixtureId": "7070134941fa70f2e10b3d92d50037a84f400a99afd06470992c3acbae6daed9",
@@ -4784,12 +4784,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.458Z",
+        "importTimestamp": "2026-07-15T16:37:40.202Z",
         "checksum": "bbe31a56509c385cd8d6d224dfe0625f83680f82ca264d8a6fe216e84100de65",
         "rawJsonString": "{\"fixtureId\":\"7070134941fa70f2e10b3d92d50037a84f400a99afd06470992c3acbae6daed9\",\"fixtureNaturalKey\":\"EPL|2020-2021|WESTHAM|ASTONVILLA|2020-11-30\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"westham\",\"awayTeamId\":\"astonvilla\",\"kickoff\":{\"value\":\"2020-11-30T20:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":6,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":16,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":6,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"P Bankes\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.458Z"
+    "generatedAt": "2026-07-15T16:37:40.202Z"
   },
   {
     "fixtureId": "24348d9cd75fcc85ef1491609916ead45d59f24d6055fb6cdc5a5ec91c6f0461",
@@ -4871,12 +4871,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.482Z",
+        "importTimestamp": "2026-07-15T16:37:40.222Z",
         "checksum": "7e55f5e15db4fffe5e9a03e5c06024a7a0c37ff09ad9c2fd1ed0ed8e94f65f3f",
         "rawJsonString": "{\"fixtureId\":\"24348d9cd75fcc85ef1491609916ead45d59f24d6055fb6cdc5a5ec91c6f0461\",\"fixtureNaturalKey\":\"EPL|2020-2021|LEEDS|NEWCASTLE|2020-12-16\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"leeds\",\"awayTeamId\":\"newcastle\",\"kickoff\":{\"value\":\"2020-12-16T18:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":5,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":25,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":10,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":10,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":4,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"S Hooper\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.482Z"
+    "generatedAt": "2026-07-15T16:37:40.222Z"
   },
   {
     "fixtureId": "f3ef04ab927bddbe68ef42268ebfde262328227c24cc09fd0fc5c8e404334b2f",
@@ -4958,12 +4958,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.485Z",
+        "importTimestamp": "2026-07-15T16:37:40.227Z",
         "checksum": "1c093c964558c9dc9c4b523442a1baca5595810b4ad442a8598839647d5636db",
         "rawJsonString": "{\"fixtureId\":\"f3ef04ab927bddbe68ef42268ebfde262328227c24cc09fd0fc5c8e404334b2f\",\"fixtureNaturalKey\":\"EPL|2020-2021|ASTONVILLA|BURNLEY|2020-12-17\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"astonvilla\",\"awayTeamId\":\"burnley\",\"kickoff\":{\"value\":\"2020-12-17T18:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":27,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":6,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":7,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":4,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"C Pawson\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.485Z"
+    "generatedAt": "2026-07-15T16:37:40.227Z"
   },
   {
     "fixtureId": "09994820c8e8776be40978fb1aca5d2c354ec4b5a4ba8eafdc9157dd5220aa5d",
@@ -5045,12 +5045,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.492Z",
+        "importTimestamp": "2026-07-15T16:37:40.233Z",
         "checksum": "c73b38bfd335d7ef88a4ab9958ee688b2aa69830253489a520a8c5cbc6210534",
         "rawJsonString": "{\"fixtureId\":\"09994820c8e8776be40978fb1aca5d2c354ec4b5a4ba8eafdc9157dd5220aa5d\",\"fixtureNaturalKey\":\"EPL|2020-2021|MANCHESTERUNITED|LEEDS|2020-12-20\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"manchesterunited\",\"awayTeamId\":\"leeds\",\"kickoff\":{\"value\":\"2020-12-20T16:30:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":6,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":26,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":17,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":14,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"A Taylor\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.492Z"
+    "generatedAt": "2026-07-15T16:37:40.233Z"
   },
   {
     "fixtureId": "373c15760f90646920463de4b0cd435f4483e886dcc7bf92a14eeeeaa1a0ec42",
@@ -5132,12 +5132,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.494Z",
+        "importTimestamp": "2026-07-15T16:37:40.236Z",
         "checksum": "2c68d72761ed92a75e4e819aa81c9418c8c275cf99d1d88508f5110f28ac3ead",
         "rawJsonString": "{\"fixtureId\":\"373c15760f90646920463de4b0cd435f4483e886dcc7bf92a14eeeeaa1a0ec42\",\"fixtureNaturalKey\":\"EPL|2020-2021|CHELSEA|WESTHAM|2020-12-21\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"chelsea\",\"awayTeamId\":\"westham\",\"kickoff\":{\"value\":\"2020-12-21T20:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":11,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":6,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":7,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"C Kavanagh\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.494Z"
+    "generatedAt": "2026-07-15T16:37:40.236Z"
   },
   {
     "fixtureId": "7261d5d915a80f7104759e5a1e6f01d2804a3b8f58fdb8b9df501bdf9f142878",
@@ -5219,12 +5219,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.501Z",
+        "importTimestamp": "2026-07-15T16:37:40.242Z",
         "checksum": "14c83ca55f336a81cf1e18fb954a89b6fbdebf571d15523bbc6fd1782cd1be3d",
         "rawJsonString": "{\"fixtureId\":\"7261d5d915a80f7104759e5a1e6f01d2804a3b8f58fdb8b9df501bdf9f142878\",\"fixtureNaturalKey\":\"EPL|2020-2021|WESTHAM|BRIGHTON|2020-12-27\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"westham\",\"awayTeamId\":\"brighton\",\"kickoff\":{\"value\":\"2020-12-27T14:15:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":11,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":13,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":4,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":4,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"S Hooper\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.501Z"
+    "generatedAt": "2026-07-15T16:37:40.242Z"
   },
   {
     "fixtureId": "640b47f09442c7ceeb22f2257412800b1fe2fadc319fd905e58d889dde8c65c8",
@@ -5306,12 +5306,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.416Z",
+        "importTimestamp": "2026-07-15T16:37:40.142Z",
         "checksum": "8207765371a5dd4b1617c426b900973fc3eb880c187971ad713e9a9dff2d7cf8",
         "rawJsonString": "{\"fixtureId\":\"640b47f09442c7ceeb22f2257412800b1fe2fadc319fd905e58d889dde8c65c8\",\"fixtureNaturalKey\":\"EPL|2020-2021|MANCHESTERUNITED|CHELSEA|2020-10-24\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"manchesterunited\",\"awayTeamId\":\"chelsea\",\"kickoff\":{\"value\":\"2020-10-24T17:30:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":14,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":6,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":4,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"M Atkinson\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.416Z"
+    "generatedAt": "2026-07-15T16:37:40.142Z"
   },
   {
     "fixtureId": "5516f19154f4edf2b65cda526a8030bc0fbe27f6cf107c375461e71b5919135c",
@@ -5393,12 +5393,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.427Z",
+        "importTimestamp": "2026-07-15T16:37:40.162Z",
         "checksum": "dda3f5695d0d82c043dbd6f7bc93a98648ea6de3a731610d36a2ab3272a723b9",
         "rawJsonString": "{\"fixtureId\":\"5516f19154f4edf2b65cda526a8030bc0fbe27f6cf107c375461e71b5919135c\",\"fixtureNaturalKey\":\"EPL|2020-2021|MANCHESTERUNITED|ARSENAL|2020-11-01\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"manchesterunited\",\"awayTeamId\":\"arsenal\",\"kickoff\":{\"value\":\"2020-11-01T16:30:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":8,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":7,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"M Dean\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.427Z"
+    "generatedAt": "2026-07-15T16:37:40.162Z"
   },
   {
     "fixtureId": "3b516536b183a9a5ef3d031108aba5693b819049f6d45b40505da2dd4fe707e2",
@@ -5480,12 +5480,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.438Z",
+        "importTimestamp": "2026-07-15T16:37:40.183Z",
         "checksum": "d379e3a3fafd16bd8c1944d52e79a50ee038ad0d0e12794d1f6fc2ed626461e9",
         "rawJsonString": "{\"fixtureId\":\"3b516536b183a9a5ef3d031108aba5693b819049f6d45b40505da2dd4fe707e2\",\"fixtureNaturalKey\":\"EPL|2020-2021|MANCHESTERCITY|LIVERPOOL|2020-11-08\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"manchestercity\",\"awayTeamId\":\"liverpool\",\"kickoff\":{\"value\":\"2020-11-08T16:30:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":7,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":10,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"C Pawson\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.438Z"
+    "generatedAt": "2026-07-15T16:37:40.183Z"
   },
   {
     "fixtureId": "491dea20c173ff9a0055c83628ec9ee525aa9a9da52315b41895d44dbf84762d",
@@ -5567,12 +5567,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.441Z",
+        "importTimestamp": "2026-07-15T16:37:40.186Z",
         "checksum": "458e2ce5a421482b6047e9694729e39bdaa0ec764ae599d1de594ae197b1c3e9",
         "rawJsonString": "{\"fixtureId\":\"491dea20c173ff9a0055c83628ec9ee525aa9a9da52315b41895d44dbf84762d\",\"fixtureNaturalKey\":\"EPL|2020-2021|TOTTENHAM|MANCHESTERCITY|2020-11-21\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"tottenham\",\"awayTeamId\":\"manchestercity\",\"kickoff\":{\"value\":\"2020-11-21T17:30:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":4,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":22,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":5,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"M Dean\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.441Z"
+    "generatedAt": "2026-07-15T16:37:40.186Z"
   },
   {
     "fixtureId": "ebdd984d49270dc7bdf020e53c2b6f155f634130b26dc031a28b69c82c59bd16",
@@ -5654,12 +5654,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.454Z",
+        "importTimestamp": "2026-07-15T16:37:40.200Z",
         "checksum": "785c3d398252824d1f10a43fdc42c11c24797bd9ea1fa8b50df362998d74b1db",
         "rawJsonString": "{\"fixtureId\":\"ebdd984d49270dc7bdf020e53c2b6f155f634130b26dc031a28b69c82c59bd16\",\"fixtureNaturalKey\":\"EPL|2020-2021|CHELSEA|TOTTENHAM|2020-11-29\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"chelsea\",\"awayTeamId\":\"tottenham\",\"kickoff\":{\"value\":\"2020-11-29T16:30:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":13,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":5,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"P Tierney\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.454Z"
+    "generatedAt": "2026-07-15T16:37:40.200Z"
   },
   {
     "fixtureId": "fcfecb397d6e984289ad688d9189896431e4fdb289bad3df3799cc32cbafd0a9",
@@ -5741,12 +5741,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.468Z",
+        "importTimestamp": "2026-07-15T16:37:40.208Z",
         "checksum": "d361cf148fb4cbbcc51c65c8662d315df08258fd70ab7829a1b20b963d83284e",
         "rawJsonString": "{\"fixtureId\":\"fcfecb397d6e984289ad688d9189896431e4fdb289bad3df3799cc32cbafd0a9\",\"fixtureNaturalKey\":\"EPL|2020-2021|TOTTENHAM|ARSENAL|2020-12-06\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"tottenham\",\"awayTeamId\":\"arsenal\",\"kickoff\":{\"value\":\"2020-12-06T16:30:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":6,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":11,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"M Atkinson\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.468Z"
+    "generatedAt": "2026-07-15T16:37:40.208Z"
   },
   {
     "fixtureId": "58b93329c4dcb06bb15167dad40599c37126043934236247932d82e0207f1dd9",
@@ -5828,12 +5828,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.474Z",
+        "importTimestamp": "2026-07-15T16:37:40.212Z",
         "checksum": "8b515e432141ab03100bdf893a0843995d98ff37f4dbd9ba438ad89e4da9ddc1",
         "rawJsonString": "{\"fixtureId\":\"58b93329c4dcb06bb15167dad40599c37126043934236247932d82e0207f1dd9\",\"fixtureNaturalKey\":\"EPL|2020-2021|MANCHESTERUNITED|MANCHESTERCITY|2020-12-12\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"manchesterunited\",\"awayTeamId\":\"manchestercity\",\"kickoff\":{\"value\":\"2020-12-12T17:30:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":11,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":9,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"C Kavanagh\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.474Z"
+    "generatedAt": "2026-07-15T16:37:40.212Z"
   },
   {
     "fixtureId": "90af9b30a55c7e750082881ffe6b301c7d5ca6acdeb5d10606493428f426043e",
@@ -5915,12 +5915,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.484Z",
+        "importTimestamp": "2026-07-15T16:37:40.225Z",
         "checksum": "4cdcb3c543e3203adac9f9c3dde05dd2c262743bd4c7de10e61fa1bf957ba61a",
         "rawJsonString": "{\"fixtureId\":\"90af9b30a55c7e750082881ffe6b301c7d5ca6acdeb5d10606493428f426043e\",\"fixtureNaturalKey\":\"EPL|2020-2021|LIVERPOOL|TOTTENHAM|2020-12-16\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"liverpool\",\"awayTeamId\":\"tottenham\",\"kickoff\":{\"value\":\"2020-12-16T20:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":17,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":8,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":11,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"A Taylor\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.484Z"
+    "generatedAt": "2026-07-15T16:37:40.225Z"
   },
   {
     "fixtureId": "1ab902afa21e63fb00a60434c3d5cc69296f06390b65e4d276363d021ca0af8d",
@@ -6002,12 +6002,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.498Z",
+        "importTimestamp": "2026-07-15T16:37:40.239Z",
         "checksum": "245594e25ee1443db5bb21fd3adeb0e44a18bdf67163230bc4c6d4190073fbae",
         "rawJsonString": "{\"fixtureId\":\"1ab902afa21e63fb00a60434c3d5cc69296f06390b65e4d276363d021ca0af8d\",\"fixtureNaturalKey\":\"EPL|2020-2021|ARSENAL|CHELSEA|2020-12-26\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"arsenal\",\"awayTeamId\":\"chelsea\",\"kickoff\":{\"value\":\"2020-12-26T17:30:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":15,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":19,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":7,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"M Oliver\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.498Z"
+    "generatedAt": "2026-07-15T16:37:40.239Z"
   },
   {
     "fixtureId": "f597164690ea716734a017f480b790e13d81342851ff26810458ce7023d39602",
@@ -6089,12 +6089,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.517Z",
+        "importTimestamp": "2026-07-15T16:37:40.258Z",
         "checksum": "b99176d2f663b78735ed73ee7db435fab14231c60f57991a0de106b86dbff439",
         "rawJsonString": "{\"fixtureId\":\"f597164690ea716734a017f480b790e13d81342851ff26810458ce7023d39602\",\"fixtureNaturalKey\":\"EPL|2020-2021|CHELSEA|MANCHESTERCITY|2021-01-03\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"chelsea\",\"awayTeamId\":\"manchestercity\",\"kickoff\":{\"value\":\"2021-01-03T16:30:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":9,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":18,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":6,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"A Taylor\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.517Z"
+    "generatedAt": "2026-07-15T16:37:40.258Z"
   },
   {
     "fixtureId": "d5c240c4f130b94552511f7ca6644667d2161db8085ef1c9c73bbc459c21fd46",
@@ -6176,12 +6176,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.421Z",
+        "importTimestamp": "2026-07-15T16:37:40.150Z",
         "checksum": "e2dfdcdd65333ffd3031f97688e1969f90aeffd91f4567b1073740fc2feede67",
         "rawJsonString": "{\"fixtureId\":\"d5c240c4f130b94552511f7ca6644667d2161db8085ef1c9c73bbc459c21fd46\",\"fixtureNaturalKey\":\"EPL|2020-2021|BURNLEY|TOTTENHAM|2020-10-26\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"burnley\",\"awayTeamId\":\"tottenham\",\"kickoff\":{\"value\":\"2020-10-26T20:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":13,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":9,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":4,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"M Oliver\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.421Z"
+    "generatedAt": "2026-07-15T16:37:40.150Z"
   },
   {
     "fixtureId": "7ea423c20ab90c5eb22a85998d2dec27936719d974827918113563bee7e234bd",
@@ -6263,12 +6263,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.424Z",
+        "importTimestamp": "2026-07-15T16:37:40.155Z",
         "checksum": "a8925820e12814153842ff7a3750dc2b95016a38811a3ef1c56cdb4a29b2fa9d",
         "rawJsonString": "{\"fixtureId\":\"7ea423c20ab90c5eb22a85998d2dec27936719d974827918113563bee7e234bd\",\"fixtureNaturalKey\":\"EPL|2020-2021|BURNLEY|CHELSEA|2020-10-31\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"burnley\",\"awayTeamId\":\"chelsea\",\"kickoff\":{\"value\":\"2020-10-31T15:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":5,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":14,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":9,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"D Coote\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.424Z"
+    "generatedAt": "2026-07-15T16:37:40.155Z"
   },
   {
     "fixtureId": "7b249cc5bcc896872eff9123841553e6b2ae647f5f980d032737873111f8be53",
@@ -6350,12 +6350,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.431Z",
+        "importTimestamp": "2026-07-15T16:37:40.169Z",
         "checksum": "8d16cd2d4391d539fd82feb082ef1ce4646e646613906036d4ae0a3c7aabcb00",
         "rawJsonString": "{\"fixtureId\":\"7b249cc5bcc896872eff9123841553e6b2ae647f5f980d032737873111f8be53\",\"fixtureNaturalKey\":\"EPL|2020-2021|BRIGHTON|BURNLEY|2020-11-06\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"brighton\",\"awayTeamId\":\"burnley\",\"kickoff\":{\"value\":\"2020-11-06T17:30:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":19,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":4,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"M Dean\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.431Z"
+    "generatedAt": "2026-07-15T16:37:40.169Z"
   },
   {
     "fixtureId": "60ec7219e32b01bff1424bc3a60a0ff264da38e11117614d21a1c6b8e2dc7936",
@@ -6437,12 +6437,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.446Z",
+        "importTimestamp": "2026-07-15T16:37:40.192Z",
         "checksum": "4f3cdf08ab8f4b6cb7846d2c7a120b5f72a05b91ebd403f49eaf3192b1177c96",
         "rawJsonString": "{\"fixtureId\":\"60ec7219e32b01bff1424bc3a60a0ff264da38e11117614d21a1c6b8e2dc7936\",\"fixtureNaturalKey\":\"EPL|2020-2021|BURNLEY|CRYSTALPALACE|2020-11-23\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"burnley\",\"awayTeamId\":\"crystalpalace\",\"kickoff\":{\"value\":\"2020-11-23T17:30:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":10,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":15,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":4,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":5,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"K Friend\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.446Z"
+    "generatedAt": "2026-07-15T16:37:40.192Z"
   },
   {
     "fixtureId": "151e62b5ae3802ef396230234b53d7781d45db0f18221d60cb62d861f606df21",
@@ -6524,12 +6524,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.450Z",
+        "importTimestamp": "2026-07-15T16:37:40.196Z",
         "checksum": "f2b19c47e72b90a2482406036dbccc26cd26f34f43aa063a3cdf15d8f46cfb21",
         "rawJsonString": "{\"fixtureId\":\"151e62b5ae3802ef396230234b53d7781d45db0f18221d60cb62d861f606df21\",\"fixtureNaturalKey\":\"EPL|2020-2021|MANCHESTERCITY|BURNLEY|2020-11-28\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"manchestercity\",\"awayTeamId\":\"burnley\",\"kickoff\":{\"value\":\"2020-11-28T15:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":5,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":19,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":9,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":6,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"L Mason\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.450Z"
+    "generatedAt": "2026-07-15T16:37:40.196Z"
   },
   {
     "fixtureId": "5dddb294e6911758de84442e8fab77d456c149518c8573a9c383e6fb517bd434",
@@ -6611,12 +6611,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.459Z",
+        "importTimestamp": "2026-07-15T16:37:40.203Z",
         "checksum": "5491db3fc49e2827578b0ef00c685a89ca6bb2350ca7aed7f4fe67fffdc8b36c",
         "rawJsonString": "{\"fixtureId\":\"5dddb294e6911758de84442e8fab77d456c149518c8573a9c383e6fb517bd434\",\"fixtureNaturalKey\":\"EPL|2020-2021|BURNLEY|EVERTON|2020-12-05\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"burnley\",\"awayTeamId\":\"everton\",\"kickoff\":{\"value\":\"2020-12-05T12:30:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":8,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":13,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":6,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"A Taylor\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.459Z"
+    "generatedAt": "2026-07-15T16:37:40.203Z"
   },
   {
     "fixtureId": "729beff76d0c66d6a35108cceb45700b1e1609b437c878bd337ec8685bfe07e9",
@@ -6698,12 +6698,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.477Z",
+        "importTimestamp": "2026-07-15T16:37:40.217Z",
         "checksum": "95a350a1ccc8d0bd10bd1764ce0fee1c79b9a579156aeaef62a26c611411a7ae",
         "rawJsonString": "{\"fixtureId\":\"729beff76d0c66d6a35108cceb45700b1e1609b437c878bd337ec8685bfe07e9\",\"fixtureNaturalKey\":\"EPL|2020-2021|ARSENAL|BURNLEY|2020-12-13\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"arsenal\",\"awayTeamId\":\"burnley\",\"kickoff\":{\"value\":\"2020-12-13T19:15:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":18,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":10,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":6,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"G Scott\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.477Z"
+    "generatedAt": "2026-07-15T16:37:40.217Z"
   },
   {
     "fixtureId": "bd40658f6043bfbc41bc8ed449fea560cbada7cedb16860b8e39b93c8c1c2719",
@@ -6785,12 +6785,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.493Z",
+        "importTimestamp": "2026-07-15T16:37:40.235Z",
         "checksum": "3beb681c2568a3a8ef7c4bde8b2cd8cb54ad25fa1672286b780ecaaec2cccbae",
         "rawJsonString": "{\"fixtureId\":\"bd40658f6043bfbc41bc8ed449fea560cbada7cedb16860b8e39b93c8c1c2719\",\"fixtureNaturalKey\":\"EPL|2020-2021|BURNLEY|WOLVES|2020-12-21\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"burnley\",\"awayTeamId\":\"wolves\",\"kickoff\":{\"value\":\"2020-12-21T17:30:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":10,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":15,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":4,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"L Mason\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.493Z"
+    "generatedAt": "2026-07-15T16:37:40.235Z"
   },
   {
     "fixtureId": "f401eb545e22cdc974033750ae246da368c4e46128aef37b5eb23852f3dbdc3f",
@@ -6872,12 +6872,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.500Z",
+        "importTimestamp": "2026-07-15T16:37:40.242Z",
         "checksum": "b65e9ac5b9ed60ba800f882e33354d212ba0445450070cd44fd9dd42f2e381ab",
         "rawJsonString": "{\"fixtureId\":\"f401eb545e22cdc974033750ae246da368c4e46128aef37b5eb23852f3dbdc3f\",\"fixtureNaturalKey\":\"EPL|2020-2021|LEEDS|BURNLEY|2020-12-27\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"leeds\",\"awayTeamId\":\"burnley\",\"kickoff\":{\"value\":\"2020-12-27T12:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":11,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":14,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":4,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":6,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"R Jones\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.500Z"
+    "generatedAt": "2026-07-15T16:37:40.242Z"
   },
   {
     "fixtureId": "f2afdfa044c78b19d8f7348d3660a1991c5c163d5c1dbe0c514f1a4a3d701366",
@@ -6959,12 +6959,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.506Z",
+        "importTimestamp": "2026-07-15T16:37:40.247Z",
         "checksum": "4c98caf5082e3ff80fecff0ee328ea09919b2462c0828b6b2d76e74d1c55e0ba",
         "rawJsonString": "{\"fixtureId\":\"f2afdfa044c78b19d8f7348d3660a1991c5c163d5c1dbe0c514f1a4a3d701366\",\"fixtureNaturalKey\":\"EPL|2020-2021|BURNLEY|SHEFFIELDUNITED|2020-12-29\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"burnley\",\"awayTeamId\":\"sheffieldunited\",\"kickoff\":{\"value\":\"2020-12-29T18:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":5,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":7,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"C Kavanagh\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.506Z"
+    "generatedAt": "2026-07-15T16:37:40.247Z"
   },
   {
     "fixtureId": "f03fde50188a052e59adf62726381e25f1ca317e935f1803dc9eb2678476d91d",
@@ -7046,12 +7046,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.415Z",
+        "importTimestamp": "2026-07-15T16:37:40.141Z",
         "checksum": "d69b502e4647c9c6107c8e79e7a636f2254ecbd8ba1e6d242ec3d4527a340938",
         "rawJsonString": "{\"fixtureId\":\"f03fde50188a052e59adf62726381e25f1ca317e935f1803dc9eb2678476d91d\",\"fixtureNaturalKey\":\"EPL|2020-2021|FULHAM|CRYSTALPALACE|2020-10-24\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"fulham\",\"awayTeamId\":\"crystalpalace\",\"kickoff\":{\"value\":\"2020-10-24T15:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":16,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":14,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":10,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"G Scott\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.415Z"
+    "generatedAt": "2026-07-15T16:37:40.141Z"
   },
   {
     "fixtureId": "acc8057156260b4b040b4b6e3d334578520055b063bf9169cd0303fdfdc033ea",
@@ -7133,12 +7133,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.417Z",
+        "importTimestamp": "2026-07-15T16:37:40.144Z",
         "checksum": "5359c5f59542982f9a86e42e86b1a6f694a4ac057ff499004e1d1aafbe84e61e",
         "rawJsonString": "{\"fixtureId\":\"acc8057156260b4b040b4b6e3d334578520055b063bf9169cd0303fdfdc033ea\",\"fixtureNaturalKey\":\"EPL|2020-2021|SOUTHAMPTON|EVERTON|2020-10-25\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"southampton\",\"awayTeamId\":\"everton\",\"kickoff\":{\"value\":\"2020-10-25T14:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":12,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":6,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":6,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"K Friend\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.417Z"
+    "generatedAt": "2026-07-15T16:37:40.144Z"
   },
   {
     "fixtureId": "d46b019c9f350b33ae7e1ea0e9c7c9a8ee05cc0b261f285e5ed21a4ea37a8f88",
@@ -7220,12 +7220,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.418Z",
+        "importTimestamp": "2026-07-15T16:37:40.145Z",
         "checksum": "35e3830efd83c69469414fa1bd6bd9dc05b5c914e247f431fc07fd933c1ef4d3",
         "rawJsonString": "{\"fixtureId\":\"d46b019c9f350b33ae7e1ea0e9c7c9a8ee05cc0b261f285e5ed21a4ea37a8f88\",\"fixtureNaturalKey\":\"EPL|2020-2021|WOLVES|NEWCASTLE|2020-10-25\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"wolves\",\"awayTeamId\":\"newcastle\",\"kickoff\":{\"value\":\"2020-10-25T16:30:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":16,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":5,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"L Mason\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.418Z"
+    "generatedAt": "2026-07-15T16:37:40.145Z"
   },
   {
     "fixtureId": "8c12780e19a3b6296622b50288f61904ee10fa252484c2b003d3dd508598522c",
@@ -7307,12 +7307,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.420Z",
+        "importTimestamp": "2026-07-15T16:37:40.148Z",
         "checksum": "483b56814ba176420e9124e5a20b864952f064f27822060c222b6c9528bd75c6",
         "rawJsonString": "{\"fixtureId\":\"8c12780e19a3b6296622b50288f61904ee10fa252484c2b003d3dd508598522c\",\"fixtureNaturalKey\":\"EPL|2020-2021|BRIGHTON|WESTBROM|2020-10-26\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"brighton\",\"awayTeamId\":\"westbrom\",\"kickoff\":{\"value\":\"2020-10-26T17:30:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":5,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":9,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"J Moss\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.420Z"
+    "generatedAt": "2026-07-15T16:37:40.148Z"
   },
   {
     "fixtureId": "d490463e23e4ed30133927cd7e2104315071e68ec0dce1d405b2250a46194e1d",
@@ -7394,12 +7394,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.425Z",
+        "importTimestamp": "2026-07-15T16:37:40.159Z",
         "checksum": "325b1df62629247ac408e2c35be7e40880e51b2509e19b408544f49dd5b723bd",
         "rawJsonString": "{\"fixtureId\":\"d490463e23e4ed30133927cd7e2104315071e68ec0dce1d405b2250a46194e1d\",\"fixtureNaturalKey\":\"EPL|2020-2021|ASTONVILLA|SOUTHAMPTON|2020-11-01\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"astonvilla\",\"awayTeamId\":\"southampton\",\"kickoff\":{\"value\":\"2020-11-01T12:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":4,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":19,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":9,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":10,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":4,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"D England\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.425Z"
+    "generatedAt": "2026-07-15T16:37:40.159Z"
   },
   {
     "fixtureId": "f18152923f7ac4043514a92b9b81c66ac3f2dddad33aacf9e60f7c4fbaf5d707",
@@ -7481,12 +7481,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.426Z",
+        "importTimestamp": "2026-07-15T16:37:40.160Z",
         "checksum": "91b6c148867b0a21cd8a5e911c04b3014e9944cda223fe08853d222da6d0784a",
         "rawJsonString": "{\"fixtureId\":\"f18152923f7ac4043514a92b9b81c66ac3f2dddad33aacf9e60f7c4fbaf5d707\",\"fixtureNaturalKey\":\"EPL|2020-2021|NEWCASTLE|EVERTON|2020-11-01\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"newcastle\",\"awayTeamId\":\"everton\",\"kickoff\":{\"value\":\"2020-11-01T14:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":11,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":15,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":4,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":4,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"S Attwell\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.426Z"
+    "generatedAt": "2026-07-15T16:37:40.160Z"
   },
   {
     "fixtureId": "bcf5860fe15bf2a33e7b610224c20f97be5198a35b2faa005e5c25c033455515",
@@ -7568,12 +7568,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.428Z",
+        "importTimestamp": "2026-07-15T16:37:40.165Z",
         "checksum": "f9fc3fe4ed6944b6891dd815239f76066a78923570c09696561fe0eac0148b38",
         "rawJsonString": "{\"fixtureId\":\"bcf5860fe15bf2a33e7b610224c20f97be5198a35b2faa005e5c25c033455515\",\"fixtureNaturalKey\":\"EPL|2020-2021|FULHAM|WESTBROM|2020-11-02\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"fulham\",\"awayTeamId\":\"westbrom\",\"kickoff\":{\"value\":\"2020-11-02T17:30:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":13,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":10,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":6,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"S Hooper\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.428Z"
+    "generatedAt": "2026-07-15T16:37:40.165Z"
   },
   {
     "fixtureId": "d26e57ea436e4b25dbdf4ee29a3954cf08521c01b10bdd58e8c0eb3b52f950d9",
@@ -7655,12 +7655,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.429Z",
+        "importTimestamp": "2026-07-15T16:37:40.167Z",
         "checksum": "0503bab10faaeb71a134111ff998d15f6a03100c2b7c4018b6ab96d2350103ab",
         "rawJsonString": "{\"fixtureId\":\"d26e57ea436e4b25dbdf4ee29a3954cf08521c01b10bdd58e8c0eb3b52f950d9\",\"fixtureNaturalKey\":\"EPL|2020-2021|LEEDS|LEICESTER|2020-11-02\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"leeds\",\"awayTeamId\":\"leicester\",\"kickoff\":{\"value\":\"2020-11-02T20:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":4,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":11,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":10,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":4,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":8,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"A Marriner\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.429Z"
+    "generatedAt": "2026-07-15T16:37:40.167Z"
   },
   {
     "fixtureId": "4ac48b1623d5710eeb4c66bb0b5352671f9025be06987df94b8ad3f150a4ddfe",
@@ -7742,12 +7742,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.432Z",
+        "importTimestamp": "2026-07-15T16:37:40.171Z",
         "checksum": "30d366bfb75412ea98ced23f1106b3567a429bbd2263ea728ef324fc093b06bc",
         "rawJsonString": "{\"fixtureId\":\"4ac48b1623d5710eeb4c66bb0b5352671f9025be06987df94b8ad3f150a4ddfe\",\"fixtureNaturalKey\":\"EPL|2020-2021|SOUTHAMPTON|NEWCASTLE|2020-11-06\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"southampton\",\"awayTeamId\":\"newcastle\",\"kickoff\":{\"value\":\"2020-11-06T20:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":15,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":4,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":8,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"P Bankes\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.432Z"
+    "generatedAt": "2026-07-15T16:37:40.171Z"
   },
   {
     "fixtureId": "85e5deb439bdd54f40e5d69015d4edc507fcad31ebc481e7d812e02b347f00af",
@@ -7829,12 +7829,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.434Z",
+        "importTimestamp": "2026-07-15T16:37:40.175Z",
         "checksum": "c6f99afd8f2bca123b7085629a84300ea7a8f5d1292b67547babc838b99effd4",
         "rawJsonString": "{\"fixtureId\":\"85e5deb439bdd54f40e5d69015d4edc507fcad31ebc481e7d812e02b347f00af\",\"fixtureNaturalKey\":\"EPL|2020-2021|CRYSTALPALACE|LEEDS|2020-11-07\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"crystalpalace\",\"awayTeamId\":\"leeds\",\"kickoff\":{\"value\":\"2020-11-07T15:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":4,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":10,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":9,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":6,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"C Kavanagh\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.434Z"
+    "generatedAt": "2026-07-15T16:37:40.175Z"
   },
   {
     "fixtureId": "c27041845b41296af9b691aa7a5111672011f14bbefea3d51ca124267f0b9ca2",
@@ -7916,12 +7916,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.419Z",
+        "importTimestamp": "2026-07-15T16:37:40.147Z",
         "checksum": "ed14767ead4ece038e35ee47400db0c5094a0e0cb1e1f7190d4dcf31f2661070",
         "rawJsonString": "{\"fixtureId\":\"c27041845b41296af9b691aa7a5111672011f14bbefea3d51ca124267f0b9ca2\",\"fixtureNaturalKey\":\"EPL|2020-2021|ARSENAL|LEICESTER|2020-10-25\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"arsenal\",\"awayTeamId\":\"leicester\",\"kickoff\":{\"value\":\"2020-10-25T19:15:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":12,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":6,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":4,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"C Pawson\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.419Z"
+    "generatedAt": "2026-07-15T16:37:40.147Z"
   },
   {
     "fixtureId": "fb1507cd148b926b53fee5f930cb3aef22981d0598e4003ac9c5ab1c022ca247",
@@ -8003,12 +8003,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.423Z",
+        "importTimestamp": "2026-07-15T16:37:40.153Z",
         "checksum": "c4be67f9b3164b1a04b27c052c1a02cf8f01d6a4cb504fa7d5f9171e967519f4",
         "rawJsonString": "{\"fixtureId\":\"fb1507cd148b926b53fee5f930cb3aef22981d0598e4003ac9c5ab1c022ca247\",\"fixtureNaturalKey\":\"EPL|2020-2021|SHEFFIELDUNITED|MANCHESTERCITY|2020-10-31\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"sheffieldunited\",\"awayTeamId\":\"manchestercity\",\"kickoff\":{\"value\":\"2020-10-31T12:30:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":5,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":16,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":8,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"M Oliver\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.423Z"
+    "generatedAt": "2026-07-15T16:37:40.153Z"
   },
   {
     "fixtureId": "e8ad93a31f9e6947b77b31ffdfd31d3e726edf632cc852b20be17c89318ccd16",
@@ -8090,12 +8090,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.424Z",
+        "importTimestamp": "2026-07-15T16:37:40.157Z",
         "checksum": "ad9d4743e7a29b2aaa9c10a3ca682c8dce5c5413232f441d0ca91193e6d41e67",
         "rawJsonString": "{\"fixtureId\":\"e8ad93a31f9e6947b77b31ffdfd31d3e726edf632cc852b20be17c89318ccd16\",\"fixtureNaturalKey\":\"EPL|2020-2021|LIVERPOOL|WESTHAM|2020-10-31\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"liverpool\",\"awayTeamId\":\"westham\",\"kickoff\":{\"value\":\"2020-10-31T17:30:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":9,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":4,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":5,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"K Friend\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.424Z"
+    "generatedAt": "2026-07-15T16:37:40.157Z"
   },
   {
     "fixtureId": "321b45cb9c8d90d821e0b8e74862684ed68d25fe63d5b06383d617105870b17a",
@@ -8177,12 +8177,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.427Z",
+        "importTimestamp": "2026-07-15T16:37:40.163Z",
         "checksum": "4e1225d2c77a734d7467f545562169c5ca84abc2e93b6197db5d9f4f3c5062d8",
         "rawJsonString": "{\"fixtureId\":\"321b45cb9c8d90d821e0b8e74862684ed68d25fe63d5b06383d617105870b17a\",\"fixtureNaturalKey\":\"EPL|2020-2021|TOTTENHAM|BRIGHTON|2020-11-01\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"tottenham\",\"awayTeamId\":\"brighton\",\"kickoff\":{\"value\":\"2020-11-01T19:15:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":9,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":6,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"G Scott\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.427Z"
+    "generatedAt": "2026-07-15T16:37:40.163Z"
   },
   {
     "fixtureId": "d317ab0d9894ac3a1e3e3f785424ab3e5be34f7ac9fc426425ba60e2853b81c9",
@@ -8264,12 +8264,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.433Z",
+        "importTimestamp": "2026-07-15T16:37:40.173Z",
         "checksum": "328ce03681e772cb33c0b948893445b4d04a07c46c71937205071ae163871c2e",
         "rawJsonString": "{\"fixtureId\":\"d317ab0d9894ac3a1e3e3f785424ab3e5be34f7ac9fc426425ba60e2853b81c9\",\"fixtureNaturalKey\":\"EPL|2020-2021|EVERTON|MANCHESTERUNITED|2020-11-07\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"everton\",\"awayTeamId\":\"manchesterunited\",\"kickoff\":{\"value\":\"2020-11-07T12:30:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":7,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":13,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":5,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"P Tierney\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.433Z"
+    "generatedAt": "2026-07-15T16:37:40.173Z"
   },
   {
     "fixtureId": "045feafd2952c8d9879299912fd6132dbad283a84eee257e3cac8cf3d1a63947",
@@ -8351,12 +8351,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.434Z",
+        "importTimestamp": "2026-07-15T16:37:40.177Z",
         "checksum": "e9b0cb19153adbcc798a20dcb72ff5929d6e80fd566b17c4ceb65e6c915889f9",
         "rawJsonString": "{\"fixtureId\":\"045feafd2952c8d9879299912fd6132dbad283a84eee257e3cac8cf3d1a63947\",\"fixtureNaturalKey\":\"EPL|2020-2021|CHELSEA|SHEFFIELDUNITED|2020-11-07\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"chelsea\",\"awayTeamId\":\"sheffieldunited\",\"kickoff\":{\"value\":\"2020-11-07T17:30:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":4,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":20,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":6,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":9,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"J Moss\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.434Z"
+    "generatedAt": "2026-07-15T16:37:40.177Z"
   },
   {
     "fixtureId": "befd3e5e874229072006c25b3b80dba29303a90dbddd0ae5dd7ee7bb672b6c9e",
@@ -8438,12 +8438,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.435Z",
+        "importTimestamp": "2026-07-15T16:37:40.179Z",
         "checksum": "dd3d04a3fc5b915f6ed6e0e9dcbd29e196f3e822a47e6d25c1692afe532d1370",
         "rawJsonString": "{\"fixtureId\":\"befd3e5e874229072006c25b3b80dba29303a90dbddd0ae5dd7ee7bb672b6c9e\",\"fixtureNaturalKey\":\"EPL|2020-2021|WESTHAM|FULHAM|2020-11-07\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"westham\",\"awayTeamId\":\"fulham\",\"kickoff\":{\"value\":\"2020-11-07T20:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":16,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":13,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":7,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"R Jones\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.435Z"
+    "generatedAt": "2026-07-15T16:37:40.179Z"
   },
   {
     "fixtureId": "88b6c98d8f6b79da2a84eb62bf393a0b074f74c77d7664e6c7292f4e86202be0",
@@ -8525,12 +8525,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.436Z",
+        "importTimestamp": "2026-07-15T16:37:40.181Z",
         "checksum": "9ead5750a2c1f11bd7f3d6c94c06044e42122eb84360de5b5f65f646ea6826cc",
         "rawJsonString": "{\"fixtureId\":\"88b6c98d8f6b79da2a84eb62bf393a0b074f74c77d7664e6c7292f4e86202be0\",\"fixtureNaturalKey\":\"EPL|2020-2021|WESTBROM|TOTTENHAM|2020-11-08\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"westbrom\",\"awayTeamId\":\"tottenham\",\"kickoff\":{\"value\":\"2020-11-08T12:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":12,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":19,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":5,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"A Madley\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.436Z"
+    "generatedAt": "2026-07-15T16:37:40.181Z"
   },
   {
     "fixtureId": "4a2d2545f700d146d0e3842e26546b04ae12b6d7d798765757e1efae8020df01",
@@ -8612,12 +8612,12 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.437Z",
+        "importTimestamp": "2026-07-15T16:37:40.183Z",
         "checksum": "fdc95cc2fd11d95b906a62ea1104cbbbc5dfa1bb617f0e165392189c9f756868",
         "rawJsonString": "{\"fixtureId\":\"4a2d2545f700d146d0e3842e26546b04ae12b6d7d798765757e1efae8020df01\",\"fixtureNaturalKey\":\"EPL|2020-2021|LEICESTER|WOLVES|2020-11-08\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"leicester\",\"awayTeamId\":\"wolves\",\"kickoff\":{\"value\":\"2020-11-08T14:00:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":1,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":10,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":7,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"A Taylor\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.437Z"
+    "generatedAt": "2026-07-15T16:37:40.183Z"
   },
   {
     "fixtureId": "f6386e17d6cb70ac98d6ce6b3868e6eb1febe70399d345f0e54208be2b58d92d",
@@ -8699,11 +8699,11 @@
       {
         "provider": "football-data.co.uk",
         "providerVersion": "v1.2",
-        "importTimestamp": "2026-07-15T16:34:41.439Z",
+        "importTimestamp": "2026-07-15T16:37:40.184Z",
         "checksum": "0280d3a348056b01c9ee534d792cf5adec68888f86f1434a333a46d9a3ddb8ba",
         "rawJsonString": "{\"fixtureId\":\"f6386e17d6cb70ac98d6ce6b3868e6eb1febe70399d345f0e54208be2b58d92d\",\"fixtureNaturalKey\":\"EPL|2020-2021|ARSENAL|ASTONVILLA|2020-11-08\",\"competitionId\":\"EPL\",\"seasonId\":\"2020-2021\",\"homeTeamId\":\"arsenal\",\"awayTeamId\":\"astonvilla\",\"kickoff\":{\"value\":\"2020-11-08T19:15:00.000Z\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"},\"homeGoals\":{\"value\":0,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"awayGoals\":{\"value\":3,\"source\":\"football-data.co.uk\",\"confidence\":0.999,\"mergeReason\":\"highest_confidence\"},\"homeShots\":{\"value\":13,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShots\":{\"value\":15,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"homeShotsOnTarget\":{\"value\":2,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"awayShotsOnTarget\":{\"value\":6,\"source\":\"football-data.co.uk\",\"confidence\":0.98,\"mergeReason\":\"highest_confidence\"},\"referee\":{\"value\":\"M Atkinson\",\"source\":\"football-data.co.uk\",\"confidence\":0.97,\"mergeReason\":\"highest_confidence\"},\"regime\":{\"value\":\"COVID_ClosedDoor\",\"source\":\"football-data.co.uk\",\"confidence\":0.99,\"mergeReason\":\"highest_confidence\"}}"
       }
     ],
-    "generatedAt": "2026-07-15T16:34:41.439Z"
+    "generatedAt": "2026-07-15T16:37:40.184Z"
   }
 ]

@@ -31,6 +31,13 @@ export interface IngestionRunResult {
   processedSeasons: number;
   skippedSeasons: string[];
   datasetCompleteness: number;
+  researchEligibility: {
+    eligible: boolean;
+    reasons: string[];
+    minimumCompleteness: number;
+    actualCompleteness: number;
+    usageLevel: 'DEVELOPMENT' | 'EXPERIMENTAL' | 'RESEARCH' | 'PRODUCTION';
+  };
 }
 
 export class LakehouseIngestionService {
@@ -184,6 +191,29 @@ export class LakehouseIngestionService {
     const datasetCompleteness = Number(((seasonsToProcess.length / allSeasons.length) * 100).toFixed(2));
     const executionMode = seasonsToProcess.length < allSeasons.length ? 'available-only' : 'strict';
 
+    const reasons: string[] = [];
+    if (datasetCompleteness < 100.0) {
+      reasons.push('dataset_completeness_below_threshold');
+    }
+    if (skippedSeasons.length > 0) {
+      reasons.push('missing_seasons');
+    }
+
+    let usageLevel: 'DEVELOPMENT' | 'EXPERIMENTAL' | 'RESEARCH' | 'PRODUCTION' = 'DEVELOPMENT';
+    if (datasetCompleteness === 100.0) {
+      usageLevel = 'RESEARCH';
+    } else if (datasetCompleteness >= 80.0) {
+      usageLevel = 'EXPERIMENTAL';
+    }
+
+    const researchEligibility = {
+      eligible: datasetCompleteness === 100.0,
+      reasons,
+      minimumCompleteness: 100,
+      actualCompleteness: datasetCompleteness,
+      usageLevel
+    };
+
     const manifest = {
       datasetVersion: nextVersion,
       schemaVersion,
@@ -203,7 +233,8 @@ export class LakehouseIngestionService {
       requestedSeasons: allSeasons.length,
       processedSeasons: seasonsToProcess.length,
       skippedSeasons,
-      datasetCompleteness
+      datasetCompleteness,
+      researchEligibility
     };
 
     await this.datasetRepo.saveManifest(manifest);
@@ -239,7 +270,8 @@ export class LakehouseIngestionService {
       requestedSeasons: allSeasons.length,
       processedSeasons: seasonsToProcess.length,
       skippedSeasons,
-      datasetCompleteness
+      datasetCompleteness,
+      researchEligibility
     };
 
     fs.writeFileSync(

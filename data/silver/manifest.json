@@ -1,5 +1,5 @@
 {
-  "datasetVersion": 8,
+  "datasetVersion": 10,
   "schemaVersion": 1,
   "fixtureCount": 1900,
   "providerCount": 3,
@@ -10,7 +10,7 @@
   },
   "qualityScore": 89.96,
   "checksum": "b288eef3f19442654158abf84a936d54dd308a33d9b56c597708db273494792e",
-  "createdAt": "2026-07-15T16:35:03.194Z",
+  "createdAt": "2026-07-15T16:38:17.525Z",
   "gitCommit": "829d2b1df4b5",
   "state": "FROZEN",
   "executionMode": "available-only",
@@ -23,5 +23,15 @@
     "2018-2019",
     "2019-2020"
   ],
-  "datasetCompleteness": 50
+  "datasetCompleteness": 50,
+  "researchEligibility": {
+    "eligible": false,
+    "reasons": [
+      "dataset_completeness_below_threshold",
+      "missing_seasons"
+    ],
+    "minimumCompleteness": 100,
+    "actualCompleteness": 50,
+    "usageLevel": "DEVELOPMENT"
+  }
 }
