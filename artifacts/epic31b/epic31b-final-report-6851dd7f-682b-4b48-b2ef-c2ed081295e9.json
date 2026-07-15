@@ -1,0 +1,506 @@
+{
+  "reportId": "6851dd7f-682b-4b48-b2ef-c2ed081295e9",
+  "generatedAt": "2026-07-15T12:40:10.403Z",
+  "epic": "EPIC 31B",
+  "title": "Production Replay & Shadow Validation — Final Report",
+  "replayCoverage": {
+    "matchesReplayed": 12,
+    "marketsReplayed": 12,
+    "leaguesCovered": [
+      "39",
+      "40",
+      "61",
+      "78",
+      "135",
+      "140"
+    ],
+    "seasonsCovered": [
+      "2023-2024"
+    ]
+  },
+  "calibrationQuality": "1 league(s) show poor calibration — retraining recommended",
+  "statisticalConfidence": "Statistical confidence is moderate or insufficient",
+  "mathematicalConsistency": "All mathematical contracts consistent with EPIC 31A definitions",
+  "performance": {
+    "totalDurationMs": 4094,
+    "avgMatchDurationMs": 341.17,
+    "peakMemoryMB": 33,
+    "totalCpuTimeMs": 4094,
+    "dbReadCount": 0,
+    "bottlenecks": [],
+    "phaseTimings": {
+      "Phase1-39": 486,
+      "Phase1-40": 703,
+      "Phase1-61": 897,
+      "Phase1-78": 1120,
+      "Phase1-135": 1353,
+      "Phase1-140": 1561,
+      "Phase 2": 2509,
+      "Phase 3": 13,
+      "Phase 4": 0,
+      "Phase 5": 6,
+      "Phase 6": 3
+    }
+  },
+  "researchReproducibility": true,
+  "productionReadiness": "NOT READY — production gates require attention",
+  "remainingRisks": [
+    "Governance issues: research_manifest.json missing fields: experimentId, datasetVersion, featureVersion, modelVersion, seed, experiment_registry.json is not an array, model_registry.json is not an array, Missing artifact directories: model_versions, feature_versions, dataset_versions"
+  ],
+  "leagueResults": [
+    {
+      "leagueId": "39",
+      "leagueName": "39",
+      "status": "PASS",
+      "evidence": "2 predictions from 2 matches. ROI: -100%, CLV: 0.0371%",
+      "metrics": {
+        "totalMatches": 2,
+        "totalPredictions": 2,
+        "won": 0,
+        "lost": 2,
+        "voided": 0,
+        "roi": -100,
+        "yield": -100,
+        "avgClv": 0.0371,
+        "winRate": 0,
+        "totalStake": 0.129,
+        "totalProfit": -0.129,
+        "brierScore": 0.3955,
+        "logLoss": 0.9913,
+        "avgKellyStake": 0.0645,
+        "maxDrawdown": 0.129,
+        "sharpeRatio": null,
+        "profitFactor": 0,
+        "longestWinStreak": 0,
+        "longestLossStreak": 2
+      },
+      "confidenceIntervals": [
+        {
+          "metric": "ROI (%)",
+          "observed": -100,
+          "mean": -100,
+          "stdErr": 0,
+          "ciLower": -100,
+          "ciUpper": -100,
+          "confidenceLevel": 0.95
+        },
+        {
+          "metric": "Brier Score",
+          "observed": 0.3955,
+          "mean": 0.3955000000000085,
+          "stdErr": 0,
+          "ciLower": 0.3955,
+          "ciUpper": 0.3955,
+          "confidenceLevel": 0.95
+        },
+        {
+          "metric": "CLV (%)",
+          "observed": 0.0371,
+          "mean": 0.037099999999999904,
+          "stdErr": 0,
+          "ciLower": 0.0371,
+          "ciUpper": 0.0371,
+          "confidenceLevel": 0.95
+        }
+      ],
+      "calibrationQuality": "Poor (Brier >= 0.35) — calibration retraining recommended",
+      "statisticalConfidence": "Insufficient (n < 30) — illustrative only",
+      "driftDetected": false
+    },
+    {
+      "leagueId": "40",
+      "leagueName": "40",
+      "status": "PASS",
+      "evidence": "2 predictions from 2 matches. ROI: 0%, CLV: 0.0371%",
+      "metrics": {
+        "totalMatches": 2,
+        "totalPredictions": 2,
+        "won": 1,
+        "lost": 1,
+        "voided": 0,
+        "roi": 0,
+        "yield": 0,
+        "avgClv": 0.0371,
+        "winRate": 50,
+        "totalStake": 0.126,
+        "totalProfit": 0,
+        "brierScore": 0.2659,
+        "logLoss": 0.726,
+        "avgKellyStake": 0.063,
+        "maxDrawdown": 0.063,
+        "sharpeRatio": null,
+        "profitFactor": 1,
+        "longestWinStreak": 1,
+        "longestLossStreak": 1
+      },
+      "confidenceIntervals": [
+        {
+          "metric": "ROI (%)",
+          "observed": 0,
+          "mean": 0,
+          "stdErr": 70.5691,
+          "ciLower": -100,
+          "ciUpper": 100,
+          "confidenceLevel": 0.95
+        },
+        {
+          "metric": "Brier Score",
+          "observed": 0.2659,
+          "mean": 0.2658999999999978,
+          "stdErr": 0.0889,
+          "ciLower": 0.1399,
+          "ciUpper": 0.3919,
+          "confidenceLevel": 0.95
+        },
+        {
+          "metric": "CLV (%)",
+          "observed": 0.0371,
+          "mean": 0.037099999999999904,
+          "stdErr": 0,
+          "ciLower": 0.0371,
+          "ciUpper": 0.0371,
+          "confidenceLevel": 0.95
+        }
+      ],
+      "calibrationQuality": "Acceptable (Brier < 0.35)",
+      "statisticalConfidence": "Insufficient (n < 30) — illustrative only",
+      "driftDetected": false
+    },
+    {
+      "leagueId": "61",
+      "leagueName": "61",
+      "status": "PASS",
+      "evidence": "2 predictions from 2 matches. ROI: 0%, CLV: 0.0371%",
+      "metrics": {
+        "totalMatches": 2,
+        "totalPredictions": 2,
+        "won": 1,
+        "lost": 1,
+        "voided": 0,
+        "roi": 0,
+        "yield": 0,
+        "avgClv": 0.0371,
+        "winRate": 50,
+        "totalStake": 0.1272,
+        "totalProfit": 0,
+        "brierScore": 0.2662,
+        "logLoss": 0.7266,
+        "avgKellyStake": 0.0636,
+        "maxDrawdown": 0.0636,
+        "sharpeRatio": null,
+        "profitFactor": 1,
+        "longestWinStreak": 1,
+        "longestLossStreak": 1
+      },
+      "confidenceIntervals": [
+        {
+          "metric": "ROI (%)",
+          "observed": 0,
+          "mean": 0,
+          "stdErr": 70.5691,
+          "ciLower": -100,
+          "ciUpper": 100,
+          "confidenceLevel": 0.95
+        },
+        {
+          "metric": "Brier Score",
+          "observed": 0.2662,
+          "mean": 0.2662000000000016,
+          "stdErr": 0.0898,
+          "ciLower": 0.139,
+          "ciUpper": 0.3934,
+          "confidenceLevel": 0.95
+        },
+        {
+          "metric": "CLV (%)",
+          "observed": 0.0371,
+          "mean": 0.037099999999999904,
+          "stdErr": 0,
+          "ciLower": 0.0371,
+          "ciUpper": 0.0371,
+          "confidenceLevel": 0.95
+        }
+      ],
+      "calibrationQuality": "Acceptable (Brier < 0.35)",
+      "statisticalConfidence": "Insufficient (n < 30) — illustrative only",
+      "driftDetected": false
+    },
+    {
+      "leagueId": "78",
+      "leagueName": "78",
+      "status": "PASS",
+      "evidence": "2 predictions from 2 matches. ROI: 0%, CLV: 0.0371%",
+      "metrics": {
+        "totalMatches": 2,
+        "totalPredictions": 2,
+        "won": 0,
+        "lost": 0,
+        "voided": 2,
+        "roi": 0,
+        "yield": 0,
+        "avgClv": 0.0371,
+        "winRate": 0,
+        "totalStake": 0.1238,
+        "totalProfit": 0,
+        "brierScore": 0.0153,
+        "logLoss": 0,
+        "avgKellyStake": 0.0619,
+        "maxDrawdown": 0,
+        "sharpeRatio": null,
+        "profitFactor": 0,
+        "longestWinStreak": 0,
+        "longestLossStreak": 0
+      },
+      "confidenceIntervals": [
+        {
+          "metric": "ROI (%)",
+          "observed": 0,
+          "mean": 0,
+          "stdErr": 0,
+          "ciLower": 0,
+          "ciUpper": 0,
+          "confidenceLevel": 0.95
+        },
+        {
+          "metric": "Brier Score",
+          "observed": 0.0153,
+          "mean": 0.015299999999999892,
+          "stdErr": 0,
+          "ciLower": 0.0153,
+          "ciUpper": 0.0153,
+          "confidenceLevel": 0.95
+        },
+        {
+          "metric": "CLV (%)",
+          "observed": 0.0371,
+          "mean": 0.037099999999999904,
+          "stdErr": 0,
+          "ciLower": 0.0371,
+          "ciUpper": 0.0371,
+          "confidenceLevel": 0.95
+        }
+      ],
+      "calibrationQuality": "Excellent (Brier < 0.15)",
+      "statisticalConfidence": "Insufficient (n < 30) — illustrative only",
+      "driftDetected": false
+    },
+    {
+      "leagueId": "135",
+      "leagueName": "135",
+      "status": "PASS",
+      "evidence": "2 predictions from 2 matches. ROI: 0%, CLV: 0.0371%",
+      "metrics": {
+        "totalMatches": 2,
+        "totalPredictions": 2,
+        "won": 1,
+        "lost": 1,
+        "voided": 0,
+        "roi": 0,
+        "yield": 0,
+        "avgClv": 0.0371,
+        "winRate": 50,
+        "totalStake": 0.1236,
+        "totalProfit": 0,
+        "brierScore": 0.2653,
+        "logLoss": 0.7246,
+        "avgKellyStake": 0.0618,
+        "maxDrawdown": 0.0618,
+        "sharpeRatio": null,
+        "profitFactor": 1,
+        "longestWinStreak": 1,
+        "longestLossStreak": 1
+      },
+      "confidenceIntervals": [
+        {
+          "metric": "ROI (%)",
+          "observed": 0,
+          "mean": 0,
+          "stdErr": 70.5691,
+          "ciLower": -100,
+          "ciUpper": 100,
+          "confidenceLevel": 0.95
+        },
+        {
+          "metric": "Brier Score",
+          "observed": 0.2653,
+          "mean": 0.2652999999999998,
+          "stdErr": 0.0872,
+          "ciLower": 0.1418,
+          "ciUpper": 0.3888,
+          "confidenceLevel": 0.95
+        },
+        {
+          "metric": "CLV (%)",
+          "observed": 0.0371,
+          "mean": 0.037099999999999904,
+          "stdErr": 0,
+          "ciLower": 0.0371,
+          "ciUpper": 0.0371,
+          "confidenceLevel": 0.95
+        }
+      ],
+      "calibrationQuality": "Acceptable (Brier < 0.35)",
+      "statisticalConfidence": "Insufficient (n < 30) — illustrative only",
+      "driftDetected": false
+    },
+    {
+      "leagueId": "140",
+      "leagueName": "140",
+      "status": "PASS",
+      "evidence": "2 predictions from 2 matches. ROI: 0%, CLV: 0.0371%",
+      "metrics": {
+        "totalMatches": 2,
+        "totalPredictions": 2,
+        "won": 1,
+        "lost": 1,
+        "voided": 0,
+        "roi": 0,
+        "yield": 0,
+        "avgClv": 0.0371,
+        "winRate": 50,
+        "totalStake": 0.1272,
+        "totalProfit": 0,
+        "brierScore": 0.2662,
+        "logLoss": 0.7266,
+        "avgKellyStake": 0.0636,
+        "maxDrawdown": 0.0636,
+        "sharpeRatio": null,
+        "profitFactor": 1,
+        "longestWinStreak": 1,
+        "longestLossStreak": 1
+      },
+      "confidenceIntervals": [
+        {
+          "metric": "ROI (%)",
+          "observed": 0,
+          "mean": 0,
+          "stdErr": 70.5691,
+          "ciLower": -100,
+          "ciUpper": 100,
+          "confidenceLevel": 0.95
+        },
+        {
+          "metric": "Brier Score",
+          "observed": 0.2662,
+          "mean": 0.2662000000000016,
+          "stdErr": 0.0898,
+          "ciLower": 0.139,
+          "ciUpper": 0.3934,
+          "confidenceLevel": 0.95
+        },
+        {
+          "metric": "CLV (%)",
+          "observed": 0.0371,
+          "mean": 0.037099999999999904,
+          "stdErr": 0,
+          "ciLower": 0.0371,
+          "ciUpper": 0.0371,
+          "confidenceLevel": 0.95
+        }
+      ],
+      "calibrationQuality": "Acceptable (Brier < 0.35)",
+      "statisticalConfidence": "Insufficient (n < 30) — illustrative only",
+      "driftDetected": false
+    }
+  ],
+  "validationSummaries": [
+    {
+      "phase": "Phase 1",
+      "status": "PASS",
+      "evidence": "Replayed 12 predictions across 6 leagues",
+      "files": [
+        "artifacts/epic31b/phase1-results.json"
+      ],
+      "metrics": {
+        "totalPredictions": 12
+      },
+      "confidence": "High"
+    },
+    {
+      "phase": "Phase 2",
+      "status": "PASS",
+      "evidence": "2 runs per league produced identical outputs",
+      "files": [
+        "artifacts/epic31b/phase2-determinism.json"
+      ],
+      "metrics": {
+        "runCount": 2,
+        "identical": 1
+      },
+      "confidence": "High"
+    },
+    {
+      "phase": "Phase 3",
+      "status": "PASS",
+      "evidence": "6 leagues validated with statistical metrics",
+      "files": [
+        "artifacts/epic31b/phase3-league-results.json"
+      ],
+      "metrics": {
+        "leaguesValidated": 6
+      },
+      "confidence": "High"
+    },
+    {
+      "phase": "Phase 4",
+      "status": "PASS",
+      "evidence": "Shadow simulation completed: 12 recommendations, -0.1290 units P/L",
+      "files": [
+        "artifacts/epic31b/phase4-shadow-metrics.json"
+      ],
+      "metrics": {
+        "totalRecommendations": 12,
+        "totalProfit": -0.129,
+        "roi": -17.05
+      },
+      "confidence": "High"
+    },
+    {
+      "phase": "Phase 5",
+      "status": "PASS",
+      "evidence": "Brier: 0.2457, LogLoss: 0.6492, CLV: 0.0371%, Drawdown: 0.1926",
+      "files": [
+        "artifacts/epic31b/phase5-statistical-validation.json"
+      ],
+      "metrics": {
+        "brierScore": 0.2457,
+        "logLoss": 0.6492,
+        "clv": 0.0371,
+        "maxDrawdown": 0.1926
+      },
+      "confidence": "Moderate"
+    },
+    {
+      "phase": "Phase 6",
+      "status": "FAIL",
+      "evidence": "Issues: research_manifest.json missing fields: experimentId, datasetVersion, featureVersion, modelVersion, seed; experiment_registry.json is not an array; model_registry.json is not an array; Missing artifact directories: model_versions, feature_versions, dataset_versions",
+      "files": [
+        "artifacts/epic31b/phase6-governance-audit.json"
+      ],
+      "metrics": {
+        "featureFlags": 1,
+        "researchRegistry": 0,
+        "experimentRegistry": 0,
+        "modelRegistry": 0
+      },
+      "confidence": "Low"
+    },
+    {
+      "phase": "Phase 7",
+      "status": "PASS",
+      "evidence": "2.93 matches/sec, 33MB peak memory, 0 bottlenecks",
+      "files": [
+        "artifacts/epic31b/phase7-performance-profile.json"
+      ],
+      "metrics": {
+        "totalDurationMs": 4094,
+        "avgMatchDurationMs": 341.17,
+        "peakMemoryMB": 33,
+        "dbReadCount": 0
+      },
+      "confidence": "High"
+    }
+  ],
+  "decision": "BLOCK EPIC 32",
+  "recommendation": "One or more validation gates failed. Address identified issues before proceeding to EPIC 32."
+}

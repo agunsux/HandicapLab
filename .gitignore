@@ -78,3 +78,8 @@ write_exec.py
 # Supabase
 supabase/.temp/
 
+# Scratch scripts
+/scratch/
+
+# Calibration artifacts
+/artifacts/calibration/

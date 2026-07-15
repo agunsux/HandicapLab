@@ -160,7 +160,7 @@ describe('Sprint 6 Integration Pipeline', () => {
       const clvCalcVal = CLVCalculator.calculate(entry, closing);
 
       expect(clvTrackerVal).toBe(clvCalcVal);
-      expect(clvTrackerVal).toBeCloseTo(-0.10, 4);
+      expect(clvTrackerVal).toBeCloseTo(0.0556, 4);
     });
   });
 

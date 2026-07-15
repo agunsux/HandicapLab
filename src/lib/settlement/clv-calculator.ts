@@ -1,6 +1,8 @@
 // HandicapLab CLV Calculator
 // Location: src/lib/settlement/clv-calculator.ts
 
+import { DeVigService } from '../settlement-core/devig';
+
 export interface ClvResult {
   clv_score: number;
   clv_percentage: number;
@@ -97,8 +99,8 @@ export class CLVCalculator {
     if (!closingOdds || closingOdds <= 1.0 || predictionOdds <= 1.0) {
       return null;
     }
-    const clv = (closingOdds / predictionOdds) - 1.0;
-    return Number(clv.toFixed(4));
+    const val = DeVigService.clv(predictionOdds, closingOdds);
+    return isNaN(val) ? null : val;
   }
 }
 

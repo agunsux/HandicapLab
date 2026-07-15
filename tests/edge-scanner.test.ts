@@ -53,9 +53,9 @@ describe('EdgeScanner Modules', () => {
   describe('ClvTracker', () => {
     it('should calculate CLV correctly when closing odds are lower than bet odds', () => {
       const betOdds = 2.0;
-      const closingOdds = 1.80; // CLV = (1.80 / 2.0) - 1 = -0.10
+      const closingOdds = 1.80; // CLV = 1/1.80 - 1/2.0 = 0.0556
       const clv = ClvTracker.calculateClv(betOdds, closingOdds);
-      expect(clv).toBeCloseTo(-0.10, 4);
+      expect(clv).toBeCloseTo(0.0556, 4);
     });
 
     it('should return null if closing odds are invalid or missing', () => {
@@ -157,7 +157,7 @@ describe('EdgeScanner Modules', () => {
       expect(picks.length).toBe(1);
       expect(picks[0].outcome).toBe('home');
       expect(picks[0].expectedValue).toBe(0.20);
-      expect(picks[0].clv).toBe(-0.1667);
+      expect(picks[0].clv).toBeCloseTo(0.0667, 4);
       expect(picks[0].line).toBe('-1.0');
     });
   });

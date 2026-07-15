@@ -150,17 +150,20 @@ SELECT
 
   -- Latency percentiles by step
   COALESCE((SELECT jsonb_object_agg(step, jsonb_build_object(
-    'avg_ms', ROUND(AVG(duration_ms)),
-    'p50_ms', ROUND(PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY duration_ms)),
-    'p99_ms', ROUND(PERCENTILE_CONT(0.99) WITHIN GROUP (ORDER BY duration_ms))
+    'avg_ms', avg_ms,
+    'p50_ms', p50_ms,
+    'p99_ms', p99_ms
   ))
     FROM (
-      SELECT step, duration_ms
+      SELECT step,
+        ROUND(AVG(duration_ms)) as avg_ms,
+        ROUND(PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY duration_ms)) as p50_ms,
+        ROUND(PERCENTILE_CONT(0.99) WITHIN GROUP (ORDER BY duration_ms)) as p99_ms
       FROM pipeline_events
       WHERE success = true
         AND created_at >= NOW() - INTERVAL '7 days'
-    ) sub
-    GROUP BY step), '{}'::jsonb) as latency;
+      GROUP BY step
+    ) sub), '{}'::jsonb) as latency;
 
 -- ==========================================
 -- 5. Function: Get Transition Timeline for Fixture
@@ -174,7 +177,7 @@ RETURNS TABLE(
   reason TEXT,
   duration_ms INTEGER,
   success BOOLEAN,
-  timestamp TIMESTAMPTZ
+  event_timestamp TIMESTAMPTZ
 ) AS $$
 BEGIN
   RETURN QUERY

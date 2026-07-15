@@ -27,12 +27,15 @@
     "shadow:predict": "tsx src/scripts/start-shadow-pipeline.ts",
     "shadow:migrate": "tsx -e \"const{migrateStatus}=require('./src/lib/db/migrate');migrateStatus().then(console.log).catch(console.error)\"",
     "shadow:evaluate": "tsx -e \"fetch('http://localhost:3000/api/shadow/evaluate').then(r=>r.json()).then(console.log).catch(console.error)\"",
-    "test:shadow": "vitest run tests/shadow-pipeline-prediction.test.ts tests/shadow-pipeline-evidence.test.ts"
+    "test:shadow": "vitest run tests/shadow-pipeline-prediction.test.ts tests/shadow-pipeline-evidence.test.ts",
+    "epic:31b": "tsx src/scripts/run-epic31b.ts",
+    "test:epic31b": "vitest run tests/epic31b/"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
     "@sentry/nextjs": "^10.62.0",
-    "@supabase/supabase-js": "^2.110.0",
+    "@supabase/ssr": "^0.12.3",
+    "@supabase/supabase-js": "^2.110.5",
     "@types/pg": "^8.20.0",
     "axios": "^1.18.1",
     "class-variance-authority": "^0.7.1",
@@ -56,6 +59,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitest/coverage-v8": "^2.1.9",
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
     "madge": "^8.0.0",
