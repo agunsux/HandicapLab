@@ -260,6 +260,9 @@ export class ProductionReplayRunner {
         expectedValue: Math.round(expectedValue * 10000) / 10000,
         settledOutcome,
         settlementProfitUnits: Math.round(settlementProfitUnits * 10000) / 10000,
+        homeGoals,
+        awayGoals,
+        leagueId,
       });
     }
 

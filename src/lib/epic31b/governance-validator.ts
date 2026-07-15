@@ -100,8 +100,9 @@ export class GovernanceValidator {
 
     try {
       const registry = JSON.parse(fs.readFileSync(experimentRegistryPath, 'utf-8'));
-      if (!Array.isArray(registry)) {
-        issues.push('experiment_registry.json is not an array');
+      const list = Array.isArray(registry) ? registry : (registry && registry.entries);
+      if (!Array.isArray(list)) {
+        issues.push('experiment_registry.json is not an array and does not contain entries');
         return false;
       }
       return true;
@@ -120,8 +121,9 @@ export class GovernanceValidator {
 
     try {
       const registry = JSON.parse(fs.readFileSync(modelRegistryPath, 'utf-8'));
-      if (!Array.isArray(registry)) {
-        issues.push('model_registry.json is not an array');
+      const list = Array.isArray(registry) ? registry : (registry && registry.models);
+      if (!Array.isArray(list)) {
+        issues.push('model_registry.json is not an array and does not contain models');
         return false;
       }
       return true;

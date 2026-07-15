@@ -50,6 +50,9 @@ export interface ReplayOutcome {
   expectedValue: number;
   settledOutcome: string;
   settlementProfitUnits: number;
+  homeGoals?: number;
+  awayGoals?: number;
+  leagueId?: LeagueId;
 }
 
 export interface ReplayMetrics {
@@ -72,6 +75,12 @@ export interface ReplayMetrics {
   profitFactor: number;
   longestWinStreak: number;
   longestLossStreak: number;
+  ece?: number;
+  mce?: number;
+  sharpness?: number;
+  entropy?: number;
+  psi?: number;
+  kellyRiskRatio?: number;
 }
 
 export interface ValidationReport {
@@ -186,3 +195,81 @@ export interface ExperimentMetadata {
   parameters: Record<string, unknown>;
   phases: string[];
 }
+
+export interface CalibrationBin {
+  binIndex: number;
+  lowerBound: number;
+  upperBound: number;
+  predictedConfidence: number;
+  realizedAccuracy: number;
+  sampleCount: number;
+}
+
+export interface RocPoint {
+  threshold: number;
+  fpr: number;
+  tpr: number;
+}
+
+export interface PrPoint {
+  threshold: number;
+  recall: number;
+  precision: number;
+}
+
+export interface DecileLift {
+  decile: number;
+  sampleCount: number;
+  winCount: number;
+  accuracy: number;
+  cumulativeLift: number;
+}
+
+export interface KellyRiskMetric {
+  avgKellyStake: number;
+  stdDevKellyStake: number;
+  expectedKellyGrowth: number;
+  realizedKellyGrowth: number;
+  riskStatus: 'SAFE' | 'WARN_OVERALLOCATION' | 'CRITICAL';
+}
+
+export interface DixonColesAudit {
+  rho: number;
+  lowScoreCorrectionFactor: number; // correction factor for low scoring matches
+  adjustmentMatchCount: number;
+  status: 'OPTIMAL' | 'SUB_OPTIMAL';
+}
+
+export interface StabilityWindow {
+  windowIndex: number;
+  rangeStart: string;
+  rangeEnd: string;
+  sampleCount: number;
+  roi: number;
+  brierScore: number;
+}
+
+export interface MultipleComparisonAudit {
+  leagueId: LeagueId;
+  leagueName: LeagueName;
+  rawPValue: number;
+  adjustedPValue: number;
+  significant: boolean;
+}
+
+export interface StatisticalValidatorOutput {
+  metrics: ReplayMetrics;
+  confidenceIntervals: ConfidenceInterval[];
+  calibrationQuality: string;
+  statisticalConfidence: string;
+  driftDetected: boolean;
+  calibrationBins: CalibrationBin[];
+  rocPoints: RocPoint[];
+  prPoints: PrPoint[];
+  decileLifts: DecileLift[];
+  kellyRisk: KellyRiskMetric;
+  dixonColesAudit: DixonColesAudit;
+  stabilityWindows: StabilityWindow[];
+  multipleComparisons: MultipleComparisonAudit[];
+}
+

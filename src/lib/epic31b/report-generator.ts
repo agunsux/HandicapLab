@@ -91,7 +91,15 @@ export class ReportGenerator {
     overallMetrics: ReplayMetrics
   ): Epic32Decision {
     const allLeaguesPass = leagueResults.every((r) => r.status === 'PASS');
-    const allGovernancePass = Object.values(governance).every((v) => v === true);
+    const allGovernancePass = 
+      governance.featureFlagsVerified &&
+      governance.researchRegistryVerified &&
+      governance.experimentRegistryVerified &&
+      governance.modelRegistryVerified &&
+      governance.artifactMetadataVerified &&
+      governance.executionMetadataVerified &&
+      governance.versionTraceabilityVerified &&
+      governance.issues.length === 0;
     const sampleSizeSufficient = overallMetrics.totalPredictions >= 100;
     const calibrationAcceptable = overallMetrics.brierScore < 0.35;
     const noDrift = !leagueResults.some((r) => r.driftDetected);
@@ -145,7 +153,15 @@ export class ReportGenerator {
 
   private assessProductionReadiness(leagueResults: LeagueValidationResult[], governance: GovernanceAudit): string {
     const allPass = leagueResults.every((r) => r.status === 'PASS');
-    const governancePass = Object.values(governance).every((v) => v === true);
+    const governancePass = 
+      governance.featureFlagsVerified &&
+      governance.researchRegistryVerified &&
+      governance.experimentRegistryVerified &&
+      governance.modelRegistryVerified &&
+      governance.artifactMetadataVerified &&
+      governance.executionMetadataVerified &&
+      governance.versionTraceabilityVerified &&
+      governance.issues.length === 0;
 
     if (allPass && governancePass) {
       return 'READY — all production gates passed';
