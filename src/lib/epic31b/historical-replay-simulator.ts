@@ -7,6 +7,7 @@ import { DixonColesModel } from '../engines/probability-engine/dixon-coles';
 import { DeVigService } from '../settlement-core/devig';
 import { settleMoneyline } from '../settlement-core/settlement';
 import { EdgeScanner } from '../engines/edge-scanner';
+import type { ProbabilityOutput } from '../engines/probability-engine/types';
 
 export interface HistoricalMatch {
   kickoffAt: Date;
@@ -231,10 +232,25 @@ export class HistoricalReplaySimulator {
           }
         }
         const sum = pHome + pDraw + pAway;
-        const mlProb = {
+        const mlProb: ProbabilityOutput = {
+          matchId: fixtureId,
+          marketType: 'ML',
+          leagueId: '39',
           pHome: pHome / sum,
           pDraw: pDraw / sum,
           pAway: pAway / sum,
+          pOver: {},
+          pUnder: {},
+          pAhHome: {},
+          pAhAway: {},
+          modelVersion: {
+            name: 'prematch-v1',
+            algo: options.model,
+            features: 'basic-v1',
+            trainedAt: new Date(),
+            trainedOnMatches: 1520,
+          },
+          calibrationApplied: true,
         };
 
         // 4. Run Edge Scanner and calculate stakes
