@@ -1,0 +1,8 @@
+{
+  "experimentId": "exp-1784122368832",
+  "timestamp": "2026-07-15T13:32:48.833Z",
+  "decision": "BLOCK",
+  "reasons": [
+    "Failed ECE or drawdown limit bounds"
+  ]
+}

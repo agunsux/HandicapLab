@@ -8,6 +8,9 @@ import { DeVigService } from '../settlement-core/devig';
 import { settleMoneyline } from '../settlement-core/settlement';
 import { EdgeScanner } from '../engines/edge-scanner';
 import type { ProbabilityOutput } from '../engines/probability-engine/types';
+import { RegimeSelector } from '../../domain/dataset/regime-selector';
+import { CapitalAllocationEngine } from '../../domain/bankroll/capital-allocation';
+import { LeakageAuditor } from '../../application/validation/leakage-auditor';
 
 export interface HistoricalMatch {
   kickoffAt: Date;
@@ -157,12 +160,10 @@ export class HistoricalReplaySimulator {
     // Sort chronological seasons
     const seasonsList = Object.keys(allSeasons).sort();
     
-    const outcomes: ReplayOutcome[] = [];
+    let rawOutcomes: ReplayOutcome[] = [];
     const errors: ValidationError[] = [];
     let validFixtures = 0;
-    let invalidFixtures = 0;
     let missingOdds = 0;
-    let missingResults = 0;
 
     // Track running history of matches to avoid look-ahead bias
     const history: HistoricalMatch[] = [];
@@ -192,7 +193,10 @@ export class HistoricalReplaySimulator {
         const pastMatches = history.filter((m) => m.kickoffAt.getTime() < match.kickoffAt.getTime());
         const xg = this.calculateLocalXg(pastMatches, match.homeTeam, match.awayTeam);
 
-        // 2. Build match features
+        // 2. Select structural regimes
+        const regimes = RegimeSelector.selectRegime(match.kickoffAt, season, { restDays: 4 });
+
+        // 3. Build match features
         const matchFeatures: any = {
           homeAttack: xg.homeAttack,
           homeDefense: xg.homeDefense,
@@ -207,9 +211,10 @@ export class HistoricalReplaySimulator {
           competitionType: 'league',
           leagueId: '39',
           season,
+          regime: regimes[0],
         };
 
-        // 3. Generate probability predictions (poisson vs dixon-coles)
+        // 4. Generate probability predictions (poisson vs dixon-coles)
         let scoreMatrix: number[][];
         if (options.model === 'dixonColes') {
           const res = DixonColesModel.predict(matchFeatures, rho);
@@ -253,7 +258,7 @@ export class HistoricalReplaySimulator {
           calibrationApplied: true,
         };
 
-        // 4. Run Edge Scanner and calculate stakes
+        // 5. Run Edge Scanner and calculate raw stakes
         const marketOdds = {
           homeOdds: match.homeOdds,
           drawOdds: match.drawOdds,
@@ -269,7 +274,7 @@ export class HistoricalReplaySimulator {
         const selection = topPick ? topPick.outcome : 'home';
         const predictedProb = selection === 'home' ? mlProb.pHome : selection === 'draw' ? mlProb.pDraw : mlProb.pAway;
 
-        // 5. Settle match outcome
+        // 6. Settle match outcome
         const actualResult = match.homeGoals > match.awayGoals ? 1 : match.homeGoals === match.awayGoals ? 0.5 : 0;
         const profitLoss = topPick
           ? (actualResult === 1 ? kellyStake * (topPick.marketOdds - 1) : actualResult === 0.5 ? 0 : -kellyStake)
@@ -281,7 +286,7 @@ export class HistoricalReplaySimulator {
 
         const settlement = settleMoneyline(match.homeGoals, match.awayGoals, selection as 'home' | 'draw' | 'away', topPick ? topPick.marketOdds : match.homeOdds, false);
 
-        outcomes.push({
+        rawOutcomes.push({
           fixtureId,
           marketType: 'ML',
           selection,
@@ -300,67 +305,85 @@ export class HistoricalReplaySimulator {
           leagueId: '39'
         });
 
-        // Add to chronological past matches list
+        // Add played match to training history (zero look-ahead)
         history.push(match);
       }
     }
 
+    // 7. Apply Capital Allocation Escalator to recommended stakes
+    const outcomes = CapitalAllocationEngine.allocate(rawOutcomes, { maxDrawdownLimit: 0.25 }, 0.0);
+
+    // 8. Run Leakage Audit checks
+    const allParsedMatches = Object.values(allSeasons).flat();
+    const leakageAudit = LeakageAuditor.audit(outcomes, allParsedMatches);
+    if (leakageAudit.hasLeakage) {
+      for (const leak of leakageAudit.issues) {
+        errors.push({
+          fixtureId: 'SYSTEM',
+          field: 'leakage',
+          message: leak,
+          severity: 'error',
+        });
+      }
+    }
+
     const validationReport: ValidationReport = {
-      totalFixtures: Object.values(allSeasons).reduce((s, m) => s + m.length, 0),
       validFixtures,
-      invalidFixtures: missingOdds + missingResults,
+      invalidFixtures: errors.length,
       missingOdds,
-      missingResults,
-      validationErrors: errors,
+      missingResults: 0,
+      errors,
     };
 
-    return { outcomes, validationReport };
+    return {
+      outcomes,
+      validationReport,
+    };
   }
 
-  /**
-   * Local dynamic team statistics calculations
-   */
-  private calculateLocalXg(pastMatches: HistoricalMatch[], homeTeam: string, awayTeam: string) {
-    if (pastMatches.length === 0) {
-      return { homeAttack: 1.0, homeDefense: 1.0, awayAttack: 1.0, awayDefense: 1.0, leagueAvgGoals: 2.5 };
+  private calculateLocalXg(
+    pastMatches: HistoricalMatch[],
+    homeTeam: string,
+    awayTeam: string
+  ): { homeAttack: number; homeDefense: number; awayAttack: number; awayDefense: number; leagueAvgGoals: number } {
+    if (pastMatches.length < 10) {
+      return { homeAttack: 1.0, homeDefense: 1.0, awayAttack: 1.0, awayDefense: 1.0, leagueAvgGoals: 1.35 };
     }
 
-    const totalMatches = pastMatches.length;
-    const totalHomeGoals = pastMatches.reduce((sum, m) => sum + m.homeGoals, 0);
-    const totalAwayGoals = pastMatches.reduce((sum, m) => sum + m.awayGoals, 0);
+    // Compute league averages
+    let totalHomeGoals = 0;
+    let totalAwayGoals = 0;
+    let homeMatchCount = 0;
+    let awayMatchCount = 0;
 
-    const leagueAvgHomeGoals = totalHomeGoals / totalMatches;
-    const leagueAvgAwayGoals = totalAwayGoals / totalMatches;
-    const leagueAvgGoals = (totalHomeGoals + totalAwayGoals) / totalMatches;
-
-    const homeTeamMatches = pastMatches.filter((m) => m.homeTeam === homeTeam);
-    let homeAttack = 1.0;
-    let homeDefense = 1.0;
-
-    if (homeTeamMatches.length > 0) {
-      const avgScored = homeTeamMatches.reduce((sum, m) => sum + m.homeGoals, 0) / homeTeamMatches.length;
-      const avgConceded = homeTeamMatches.reduce((sum, m) => sum + m.awayGoals, 0) / homeTeamMatches.length;
-      homeAttack = leagueAvgHomeGoals > 0 ? avgScored / leagueAvgHomeGoals : 1.0;
-      homeDefense = leagueAvgAwayGoals > 0 ? avgConceded / leagueAvgAwayGoals : 1.0;
+    for (const m of pastMatches) {
+      totalHomeGoals += m.homeGoals;
+      totalAwayGoals += m.awayGoals;
     }
 
-    const awayTeamMatches = pastMatches.filter((m) => m.awayTeam === awayTeam);
-    let awayAttack = 1.0;
-    let awayDefense = 1.0;
+    const avgHomeScored = totalHomeGoals / pastMatches.length;
+    const avgAwayScored = totalAwayGoals / pastMatches.length;
 
-    if (awayTeamMatches.length > 0) {
-      const avgScored = awayTeamMatches.reduce((sum, m) => sum + m.awayGoals, 0) / awayTeamMatches.length;
-      const avgConceded = awayTeamMatches.reduce((sum, m) => sum + m.homeGoals, 0) / awayTeamMatches.length;
-      awayAttack = leagueAvgAwayGoals > 0 ? avgScored / leagueAvgAwayGoals : 1.0;
-      awayDefense = leagueAvgHomeGoals > 0 ? avgConceded / leagueAvgHomeGoals : 1.0;
-    }
+    // Team specific scoring/conceding averages
+    const homeScored = pastMatches.filter((m) => m.homeTeam === homeTeam).reduce((sum, m) => sum + m.homeGoals, 0);
+    const homeConceded = pastMatches.filter((m) => m.homeTeam === homeTeam).reduce((sum, m) => sum + m.awayGoals, 0);
+    const homeMatches = pastMatches.filter((m) => m.homeTeam === homeTeam).length || 1;
+
+    const awayScored = pastMatches.filter((m) => m.awayTeam === awayTeam).reduce((sum, m) => sum + m.awayGoals, 0);
+    const awayConceded = pastMatches.filter((m) => m.awayTeam === awayTeam).reduce((sum, m) => sum + m.homeGoals, 0);
+    const awayMatches = pastMatches.filter((m) => m.awayTeam === awayTeam).length || 1;
+
+    const homeAttack = (homeScored / homeMatches) / (avgHomeScored || 1);
+    const homeDefense = (homeConceded / homeMatches) / (avgAwayScored || 1);
+    const awayAttack = (awayScored / awayMatches) / (avgAwayScored || 1);
+    const awayDefense = (awayConceded / awayMatches) / (avgHomeScored || 1);
 
     return {
-      homeAttack: Math.max(0.1, Math.min(3.0, homeAttack)),
-      homeDefense: Math.max(0.1, Math.min(3.0, homeDefense)),
-      awayAttack: Math.max(0.1, Math.min(3.0, awayAttack)),
-      awayDefense: Math.max(0.1, Math.min(3.0, awayDefense)),
-      leagueAvgGoals: leagueAvgGoals || 2.5,
+      homeAttack,
+      homeDefense,
+      awayAttack,
+      awayDefense,
+      leagueAvgGoals: (avgHomeScored + avgAwayScored) / 2 || 1.35,
     };
   }
 }
