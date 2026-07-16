@@ -1,0 +1,38 @@
+[
+  {
+    "model": "historical-baseline-v1",
+    "matches": 0,
+    "accuracy": 0,
+    "brierScore": 0,
+    "logLoss": 0,
+    "calibrationError": 0,
+    "probSumErrors": 0
+  },
+  {
+    "model": "poisson-xg-v1",
+    "matches": 0,
+    "accuracy": 0,
+    "brierScore": 0,
+    "logLoss": 0,
+    "calibrationError": 0,
+    "probSumErrors": 0
+  },
+  {
+    "model": "xg-strength-v1",
+    "matches": 0,
+    "accuracy": 0,
+    "brierScore": 0,
+    "logLoss": 0,
+    "calibrationError": 0,
+    "probSumErrors": 0
+  },
+  {
+    "model": "dixon-coles-v1",
+    "matches": 0,
+    "accuracy": 0,
+    "brierScore": 0,
+    "logLoss": 0,
+    "calibrationError": 0,
+    "probSumErrors": 0
+  }
+]

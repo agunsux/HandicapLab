@@ -1,0 +1,1082 @@
+[
+  {
+    "fixtureId": "f2daebf086bc1ce7f974407bd108d211d460ddf83bc59b343d1a462d3ceba31d",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.4378,
+      "draw": 0.319,
+      "awayWin": 0.2432
+    },
+    "actualResult": "DRAW",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-10"
+  },
+  {
+    "fixtureId": "4023cef8204241f3e8c8045be64798c02585edde9ea722a60bd90b940c431780",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.541,
+      "draw": 0.2156,
+      "awayWin": 0.2434
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-10"
+  },
+  {
+    "fixtureId": "db53e2d507342f1ae4aa09f5acf156aa87478fd60680115e5e7279bfa16a5053",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.471,
+      "draw": 0.1846,
+      "awayWin": 0.3445
+    },
+    "actualResult": "DRAW",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-10"
+  },
+  {
+    "fixtureId": "7034b4ca50c833b0c8fa383190f72c8a5eb59f984df68ba6534bf0b50bb60c2f",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.6453,
+      "draw": 0.1724,
+      "awayWin": 0.1823
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-10"
+  },
+  {
+    "fixtureId": "de2d8e6e65f92e2e59374c650d2ee5d2c83c76ceeeb44cd332f11608817aeb31",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.3092,
+      "draw": 0.2503,
+      "awayWin": 0.4405
+    },
+    "actualResult": "AWAY_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-11"
+  },
+  {
+    "fixtureId": "2a06ecf422a7bb086b25aa89f810699d9cd056953dea8473c1ee185f0933584d",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.2757,
+      "draw": 0.23,
+      "awayWin": 0.4943
+    },
+    "actualResult": "DRAW",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-11"
+  },
+  {
+    "fixtureId": "a9f05bac6691da3db9f9a795bef15bfbd203c199e154c5c09ce8fc2862107876",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.4458,
+      "draw": 0.2479,
+      "awayWin": 0.3064
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-11"
+  },
+  {
+    "fixtureId": "04f1f2400b77a33169584f919de021c9b27627749a0cad6eafab4179c9431b7a",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.6256,
+      "draw": 0.1793,
+      "awayWin": 0.195
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-11"
+  },
+  {
+    "fixtureId": "3957e4f345e790229b18364349ed24da3d2fbfec316ed91c57f7558181b5a220",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.683,
+      "draw": 0.1458,
+      "awayWin": 0.1712
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-11"
+  },
+  {
+    "fixtureId": "43dc4c69f368710776ac1898af31c65294b3a000a6a28b9dd19266853dd0d37a",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.3063,
+      "draw": 0.3531,
+      "awayWin": 0.3406
+    },
+    "actualResult": "DRAW",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-12"
+  },
+  {
+    "fixtureId": "cf21901fd98ab700deb14deba0e27cedec8b6e980df4ceecd66d3d1ed6b53ebf",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.6466,
+      "draw": 0.1908,
+      "awayWin": 0.1626
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-12"
+  },
+  {
+    "fixtureId": "78c4d4df814063a49f42c145a56e96aa634ea22fbaea519ea14afc72e9d63c82",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.3648,
+      "draw": 0.2284,
+      "awayWin": 0.4067
+    },
+    "actualResult": "DRAW",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-12"
+  },
+  {
+    "fixtureId": "9a5980c95e5397cc4af7450bc0dc9f205798b5b6327e8ecbff669c3e4a21a0d7",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.362,
+      "draw": 0.18,
+      "awayWin": 0.458
+    },
+    "actualResult": "DRAW",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-12"
+  },
+  {
+    "fixtureId": "f79d7a8d4d36297232c9cef4d851fce44c2ef3111ab6fd2fbb6af4ea97ec8fd3",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.7258,
+      "draw": 0.1397,
+      "awayWin": 0.1345
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-12"
+  },
+  {
+    "fixtureId": "73bba396cd7d6b4a1897377375cb5461aef6ca0866f19cce55fc6b21d6bcf187",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.4891,
+      "draw": 0.2187,
+      "awayWin": 0.2922
+    },
+    "actualResult": "DRAW",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-13"
+  },
+  {
+    "fixtureId": "bf448deac64aab7db8c02f24864753be42b2b036ee1a2537d01fce47fb3f4d10",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.291,
+      "draw": 0.2022,
+      "awayWin": 0.5068
+    },
+    "actualResult": "DRAW",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-13"
+  },
+  {
+    "fixtureId": "3416f29168a9a99228387c41fc33d1f3d0938fbbe64c866f2f97ef8418d4fdae",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.3218,
+      "draw": 0.2451,
+      "awayWin": 0.433
+    },
+    "actualResult": "DRAW",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-13"
+  },
+  {
+    "fixtureId": "e2fc160282c5aee2b7cdedd8fe4ad948620d2236afb7e3b3232d4e21cb41a3e3",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.415,
+      "draw": 0.2043,
+      "awayWin": 0.3807
+    },
+    "actualResult": "DRAW",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-13"
+  },
+  {
+    "fixtureId": "d4c6021835dda6247fa7b9c168a590dee6472d1e578efba11a02b1910cd5a908",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.8673,
+      "draw": 0.0834,
+      "awayWin": 0.0493
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-13"
+  },
+  {
+    "fixtureId": "e8ded2d36ced521e27f8c1af40202503585e112365c5365e43ca6c7e1978acf7",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.3757,
+      "draw": 0.2165,
+      "awayWin": 0.4078
+    },
+    "actualResult": "DRAW",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-14"
+  },
+  {
+    "fixtureId": "ba3533ad67bf069c657a8c066d1e19c94b6cc2edb84953b731435f5c0a30135f",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.5266,
+      "draw": 0.195,
+      "awayWin": 0.2784
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-14"
+  },
+  {
+    "fixtureId": "5ee3ee78c1d3dacee0bf96a08245534f3e252ca0e3f5f0d5690bfd744fefa47b",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.4292,
+      "draw": 0.179,
+      "awayWin": 0.3918
+    },
+    "actualResult": "DRAW",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-14"
+  },
+  {
+    "fixtureId": "54def237de1825ee86a58410c838aaa34ef89c4024232a413c8a213394763162",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.9033,
+      "draw": 0.0722,
+      "awayWin": 0.0244
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-14"
+  },
+  {
+    "fixtureId": "8e4904ced3b0c22c1d05d5309a47d6ab88820cc8e7227d401e83958abe0812e7",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.7527,
+      "draw": 0.1229,
+      "awayWin": 0.1244
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-14"
+  },
+  {
+    "fixtureId": "57be3dd6b1043049bc9df2ae8258463c20e190fba926576112a7d78152f41f08",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.1809,
+      "draw": 0.2222,
+      "awayWin": 0.5969
+    },
+    "actualResult": "AWAY_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-15"
+  },
+  {
+    "fixtureId": "8a49ba00d37c5a9841f23ac9c7c7c1947faaba1527901bbfbdfdebec97d19dc4",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.2576,
+      "draw": 0.199,
+      "awayWin": 0.5433
+    },
+    "actualResult": "DRAW",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-15"
+  },
+  {
+    "fixtureId": "504cfd8cc1a0829ca1056072b2e0f289f4869ce227b46da9880054faceb0d1f5",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.4047,
+      "draw": 0.1803,
+      "awayWin": 0.415
+    },
+    "actualResult": "DRAW",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-15"
+  },
+  {
+    "fixtureId": "fc08fc8f3aebbb87c4ab51a25437f6b5790d3c45f8031018762dc7320316df42",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.8167,
+      "draw": 0.1249,
+      "awayWin": 0.0585
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-15"
+  },
+  {
+    "fixtureId": "0ee50ba9cc273da6b2f542eaaceab0aba9a8a0fe5f5bd695eb1ee3d8f34cd3a1",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.8603,
+      "draw": 0.0885,
+      "awayWin": 0.0512
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-15"
+  },
+  {
+    "fixtureId": "6c73f0d66da2059f348762cb6ed4148ff2b677c15e7cbdbbceaa6a8ec7e450fc",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.2521,
+      "draw": 0.2752,
+      "awayWin": 0.4727
+    },
+    "actualResult": "AWAY_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-16"
+  },
+  {
+    "fixtureId": "ee183c4e2edae6f5feeff2145dbd89d2559b6a80f342fac918c3ce71c0af02d9",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.3546,
+      "draw": 0.2119,
+      "awayWin": 0.4335
+    },
+    "actualResult": "DRAW",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-16"
+  },
+  {
+    "fixtureId": "6adc937b26af71de5d254541bc7db8c775c77dd7825cb9273a0a67b9abb05455",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.4936,
+      "draw": 0.2545,
+      "awayWin": 0.2519
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-16"
+  },
+  {
+    "fixtureId": "53bf7e50d8142aa3c632c5c64ad39b8329ec085e9ba0e9aa9c9088df0191328c",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.6733,
+      "draw": 0.1612,
+      "awayWin": 0.1656
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-16"
+  },
+  {
+    "fixtureId": "416d01dcc2ff69d241d027e60ae854ffca0395be5865f6fadb9b0e0bc4f76472",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.7561,
+      "draw": 0.136,
+      "awayWin": 0.1079
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-16"
+  },
+  {
+    "fixtureId": "7524f6818f238ed6869c252a691194b35993c4490d6673b703e1f3bc9ca72361",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.1735,
+      "draw": 0.1904,
+      "awayWin": 0.6361
+    },
+    "actualResult": "AWAY_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-17"
+  },
+  {
+    "fixtureId": "4ebc299d78d0d0c8afbaa077a91d0212346475e8ca177c13f74b4a6de6deffa3",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.4421,
+      "draw": 0.2161,
+      "awayWin": 0.3418
+    },
+    "actualResult": "DRAW",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-17"
+  },
+  {
+    "fixtureId": "eb84621040640f51758fe956269325163bb751086752429a75de6681d7aa9dd3",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.6741,
+      "draw": 0.16,
+      "awayWin": 0.1659
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-17"
+  },
+  {
+    "fixtureId": "e0a5942994b6407f7043713a68ee57c4b8c77a7e00a908c44836ce6d8dc0cad4",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.6768,
+      "draw": 0.1602,
+      "awayWin": 0.163
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-17"
+  },
+  {
+    "fixtureId": "f0730b667a7a165f5051130cc7471b127636625692852525588ccc7a176d6180",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.5243,
+      "draw": 0.1904,
+      "awayWin": 0.2853
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-17"
+  },
+  {
+    "fixtureId": "8c08b0a4ddc161542bbe2ab64ea3d37234e5495f9709db1e51bf09fc8a1f642d",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.2968,
+      "draw": 0.2232,
+      "awayWin": 0.4799
+    },
+    "actualResult": "DRAW",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-18"
+  },
+  {
+    "fixtureId": "79163ef236451a9c5482e0b2d3ed2c6c37ce1fd3c82c26765b97e1be327ce09e",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.4956,
+      "draw": 0.2761,
+      "awayWin": 0.2284
+    },
+    "actualResult": "DRAW",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-18"
+  },
+  {
+    "fixtureId": "382ee428a0fe01fb9acf943b16d070a326ff14e51abad69f299ed3e227c42bbf",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.6403,
+      "draw": 0.2234,
+      "awayWin": 0.1362
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-18"
+  },
+  {
+    "fixtureId": "9f6057b553caf87bb95803395ef7e3f20b6bfaad68c1ec37d19beea527543a48",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.5798,
+      "draw": 0.2142,
+      "awayWin": 0.206
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-18"
+  },
+  {
+    "fixtureId": "06f30d4251f87da6ff02b74fc5d17ed7ac504bc28242db560a12fb5692042d00",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.6973,
+      "draw": 0.143,
+      "awayWin": 0.1597
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-18"
+  },
+  {
+    "fixtureId": "b730b97265281107f371fefb33df8098eb9ace5175a4b431690b9d7e132ef444",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.2838,
+      "draw": 0.1899,
+      "awayWin": 0.5262
+    },
+    "actualResult": "AWAY_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-19"
+  },
+  {
+    "fixtureId": "878ab33ae2737e5fb149f852b2a96c9b26a83fb12be2f0c9e23932ad6b5f2f49",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.6174,
+      "draw": 0.2153,
+      "awayWin": 0.1673
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-19"
+  },
+  {
+    "fixtureId": "b3453066338332d9d89ac0c9d8e1225282c80c45ac44448d82aa5a768237d11e",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.6757,
+      "draw": 0.1706,
+      "awayWin": 0.1537
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-19"
+  },
+  {
+    "fixtureId": "5f029985c58ce4970b35058d92cd7bc8dc83165730864ec6f7c63a546f63e188",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.7622,
+      "draw": 0.1261,
+      "awayWin": 0.1117
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-19"
+  },
+  {
+    "fixtureId": "ecdd5a20d7fbf3cc3f569de1dec52c02233ab6cc35880a977e56796d406260a4",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.6545,
+      "draw": 0.1541,
+      "awayWin": 0.1914
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-19"
+  },
+  {
+    "fixtureId": "d65539736b52ebbfdfad93f327d3f1587f04358b1f3d3d4ea5e61afa0f4baf43",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.2988,
+      "draw": 0.2584,
+      "awayWin": 0.4427
+    },
+    "actualResult": "AWAY_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-20"
+  },
+  {
+    "fixtureId": "2e68aba57064e616bb13dd4d28596515e63b9f604caf0353b269e86e92f2685c",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.7907,
+      "draw": 0.1407,
+      "awayWin": 0.0686
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-20"
+  },
+  {
+    "fixtureId": "33b97e4e8b3a7e323383cb91a31eb1904572113fe71f659bb79dc7c1789536c8",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.4187,
+      "draw": 0.2247,
+      "awayWin": 0.3566
+    },
+    "actualResult": "DRAW",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-20"
+  },
+  {
+    "fixtureId": "bbf745ad6eb5a9c13ed1eee350dea52554bd577ec14c87085b81da7964c729ad",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.4887,
+      "draw": 0.1872,
+      "awayWin": 0.3241
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-20"
+  },
+  {
+    "fixtureId": "acc9a7233ffe333e97e42632d25acce8ab3e1ae4afd23a72ba31a549a1954704",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.6636,
+      "draw": 0.1495,
+      "awayWin": 0.1869
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-20"
+  },
+  {
+    "fixtureId": "82df8cb6bff75b7a3a1ef2c1d039802e87ce5b8cd73e3308cb37d72249501137",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.6613,
+      "draw": 0.2063,
+      "awayWin": 0.1325
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-21"
+  },
+  {
+    "fixtureId": "63dcba2c7365b360c171d0827b4dc584a4e71b05d6114c3eb75ccb5a335c698b",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.6405,
+      "draw": 0.1833,
+      "awayWin": 0.1761
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-21"
+  },
+  {
+    "fixtureId": "c94d81e6ad47f04a47b1022d0bf197fb796283a050397321c15e1c550db95306",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.3916,
+      "draw": 0.1916,
+      "awayWin": 0.4168
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-21"
+  },
+  {
+    "fixtureId": "524d8faebdd25b2953c85e1a35769a00c2aeb296d7df823dc085cf0bcb367f82",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.3431,
+      "draw": 0.1862,
+      "awayWin": 0.4707
+    },
+    "actualResult": "DRAW",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-21"
+  },
+  {
+    "fixtureId": "a0ee04650f2fce96bfdaaf34c8e4cc88054bbbfc0a73c35305913ee02c8bb037",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.2737,
+      "draw": 0.2764,
+      "awayWin": 0.4499
+    },
+    "actualResult": "DRAW",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-22"
+  },
+  {
+    "fixtureId": "0e038b6d3287bd4039911f118a7d9a2afbdc2d87821da0fee8e452f9742548c1",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.3796,
+      "draw": 0.2283,
+      "awayWin": 0.3921
+    },
+    "actualResult": "DRAW",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-22"
+  },
+  {
+    "fixtureId": "09c9465f25af7caf7530d9d1557ed014503508cecfeae40f392af2732bc00ebd",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.5492,
+      "draw": 0.1707,
+      "awayWin": 0.2801
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-22"
+  },
+  {
+    "fixtureId": "1513f05dfbb970cc753eedca5338c6e8972d5c5875beab5d70d0631554071b67",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.3142,
+      "draw": 0.1842,
+      "awayWin": 0.5017
+    },
+    "actualResult": "DRAW",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-22"
+  },
+  {
+    "fixtureId": "ae2b07587d5a95aa34d9a1f6b7ea3ef9032bfb2842704d498de4c745ece63984",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.2655,
+      "draw": 0.2243,
+      "awayWin": 0.5102
+    },
+    "actualResult": "AWAY_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-23"
+  },
+  {
+    "fixtureId": "fbff1e67aab22f9c9ac0d1131eb1270b6be5a34cc6ab3cf33b28d00d90ce7b0b",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.5013,
+      "draw": 0.1932,
+      "awayWin": 0.3055
+    },
+    "actualResult": "DRAW",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-23"
+  },
+  {
+    "fixtureId": "ba85b7638f63e8a10e5a74b6dd040f1d3051fa3486b8cefb53c380fe2e55757b",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.4611,
+      "draw": 0.1965,
+      "awayWin": 0.3424
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-23"
+  },
+  {
+    "fixtureId": "3e727ee4ec2a74367ac7dff3e61c024d9bf6f82d8520c9f873ee0d8bfe90b310",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.742,
+      "draw": 0.1375,
+      "awayWin": 0.1205
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-23"
+  },
+  {
+    "fixtureId": "72762a7fdece4450f2a6c52c421e2830ced2e4c9fb710c90e2ae9d8b5fd062a9",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.5424,
+      "draw": 0.233,
+      "awayWin": 0.2246
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-24"
+  },
+  {
+    "fixtureId": "52abca5d59a7c45982b7e81cc7e24f7115cd78d2c7526c498f2c6736600345a2",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.3795,
+      "draw": 0.2453,
+      "awayWin": 0.3751
+    },
+    "actualResult": "DRAW",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-24"
+  },
+  {
+    "fixtureId": "2158f06de9f5b7c0c2e40e6c2ad407bad6171c56cf0005ca267fb7f3f4ef752f",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.3033,
+      "draw": 0.1896,
+      "awayWin": 0.5071
+    },
+    "actualResult": "AWAY_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-24"
+  },
+  {
+    "fixtureId": "a3762d2c7a21a02f1959b03423b309f70aed232894f4e40b403ef3d3d6ae71ac",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.9065,
+      "draw": 0.0678,
+      "awayWin": 0.0257
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-24"
+  },
+  {
+    "fixtureId": "bb447f9c45696e4fdfc383fb81ebf290841e63a4a24c67fb31e47f565048040b",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.3105,
+      "draw": 0.2071,
+      "awayWin": 0.4824
+    },
+    "actualResult": "DRAW",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-25"
+  },
+  {
+    "fixtureId": "84933a95792db1fc1e83bf0f1cbff558d6c8f8afda91ea00d88c24d4fd96774a",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.2419,
+      "draw": 0.1914,
+      "awayWin": 0.5666
+    },
+    "actualResult": "AWAY_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-25"
+  },
+  {
+    "fixtureId": "9ce740634be8ebc6a6b86d92d1fe6568e21250c98033289586fa66dab5a513a1",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.7616,
+      "draw": 0.1567,
+      "awayWin": 0.0816
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-25"
+  },
+  {
+    "fixtureId": "1a95d0b38119302721328ae91c37e2f7d568345d9354f959772190b31a6fae06",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.7688,
+      "draw": 0.1356,
+      "awayWin": 0.0957
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-25"
+  },
+  {
+    "fixtureId": "330e91ac593de6319359b780f285381042dce9f83fc69a42c17393240c41e11d",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.3154,
+      "draw": 0.2037,
+      "awayWin": 0.4809
+    },
+    "actualResult": "DRAW",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-26"
+  },
+  {
+    "fixtureId": "bf9ea08723b0323a2e9c0993e719e9a5a47911c5fa0ab6118d346dcf3c233ece",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.4607,
+      "draw": 0.2065,
+      "awayWin": 0.3328
+    },
+    "actualResult": "DRAW",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-26"
+  },
+  {
+    "fixtureId": "cfb427609c3184530a132440fa775b80fbf0ca729bf427d53507115bb6046489",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.74,
+      "draw": 0.1453,
+      "awayWin": 0.1146
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-26"
+  },
+  {
+    "fixtureId": "761195deaeee5248e77ad5f1ab60142bb375e0c53d83b9f4fd9df179028dacc8",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.7544,
+      "draw": 0.1312,
+      "awayWin": 0.1144
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-26"
+  },
+  {
+    "fixtureId": "c16052e26e5cd7267ff3e18eab7d3040e3321ca9b3048c209f13a1e234287ede",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.2853,
+      "draw": 0.2266,
+      "awayWin": 0.4881
+    },
+    "actualResult": "DRAW",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-27"
+  },
+  {
+    "fixtureId": "3f306d4df15919b17dfa1d9ea450570b39e1731dbe9379be372d44d8416d0ab4",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.5407,
+      "draw": 0.267,
+      "awayWin": 0.1923
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-27"
+  },
+  {
+    "fixtureId": "d25b738819d7885acd475c48407868e9565f36f5542fb4e984d163187f395c23",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.6739,
+      "draw": 0.1938,
+      "awayWin": 0.1323
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-27"
+  },
+  {
+    "fixtureId": "7bfe3163b213ed5c31ff467df4c12ebac567db6da0ee22402a73164ee43c3f51",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.6669,
+      "draw": 0.1566,
+      "awayWin": 0.1764
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-27"
+  },
+  {
+    "fixtureId": "053b75b2a3c5681cabeab776170a5fc238122316b960d5713098c405f93c6abb",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.2565,
+      "draw": 0.2314,
+      "awayWin": 0.5121
+    },
+    "actualResult": "DRAW",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-28"
+  },
+  {
+    "fixtureId": "2b7a01e0a3d9a523cd6c08b4b9b2342594b4c0b95d5b3f076b7e782e8bfc1c6a",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.6247,
+      "draw": 0.1811,
+      "awayWin": 0.1942
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-28"
+  },
+  {
+    "fixtureId": "7fff68763f74258ee8dcc0026bfda018c26d154c81c00cc2a88c4ee7b89f6673",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.3984,
+      "draw": 0.2151,
+      "awayWin": 0.3865
+    },
+    "actualResult": "DRAW",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-28"
+  },
+  {
+    "fixtureId": "e55a4af61a57bfe03b288f842ce2446aeca2cde380997538793622a849267a70",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.719,
+      "draw": 0.154,
+      "awayWin": 0.127
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-28"
+  },
+  {
+    "fixtureId": "9bce8b3b351ea57dc7a82d8a54fed0956411d346b9b2061d8872c1bc28040155",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.6023,
+      "draw": 0.2961,
+      "awayWin": 0.1016
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-29"
+  },
+  {
+    "fixtureId": "17ea64a858f2810d86039e2ba703989f0129f9812e68f20691f4a4915e857add",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.4205,
+      "draw": 0.2366,
+      "awayWin": 0.3428
+    },
+    "actualResult": "DRAW",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-29"
+  },
+  {
+    "fixtureId": "8506771f4e5d90103728e608a18cdb0222d3c3970888d4f0a70541e0aba57d4a",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.6234,
+      "draw": 0.1826,
+      "awayWin": 0.194
+    },
+    "actualResult": "HOME_WIN",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-29"
+  },
+  {
+    "fixtureId": "c95ca8e54c17603271be1f0fee4461c0a2dd28ee5aae4b51591c4594e968e767",
+    "modelVersion": "poisson_xg",
+    "prediction": {
+      "homeWin": 0.4098,
+      "draw": 0.2031,
+      "awayWin": 0.3871
+    },
+    "actualResult": "DRAW",
+    "timestamp": "2026-07-16T20:13:40.136Z",
+    "dataCutoffDate": "2024-09-29"
+  }
+]

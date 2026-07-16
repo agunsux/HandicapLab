@@ -1,0 +1,15 @@
+{
+  "season": "2025-2026",
+  "league": "EPL",
+  "total_fixtures": 0,
+  "understat_matches": 0,
+  "football_data_rows": 380,
+  "matches_merged": 0,
+  "understat_unmatched": 0,
+  "football_data_unmatched": 380,
+  "score_mismatches": 0,
+  "checksum_fixtures": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "checksum_understat_source": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "checksum_football_data_source": "3e3a8352f9ada6789c508d6ca184424421fed56a30400904a4a327c583407e62",
+  "generated_at": "2026-07-16T19:59:14.261Z"
+}
