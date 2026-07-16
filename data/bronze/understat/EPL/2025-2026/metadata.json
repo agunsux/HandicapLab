@@ -1,0 +1,11 @@
+{
+  "provider": "understat",
+  "league": "English Premier League",
+  "season": "2025-2026",
+  "dataset": "season_table",
+  "version": 1,
+  "status": "migrated",
+  "record_count": 20,
+  "checksum": null,
+  "imported_at": "2026-07-16T17:55:13.504Z"
+}

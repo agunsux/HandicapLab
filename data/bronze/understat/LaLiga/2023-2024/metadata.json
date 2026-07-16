@@ -1,0 +1,11 @@
+{
+  "provider": "understat",
+  "league": "La Liga",
+  "season": "2023-2024",
+  "dataset": "season_table",
+  "version": 1,
+  "status": "placeholder",
+  "record_count": 0,
+  "checksum": null,
+  "imported_at": null
+}
