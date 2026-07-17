@@ -1,0 +1,15 @@
+{
+  "timestamp": "2026-07-17T16:54:32.269Z",
+  "models": [
+    "Naive_Baseline",
+    "Poisson_Expected"
+  ],
+  "results": [
+    {
+      "season": "2023-2024",
+      "samples": 380,
+      "naiveAccuracy": "0.4605",
+      "poissonProxyAccuracy": "0.4474"
+    }
+  ]
+}

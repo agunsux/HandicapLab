@@ -1,0 +1,101 @@
+{
+  "ARSENAL": {
+    "aliases": ["Arsenal", "Arsenal FC"]
+  },
+  "ASTON_VILLA": {
+    "aliases": ["Aston Villa", "Aston Villa FC"]
+  },
+  "BOURNEMOUTH": {
+    "aliases": ["Bournemouth", "AFC Bournemouth"]
+  },
+  "BRENTFORD": {
+    "aliases": ["Brentford", "Brentford FC"]
+  },
+  "BRIGHTON": {
+    "aliases": ["Brighton", "Brighton and Hove Albion", "Brighton & Hove Albion"]
+  },
+  "BURNLEY": {
+    "aliases": ["Burnley", "Burnley FC"]
+  },
+  "CARDIFF": {
+    "aliases": ["Cardiff", "Cardiff City"]
+  },
+  "CHELSEA": {
+    "aliases": ["Chelsea", "Chelsea FC"]
+  },
+  "CRYSTAL_PALACE": {
+    "aliases": ["Crystal Palace", "Crystal Palace FC"]
+  },
+  "EVERTON": {
+    "aliases": ["Everton", "Everton FC"]
+  },
+  "FULHAM": {
+    "aliases": ["Fulham", "Fulham FC"]
+  },
+  "HUDDERSFIELD": {
+    "aliases": ["Huddersfield", "Huddersfield Town"]
+  },
+  "HULL": {
+    "aliases": ["Hull", "Hull City"]
+  },
+  "LEEDS": {
+    "aliases": ["Leeds", "Leeds United"]
+  },
+  "LEICESTER": {
+    "aliases": ["Leicester", "Leicester City"]
+  },
+  "LIVERPOOL": {
+    "aliases": ["Liverpool", "Liverpool FC"]
+  },
+  "LUTON": {
+    "aliases": ["Luton", "Luton Town"]
+  },
+  "MAN_CITY": {
+    "aliases": ["Man City", "Manchester City"]
+  },
+  "MAN_UNITED": {
+    "aliases": ["Man United", "Manchester United"]
+  },
+  "MIDDLESBROUGH": {
+    "aliases": ["Middlesbrough", "Middlesbrough FC"]
+  },
+  "NEWCASTLE": {
+    "aliases": ["Newcastle", "Newcastle United"]
+  },
+  "NORWICH": {
+    "aliases": ["Norwich", "Norwich City"]
+  },
+  "NOTTINGHAM_FOREST": {
+    "aliases": ["Nott'm Forest", "Nottingham Forest"]
+  },
+  "SHEFFIELD_UNITED": {
+    "aliases": ["Sheffield United", "Sheffield United FC"]
+  },
+  "SOUTHAMPTON": {
+    "aliases": ["Southampton", "Southampton FC"]
+  },
+  "STOKE": {
+    "aliases": ["Stoke", "Stoke City"]
+  },
+  "SUNDERLAND": {
+    "aliases": ["Sunderland", "Sunderland AFC"]
+  },
+  "SWANSEA": {
+    "aliases": ["Swansea", "Swansea City"]
+  },
+  "TOTTENHAM": {
+    "aliases": ["Tottenham", "Tottenham Hotspur"]
+  },
+  "WATFORD": {
+    "aliases": ["Watford", "Watford FC"]
+  },
+  "WEST_BROM": {
+    "aliases": ["West Brom", "West Bromwich Albion"]
+  },
+  "WEST_HAM": {
+    "aliases": ["West Ham", "West Ham United"]
+  },
+  "WOLVERHAMPTON": {
+    "aliases": ["Wolves", "Wolverhampton Wanderers"]
+  }
+}

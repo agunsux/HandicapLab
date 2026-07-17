@@ -1,0 +1,20 @@
+{
+  "totalFixtures": 3420,
+  "totalFeatures": 3420,
+  "seasonsCoverage": {
+    "2015-2016": 380,
+    "2016-2017": 380,
+    "2017-2018": 380,
+    "2018-2019": 380,
+    "2019-2020": 380,
+    "2020-2021": 380,
+    "2021-2022": 380,
+    "2022-2023": 380,
+    "2023-2024": 380
+  },
+  "duplicates": 0,
+  "missingFeatures": 0,
+  "missingValues": 0,
+  "integrityPassed": true,
+  "errors": []
+}

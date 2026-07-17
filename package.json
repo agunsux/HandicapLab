@@ -31,7 +31,18 @@
     "epic:31b": "tsx src/scripts/run-epic31b.ts",
     "test:epic31b": "vitest run tests/epic31b/",
     "epic:31b:6": "tsx src/scripts/run-epic31b6.ts",
-    "test:epic31b6": "vitest run tests/epic31b6/"
+    "test:epic31b6": "vitest run tests/epic31b6/",
+    "epic32:pipeline": "tsx src/pipelines/orchestrator.ts",
+    "epic32:phase1": "tsx -e \"const{runMergeEngine}=require('./src/pipelines/silver/merge-engine');runMergeEngine().then(r=>console.log(JSON.stringify(r,null,2)))\"",
+    "epic32:phase2": "tsx -e \"const{runTeamRegistry}=require('./src/pipelines/silver/team-registry');runTeamRegistry().then(r=>console.log(JSON.stringify(r,null,2)))\"",
+    "epic32:phase3": "tsx -e \"const{runFeatureStore}=require('./src/pipelines/features/feature-store');runFeatureStore().then(r=>console.log(JSON.stringify(r,null,2)))\"",
+    "epic32:phase5": "tsx -e \"const{runDatasetBuilder}=require('./src/pipelines/golden/dataset-builder');runDatasetBuilder().then(r=>console.log(JSON.stringify(r,null,2)))\"",
+    "epic32:phase6": "tsx -e \"const{runValidation}=require('./src/pipelines/validation/data-validator');runValidation().then(r=>console.log(JSON.stringify(r,null,2)))\"",
+    "epic32:phase7": "tsx -e \"const{runWalkForward}=require('./src/pipelines/walkforward/walkforward-generator');runWalkForward().then(r=>console.log(JSON.stringify(r,null,2)))\"",
+    "epic32:phase8": "tsx -e \"const{runBaselines}=require('./src/pipelines/baselines/research-baselines');runBaselines().then(r=>console.log(JSON.stringify(r,null,2)))\"",
+    "epic32:phases1-5": "tsx -e \"const{runPipeline}=require('./src/pipelines/orchestrator');runPipeline({phases:[1,2,3,4,5]}).then(r=>console.log(JSON.stringify(r,null,2)))\"",
+    "epic32:phases6-10": "tsx -e \"const{runPipeline}=require('./src/pipelines/orchestrator');runPipeline({phases:[6,7,8,9,10]}).then(r=>console.log(JSON.stringify(r,null,2)))\"",
+    "pipeline": "tsx src/pipeline/cli/run-pipeline.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
@@ -42,6 +53,7 @@
     "axios": "^1.18.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "csv-parse": "^7.0.1",
     "csv-parser": "^3.2.1",
     "dotenv": "^17.4.2",
     "duckdb": "1.4.4",
