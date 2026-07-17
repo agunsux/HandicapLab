@@ -1,0 +1,9 @@
+{
+  "issues": [],
+  "notes": [
+    "moneyline: 3420 records, 3420 unique fixtures, 0 expected duplicates (multi-line design)",
+    "asian_handicap: 71820 records, 3420 unique fixtures, 68400 expected duplicates (multi-line design)",
+    "over_under: 30780 records, 3420 unique fixtures, 27360 expected duplicates (multi-line design)"
+  ],
+  "pass": true
+}

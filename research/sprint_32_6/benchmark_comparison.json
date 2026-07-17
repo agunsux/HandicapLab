@@ -1,0 +1,78 @@
+{
+  "comparisons": [
+    {
+      "metric": "home_win_pct",
+      "dataset_value": 44.9,
+      "reference_value": 45.0,
+      "difference": -0.1,
+      "tolerance": 3.0,
+      "within_tolerance": true,
+      "source": "EPL historical avg"
+    },
+    {
+      "metric": "draw_pct",
+      "dataset_value": 23.2,
+      "reference_value": 25.0,
+      "difference": -1.8,
+      "tolerance": 3.0,
+      "within_tolerance": true,
+      "source": "EPL historical avg"
+    },
+    {
+      "metric": "away_win_pct",
+      "dataset_value": 31.9,
+      "reference_value": 30.0,
+      "difference": 1.9,
+      "tolerance": 3.0,
+      "within_tolerance": true,
+      "source": "EPL historical avg"
+    },
+    {
+      "metric": "avg_goals",
+      "dataset_value": 2.82,
+      "reference_value": 2.7,
+      "difference": 0.12,
+      "tolerance": 0.3,
+      "within_tolerance": true,
+      "source": "EPL historical avg"
+    },
+    {
+      "metric": "btts_pct",
+      "dataset_value": 51.8,
+      "reference_value": 52.0,
+      "difference": -0.2,
+      "tolerance": 4.0,
+      "within_tolerance": true,
+      "source": "EPL historical avg"
+    },
+    {
+      "metric": "over_2_5_pct",
+      "dataset_value": 53.9,
+      "reference_value": 52.0,
+      "difference": 1.9,
+      "tolerance": 4.0,
+      "within_tolerance": true,
+      "source": "EPL historical avg"
+    },
+    {
+      "metric": "home_goals_avg",
+      "dataset_value": 1.56,
+      "reference_value": 1.5,
+      "difference": 0.06,
+      "tolerance": 0.2,
+      "within_tolerance": true,
+      "source": "EPL historical avg"
+    },
+    {
+      "metric": "away_goals_avg",
+      "dataset_value": 1.26,
+      "reference_value": 1.2,
+      "difference": 0.06,
+      "tolerance": 0.2,
+      "within_tolerance": true,
+      "source": "EPL historical avg"
+    }
+  ],
+  "flags": [],
+  "all_within_tolerance": true
+}

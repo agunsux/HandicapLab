@@ -1,0 +1,244 @@
+{
+  "asian_handicap": {
+    "total_records": 71820,
+    "target_distribution": {
+      "WIN": 35077,
+      "LOSS": 28352,
+      "PUSH": 2797,
+      "HALF_WIN": 2797,
+      "HALF_LOSS": 2797
+    },
+    "win_pct": 48.8,
+    "loss_pct": 39.5,
+    "push_pct": 3.9,
+    "half_win_pct": 3.9,
+    "half_loss_pct": 3.9,
+    "valid_targets": true,
+    "mismatch_count": 0,
+    "by_season": {
+      "2015-2016": {
+        "LOSS": 3148,
+        "HALF_LOSS": 317,
+        "PUSH": 317,
+        "HALF_WIN": 317,
+        "WIN": 3881
+      },
+      "2016-2017": {
+        "LOSS": 2981,
+        "HALF_LOSS": 309,
+        "PUSH": 309,
+        "HALF_WIN": 309,
+        "WIN": 4072
+      },
+      "2017-2018": {
+        "LOSS": 3067,
+        "HALF_LOSS": 302,
+        "PUSH": 302,
+        "HALF_WIN": 302,
+        "WIN": 4007
+      },
+      "2018-2019": {
+        "LOSS": 3086,
+        "HALF_LOSS": 320,
+        "PUSH": 320,
+        "HALF_WIN": 320,
+        "WIN": 3934
+      },
+      "2019-2020": {
+        "WIN": 3917,
+        "LOSS": 3121,
+        "HALF_LOSS": 314,
+        "PUSH": 314,
+        "HALF_WIN": 314
+      },
+      "2020-2021": {
+        "LOSS": 3531,
+        "HALF_LOSS": 318,
+        "PUSH": 318,
+        "HALF_WIN": 318,
+        "WIN": 3495
+      },
+      "2021-2022": {
+        "LOSS": 3273,
+        "HALF_LOSS": 302,
+        "PUSH": 302,
+        "HALF_WIN": 302,
+        "WIN": 3801
+      },
+      "2022-2023": {
+        "LOSS": 3026,
+        "HALF_LOSS": 311,
+        "PUSH": 311,
+        "HALF_WIN": 311,
+        "WIN": 4021
+      },
+      "2023-2024": {
+        "LOSS": 3119,
+        "HALF_LOSS": 304,
+        "PUSH": 304,
+        "HALF_WIN": 304,
+        "WIN": 3949
+      }
+    }
+  },
+  "over_under": {
+    "total_records": 30780,
+    "target_distribution": {
+      "WIN": 14382,
+      "LOSS": 11730,
+      "PUSH": 1556,
+      "HALF_WIN": 1556,
+      "HALF_LOSS": 1556
+    },
+    "valid_targets": true,
+    "mismatch_count": 0,
+    "by_season": {
+      "2015-2016": {
+        "LOSS": 1388,
+        "WIN": 1546,
+        "HALF_WIN": 162,
+        "PUSH": 162,
+        "HALF_LOSS": 162
+      },
+      "2016-2017": {
+        "LOSS": 1297,
+        "WIN": 1610,
+        "HALF_WIN": 171,
+        "PUSH": 171,
+        "HALF_LOSS": 171
+      },
+      "2017-2018": {
+        "WIN": 1501,
+        "HALF_WIN": 170,
+        "PUSH": 170,
+        "HALF_LOSS": 170,
+        "LOSS": 1409
+      },
+      "2018-2019": {
+        "WIN": 1599,
+        "HALF_WIN": 183,
+        "PUSH": 183,
+        "HALF_LOSS": 183,
+        "LOSS": 1272
+      },
+      "2019-2020": {
+        "WIN": 1524,
+        "HALF_WIN": 197,
+        "PUSH": 197,
+        "HALF_LOSS": 197,
+        "LOSS": 1305
+      },
+      "2020-2021": {
+        "WIN": 1447,
+        "HALF_WIN": 177,
+        "PUSH": 177,
+        "HALF_LOSS": 177,
+        "LOSS": 1442
+      },
+      "2021-2022": {
+        "WIN": 1609,
+        "HALF_WIN": 169,
+        "PUSH": 169,
+        "HALF_LOSS": 169,
+        "LOSS": 1304
+      },
+      "2022-2023": {
+        "WIN": 1571,
+        "HALF_WIN": 166,
+        "PUSH": 166,
+        "HALF_LOSS": 166,
+        "LOSS": 1351
+      },
+      "2023-2024": {
+        "WIN": 1975,
+        "HALF_WIN": 161,
+        "PUSH": 161,
+        "HALF_LOSS": 161,
+        "LOSS": 962
+      }
+    },
+    "by_line": {
+      "1.5": {
+        "WIN": 2646,
+        "LOSS": 774,
+        "PUSH": 0,
+        "HALF_WIN": 0,
+        "HALF_LOSS": 0,
+        "total": 3420,
+        "win_pct": 77.4
+      },
+      "1.75": {
+        "WIN": 1844,
+        "LOSS": 774,
+        "PUSH": 0,
+        "HALF_WIN": 802,
+        "HALF_LOSS": 0,
+        "total": 3420,
+        "win_pct": 53.9
+      },
+      "2": {
+        "WIN": 1844,
+        "LOSS": 774,
+        "PUSH": 802,
+        "HALF_WIN": 0,
+        "HALF_LOSS": 0,
+        "total": 3420,
+        "win_pct": 53.9
+      },
+      "2.25": {
+        "WIN": 1844,
+        "LOSS": 774,
+        "PUSH": 0,
+        "HALF_WIN": 0,
+        "HALF_LOSS": 802,
+        "total": 3420,
+        "win_pct": 53.9
+      },
+      "2.5": {
+        "WIN": 1844,
+        "LOSS": 1576,
+        "PUSH": 0,
+        "HALF_WIN": 0,
+        "HALF_LOSS": 0,
+        "total": 3420,
+        "win_pct": 53.9
+      },
+      "2.75": {
+        "WIN": 1090,
+        "LOSS": 1576,
+        "PUSH": 0,
+        "HALF_WIN": 754,
+        "HALF_LOSS": 0,
+        "total": 3420,
+        "win_pct": 31.9
+      },
+      "3": {
+        "WIN": 1090,
+        "LOSS": 1576,
+        "PUSH": 754,
+        "HALF_WIN": 0,
+        "HALF_LOSS": 0,
+        "total": 3420,
+        "win_pct": 31.9
+      },
+      "3.25": {
+        "WIN": 1090,
+        "LOSS": 1576,
+        "PUSH": 0,
+        "HALF_WIN": 0,
+        "HALF_LOSS": 754,
+        "total": 3420,
+        "win_pct": 31.9
+      },
+      "3.5": {
+        "WIN": 1090,
+        "LOSS": 2330,
+        "PUSH": 0,
+        "HALF_WIN": 0,
+        "HALF_LOSS": 0,
+        "total": 3420,
+        "win_pct": 31.9
+      }
+    }
+  }
+}
