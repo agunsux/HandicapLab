@@ -24,3 +24,7 @@ For all upcoming sprints, enforce the following structured release flow:
 8. **Git Commit, Tag, Push & Deploy**: Push to GitHub, tag release, and deploy to Vercel.
 9. **Smoke Test**: Assert that public and private endpoints respond successfully in production.
 
+# Research Invariants & Data Governance
+
+- **No Future Leakage**: Tidak boleh ada feature yang berasal dari data dengan timestamp ≥ kickoff pertandingan yang diprediksi.
+- **No extraordinary result without audit**: Jika ada ROI > 10%, atau peningkatan Brier > 10%, atau lonjakan performa yang tidak biasa, sistem harus otomatis meminta audit terhadap potensi leakage, definisi target, pembagian data, sample size, dan metodologi evaluasi.

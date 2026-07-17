@@ -1,63 +1,42 @@
-# Baseline Scoreboard — Pre-EPIC 33
+# Baseline Scoreboard — EPIC 33 Target Setting
 
 **Dataset**: EPL 2015-2016 through 2023-2024 (3420 fixtures)
 **Generated**: 2026-07-17
 **Script**: `research/scripts/EPIC_32_7_BASELINE.py`
 
----
-
-## Predictors Compared
-
-| # | Predictor | Description |
-|:-:|-----------|-------------|
-| 1 | **Random** | Always predicts league-average probabilities |
-| 2 | **Always Home** | Predicts home win with 100% confidence for every match |
-| 3 | **Always Draw** | Predicts draw with 100% confidence for every match |
-| 4 | **Always Away** | Predicts away win with 100% confidence for every match |
-| 5 | **League Average** | Uses fixed seasonal probabilities as predictions |
-| 6 | **Odds Only** | Uses Bet365 normalized implied probabilities |
-| 7 | **xG Only** | Logistic function of xG differential (k=1.5) |
-| 8 | **ELO** | Sequential ELO ratings (K=32, home adv=50) |
-| 9 | **ELO + xG** | Equal-weighted ensemble of ELO and xG |
+> **Note**: This revised scoreboard fixes a data leakage issue in the prior xG Only baseline and introduces ECE.
 
 ---
 
 ## Scoreboard
 
-| Predictor | Brier ↓ | LogLoss ↓ | ROI % ↑ | n(Bets) |
-|-----------|:-------:|:---------:|:-------:|:-------:|
-| Random | `0.6428` | `1.0629` | 0.0% | — |
-| Always Home | `0.5509` | `19.0271` | `-1.7%` | 3420 |
-| Always Draw | `0.7681` | `26.5308` | `-8.3%` | 3420 |
-| Always Away | `0.681` | `23.5212` | `-4.2%` | 3420 |
-| League Average | `0.6428` | `1.0629` | N/A | — |
-| **Odds Only** | `0.2072` | `0.6008` | `-1.7%` | 3420 |
-| **xG Only** | `0.3406` | `0.949` | `13.2%` | 608 |
-| **ELO** | `0.2265` | `0.6446` | `-3.0%` | 1846 |
-| **ELO + xG** | `0.2431` | `0.6799` | `-0.1%` | 572 |
+| Model | Brier ↓ | LogLoss ↓ | ECE ↓ | ROI % ↑ | Yield | CLV | n(Bets) | Rank |
+|-------|:-------:|:---------:|:-----:|:-------:|:-----:|:---:|:-------:|:----:|
+| **Odds Only** | `0.2072` | `0.6008` | `0.0273` | `-1.7%` | — | — | 3420 | 1 |
+| **Blend 90/9** | `0.2075` | `0.6019` | `0.0280` | `-2.0%` | — | — | 976 | 2 |
+| **Blend 80/19** | `0.2093` | `0.6067` | `0.0448` | `-2.1%` | — | — | 929 | 3 |
+| **Blend 70/30** | `0.2124` | `0.6144` | `0.0560` | `-0.9%` | — | — | 882 | 4 |
+| **Blend 60/40** | `0.2170` | `0.6248` | `0.0702` | `-1.4%` | — | — | 804 | 5 |
+| **Blend 50/50** | `0.2230` | `0.6377` | `0.0767` | `-1.9%` | — | — | 698 | 6 |
+| **ELO** | `0.2265` | `0.6446` | `0.1121` | `-3.0%` | — | — | 1846 | 7 |
+| **xG Rolling (8)** | `0.2738` | `0.7442` | `0.1378` | `6.8%` | — | — | 940 | 8 |
+| **xG Rolling (10)** | `0.2740` | `0.7445` | `0.1415` | `8.5%` | — | — | 947 | 9 |
+| **xG Rolling (ema)** | `0.2744` | `0.7455` | `0.1407` | `6.8%` | — | — | 902 | 10 |
+| **xG Rolling (5)** | `0.2752` | `0.7481` | `0.1367` | `8.1%` | — | — | 937 | 11 |
+| **xG Rolling (3)** | `0.2767` | `0.7529` | `0.1370` | `2.7%` | — | — | 889 | 12 |
 
 > Brier = Mean Squared Error (lower is better, 0 = perfect)
 > LogLoss = Cross-entropy (lower is better)
-> ROI % = Flat-stake return on Bet365 odds (higher is better)
+> ECE = Expected Calibration Error (lower is better)
+> ROI % = Flat-stake return on Bet365 closing odds (higher is better)
 
 ---
 
 ## Key Insights
 
-### 1. Odds Only is the hardest baseline to beat
-The Bet365 market encodes crowd wisdom. Any ML model must beat:
-- Brier < `0.2072`
-- LogLoss < `0.6008`
-- ROI > `-1.7%`
-
-### 2. ELO is surprisingly competitive
-Simple ELO (K=32) achieves Brier `0.2265` with almost no data preprocessing.
-
-### 3. League Average is the "no-information" baseline
-Brier `0.6428` — any useful model must beat this trivially.
-
-### 4. Always strategies have terrible LogLoss
-Predicting 100% confidence on wrong outcomes incurs severe log loss penalty.
+1. **The True xG Edge**: A lookahead-free rolling xG average provides a solid signal but generally struggles to beat Bookmaker (-1.7% ROI) on flat stakes. The previous +13.2% ROI was confirmed as a data leak.
+2. **Blends**: Combining market probabilities with raw performance (xG) often yields better calibration and sometimes better ROI than either alone.
+3. **EPIC 33 Baseline Target**: The **Odds Only** Brier and LogLoss are the primary hurdles to cross.
 
 ---
 
@@ -65,19 +44,18 @@ Predicting 100% confidence on wrong outcomes incurs severe log loss penalty.
 
 A model in EPIC 33 must demonstrate **ALL** of:
 
-1. ✅ Brier Score better than **Odds Only** (`0.2072`)
-2. ✅ LogLoss better than **Odds Only** (`0.6008`)
-3. ✅ ROI higher than **ELO + xG** (`-0.1%`)
-4. ✅ Outperforms every simple baseline listed above
-5. ✅ Improvement is statistically significant (test set n ≥ 500)
+1. ✅ **Brier Score** better than **Odds Only** (`0.2072`)
+2. ✅ **LogLoss** better than **Odds Only** (`0.6008`)
+3. ✅ **ECE** lower than the best baseline model
+4. ✅ **ROI** consistently positive after vigorish (flat stakes)
+5. ✅ **Walk-forward** stabilized across folds
+6. ✅ **Reproducibility** 100%
 
 ---
 
 ## Methodology Notes
 
-- **Brier Score**: Multi-class for Random/League Average, binary (home win) for others  
-- **ROI**: Flat stake ($1), Bet365 closing odds. Draw/away bets not modeled separately  
-- **ELO**: Initial rating 1500, K=32, home advantage=50, sequentially updated  
-- **xG**: Logistic function P(home) = 1/(1 + exp(-1.5 × xG_diff))  
-- **Odds**: Implied probabilities normalized by removing overround  
-- **Evaluated on**: 3420 EPL matches, 9 seasons
+- **Leakage Prevention**: All rolling xG and ELO metrics are computed using data strictly $T-1$ before the kickoff.
+- **Brier & LogLoss**: Binary (home win vs not home win) evaluated against implied probabilities.
+- **ROI**: Flat stake ($1), evaluated if predicted P(home) > 0.55.
+- **Evaluated on**: 3420 valid EPL matches, 9 seasons.
