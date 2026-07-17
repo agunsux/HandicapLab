@@ -55,13 +55,13 @@
 
 | Goals/Game | Frequency | Percentage |
 |----------:|---------:|----------:|
-| 0          | 220      | 6.4%      |
-| 1          | 554      | 16.2%     |
-| 2          | 802      | 23.5%     |
-| 3          | 754      | 22.0%     |
-| 4          | 565      | 16.5%     |
-| 5          | 311      | 9.1%      |
-| 6+         | 84       | 2.5%      |
+| 0          | 551      | 16.1%     |
+| 1          | 860      | 25.1%     |
+| 2          | 799      | 23.4%     |
+| 3          | 580      | 17.0%     |
+| 4          | 358      | 10.5%     |
+| 5          | 169      | 4.9%      |
+| 6+         | 103      | 3.0%      |
 
 **Goal Distribution Trend:**
 
@@ -105,13 +105,40 @@
 
 ---
 
-## 4. Over/Under Distribution
+## 4. Over/Under Distribution (by Line Level)
 
-| Market      | Win %  | Push % | Sample  |
-|:------------|------:|------:|-------:|
-| Lines (all) | 46.7% | 5.1%  | 30,780 |
+**Actual match outcomes computed from 3,420 EPL fixtures:**
 
-**Key Insight**: The overall OU market shows a negative edge (46.7% win rate across all lines after adjusting for ~8% overround). Individual line performance requires breakdown by handicap level.
+| Market    | Actual Hit % | Push % | Sample  |
+|:----------|:-----------:|:------:|:------:|
+| Over 0.5  | 83.9%       | 0.0%   | 3,420  |
+| Over 1.5  | 58.7%       | 0.0%   | 3,420  |
+| Over 2.5  | 35.4%       | 0.0%   | 3,420  |
+| Over 3.5  | 18.4%       | 0.0%   | 3,420  |
+| Over 4.5  | 8.0%        | 0.0%   | 3,420  |
+| Over 5.5  | 3.0%        | 0.0%   | 3,420  |
+| Under 0.5 | 16.1%       | 0.0%   | 3,420  |
+| Under 1.5 | 41.3%       | 0.0%   | 3,420  |
+| Under 2.5 | 64.6%       | 0.0%   | 3,420  |
+| Under 3.5 | 81.6%       | 0.0%   | 3,420  |
+| Under 4.5 | 92.0%       | 0.0%   | 3,420  |
+| Under 5.5 | 97.0%       | 0.0%   | 3,420  |
+
+**Gold Dataset OU Line Distribution (computed from features.line field):**
+
+| Line  | Win %  | Push % | Sample | Market Type  |
+|:------|:------:|:------:|:-----:|:-------------|
+| 1.5   | 73.2%  | 0.0%   | 3,420 | Over (low)  |
+| 1.75  | 52.9%  | 20.3%  | 3,420 | Asian OU    |
+| 2.0   | 52.9%  | 20.3%  | 3,420 | Asian OU    |
+| 2.25  | 52.9%  | 20.3%  | 3,420 | Asian OU    |
+| 2.5   | 52.9%  | 0.0%   | 3,420 | Standard    |
+| 2.75  | 30.5%  | 22.4%  | 3,420 | Asian OU    |
+| 3.0   | 30.5%  | 22.4%  | 3,420 | Asian OU    |
+| 3.25  | 30.5%  | 22.4%  | 3,420 | Asian OU    |
+| 3.5   | 30.5%  | 0.0%   | 3,420 | Standard    |
+
+**Key Insight**: The OU gold dataset replicates the same 9 lines per fixture at different thresholds. The Over 2.5 line hits 35.4% of the time — lower than the naive 50% expectation, confirming that the "Over 2.5" market requires careful pricing. Asian OU lines (0.25 increments) have significant push rates (20-22%), which is critical for ROI calculations.
 
 ---
 
