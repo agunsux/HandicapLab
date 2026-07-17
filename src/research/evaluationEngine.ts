@@ -103,7 +103,7 @@ export class EvaluationEngine {
     let logLossSum = 0;
 
     for (const p of settled) {
-      const actualVector = this.getActualVector(p.actualResult);
+      const actualVector = this.getActualVector(p.actualResult as 'home' | 'draw' | 'away');
       
       // Brier contribution
       brierSum += Math.pow(p.homeWinProb - actualVector.home, 2);

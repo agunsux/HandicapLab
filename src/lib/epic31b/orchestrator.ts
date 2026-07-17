@@ -91,7 +91,7 @@ export class Epic31BOrchestrator {
     // 4. Run statistical and calibration calculations
     console.log('[Step 4] Calculating statistical calibration metrics...');
     const stats = StatisticalValidator.validate(replay.outcomes);
-    console.log(`  ECE: ${stats.metrics.ece}, Brier Score: ${stats.metrics.brierScore}, Log Loss: ${stats.metrics.logLoss}`);
+    console.log(`  ECE: ${stats.metrics.ece ?? 0}, Brier Score: ${stats.metrics.brierScore}, Log Loss: ${stats.metrics.logLoss}`);
 
     // 5. Run 10,000 Monte Carlo bankroll simulations
     console.log('[Step 5] Launching 10,000 path Monte Carlo bankroll simulation...');
@@ -238,9 +238,9 @@ export class Epic31BOrchestrator {
       {
         phase: 'Phase 5',
         status: gates.passed ? 'PASS' : 'FAIL',
-        evidence: `ECE: ${stats.metrics.ece}, Brier Score: ${stats.metrics.brierScore}`,
+        evidence: `ECE: ${stats.metrics.ece ?? 0}, Brier Score: ${stats.metrics.brierScore}`,
         files: [],
-        metrics: { ece: stats.metrics.ece },
+        metrics: { ece: stats.metrics.ece ?? 0 },
         confidence: 'High',
       },
       {
@@ -303,7 +303,7 @@ export class Epic31BOrchestrator {
           leagueId: '39',
           leagueName: 'EPL',
           status: gates.passed ? 'PASS' : 'FAIL',
-          evidence: `ECE: ${stats.metrics.ece}`,
+          evidence: `ECE: ${stats.metrics.ece ?? 0}`,
           metrics: stats.metrics,
           confidenceIntervals: stats.confidenceIntervals,
           calibrationQuality: stats.calibrationQuality,

@@ -8,7 +8,8 @@ export type LeagueName = 'EPL' | 'La Liga' | 'Bundesliga' | 'Serie A' | 'Ligue 1
 export type MarketType = 'ML' | 'AH' | 'OU';
 export type ValidationStatus = 'PASS' | 'FAIL' | 'WARNING';
 export type Epic32Decision = 'APPROVE EPIC 32' | 'BLOCK EPIC 32';
-
+import type { ReplayMetrics } from '../replay/types';
+export type { ReplayMetrics };
 export interface LeagueConfig {
   leagueId: LeagueId;
   leagueName: LeagueName;
@@ -55,33 +56,7 @@ export interface ReplayOutcome {
   leagueId?: LeagueId;
 }
 
-export interface ReplayMetrics {
-  totalMatches: number;
-  totalPredictions: number;
-  won: number;
-  lost: number;
-  voided: number;
-  roi: number;
-  yield: number;
-  avgClv: number;
-  winRate: number;
-  totalStake: number;
-  totalProfit: number;
-  brierScore: number;
-  logLoss: number;
-  avgKellyStake: number;
-  maxDrawdown: number;
-  sharpeRatio: number | null;
-  profitFactor: number;
-  longestWinStreak: number;
-  longestLossStreak: number;
-  ece?: number;
-  mce?: number;
-  sharpness?: number;
-  entropy?: number;
-  psi?: number;
-  kellyRiskRatio?: number;
-}
+
 
 export interface ValidationReport {
   totalFixtures: number;

@@ -102,6 +102,26 @@ export interface ReplayMetrics {
   winRate: number;
   totalStake: number;
   totalProfit: number;
+  yield?: number;
+  avgKellyStake?: number;
+  maxDrawdown?: number;
+  sharpeRatio?: number | null;
+  sortinoRatio?: number | null;
+  profitFactor?: number;
+  longestWinStreak?: number;
+  longestLossStreak?: number;
+  ece?: number;
+  mce?: number;
+  sharpness?: number;
+  entropy?: number;
+  psi?: number;
+  kellyRiskRatio?: number;
+  accuracy?: number;
+  precision?: number;
+  recall?: number;
+  f1?: number;
+  rocauc?: number;
+  prauc?: number;
 }
 
 export interface ReplayResult {

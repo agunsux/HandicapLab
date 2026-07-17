@@ -75,7 +75,7 @@ export class ExperimentScheduler {
       candidateExperimentId: candidateId,
       deltaROI: Math.round((candidateMetrics.roi - baseMetrics.roi) * 100) / 100,
       deltaCLV: Math.round((candidateMetrics.avgClv - baseMetrics.avgClv) * 10000) / 10000,
-      deltaECE: Math.round((candidateMetrics.ece - baseMetrics.ece) * 10000) / 10000,
+      deltaECE: Math.round(((candidateMetrics.ece ?? 0) - (baseMetrics.ece ?? 0)) * 10000) / 10000,
       deltaLogLoss: Math.round((candidateMetrics.logLoss - baseMetrics.logLoss) * 10000) / 10000,
       deltaRuntimeMs: candidateDurationMs - baseDurationMs,
     };

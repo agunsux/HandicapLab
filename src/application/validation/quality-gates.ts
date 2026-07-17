@@ -24,20 +24,20 @@ export class QualityGates {
     const checks: Record<string, { passed: boolean; value: number | string; limit: number | string }> = {};
     let passed = true;
 
-    // 1. Expected Calibration Error (ECE)
-    const ecePassed = stats.metrics.ece <= config.maxExpectedCalibrationError;
+    const ece = stats.metrics.ece ?? 0;
+    const ecePassed = ece <= config.maxExpectedCalibrationError;
     checks['expectedCalibrationError'] = {
       passed: ecePassed,
-      value: stats.metrics.ece,
+      value: ece,
       limit: config.maxExpectedCalibrationError,
     };
     if (!ecePassed) passed = false;
 
-    // 2. Max Drawdown
-    const ddPassed = stats.metrics.maxDrawdown <= config.maxDrawdownLimit;
+    const maxDrawdown = stats.metrics.maxDrawdown ?? 0;
+    const ddPassed = maxDrawdown <= config.maxDrawdownLimit;
     checks['maxDrawdown'] = {
       passed: ddPassed,
-      value: stats.metrics.maxDrawdown,
+      value: maxDrawdown,
       limit: config.maxDrawdownLimit,
     };
     if (!ddPassed) passed = false;

@@ -777,25 +777,25 @@ describe('Feature Flag Registry', () => {
 
   it('creates flag on enable if not exists', () => {
     const flags = new FeatureFlagRegistry([]);
-    flags.enable('new_feature');
-    expect(flags.isEnabled('new_feature')).toBe(true);
+    flags.enable('new_feature' as any);
+    expect(flags.isEnabled('new_feature' as any)).toBe(true);
   });
 
   it('supports rollout percentage', () => {
     const flags = new FeatureFlagRegistry([
-      { name: 'rollout_test', enabled: true, description: '', owner: 'test', createdAt: '', updatedAt: '', rolloutPercentage: 0 },
+      { name: 'rollout_test' as any, enabled: true, description: '', owner: 'test', createdAt: '', updatedAt: '', rolloutPercentage: 0 },
     ]);
     // With 0% rollout, no user should have access
-    expect(flags.isAccessible('rollout_test', { userId: 'user-1' })).toBe(false);
-    expect(flags.isAccessible('rollout_test')).toBe(true); // No userId = no rollout check
+    expect(flags.isAccessible('rollout_test' as any, { userId: 'user-1' })).toBe(false);
+    expect(flags.isAccessible('rollout_test' as any)).toBe(true); // No userId = no rollout check
   });
 
   it('supports beta user list', () => {
     const flags = new FeatureFlagRegistry([
-      { name: 'beta_feature', enabled: true, description: '', owner: 'test', createdAt: '', updatedAt: '', betaUserIds: ['beta-user'] },
+      { name: 'beta_feature' as any, enabled: true, description: '', owner: 'test', createdAt: '', updatedAt: '', betaUserIds: ['beta-user'] },
     ]);
-    expect(flags.isAccessible('beta_feature', { userId: 'beta-user' })).toBe(true);
-    expect(flags.isAccessible('beta_feature', { userId: 'non-beta-user' })).toBe(false);
+    expect(flags.isAccessible('beta_feature' as any, { userId: 'beta-user' })).toBe(true);
+    expect(flags.isAccessible('beta_feature' as any, { userId: 'non-beta-user' })).toBe(false);
   });
 });
 

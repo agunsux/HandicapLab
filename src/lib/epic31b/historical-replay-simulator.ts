@@ -328,11 +328,12 @@ export class HistoricalReplaySimulator {
     }
 
     const validationReport: ValidationReport = {
+      totalFixtures: validFixtures + missingOdds + errors.length,
       validFixtures,
       invalidFixtures: errors.length,
       missingOdds,
       missingResults: 0,
-      errors,
+      validationErrors: errors,
     };
 
     return {
