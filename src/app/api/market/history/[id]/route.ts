@@ -2,7 +2,6 @@
 // Location: src/app/api/market/history/[id]/route.ts
 
 import { NextResponse } from 'next/server';
-import { MarketLogRepository } from '../../../../../lib/data/marketLogRepository';
 import { MockMarketDataProvider } from '../../../../../lib/market/mockProvider';
 
 export async function GET(
@@ -15,7 +14,8 @@ export async function GET(
     
     // Get history from mock provider
     const events = await provider.getMarketHistory(matchId, 'Pinnacle', 'ML');
-    const localMovements = MarketLogRepository.getMovements(matchId);
+    const { MarketLogRepository } = await import('../../../../../lib/data/marketLogRepository.runtime');
+    const localMovements = await MarketLogRepository.getMovements(matchId);
 
     return NextResponse.json({
       matchId,

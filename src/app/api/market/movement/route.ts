@@ -2,11 +2,11 @@
 // Location: src/app/api/market/movement/route.ts
 
 import { NextResponse } from 'next/server';
-import { MarketLogRepository } from '../../../../lib/data/marketLogRepository';
 
 export async function GET() {
   try {
-    const movements = MarketLogRepository.getMovements();
+    const { MarketLogRepository } = await import('../../../../lib/data/marketLogRepository.runtime');
+    const movements = await MarketLogRepository.getMovements();
     return NextResponse.json({
       count: movements.length,
       movements

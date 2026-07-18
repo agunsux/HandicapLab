@@ -1,7 +1,10 @@
-import fs from 'fs';
-import path from 'path';
+import type fsType from 'fs';
+import type pathType from 'path';
 import { ZodSchemaValidator } from '../validation/zodSchemaValidator';
 import { MatchBusinessValidator } from '../validation/matchBusinessValidator';
+
+const fs: typeof fsType = eval("require('fs')");
+const path: typeof pathType = eval("require('path')");
 
 export interface DatasetMetadata {
   provider: string;

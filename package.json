@@ -7,6 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint src",
+    "check:size": "node scripts/check-size.js",
+    "predeploy": "node scripts/check-size.js",
     "simulate": "tsx src/scripts/simulate.ts",
     "validate": "tsx src/scripts/validate.ts",
     "stability": "tsx src/scripts/stabilityTest.ts",

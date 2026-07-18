@@ -2,11 +2,11 @@
 // Location: src/app/api/market/clv/route.ts
 
 import { NextResponse } from 'next/server';
-import { MarketLogRepository } from '../../../../lib/data/marketLogRepository';
 
 export async function GET() {
   try {
-    const results = MarketLogRepository.getCLVResults();
+    const { MarketLogRepository } = await import('../../../../lib/data/marketLogRepository.runtime');
+    const results = await MarketLogRepository.getCLVResults();
     if (results.length === 0) {
       return NextResponse.json({
         averageCLV: 0,

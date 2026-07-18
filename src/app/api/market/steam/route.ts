@@ -2,14 +2,14 @@
 // Location: src/app/api/market/steam/route.ts
 
 import { NextResponse } from 'next/server';
-import { MarketLogRepository } from '../../../../lib/data/marketLogRepository';
 import { SteamMoveDetector } from '../../../../lib/market/steamDetector';
 import { VolatilityEngine } from '../../../../lib/market/volatilityEngine';
 import { MockMarketDataProvider } from '../../../../lib/market/mockProvider';
 
 export async function GET() {
   try {
-    const clvList = MarketLogRepository.getCLVResults();
+    const { MarketLogRepository } = await import('../../../../lib/data/marketLogRepository.runtime');
+    const clvList = await MarketLogRepository.getCLVResults();
     const provider = new MockMarketDataProvider();
     
     const alerts = [];
