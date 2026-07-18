@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase.server';
 import { LEAGUE_REGISTRY, LeagueConfig } from '@/lib/crons/leagueRegistry';
 import { sendTelegramAlert } from './telegram';
+import { DependencyRegistry } from '../health/registry';
 
 export interface IngestionHealthDetail {
   leagueId: string;
@@ -250,17 +251,13 @@ export async function runHealthCheck(): Promise<HealthCheckResult> {
     alertsSent = await sendTelegramAlert(alertMsg);
   }
 
-  // --- Database ping/latency ---
-  const startDb = Date.now();
-  let dbHealthy = true;
-  let dbLatency = 0;
-  try {
-    const { error: dbPingErr } = await supabase.from('matches').select('id').limit(1);
-    if (dbPingErr) throw dbPingErr;
-    dbLatency = Date.now() - startDb;
-  } catch (err) {
-    dbHealthy = false;
-  }
+  // --- Database ping/latency using central registry ---
+  const registry = DependencyRegistry.getInstance();
+  const regResult = await registry.runAll();
+  const dbCheck = regResult.services.database;
+  const dbHealthy = dbCheck.status === 'healthy';
+  const dbLatency = dbCheck.latency_ms;
+  databaseHealth.healthy = dbHealthy;
 
   // --- Odds Staleness check ---
   let lastOddsTime: string | null = null;
