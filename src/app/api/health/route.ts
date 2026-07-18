@@ -1,24 +1,31 @@
-// Public Health Check Endpoint (Backward Compatible)
+// Public Health Check & Reliability Summary Endpoint
 // Location: src/app/api/health/route.ts
 
 import { NextResponse } from 'next/server';
 import { DependencyRegistry } from '@/lib/health/registry';
+import { ReliabilityEvaluator } from '@/lib/reliability/evaluator';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
   const registry = DependencyRegistry.getInstance();
-  const result = await registry.runAll();
+  const healthResult = await registry.runAll();
+  
+  const report = ReliabilityEvaluator.evaluate(healthResult.timestamp, healthResult.services);
 
-  const dbCheck = result.services.database;
-  const storageCheck = result.services.storage;
+  const dbCheck = report.services.database;
+  const storageCheck = report.services.storage;
 
   const isHealthy = dbCheck.status === 'healthy' && storageCheck.status === 'healthy';
   const status = isHealthy ? 200 : 500;
 
   const responseBody = {
     status: isHealthy ? 'healthy' : 'unhealthy',
-    timestamp: result.timestamp,
+    score: report.score,
+    timestamp: report.timestamp,
+    services: report.services,
+    slos: report.slos,
+    // Maintain backward compatibility for older tooling/deployment checks
     checks: {
       database: dbCheck.status === 'healthy' ? 'healthy' : 'unhealthy',
       environment: {

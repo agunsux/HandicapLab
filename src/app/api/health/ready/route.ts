@@ -1,28 +1,34 @@
-// Readiness Health Check Endpoint
+// Readiness Health Check & SLO Verification Endpoint
 // Location: src/app/api/health/ready/route.ts
 
 import { NextResponse } from 'next/server';
 import { DependencyRegistry } from '@/lib/health/registry';
+import { ReliabilityEvaluator } from '@/lib/reliability/evaluator';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
   const registry = DependencyRegistry.getInstance();
-  const result = await registry.runAll();
+  const healthResult = await registry.runAll();
+  
+  const report = ReliabilityEvaluator.evaluate(healthResult.timestamp, healthResult.services);
 
-  // Readiness depends on database and storage (env vars) being healthy
-  const dbCheck = result.services.database;
-  const storageCheck = result.services.storage;
+  const dbSlo = report.slos.database;
+  const storageSlo = report.slos.storage;
 
-  const isReady = dbCheck.status === 'healthy' && storageCheck.status === 'healthy';
+  const isReady = dbSlo.slo_met && storageSlo.slo_met;
   const status = isReady ? 200 : 503;
 
   return NextResponse.json({
     status: isReady ? 'ready' : 'not_ready',
-    timestamp: result.timestamp,
+    timestamp: report.timestamp,
     services: {
-      database: dbCheck.status,
-      storage: storageCheck.status
+      database: dbSlo.status,
+      storage: storageSlo.status
+    },
+    slo_compliance: {
+      database_slo_met: dbSlo.slo_met,
+      storage_slo_met: storageSlo.slo_met
     }
   }, { status });
 }
