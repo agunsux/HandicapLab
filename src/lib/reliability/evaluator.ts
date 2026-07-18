@@ -11,7 +11,7 @@ export class ReliabilityEvaluator {
     services: Record<string, HealthCheckResult>
   ): ReliabilityReport {
     const slos: Record<string, SLIStatus> = {};
-    const now = Date.now();
+    const now = new Date(timestamp).getTime();
 
     // 1. Database SLO Check
     const dbCheck = services.database || { status: 'unhealthy', latency_ms: 0 };
