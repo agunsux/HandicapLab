@@ -6,6 +6,22 @@
   },
   "crons": [
     {
+      "path": "/api/cron/live-validation/scheduler",
+      "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/api/cron/live-validation/settlement",
+      "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cron/live-validation/metrics",
+      "schedule": "0 1 * * *"
+    },
+    {
+      "path": "/api/cron/live-validation/archive",
+      "schedule": "30 1 * * *"
+    },
+    {
       "path": "/api/cron/ingest",
       "schedule": "0 23 * * *"
     },
