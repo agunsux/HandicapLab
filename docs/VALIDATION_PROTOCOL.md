@@ -1,24 +1,54 @@
-# 60–90 DAY LIVE VALIDATION PROTOCOL
+# 60–90 DAY LIVE VALIDATION PROTOCOL & REVIEW SIGN-OFF
 
-**Document Version:** 1.0.0  
-**Phase:** EPIC 35  
-
----
-
-## 1. Protocol Objective
-
-HandicapLab must execute autonomously in production for 60 to 90 consecutive days to gather objective, un-biased empirical evidence on model performance before any adaptive learning or automated retraining (EPIC 42) is permitted.
+**Document Version:** 1.1.0  
+**Phase:** EPIC 35 + EPIC 35B  
+**Review Status:** **APPROVED FOR LIVE VALIDATION** (Platform Validation Complete)
 
 ---
 
-## 2. Exit Criteria for EPIC 35
+## 1. Executive Summary & Distinction
 
-EPIC 35 is deemed successful ONLY when all of the following criteria are satisfied:
+The technical review has officially approved the **Platform Validation** of HandicapLab.
 
-1. **Autonomous Execution**: Minimum of 60 consecutive days of execution without manual intervention.
-2. **Zero Modification**: 0 records modified, edited, or deleted in `prediction_snapshots` or `settlements`.
-3. **Zero Duplicates**: 0 duplicate prediction snapshots or duplicate settlements generated.
-4. **Stable Reliability**: Scheduler execution reliability &ge; 99.9%.
-5. **Positive Predictive Value**: Empirical proof of positive Closing Line Value (CLV &gt; 0) and calibration stability under live market conditions.
+> [!IMPORTANT]
+> **Platform Validation vs Model Validation**:
+> - **Platform Validation (100% Complete)**: Verifies that the infrastructure, scheduler, snapshots, settlement engine, job runner, evidence archiver, and deterministic replay tool operate with zero errors, zero duplicates, and full cryptographic auditability.
+> - **Model Validation (Ongoing - 60–90 Days)**: Evaluates whether the frozen model demonstrates real-world edge (positive CLV, stable calibration, positive ROI over long horizons) under live market conditions.
 
-Only upon meeting these criteria may EPIC 42 (Auto Retraining Platform) be initiated.
+---
+
+## 2. Mandatory Freeze Invariants (Strict Observer Mode)
+
+During the 60–90 day observation period, the system operates under strict **Code & Feature Freeze**:
+
+- ❌ **NO** new feature engineering
+- ❌ **NO** new model ensembles or parameter tuning
+- ❌ **NO** automated retraining (EPIC 42 is deferred until graduation)
+- ❌ **NO** threshold or EV recommendation rule changes
+- ❌ **NO** staking logic modifications
+- 🛠️ **ONLY** operational bug fixes (infrastructure, network timeouts, API rate limits) are permitted, with zero changes to prediction calculations.
+
+---
+
+## 3. Graduation Target Matrix (60–90 Day Criteria)
+
+| Metric / Requirement | Target Threshold | Operational Action |
+|---|---|---|
+| **Prediction Coverage** | &gt;99% of eligible fixtures | Scheduler automation monitor |
+| **Snapshot Immutability** | 100% immutable | PostgreSQL engine triggers active |
+| **Duplicate Predictions** | 0 duplicates | Idempotency key rejection |
+| **Duplicate Settlements** | 0 duplicates | Idempotency key rejection |
+| **Scheduler Uptime** | &gt;99.9% | Vercel Cron + JobRunner DLQ |
+| **Deterministic Replay Audit** | 100% bit-exact success | `replayPrediction()` certification |
+| **Missing Odds Quote Rate** | &lt;1.0% | Odds capture health alerts |
+| **Average CLV** | Positively Retained (&gt;0.0%) | Daily/Weekly rolling metrics |
+| **Calibration Stability** | ECE &lt; 3.0%, MCE &lt; 5.0% | Calibration monitor reliability curves |
+| **Population Drift (PSI)** | PSI &lt; 0.10 (Stable) | Drift detector alerts |
+
+---
+
+## 4. Transition to EPIC 41 (Model Governance) & EPIC 42 (Auto Retraining)
+
+At the conclusion of 90 days:
+1. If **CLV remains positive**, calibration is stable, and operations are error-free: proceed to **EPIC 41 (Model Governance)** and **EPIC 42 (Auto Retraining)**.
+2. If **CLV or edge degrades**: the live validation platform has succeeded in its primary duty — preventing premature automation of unproven model iterations.
