@@ -35,28 +35,31 @@ export default function Navbar() {
         </Link>
 
         {/* Navigation Links */}
-        <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-400">
-          <Link href="/scanner" className="hover:text-zinc-100 transition-colors">
-            Edge Scanner
-          </Link>
-          <Link href="/competitions" className="hover:text-zinc-100 transition-colors">
-            Competitions
-          </Link>
-          <Link href="/teams" className="hover:text-zinc-100 transition-colors">
-            Teams
-          </Link>
-          <Link href="/performance" className="hover:text-zinc-100 transition-colors">
-            Performance
-          </Link>
-          <Link href="/pricing" className="hover:text-zinc-100 transition-colors">
-            Pricing
-          </Link>
-          <Link
-            href="/dashboard"
-            className="hover:text-zinc-100 transition-colors flex items-center gap-1 font-mono text-xs bg-zinc-900 border border-zinc-800 px-2.5 py-1 rounded"
-          >
+        <nav className="hidden md:flex items-center gap-4 text-xs font-mono font-medium text-zinc-400">
+          <Link href="/validation" className="hover:text-emerald-400 transition-colors flex items-center gap-1 text-emerald-400 font-bold">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-            Access Ledger
+            Validation
+          </Link>
+          <Link href="/research/hall-of-mistakes" className="hover:text-amber-400 transition-colors flex items-center gap-1 text-amber-400 font-bold bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded">
+            ⚠️ Mistakes
+          </Link>
+          <Link href="/scanner" className="hover:text-emerald-400 transition-colors">
+            Predictions
+          </Link>
+          <Link href="/signals" className="hover:text-emerald-400 transition-colors">
+            Value Bets
+          </Link>
+          <Link href="/research/reports" className="hover:text-emerald-400 transition-colors">
+            Reports
+          </Link>
+          <Link href="/ledger" className="hover:text-emerald-400 transition-colors">
+            Public Ledger
+          </Link>
+          <Link href="/trust-center" className="hover:text-emerald-400 transition-colors">
+            Trust Center
+          </Link>
+          <Link href="/methodology" className="hover:text-emerald-400 transition-colors">
+            Documentation
           </Link>
         </nav>
 

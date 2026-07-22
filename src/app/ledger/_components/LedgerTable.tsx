@@ -275,6 +275,7 @@ export function LedgerTable({ initialItems }: LedgerTableProps) {
           <table className="w-full text-left text-xs font-mono border-collapse">
             <thead className="bg-slate-950/60 border-b border-slate-800 text-slate-400">
               <tr>
+                <th className="px-6 py-4">Prediction DOI</th>
                 <th className="px-6 py-4">Match</th>
                 <th className="px-6 py-4">Competition</th>
                 <th className="px-6 py-4">Decision Log</th>
@@ -285,11 +286,17 @@ export function LedgerTable({ initialItems }: LedgerTableProps) {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/60 text-slate-300">
-              {filteredItems.map((item) => {
+              {filteredItems.map((item, idx) => {
                 const isPending = item.result_status === 'pending';
                 const datePublished = new Date(item.published_at);
                 const isExpanded = expandedId === item.id;
                 
+                // Formulate Prediction DOI
+                const year = datePublished.getFullYear() || 2026;
+                const compCode = (item.competition_name || 'GEN').substring(0, 3).toUpperCase();
+                const doiIndex = String(idx + 1).padStart(6, '0');
+                const predictionDoi = `HLP-${year}-${compCode}-${doiIndex}`;
+
                 return (
                   <>
                     <tr
@@ -297,6 +304,15 @@ export function LedgerTable({ initialItems }: LedgerTableProps) {
                       onClick={() => toggleRow(item.id)}
                       className="hover:bg-slate-850/30 transition-colors cursor-pointer"
                     >
+                      <td className="px-6 py-4 font-mono text-[11px]">
+                        <a
+                          href={`/ledger/${item.id}`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="text-emerald-400 font-bold hover:underline flex items-center gap-1 bg-emerald-500/10 border border-emerald-500/20 px-2 py-1 rounded w-fit"
+                        >
+                          🏷️ {predictionDoi}
+                        </a>
+                      </td>
                       <td className="px-6 py-4">
                         <div className="font-sans font-bold text-white text-sm">
                           {item.home_team} vs {item.away_team}

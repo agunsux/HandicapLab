@@ -24,33 +24,52 @@ export default function Footer() {
           </p>
         </div>
 
-        {/* Middle Column: Links */}
+        {/* Middle Column: Research & Trust Links */}
         <div className="space-y-3">
-          <span className="font-mono text-[10px] font-bold text-zinc-400 uppercase tracking-widest block">Navigation</span>
-          <ul className="space-y-2">
+          <span className="font-mono text-[10px] font-bold text-emerald-400 uppercase tracking-widest block">Governance & Audit</span>
+          <ul className="space-y-2 font-mono text-[11px]">
             <li>
-              <a href="#the-edge" className="hover:text-zinc-300 transition-colors">The Edge</a>
+              <Link href="/methodology" className="hover:text-emerald-400 transition-colors">Scientific Methodology</Link>
             </li>
             <li>
-              <a href="#live-stats" className="hover:text-zinc-300 transition-colors">Live Performance</a>
+              <Link href="/trust-center/verification-policy" className="hover:text-emerald-400 transition-colors">Verification Policy</Link>
             </li>
             <li>
-              <a href="#pricing" className="hover:text-zinc-300 transition-colors">Pricing</a>
+              <Link href="/research/hall-of-mistakes" className="hover:text-amber-400 transition-colors flex items-center gap-1 text-amber-400/90 font-bold">
+                ⚠️ Hall of Mistakes
+              </Link>
             </li>
             <li>
-              <Link href="/dashboard" className="hover:text-zinc-300 transition-colors">Ledger Dashboard</Link>
+              <Link href="/research/reports" className="hover:text-emerald-400 transition-colors">Weekly & Monthly Reports</Link>
+            </li>
+            <li>
+              <Link href="/research/timeline" className="hover:text-emerald-400 transition-colors">Model Timeline (v1 → v3)</Link>
+            </li>
+            <li>
+              <Link href="/trust-center/security" className="hover:text-emerald-400 transition-colors">Security Status</Link>
             </li>
           </ul>
         </div>
 
-        {/* Right Column: Platform details */}
+        {/* Right Column: Ledger & Infrastructure */}
         <div className="space-y-3">
-          <span className="font-mono text-[10px] font-bold text-zinc-400 uppercase tracking-widest block">Engine Details</span>
-          <ul className="space-y-2 font-mono text-[10px] text-zinc-500">
-            <li>Primary Model: Poisson v1.2-cal</li>
-            <li>Secondary Model: Dixon-Coles-rho</li>
-            <li>Staking Metric: Fractional Kelly (0.25)</li>
-            <li>Audited Brier Range: 0.18 - 0.22</li>
+          <span className="font-mono text-[10px] font-bold text-emerald-400 uppercase tracking-widest block">Public Infrastructure</span>
+          <ul className="space-y-2 font-mono text-[11px]">
+            <li>
+              <Link href="/validation" className="hover:text-emerald-400 transition-colors">Live Validation Dashboard</Link>
+            </li>
+            <li>
+              <Link href="/ledger" className="hover:text-emerald-400 transition-colors">Public Ledger</Link>
+            </li>
+            <li>
+              <Link href="/trust-center" className="hover:text-emerald-400 transition-colors">Trust Center</Link>
+            </li>
+            <li>
+              <Link href="/research/datasets" className="hover:text-emerald-400 transition-colors">Open Datasets (CSV)</Link>
+            </li>
+            <li>
+              <Link href="/methodology#api" className="hover:text-emerald-400 transition-colors">API Documentation</Link>
+            </li>
           </ul>
         </div>
       </div>
