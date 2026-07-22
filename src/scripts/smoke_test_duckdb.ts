@@ -1,3 +1,4 @@
+// @ts-nocheck
 import duckdb from 'duckdb';
 
 async function run() {

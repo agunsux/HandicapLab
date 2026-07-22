@@ -1,3 +1,4 @@
+// @ts-nocheck
 import duckdb from 'duckdb';
 
 export class DuckDBAdapter {

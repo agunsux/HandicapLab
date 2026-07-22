@@ -36,7 +36,6 @@ const methodologyVersions: MethodologyVersion[] = [
   },
   {
     tag: 'v3.0',
-    tag: 'v3.0 Probability Calibration & ECE Engine',
     name: 'v3.0 Probability Calibration & ECE Engine',
     date: 'June 2026',
     commit: '7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1f',

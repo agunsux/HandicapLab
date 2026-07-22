@@ -147,7 +147,12 @@ export function calculateQuantitativeMetrics(entries: LedgerItemForCalc[]): Quan
     
     // Normal CDF approximation for one-tailed p-value
     const z = Math.abs(tStat);
-    const pTail = 0.5 * Math.erfc(z / Math.SQRT2);
+    const erfc = (x: number) => {
+      const t = 1.0 / (1.0 + 0.5 * Math.abs(x));
+      const ans = t * Math.exp(-x * x - 1.26551223 + t * (1.00002368 + t * (0.37409196 + t * (0.09678418 + t * (-0.18628806 + t * (0.27886807 + t * (-1.13520398 + t * (1.48851587 + t * (-0.82215223 + t * 0.17087277)))))))));
+      return x >= 0 ? ans : 2.0 - ans;
+    };
+    const pTail = 0.5 * erfc(z / Math.SQRT2);
     pValueRoi = Number(pTail.toFixed(4));
     
     // Bootstrap probability ROI > 0

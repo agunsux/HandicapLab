@@ -23,30 +23,30 @@ export async function GET(req: NextRequest) {
     const metricsRecords = await metricsEngine.run(correlationId);
 
     // 2. Calibration Monitoring
-    const calMonitor = new CalibrationMonitor(store, {
+    const calMonitor = new CalibrationMonitor({
+      store,
       schemaVersion: '1.0',
-      bucketCount: DEFAULT_LIVE_VALIDATION_CONFIG.calibration.bucketCount,
     });
-    const calRecord = await calMonitor.evaluateAndPersist(correlationId);
+    const calRecord = await calMonitor.run(30, correlationId);
 
     // 3. Drift Detection
-    const driftDetector = new DriftDetector(store, {
-      schemaVersion: '1.0',
-      warningThreshold: DEFAULT_LIVE_VALIDATION_CONFIG.drift.psiWarningThreshold,
-      criticalThreshold: DEFAULT_LIVE_VALIDATION_CONFIG.drift.psiCriticalThreshold,
+    const driftDetector = new DriftDetector({
+      store,
+      config: DEFAULT_LIVE_VALIDATION_CONFIG,
     });
-    const driftEvents = await driftDetector.evaluateAndPersistAll(correlationId);
+    const driftEvents = await driftDetector.run(correlationId);
 
     // 4. Alert Engine
-    const alertEngine = new AlertEngine(store, {
-      config: DEFAULT_LIVE_VALIDATION_CONFIG.alerting,
-      schemaVersion: '1.0',
+    const alertEngine = new AlertEngine({
+      store,
+      config: DEFAULT_LIVE_VALIDATION_CONFIG,
+      channels: [],
     });
-    const alerts = await alertEngine.evaluateAndPersist(correlationId);
+    const alerts = await alertEngine.run(correlationId);
 
     // 5. Weekly Scientific Report
-    const reportGen = new WeeklyReportGenerator(store, { schemaVersion: '1.0' });
-    const weeklyReport = await reportGen.generateAndPersist(correlationId);
+    const reportGen = new WeeklyReportGenerator({ store, schemaVersion: '1.0' });
+    const weeklyReport = await reportGen.run(correlationId);
 
     return NextResponse.json({
       success: true,
