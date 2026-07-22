@@ -9,6 +9,7 @@ import { PredictionCheck } from './checks/prediction';
 import { SettlementCheck } from './checks/settlement';
 import { BillingCheck } from './checks/billing';
 import { StorageCheck } from './checks/storage';
+import { ProviderCredentialCheck } from './credential-health';
 
 export class DependencyRegistry {
   private static instance: DependencyRegistry | null = null;
@@ -25,6 +26,7 @@ export class DependencyRegistry {
       this.instance.register(new SettlementCheck());
       this.instance.register(new BillingCheck());
       this.instance.register(new StorageCheck());
+      this.instance.register(new ProviderCredentialCheck());
     }
     return this.instance;
   }
