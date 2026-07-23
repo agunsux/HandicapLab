@@ -57,15 +57,15 @@ export default function AppLayout({
             <span>Competitions Coverage</span>
           </Link>
 
-          <Link
-            href="/teams"
-            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-slate-400 hover:bg-slate-850 hover:text-white"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-users"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            <span>Teams Coverage</span>
-          </Link>
-
           <div className="text-[10px] font-mono text-slate-500 uppercase tracking-widest px-2 pt-6 mb-2">Trust & Audits</div>
+
+          <Link
+            href="/evidence"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 hover:bg-slate-800 hover:text-white font-bold"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-microscope"><path d="M6 18h8"/><path d="M3 22h18"/><path d="M14 22a7 7 0 1 0 0-14h-1"/><path d="M9 14h2"/><path d="M9 12a2 2 0 0 1-2-2V6h4v4a2 2 0 0 1-2 2Z"/><path d="M12 6V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v3"/></svg>
+            <span>Evidence Center</span>
+          </Link>
 
           <Link
             href="/performance"
@@ -83,16 +83,8 @@ export default function AppLayout({
             <span>Historical ROI</span>
           </Link>
 
-          <Link
-            href="/clv"
-            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-slate-400 hover:bg-slate-850 hover:text-white"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-award"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
-            <span>CLV Leaderboard</span>
-          </Link>
-
           <div className="text-[10px] font-mono text-slate-500 uppercase tracking-widest px-2 pt-6 mb-2">Account</div>
-          
+
           <Link
             href="/pricing"
             className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-slate-400 hover:bg-slate-850 hover:text-white"

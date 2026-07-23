@@ -3,10 +3,10 @@
   "featureVersion": "v1.0",
   "modelVersion": "dixonColes-v1",
   "calibrationVersion": "beta-v1",
-  "experimentVersion": "exp-1784752087139",
+  "experimentVersion": "exp-1784828227286",
   "decisionVersion": "v1.0",
   "reportVersion": "v1.0",
-  "evidenceVersion": "1a6b07d2",
+  "evidenceVersion": "3cf06b21",
   "gitCommit": "a1b2c3d4e5f6",
   "randomSeed": 42
 }

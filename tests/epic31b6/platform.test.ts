@@ -41,9 +41,9 @@ describe('EPIC 31B.6 — Historical Data Platform Tests', () => {
       const csvProvider = new FootballDataCSVProvider();
       const understatProvider = new UnderstatProvider();
 
-      const fixtures = await csvProvider.fetchFixtures('EPL', '2023-2024');
-      const odds = await csvProvider.fetchOdds('EPL', '2023-2024');
-      const understatFixtures = await understatProvider.fetchFixtures('EPL', '2023-2024');
+      const fixtures = await csvProvider.fetchFixtures('EPL', '2015-2016');
+      const odds = await csvProvider.fetchOdds('EPL', '2015-2016');
+      const understatFixtures = await understatProvider.fetchFixtures('EPL', '2015-2016');
 
       expect(fixtures.length).toBeGreaterThan(0);
       expect(odds.length).toBeGreaterThan(0);
