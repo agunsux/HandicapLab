@@ -215,17 +215,27 @@ interface FetchOptions {
 export class ApiFootballClient {
   private baseUrl: string;
   private apiKey: string;
+  private lastRequestTime: number = 0;
+  private rateLimitDelayMs: number = 7000;
 
   constructor() {
-    // Check both standard APIFOOTBALL_KEY and local convention API_FOOTBALL_KEY
     const key = process.env.APIFOOTBALL_KEY || process.env.API_FOOTBALL_KEY;
     if (!key) {
       this.apiKey = '';
     } else {
       this.apiKey = key;
     }
-
     this.baseUrl = process.env.APIFOOTBALL_BASE_URL || 'https://v3.football.api-sports.io';
+  }
+
+  private async enforceRateLimit(): Promise<void> {
+    const now = Date.now();
+    const elapsed = now - this.lastRequestTime;
+    if (elapsed < this.rateLimitDelayMs) {
+      const wait = this.rateLimitDelayMs - elapsed;
+      await new Promise((resolve) => setTimeout(resolve, wait));
+    }
+    this.lastRequestTime = Date.now();
   }
 
   private ensureApiKey(): void {
@@ -246,7 +256,11 @@ export class ApiFootballClient {
   ): Promise<T> {
     this.ensureApiKey();
 
+    await this.enforceRateLimit();
+
     const { timeoutMs = 10000 } = options;
+
+    for (let attempt = 1; attempt <= 3; attempt++) {
     const url = new URL(`${this.baseUrl}/${endpoint}`);
     
     Object.entries(params).forEach(([key, val]) => {
@@ -337,6 +351,17 @@ export class ApiFootballClient {
     } catch (error: any) {
       clearTimeout(timeoutId);
 
+      // Retry on 429 rate limit or 5xx server errors
+      const isRetryable = error instanceof ApiError && error.status !== undefined && (
+        error.status === 429 || (error.status >= 500 && error.status < 600)
+      );
+      if (isRetryable && attempt < 3) {
+        const backoffMs = error.status! === 429 ? 10000 * attempt : 5000 * attempt;
+        console.warn(`[ApiFootballClient] Retry ${attempt}/3 after ${backoffMs}ms (status ${error.status})`);
+        await new Promise((r) => setTimeout(r, backoffMs));
+        continue;
+      }
+
       if (error.name === 'AbortError') {
         console.error(`[ApiFootballClient] Request to ${endpoint} timed out after ${timeoutMs}ms.`);
         throw new ApiError(`Request timed out after ${timeoutMs}ms`, endpoint, 408);
@@ -350,8 +375,10 @@ export class ApiFootballClient {
       throw new ApiError(error.message || 'Unknown network error', endpoint, 500, error);
     }
   }
+  return undefined as unknown as T;
+}
 
-  /**
+/**
    * Fetch fixtures for a given league and season
    */
   public async getFixtures(
