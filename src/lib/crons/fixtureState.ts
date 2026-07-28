@@ -217,6 +217,18 @@ export async function getFixturesNeedingSettlement(): Promise<FixtureStateRow[]>
   return (data ?? []).map(mapRow);
 }
 
+// Fixtures needing prediction (SNAPSHOT_COMPLETE — snapshot done, prediction not yet generated)
+export async function getFixturesNeedingPrediction(): Promise<FixtureStateRow[]> {
+  const { data } = await supabase
+    .from('fixture_states')
+    .select('*')
+    .eq('state', 'SNAPSHOT_COMPLETE')
+    .order('priority_score', { ascending: false })
+    .limit(50);
+
+  return (data ?? []).map(mapRow);
+}
+
 // Fixtures needing metrics update (SETTLED)
 export async function getFixturesNeedingMetricsUpdate(): Promise<FixtureStateRow[]> {
   const { data } = await supabase

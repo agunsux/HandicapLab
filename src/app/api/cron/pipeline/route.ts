@@ -1,14 +1,22 @@
-// EPIC 54 — Autonomous Pipeline Cron Route
-// Called 4x daily by Vercel Cron Jobs.
+// EPIC 54/55 — Autonomous Pipeline Cron Route
+// Called 4x daily by Vercel Cron Jobs (06:00, 12:00, 18:00, 22:00 UTC).
 // Triggers the Central Orchestrator which coordinates all pipeline stages.
-// The orchestrator handles recovery, queue processing, and quota management.
-// If a run is missed (deploy, outage), the next run recovers via recoverStuckEvents.
+// Phase 0 (recovery) ensures no work is lost on restart/deploy.
 
 import { NextResponse, type NextRequest } from 'next/server';
 import { runOrchestrator } from '@/lib/crons/orchestrator';
 import { getProviderHealth } from '@/lib/providers/quotaManager';
 import { getQueueDepth } from '@/lib/crons/eventQueue';
 import { getLeagueImportProgress } from '@/lib/crons/fixtureState';
+
+export const maxDuration = 300;
+
+const WINDOW_LABELS: Record<number, string> = {
+  6: 'morning',
+  12: 't120_prelineup',
+  18: 't60_lineups',
+  22: 'postmatch',
+};
 
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get('authorization');
@@ -17,8 +25,11 @@ export async function GET(request: NextRequest) {
   }
 
   const mode = request.nextUrl.searchParams.get('mode') || 'full';
+  const hour = new Date().getUTCHours();
+  const windowLabel = WINDOW_LABELS[hour] ?? `hour_${hour}`;
 
-  // Read-only modes (no pipeline execution)
+  console.log(`[Pipeline Cron] Triggered at UTC ${hour}:00 (window: ${windowLabel})`);
+
   if (mode === 'health') {
     const [health, queue, progress] = await Promise.all([
       getProviderHealth(),
@@ -33,10 +44,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ success: true, data: queue });
   }
 
-  // Full pipeline run
   try {
     const report = await runOrchestrator();
-    return NextResponse.json({ success: true, result: report });
+    return NextResponse.json({ success: true, window: windowLabel, result: report });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Unknown error';
     console.error('[Pipeline Cron] Fatal:', error);

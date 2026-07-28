@@ -8,6 +8,8 @@ import { getProviderHealth } from '@/lib/providers/quotaManager';
 import { getQueueDepth } from '@/lib/crons/eventQueue';
 import { getLeagueImportProgress } from '@/lib/crons/fixtureState';
 
+export const maxDuration = 300;
+
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get('authorization');
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {

@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: __dirname,
   },
+  serverExternalPackages: ['duckdb'],
   async headers() {
     return [
       {
@@ -21,7 +22,6 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-  serverExternalPackages: ['duckdb'],
 };
 
 export default withSentryConfig(nextConfig, {
