@@ -15,7 +15,7 @@
 // Static priority tiers are REMOVED — everything is dynamic.
 
 import { supabase } from '@/lib/supabase.server';
-import { LEAGUE_PRIORITIES } from '@/lib/config/leaguePriorities';
+
 import { getProviderHealth, type ProviderHealth } from '@/lib/providers/quotaManager';
 
 export interface LeagueEfficiency {
@@ -128,8 +128,16 @@ export async function loadAllLeagueEfficiency(): Promise<LeagueEfficiency[]> {
 }
 
 async function seedFromConfig(): Promise<LeagueEfficiency[]> {
-  const entries: LeagueEfficiency[] = LEAGUE_PRIORITIES.map((l) => ({
-    leagueId: l.apiFootballId,
+  const seeds = [
+    { id: 39, name: 'Premier League' },
+    { id: 140, name: 'La Liga' },
+    { id: 135, name: 'Serie A' },
+    { id: 78, name: 'Bundesliga' },
+    { id: 61, name: 'Ligue 1' }
+  ];
+
+  const entries: LeagueEfficiency[] = seeds.map((l) => ({
+    leagueId: l.id,
     leagueName: l.name,
     roi: 0,
     clv: 0,

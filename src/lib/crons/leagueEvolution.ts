@@ -4,7 +4,6 @@
 // Certification per league is independent — no league depends on another.
 
 import { supabase } from '@/lib/supabase.server';
-import { LEAGUE_PRIORITIES } from '@/lib/config/leaguePriorities';
 import { recordAuditEvent } from '@/lib/crons/auditTrail';
 
 export type CertificationLevel = 'research' | 'historical_imported' | 'calibrated' | 'building_track_record' | 'verified';
@@ -56,14 +55,17 @@ export async function getLeagueProfile(leagueId: number): Promise<LeagueProfile 
 export async function initializeLeagues(): Promise<number> {
   let initialized = 0;
 
-  for (const league of LEAGUE_PRIORITIES) {
-    const existing = await getLeagueProfile(league.apiFootballId);
+  const { data: configuredLeagues } = await supabase.from('league_efficiency').select('league_id, league_name');
+  if (!configuredLeagues) return 0;
+
+  for (const league of configuredLeagues) {
+    const existing = await getLeagueProfile(league.league_id);
     if (existing) continue;
 
     await supabase.from('league_evolution').insert({
-      league_id: league.apiFootballId,
-      league_name: league.name,
-      season: league.season,
+      league_id: league.league_id,
+      league_name: league.league_name,
+      season: new Date().getFullYear(),
       certification: 'research',
       historical_coverage_pct: 0,
       prediction_count: 0,
