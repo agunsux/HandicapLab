@@ -1,10 +1,16 @@
 // EPIC 53 Stage C/F — Worldwide Scheduler Cron + Provider Health Dashboard
-// Called 2-3x daily by Vercel Cron Jobs.
+// Called by Vercel Cron Jobs at 4 daily windows.
 // Orchestrates the full worldwide prediction pipeline within quota limits.
+//
+// Query modes:
+//   ?mode=full      — run the full scheduler pipeline (default)
+//   ?mode=health    — return provider health snapshot (no pipeline)
+//   ?mode=progress  — return league import progress (no pipeline)
 
 import { NextResponse, type NextRequest } from 'next/server';
 import { runWorldwideScheduler } from '@/lib/crons/worldwideScheduler';
 import { getProviderHealth } from '@/lib/providers/quotaManager';
+import { getLeagueImportProgress } from '@/lib/crons/fixtureState';
 
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get('authorization');
@@ -17,6 +23,11 @@ export async function GET(request: NextRequest) {
   if (mode === 'health') {
     const health = await getProviderHealth();
     return NextResponse.json({ success: true, data: health });
+  }
+
+  if (mode === 'progress') {
+    const progress = await getLeagueImportProgress();
+    return NextResponse.json({ success: true, data: progress });
   }
 
   try {

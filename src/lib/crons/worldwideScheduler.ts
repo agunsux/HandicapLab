@@ -1,255 +1,249 @@
-// EPIC 53 Stage C — Worldwide Fixture Scheduler
-// 4 daily request windows (morning → T-120 → T-60 lineups → post-match analysis).
-// Orchestrates: fixture discovery → priority ranking → T-60 snapshots → post-match settlement.
-// Quota prorated across windows; when tight, only top-tier leagues get processed.
+// EPIC 53 Stage C — Worldwide Fixture Scheduler (v2)
+// 4 daily windows: morning → T-120 pre-lineup → T-60 lineups → post-match analysis
+// Orchestrates the pipeline by reading fixture_states — does NOT re-discover every run.
+// Every external call goes through QuotaManager.acquire().
 //
-// Key design: quota is checked BEFORE every external call. Historical runs
-// only on surplus quota. Critical T-60 windows always get the first slice.
+// Snapshot Dependency Graph: each source is tracked independently.
+// If weather fails, snapshot completes with data_gap = ['weather'].
 
-import { discoverFixtures, getCriticalWindowFixtures, type ScoredFixture } from '@/lib/crons/fixtureDiscovery';
-import { getQuota, canProceed, logProviderCall } from '@/lib/providers/quotaManager';
+import { discoverFixtures, type ScoredFixture } from '@/lib/crons/fixtureDiscovery';
 import { runT60Snapshot } from '@/lib/crons/t60Snapshot';
+import { acquire, logCall, getProviderHealth } from '@/lib/providers/quotaManager';
+import {
+  upsertFixture,
+  transitionState,
+  markSnapshotDependency,
+  getFixturesByState,
+  getFixturesNeedingSnapshots,
+  getFixturesNeedingPostMatch,
+  getLeagueImportProgress,
+  type FixtureState,
+  type FixtureStateRow,
+} from '@/lib/crons/fixtureState';
 import { LEAGUE_PRIORITIES } from '@/lib/config/leaguePriorities';
-import { apiFootballClient } from '@/lib/apis/apifootball';
-import { supabase } from '@/lib/supabase.server';
 
 export interface SchedulerResult {
-  totalFixturesFound: number;
-  criticalWindowFixtures: number;
+  window: number;
+  fixturesDiscovered: number;
+  fixturesNewlyInserted: number;
   snapshotsBuilt: number;
   snapshotErrors: number;
+  snapshotDependencyGaps: Record<string, number>;
+  postMatchAnalysed: number;
   historicalBatchesRun: number;
-  postMatchAnalyses: number;
-  skipped: {
-    quotaBlocked: number;
-    noOdds: number;
-    alreadyProcessed: number;
-  };
-  quota: {
-    apifootballBefore: { used: number; remaining: number; pct: number };
-    apifootballAfter: { used: number; remaining: number; pct: number };
-    oddspapiBefore: { used: number; remaining: number; pct: number };
-    oddspapiAfter: { used: number; remaining: number; pct: number };
-  };
+  quotaBefore: { apifootball: { used: number; rem: number; pct: number }; oddspapi: { used: number; rem: number; pct: number } };
+  quotaAfter: { apifootball: { used: number; rem: number; pct: number }; oddspapi: { used: number; rem: number; pct: number } };
+  providerHealth: Awaited<ReturnType<typeof getProviderHealth>>;
+  leagueProgress: Awaited<ReturnType<typeof getLeagueImportProgress>>;
 }
 
-// 4 daily windows. Quota is divided evenly among them so no single window
-// exhausts the day's budget.
 const DAILY_WINDOWS = 4;
-const WINDOW_HOURS = [6, 10, 18, 22]; // morning, T-120, T-60 lineups, post-match
 
-// Determine which window we're in (0-3)
 function currentWindow(): number {
   const h = new Date().getUTCHours();
-  if (h < 8) return 0;  // morning poll
-  if (h < 14) return 1; // T-120 pre-lineup
-  if (h < 20) return 2; // T-60 lineups
-  return 3;              // post-match analysis
+  if (h < 8) return 0;   // morning discovery
+  if (h < 14) return 1;  // T-120 pre-lineup
+  if (h < 20) return 2;  // T-60 lineups
+  return 3;               // post-match analysis
 }
 
-// Max API calls this window is allowed (prorated)
-function windowBudget(dailyLimit: number): number {
-  return Math.max(1, Math.floor(dailyLimit / DAILY_WINDOWS));
+// ─── Phase 1: Discover new fixtures ─────────────────────────────────
+async function phaseDiscovery(): Promise<{ fixtures: ScoredFixture[]; newlyInserted: number }> {
+  const discovered = await discoverFixtures();
+  let newlyInserted = 0;
+
+  for (const f of discovered.fixtures) {
+    await upsertFixture(f);
+    newlyInserted += 1;
+  }
+
+  return { fixtures: discovered.fixtures, newlyInserted };
 }
 
-// Post-match: fetch results for recently settled fixtures, storing stats
-async function runPostMatchAnalysis(): Promise<number> {
+// ─── Phase 2: T-60 snapshots ────────────────────────────────────────
+async function phaseSnapshots(): Promise<{
+  built: number;
+  errors: number;
+  dependencyGaps: Record<string, number>;
+}> {
+  const now = new Date();
+  const windowStart = new Date(now.getTime() + 30 * 60_000);
+  const windowEnd = new Date(now.getTime() + 90 * 60_000);
+
+  // Get fixtures in critical T-30 to T-90 window
+  const candidates = await getFixturesNeedingSnapshots(windowStart, windowEnd);
+  if (candidates.length === 0) return { built: 0, errors: 0, dependencyGaps: {} };
+
+  // Check quota before running snapshots (critical priority)
+  const receipt = await acquire('oddspapi', 'odds', 'critical');
+  if (!receipt.ok) {
+    console.warn(`[Scheduler] Snapshots skipped: ${receipt.reason}`);
+    return { built: 0, errors: 0, dependencyGaps: {} };
+  }
+
+  // Mark fixtures as SNAPSHOT_READY
+  for (const f of candidates) {
+    await transitionState(f.fixtureId, 'SNAPSHOT_READY');
+  }
+
+  try {
+    const result = await runT60Snapshot();
+    const errors = result.snapshots.filter((s) => !s.success).length;
+
+    // Update dependency graph for each fixture
+    const dependencyGaps: Record<string, number> = {};
+    for (const s of result.snapshots) {
+      const fixtureId = String(s.fixtureId ?? s.homeTeam + '_' + s.awayTeam);
+      if (s.dataGap && s.dataGap.length > 0) {
+        for (const gap of s.dataGap) {
+          dependencyGaps[gap] = (dependencyGaps[gap] ?? 0) + 1;
+          await markSnapshotDependency(fixtureId, gap as any, 'missing');
+        }
+        await transitionState(fixtureId, 'SNAPSHOT_READY', { snapshotDataGap: s.dataGap });
+      } else {
+        await markSnapshotDependency(fixtureId, 'odds', 'ok');
+        await markSnapshotDependency(fixtureId, 'weather', 'ok');
+        await markSnapshotDependency(fixtureId, 'injuries', 'ok');
+        await markSnapshotDependency(fixtureId, 'lineups', 'ok');
+        await markSnapshotDependency(fixtureId, 'rivalry', 'ok');
+      }
+    }
+
+    await logCall('oddspapi', 'odds', 0, 200, { mode: 't60_snapshot', count: candidates.length });
+
+    return { built: result.total, errors, dependencyGaps };
+  } catch (err) {
+    console.error('[Scheduler] Snapshot run failed:', err);
+    return { built: 0, errors: candidates.length, dependencyGaps: {} };
+  }
+}
+
+// ─── Phase 3: Post-match analysis ───────────────────────────────────
+async function phasePostMatch(): Promise<number> {
+  const finished = await getFixturesNeedingPostMatch();
   let analysed = 0;
 
-  for (const league of LEAGUE_PRIORITIES) {
-    const check = await canProceed('apifootball', 'normal');
-    if (!check.allowed) break;
+  for (const f of finished) {
+    const receipt = await acquire('apifootball', 'fixtures/postmatch', 'normal');
+    if (!receipt.ok) break;
 
     try {
-      // Fetch completed fixtures for today (past 48h) to collect results
-      const startTime = Date.now();
-      const response = await apiFootballClient.getFixtures(league.apiFootballId, league.season);
-      await logProviderCall('apifootball', 'fixtures/postmatch', Date.now() - startTime, 200, {
-        leagueId: league.apiFootballId,
-        mode: 'post_match_analysis',
-      });
-
-      for (const item of response.response) {
-        const status = item.fixture.status.short;
-        if (status !== 'FT' && status !== 'AET' && status !== 'PEN') continue;
-
-        // Store match stats for calibration pipeline
-        // (settlement already handled by EPIC 31 — this is for league calibration data collection)
-        const fixtureId = String(item.fixture.id);
-        const { data: existing } = await supabase
-          .from('matches')
-          .select('id')
-          .eq('fixture_id', fixtureId)
-          .maybeSingle();
-
-        if (!existing) {
-          await supabase.from('matches').upsert({
-            fixture_id: fixtureId,
-            league: league.name,
-            league_id: league.apiFootballId,
-            season: league.season,
-            home_team: item.teams.home.name,
-            away_team: item.teams.away.name,
-            kickoff: item.fixture.date,
-            status,
-            home_score: item.goals.home,
-            away_score: item.goals.away,
-            var_era: true,
-          });
-        }
-
-        analysed += 1;
-      }
+      // Transition FINISHED → SETTLED (settlement already handled by EPIC 31)
+      await transitionState(f.fixtureId, 'SETTLED');
+      analysed += 1;
     } catch {
-      break; // preserve quota
+      break;
     }
   }
 
   return analysed;
 }
 
-// Main scheduler entry point — called by cron route
+// ─── Phase 4: Historical surplus ────────────────────────────────────
+async function phaseHistorical(): Promise<number> {
+  let batches = 0;
+
+  for (const league of LEAGUE_PRIORITIES) {
+    const receipt = await acquire('apifootball', 'fixtures/historical', 'background');
+    if (!receipt.ok) break;
+
+    try {
+      await logCall('apifootball', 'fixtures/historical', 0, 200, {
+        leagueId: league.apiFootballId,
+        mode: 'historical_surplus',
+      });
+      batches += 1;
+    } catch {
+      break;
+    }
+  }
+
+  return batches;
+}
+
+// ─── Main entry ─────────────────────────────────────────────────────
 export async function runWorldwideScheduler(): Promise<SchedulerResult> {
   const windowIdx = currentWindow();
-  console.log(`[WorldwideScheduler] Starting scheduler run (window ${windowIdx + 1}/${DAILY_WINDOWS})...`);
+  console.log(`[WorldwideScheduler] Window ${windowIdx + 1}/${DAILY_WINDOWS} starting...`);
+
+  // Capture pre-run state
+  const health = await getProviderHealth();
+  const apifootballHealth = health.find((h) => h.provider === 'apifootball')!;
+  const oddspapiHealth = health.find((h) => h.provider === 'oddspapi')!;
 
   const quotaBefore = {
-    apifootball: await getQuota('apifootball'),
-    oddspapi: await getQuota('oddspapi'),
+    apifootball: { used: apifootballHealth.quotaUsed, rem: apifootballHealth.quotaRemaining, pct: apifootballHealth.quotaPct },
+    oddspapi: { used: oddspapiHealth.quotaUsed, rem: oddspapiHealth.quotaRemaining, pct: oddspapiHealth.quotaPct },
   };
 
-  // Prorate: reserve budget for remaining windows today
-  const apifootballBudget = windowBudget(quotaBefore.apifootball.dailyLimit);
-  const budgetUsedSoFar = quotaBefore.apifootball.usedToday;
-  const windowsRemaining = DAILY_WINDOWS - windowIdx - 1;
-  const reserveForLater = windowsRemaining * apifootballBudget;
-  const effectiveRemaining = Math.max(0, quotaBefore.apifootball.remaining - reserveForLater);
-  const quotaTight = effectiveRemaining < apifootballBudget;
+  // Phase 1: Discovery (windows 0 and 1 — morning and T-120)
+  let fixturesDiscovered = 0;
+  let fixturesNewlyInserted = 0;
+  if (windowIdx <= 1) {
+    const d = await phaseDiscovery();
+    fixturesDiscovered = d.fixtures.length;
+    fixturesNewlyInserted = d.newlyInserted;
+  }
 
-  console.log(`[WorldwideScheduler] Budget: ${budgetUsedSoFar}/${quotaBefore.apifootball.dailyLimit} used, ${effectiveRemaining} effective remaining, quotaTight=${quotaTight}`);
-
-  // --- Phase 1: Discover fixtures (top tiers only if quota tight) ---
-  const discovered = await discoverFixtures();
-  const { fixtures } = discovered;
-
-  // If quota is tight, discard lower-tier fixtures
-  const activeFixtures = quotaTight
-    ? fixtures.filter((f) => f.leagueTier <= 1)
-    : fixtures;
-
-  console.log(`[WorldwideScheduler] Discovered ${fixtures.length} fixtures (active: ${activeFixtures.length}) across ${LEAGUE_PRIORITIES.length} leagues`);
-
-  // --- Phase 2: Find T-60 critical window fixtures ---
-  const now = new Date();
-  const critical = getCriticalWindowFixtures(activeFixtures, now);
-
-  console.log(`[WorldwideScheduler] Critical window (T-60): ${critical.length} fixtures`);
-
-  // --- Phase 3: Run T-60 snapshots for critical fixtures ---
+  // Phase 2: T-60 snapshots (windows 1 and 2 — pre-lineup and lineup)
   let snapshotsBuilt = 0;
   let snapshotErrors = 0;
-
-  if (critical.length > 0) {
-    try {
-      const snapshotResult = await runT60Snapshot();
-      snapshotsBuilt = snapshotResult.total;
-      snapshotErrors = snapshotResult.snapshots.filter((s) => !s.success).length;
-    } catch (err) {
-      console.error('[WorldwideScheduler] T-60 snapshot run failed:', err);
-      snapshotErrors = critical.length;
-    }
+  let snapshotDependencyGaps: Record<string, number> = {};
+  if (windowIdx >= 1 && windowIdx <= 2) {
+    const s = await phaseSnapshots();
+    snapshotsBuilt = s.built;
+    snapshotErrors = s.errors;
+    snapshotDependencyGaps = s.dependencyGaps;
   }
 
-  // --- Phase 3b: Post-match analysis (window 3 only) ---
-  let postMatchAnalyses = 0;
+  // Phase 3: Post-match analysis (window 3 only)
+  let postMatchAnalysed = 0;
   if (windowIdx === 3) {
-    const check = await canProceed('apifootball', 'normal');
-    if (check.allowed) {
-      postMatchAnalyses = await runPostMatchAnalysis();
-      console.log(`[WorldwideScheduler] Post-match analysis: ${postMatchAnalyses} fixtures analysed`);
-    }
+    postMatchAnalysed = await phasePostMatch();
   }
 
-  // --- Phase 4: Historical surplus (only if comfortable quota remaining) ---
+  // Phase 4: Historical surplus (any window, but only if quota > 25% remaining after earlier phases)
   let historicalBatchesRun = 0;
-  const apifootballAfterPhase3 = await getQuota('apifootball');
-
-  if (apifootballAfterPhase3.usagePct < 75) {
-    const historicalCheck = await canProceed('apifootball', 'background');
-    if (historicalCheck.allowed) {
-      for (const league of LEAGUE_PRIORITIES) {
-        const check = await canProceed('apifootball', 'background');
-        if (!check.allowed) break;
-        try {
-          const startTime = Date.now();
-          await logProviderCall('apifootball', 'fixtures/historical', Date.now() - startTime, 200, {
-            leagueId: league.apiFootballId,
-            season: league.season,
-            mode: 'historical_surplus',
-          });
-          historicalBatchesRun += 1;
-        } catch {
-          break;
-        }
-      }
-    }
+  const postHealth = await getProviderHealth();
+  const postApifootball = postHealth.find((h) => h.provider === 'apifootball')!;
+  if (postApifootball.quotaPct < 75) {
+    historicalBatchesRun = await phaseHistorical();
   }
 
-  // --- Final quota snapshot ---
+  // Capture post-run state
+  const healthAfter = await getProviderHealth();
+  const afAfter = healthAfter.find((h) => h.provider === 'apifootball')!;
+  const opAfter = healthAfter.find((h) => h.provider === 'oddspapi')!;
   const quotaAfter = {
-    apifootball: await getQuota('apifootball'),
-    oddspapi: await getQuota('oddspapi'),
+    apifootball: { used: afAfter.quotaUsed, rem: afAfter.quotaRemaining, pct: afAfter.quotaPct },
+    oddspapi: { used: opAfter.quotaUsed, rem: opAfter.quotaRemaining, pct: opAfter.quotaPct },
   };
 
-  const skippedCount = discovered.skipped;
+  const leagueProgress = await getLeagueImportProgress();
 
-  console.log('[WorldwideScheduler] Run complete', {
-    window: windowIdx + 1,
-    fixturesFound: activeFixtures.length,
-    critical: critical.length,
+  console.log(`[WorldwideScheduler] Window ${windowIdx + 1} complete`, {
+    discovered: fixturesDiscovered,
+    new: fixturesNewlyInserted,
     snapshotsBuilt,
     snapshotErrors,
-    postMatchAnalyses,
-    historicalBatchesRun,
-    quota: {
-      apifootball: `${quotaAfter.apifootball.usedToday}/${quotaAfter.apifootball.dailyLimit} (${quotaAfter.apifootball.usagePct}%)`,
-      oddspapi: `${quotaAfter.oddspapi.usedToday}/${quotaAfter.oddspapi.dailyLimit} (${quotaAfter.oddspapi.usagePct}%)`,
-    },
+    dependencyGaps: snapshotDependencyGaps,
+    postMatch: postMatchAnalysed,
+    historical: historicalBatchesRun,
+    quota: `AF: ${afAfter.quotaUsed}/${afAfter.quotaLimit} (${afAfter.quotaPct}%), OP: ${opAfter.quotaUsed}/${opAfter.quotaLimit} (${opAfter.quotaPct}%)`,
   });
 
   return {
-    totalFixturesFound: activeFixtures.length,
-    criticalWindowFixtures: critical.length,
+    window: windowIdx + 1,
+    fixturesDiscovered,
+    fixturesNewlyInserted,
     snapshotsBuilt,
     snapshotErrors,
+    snapshotDependencyGaps,
+    postMatchAnalysed,
     historicalBatchesRun,
-    postMatchAnalyses,
-    skipped: {
-      quotaBlocked: skippedCount,
-      noOdds: 0,
-      alreadyProcessed: 0,
-    },
-    quota: {
-      apifootballBefore: {
-        used: quotaBefore.apifootball.usedToday,
-        remaining: quotaBefore.apifootball.remaining,
-        pct: quotaBefore.apifootball.usagePct,
-      },
-      apifootballAfter: {
-        used: quotaAfter.apifootball.usedToday,
-        remaining: quotaAfter.apifootball.remaining,
-        pct: quotaAfter.apifootball.usagePct,
-      },
-      oddspapiBefore: {
-        used: quotaBefore.oddspapi.usedToday,
-        remaining: quotaBefore.oddspapi.remaining,
-        pct: quotaBefore.oddspapi.usagePct,
-      },
-      oddspapiAfter: {
-        used: quotaAfter.oddspapi.usedToday,
-        remaining: quotaAfter.oddspapi.remaining,
-        pct: quotaAfter.oddspapi.usagePct,
-      },
-    },
+    quotaBefore,
+    quotaAfter,
+    providerHealth: healthAfter,
+    leagueProgress,
   };
 }

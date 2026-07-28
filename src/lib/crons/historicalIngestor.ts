@@ -5,7 +5,7 @@
 import { supabase } from '@/lib/supabase.server';
 import { apiFootballClient } from '@/lib/apis/apifootball';
 import { LEAGUE_PRIORITIES } from '@/lib/config/leaguePriorities';
-import { canProceed, logProviderCall } from '@/lib/providers/quotaManager';
+import { acquire, logCall } from '@/lib/providers/quotaManager';
 
 export interface HistoricalProgress {
   id: string;
@@ -67,16 +67,15 @@ export async function importHistoricalBatch(
   leagueId: number,
   progress: HistoricalProgress
 ): Promise<{ imported: number; completed: boolean } | null> {
-  const check = await canProceed('apifootball', 'background');
-  if (!check.allowed) return null;
+  const receipt = await acquire('apifootball', 'fixtures/historical', 'background');
+  if (!receipt.ok) return null;
 
   try {
     const nextPage = progress.lastImportedPage + 1;
     const startTime = Date.now();
 
-    // API-Football fixtures endpoint with pagination
     const response = await apiFootballClient.getFixtures(leagueId, progress.season);
-    await logProviderCall('apifootball', 'fixtures/historical', Date.now() - startTime, 200, {
+    await logCall('apifootball', 'fixtures/historical', Date.now() - startTime, 200, {
       leagueId,
       page: nextPage,
     });
@@ -158,8 +157,8 @@ export async function runHistoricalIngestor(): Promise<{
   let completed = 0;
 
   for (const league of LEAGUE_PRIORITIES) {
-    const check = await canProceed('apifootball', 'background');
-    if (!check.allowed) break;
+    const receipt = await acquire('apifootball', 'fixtures/historical', 'background');
+    if (!receipt.ok) break;
 
     const progress = await getOrCreateProgress(league.apiFootballId, league.name, league.season);
     if (progress.status === 'completed') continue;

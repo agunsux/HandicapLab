@@ -4,7 +4,7 @@
 
 import { apiFootballClient, type ApiFootballFixtureResponseItem } from '@/lib/apis/apifootball';
 import { LEAGUE_PRIORITIES, type LeaguePriority } from '@/lib/config/leaguePriorities';
-import { canProceed, logProviderCall } from '@/lib/providers/quotaManager';
+import { acquire, logCall } from '@/lib/providers/quotaManager';
 
 export interface ScoredFixture {
   fixtureId: number;
@@ -56,26 +56,19 @@ function computePriorityScore(league: LeaguePriority, kickoff: Date, now: Date):
 }
 
 // Discover fixtures for all supported leagues, scored and sorted.
-// Only runs if quota allows for apifootball at 'normal' priority.
+// Every API call goes through QuotaManager.acquire().
 export async function discoverFixtures(): Promise<{
   fixtures: ScoredFixture[];
   skipped: number;
   quotaOk: boolean;
 }> {
-  const check = await canProceed('apifootball', 'normal');
-  if (!check.allowed) {
-    console.warn(`[FixtureDiscovery] Skipped: ${check.reason}`);
-    return { fixtures: [], skipped: 0, quotaOk: false };
-  }
-
   const now = new Date();
   const allFixtures: ScoredFixture[] = [];
   let skipped = 0;
 
   for (const league of LEAGUE_PRIORITIES) {
-    // Check quota before each league fetch
-    const leagueCheck = await canProceed('apifootball', 'normal');
-    if (!leagueCheck.allowed) {
+    const receipt = await acquire('apifootball', 'fixtures', 'normal');
+    if (!receipt.ok) {
       skipped += 1;
       continue;
     }
@@ -83,7 +76,7 @@ export async function discoverFixtures(): Promise<{
     try {
       const startTime = Date.now();
       const response = await apiFootballClient.getFixtures(league.apiFootballId, league.season);
-      await logProviderCall('apifootball', 'fixtures', Date.now() - startTime, 200, {
+      await logCall('apifootball', 'fixtures', Date.now() - startTime, 200, {
         leagueId: league.apiFootballId,
         results: response.results,
       });
