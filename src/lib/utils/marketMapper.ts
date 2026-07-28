@@ -8,7 +8,7 @@ export interface OddsQuote {
 
 export interface MarketOdds {
   bookmaker: string;
-  marketType: 'ML' | 'AH' | 'OU';
+  marketType: 'ML' | 'AH' | 'OU' | 'BTTS';
   line: number | null;
   opening: OddsQuote | null;
   current: OddsQuote | null;
@@ -22,6 +22,7 @@ export interface MatchMarketData {
   moneyline: MarketOdds | null;
   asianHandicap: MarketOdds | null;
   overUnder: MarketOdds | null;
+  btts: MarketOdds | null;
 }
 
 export function mapMarketOdds(preds: DbPrediction[]): MatchMarketData {
@@ -29,12 +30,13 @@ export function mapMarketOdds(preds: DbPrediction[]): MatchMarketData {
     matchId: preds.length > 0 ? preds[0].match_id : '',
     moneyline: null,
     asianHandicap: null,
-    overUnder: null
+    overUnder: null,
+    btts: null
   };
 
   for (const p of preds) {
-    const type = p.market_type as 'ML' | 'AH' | 'OU';
-    if (type !== 'ML' && type !== 'AH' && type !== 'OU') continue;
+    const type = p.market_type as 'ML' | 'AH' | 'OU' | 'BTTS';
+    if (type !== 'ML' && type !== 'AH' && type !== 'OU' && type !== 'BTTS') continue;
 
     const timestamp = p.prediction_timestamp || p.generated_at || null;
     let bookmaker = 'Pinnacle';
@@ -135,6 +137,8 @@ export function mapMarketOdds(preds: DbPrediction[]): MatchMarketData {
       result.asianHandicap = marketOdds;
     } else if (type === 'OU') {
       result.overUnder = marketOdds;
+    } else if (type === 'BTTS') {
+      result.btts = marketOdds;
     }
   }
 

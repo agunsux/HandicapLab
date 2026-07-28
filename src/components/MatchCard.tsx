@@ -12,13 +12,14 @@ export function MatchCard({ match, prediction }: any) {
   let mlHome = 0, mlDraw = 0, mlAway = 0;
   let ahLineVal = 0, ahHome = 0;
   let ouLineVal = 0, overVal = 0;
+  let bttsYes = 0;
   let confidenceVal = 'Low';
 
   if (Array.isArray(prediction)) {
-    // New Sprints 5 schema (array of predictions)
     const mlPred = prediction.find((p: any) => p.market_type === 'ML');
     const ahPred = prediction.find((p: any) => p.market_type === 'AH');
     const ouPred = prediction.find((p: any) => p.market_type === 'OU');
+    const bttsPred = prediction.find((p: any) => p.market_type === 'BTTS');
 
     if (mlPred) {
       const predData = typeof mlPred.prediction === 'object' && mlPred.prediction ? mlPred.prediction : {};
@@ -31,20 +32,20 @@ export function MatchCard({ match, prediction }: any) {
       const predData = typeof ahPred.prediction === 'object' && ahPred.prediction ? ahPred.prediction : {};
       ahLineVal = Number(predData.ah_line || ahPred.ah_line || 0);
       ahHome = Number(predData.ah_prob || ahPred.ah_prob || 0);
-      if (!mlPred) {
-        confidenceVal = predData.confidence || ahPred.confidence || 'Low';
-      }
+      if (!mlPred) confidenceVal = predData.confidence || ahPred.confidence || 'Low';
     }
     if (ouPred) {
       const predData = typeof ouPred.prediction === 'object' && ouPred.prediction ? ouPred.prediction : {};
       ouLineVal = Number(predData.ou_line || ouPred.ou_line || 0);
       overVal = Number(predData.over_prob || ouPred.over_prob || 0);
-      if (!mlPred && !ahPred) {
-        confidenceVal = predData.confidence || ouPred.confidence || 'Low';
-      }
+      if (!mlPred && !ahPred) confidenceVal = predData.confidence || ouPred.confidence || 'Low';
+    }
+    if (bttsPred) {
+      const predData = typeof bttsPred.prediction === 'object' && bttsPred.prediction ? bttsPred.prediction : {};
+      bttsYes = Number(predData.btts_yes_prob || predData.yes_prob || 0);
+      if (!mlPred && !ahPred && !ouPred) confidenceVal = predData.confidence || bttsPred.confidence || 'Low';
     }
   } else {
-    // Legacy schema (flat object)
     mlHome = Number(prediction.home_prob || 0);
     mlDraw = Number(prediction.draw_prob || 0);
     mlAway = Number(prediction.away_prob || 0);
@@ -52,13 +53,12 @@ export function MatchCard({ match, prediction }: any) {
     ahHome = Number(prediction.ah_prob || 0);
     ouLineVal = Number(prediction.ou_line || 0);
     overVal = Number(prediction.over_prob || 0);
+    bttsYes = Number(prediction.btts_yes_prob || 0);
     confidenceVal = prediction.confidence || 'Low';
   }
 
-  // 1. Moneyline Pick & Prob
   let mlPick = 'Draw';
   let mlProb = mlDraw;
-
   if (mlHome > Math.max(mlDraw, mlAway)) {
     mlPick = homeTeam;
     mlProb = mlHome;
@@ -67,33 +67,23 @@ export function MatchCard({ match, prediction }: any) {
     mlProb = mlAway;
   }
 
-  // 2. Asian Handicap Pick & Prob
   let ahPick = '';
   let ahProb = 0;
-
   if (ahHome >= 0.50) {
     ahPick = `${homeTeam} (${ahLineVal >= 0 ? '+' : ''}${ahLineVal})`;
     ahProb = ahHome;
   } else {
-    // If we cover away, the line sign is inverted
     const awayLine = -ahLineVal;
     ahPick = `${awayTeam} (${awayLine >= 0 ? '+' : ''}${awayLine})`;
     ahProb = 1 - ahHome;
   }
 
-  // 3. Over/Under Pick & Prob
-  let ouPick = '';
-  let ouProb = 0;
+  const ouPick = overVal >= 0.50 ? `Over ${ouLineVal}` : `Under ${ouLineVal}`;
+  const ouProb = overVal >= 0.50 ? overVal : 1 - overVal;
 
-  if (overVal >= 0.50) {
-    ouPick = `Over ${ouLineVal}`;
-    ouProb = overVal;
-  } else {
-    ouPick = `Under ${ouLineVal}`;
-    ouProb = 1 - overVal;
-  }
+  const bttsPick = bttsYes >= 0.50 ? 'Yes' : 'No';
+  const bttsProb = bttsYes >= 0.50 ? bttsYes : 1 - bttsYes;
 
-  // Parse kickoff time
   const matchTime = new Date(match.kickoff).toLocaleTimeString([], {
     hour: '2-digit',
     minute: '2-digit',
@@ -102,30 +92,27 @@ export function MatchCard({ match, prediction }: any) {
 
   return (
     <Link href={`/matches/${match.id}`} className="block transition-transform duration-200 hover:-translate-y-0.5">
-      <div className="bg-gradient-to-br from-white to-slate-50/50 border border-slate-200/80 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:border-slate-300/80 transition-all duration-300 flex flex-col justify-between">
-        {/* Card Header */}
-        <div className="p-5 border-b border-slate-100 flex justify-between items-center bg-white">
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden hover:border-slate-700 transition-all duration-300">
+        <div className="p-5 border-b border-slate-800 flex justify-between items-center">
           <div className="flex flex-col gap-1.5">
             <div className="flex items-center gap-2">
-              <span className="inline-flex px-2 py-0.5 bg-indigo-50 text-[10px] font-black uppercase tracking-wider text-indigo-600 rounded">
+              <span className="inline-flex px-2 py-0.5 bg-slate-800 text-[10px] font-black uppercase tracking-wider text-slate-300 rounded">
                 {match.league || 'League'}
               </span>
-              <span className="text-xs font-semibold text-slate-400">
-                {matchTime}
-              </span>
+              <span className="text-xs font-semibold text-slate-500">{matchTime}</span>
             </div>
-            <h3 className="text-base font-extrabold text-slate-800 tracking-tight">
-              {homeTeam} <span className="text-slate-400 font-medium font-sans">vs</span> {awayTeam}
+            <h3 className="text-base font-extrabold text-white tracking-tight">
+              {homeTeam} <span className="text-slate-500 font-medium font-sans">vs</span> {awayTeam}
             </h3>
           </div>
           <ConfidenceBadge confidence={confidenceVal} />
         </div>
-        
-        {/* Card Predictions Grid (3 markets) */}
-        <div className="p-5 grid grid-cols-1 md:grid-cols-3 gap-3 bg-slate-50/30">
-          <PredictionCard market="Match Winner" pick={mlPick} probability={mlProb} />
-          <PredictionCard market="Over/Under" pick={ouPick} probability={ouProb} />
+
+        <div className="p-5 grid grid-cols-2 md:grid-cols-4 gap-3">
+          <PredictionCard market="Moneyline" pick={mlPick} probability={mlProb} />
           <PredictionCard market="Asian Handicap" pick={ahPick} probability={ahProb} />
+          <PredictionCard market="Over/Under" pick={ouPick} probability={ouProb} />
+          <PredictionCard market="BTTS" pick={bttsPick} probability={bttsProb} />
         </div>
       </div>
     </Link>

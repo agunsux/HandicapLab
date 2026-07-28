@@ -7,7 +7,7 @@ interface MarketPanelProps {
 
 export function MarketPanel({ marketData }: MarketPanelProps) {
   // If no market data is available at all
-  const hasData = marketData && (marketData.moneyline || marketData.asianHandicap || marketData.overUnder);
+  const hasData = marketData && (marketData.moneyline || marketData.asianHandicap || marketData.overUnder || marketData.btts);
   
   if (!hasData) {
     return (
@@ -24,7 +24,7 @@ export function MarketPanel({ marketData }: MarketPanelProps) {
   }
 
   // Render individual quote row
-  const renderQuote = (quote: OddsQuote | null, type: 'ML' | 'AH' | 'OU', label: string) => {
+  const renderQuote = (quote: OddsQuote | null, type: 'ML' | 'AH' | 'OU' | 'BTTS', label: string) => {
     if (!quote || (quote.homeOdds === 0 && quote.awayOdds === 0)) {
       return (
         <div className="flex justify-between items-center py-2 text-xs font-mono border-b border-slate-800/40 last:border-0">
@@ -131,10 +131,11 @@ export function MarketPanel({ marketData }: MarketPanelProps) {
       </div>
 
       {/* Grid of market bookmaker panels */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {renderMarketCard(marketData.moneyline, 'Moneyline (1X2)', 'ML', 'text-emerald-400 bg-emerald-500/10')}
         {renderMarketCard(marketData.asianHandicap, 'Asian Handicap', 'AH', 'text-indigo-400 bg-indigo-500/10')}
         {renderMarketCard(marketData.overUnder, 'Over / Under', 'OU', 'text-amber-400 bg-amber-500/10')}
+        {renderMarketCard(marketData.btts, 'Both Teams to Score', 'BTTS', 'text-rose-400 bg-rose-500/10')}
       </div>
     </div>
   );

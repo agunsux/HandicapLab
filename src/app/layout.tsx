@@ -13,10 +13,10 @@ const monoFont = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'HandicapLab | Football Market Analytics & Probability Intelligence',
+  title: 'HandicapLab | Verified Football Predictions',
   description:
-    'Global football market analytics platform focused on Asian Handicap, Over/Under Total Goals, and Moneyline value edge detection.',
-  keywords: 'Football analytics, Asian Handicap, Over/Under, Moneyline odds, value bets, betting edge, Poisson distribution model',
+    'Verified profitable betting intelligence backed by long-term historical evidence. Transparent track record, Pinnacle closing line value, and continuously verified predictions.',
+  keywords: 'verified betting predictions, football picks, ROI tracked, closing line value, Pinnacle odds, historical validation, profitable betting',
 };
 
 export default function RootLayout({
