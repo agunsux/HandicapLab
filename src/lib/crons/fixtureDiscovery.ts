@@ -1,10 +1,10 @@
-// EPIC 53 Stage B — Worldwide Fixture Discovery
-// Discovers upcoming fixtures from API-Football for all supported leagues.
+// EPIC 56 — Worldwide Fixture Discovery (Dynamic)
+// Discovers upcoming fixtures from API-Football for all active leagues in the DB.
 // Returns ranked fixtures with priority scores for quota-aware scheduling.
 
 import { apiFootballClient, type ApiFootballFixtureResponseItem } from '@/lib/apis/apifootball';
-import { LEAGUE_PRIORITIES, type LeaguePriority } from '@/lib/config/leaguePriorities';
 import { acquire, logCall } from '@/lib/providers/quotaManager';
+import { supabase } from '@/lib/supabase.server';
 
 export interface ScoredFixture {
   fixtureId: number;
@@ -22,11 +22,11 @@ export interface ScoredFixture {
 
 // Priority score: 0-100
 // Factors: league tier, time until kickoff, whether lineups could be available
-function computePriorityScore(league: LeaguePriority, kickoff: Date, now: Date): number {
+function computePriorityScore(leagueTier: number, kickoff: Date, now: Date): number {
   let score = 0;
 
   // League tier: tier 1 = 40 pts, tier 2 = 30, tier 3 = 20, tier 4 = 10, tier 5 = 5, tier 6 = 0
-  score += Math.max(0, 40 - (league.tier - 1) * 10);
+  score += Math.max(0, 40 - (leagueTier - 1) * 10);
 
   // Time proximity: T-120 to T-60 is the critical window
   const msUntilKickoff = kickoff.getTime() - now.getTime();
@@ -55,7 +55,7 @@ function computePriorityScore(league: LeaguePriority, kickoff: Date, now: Date):
   return Math.min(100, score);
 }
 
-// Discover fixtures for all supported leagues, scored and sorted.
+// Discover fixtures for all active leagues, scored and sorted.
 // Every API call goes through QuotaManager.acquire().
 export async function discoverFixtures(): Promise<{
   fixtures: ScoredFixture[];
@@ -66,8 +66,19 @@ export async function discoverFixtures(): Promise<{
   const allFixtures: ScoredFixture[] = [];
   let skipped = 0;
 
-  for (const league of LEAGUE_PRIORITIES) {
-    const receipt = await acquire('apifootball', 'fixtures', 'normal');
+  const { data: leagues, error } = await supabase
+    .from('leagues')
+    .select('*')
+    .eq('is_active', true)
+    .order('priority_score', { ascending: false });
+
+  if (error || !leagues) {
+    console.error('[FixtureDiscovery] Failed to fetch active leagues:', error);
+    return { fixtures: [], skipped: 0, quotaOk: true };
+  }
+
+  for (const league of leagues) {
+    const receipt = await acquire('apifootball', 'fixtures', 60); // Priority 60
     if (!receipt.ok) {
       skipped += 1;
       continue;
@@ -75,9 +86,9 @@ export async function discoverFixtures(): Promise<{
 
     try {
       const startTime = Date.now();
-      const response = await apiFootballClient.getFixtures(league.apiFootballId, league.season);
+      const response = await apiFootballClient.getFixtures(league.id, league.season || new Date().getFullYear());
       await logCall('apifootball', 'fixtures', Date.now() - startTime, 200, {
-        leagueId: league.apiFootballId,
+        leagueId: league.id,
         results: response.results,
       });
 
@@ -89,12 +100,12 @@ export async function discoverFixtures(): Promise<{
         // Skip already finished (FT, AET, PEN, CANC, ABD, POSTP)
         if (['FT', 'AET', 'PEN', 'CANC', 'ABD', 'POSTP'].includes(status)) continue;
 
-        const score = computePriorityScore(league, kickoff, now);
+        const score = computePriorityScore(league.tier || 6, kickoff, now);
         allFixtures.push({
           fixtureId: item.fixture.id,
-          leagueId: league.apiFootballId,
+          leagueId: league.id,
           leagueName: league.name,
-          leagueTier: league.tier,
+          leagueTier: league.tier || 6,
           homeTeam: item.teams.home.name,
           homeTeamId: item.teams.home.id,
           awayTeam: item.teams.away.name,
@@ -105,7 +116,7 @@ export async function discoverFixtures(): Promise<{
         });
       }
     } catch (err) {
-      console.error(`[FixtureDiscovery] Failed for league ${league.name} (${league.apiFootballId}):`, err);
+      console.error(`[FixtureDiscovery] Failed for league ${league.name} (${league.id}):`, err);
       skipped += 1;
     }
   }
@@ -124,3 +135,4 @@ export function getCriticalWindowFixtures(fixtures: ScoredFixture[], now: Date):
     return minutesUntil >= 30 && minutesUntil <= 90;
   });
 }
+

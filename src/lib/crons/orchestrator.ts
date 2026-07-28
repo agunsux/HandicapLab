@@ -34,10 +34,11 @@ import {
 import { recordAuditEvent, audited } from '@/lib/crons/auditTrail';
 import { runEvidenceEngine } from '@/lib/crons/evidenceEngine';
 import { runLeagueEvolution } from '@/lib/crons/leagueEvolution';
-import { LEAGUE_PRIORITIES } from '@/lib/config/leaguePriorities';
 import { supabase } from '@/lib/supabase.server';
 import { processAndStorePrediction } from '@/services/prediction.ledger';
-
+import { computeAllocation, updateFixtureVolumes, updateLeagueEfficiency } from '@/lib/crons/adaptiveScheduler';
+import { syncLeaguesFromProvider, getActiveLeagues } from '@/lib/config/leagueRegistry';
+import { runHistoricalIngestor } from '@/lib/crons/historicalIngestor';
 export interface OrchestratorReport {
   recoveredStuckEvents: number;
   queueDepth: { pending: number; processing: number; failed: number; completed: number };
@@ -49,6 +50,10 @@ export interface OrchestratorReport {
   metricsUpdated: number;
   leaguesPromoted: number;
   historicalBatchesRun: number;
+  leaguesSynced: number;
+  activeLeagues: number;
+  skippedLeagues: number;
+  allocationMode: string;
   providerHealth: Awaited<ReturnType<typeof getProviderHealth>>;
   leagueProgress: Awaited<ReturnType<typeof getLeagueImportProgress>>;
   durationMs: number;
@@ -65,7 +70,7 @@ async function phaseRecovery(): Promise<number> {
 
 // ─── Phase 1: Discovery ─────────────────────────────────────────────
 async function phaseDiscovery(): Promise<number> {
-  const discReceipt = await acquire('apifootball', 'fixtures', 'normal');
+  const discReceipt = await acquire('apifootball', 'fixtures', 60); // Priority 60: Discovery
   if (!discReceipt.ok) {
     console.warn(`[Orchestrator] Discovery skipped: ${discReceipt.reason}`);
     return 0;
@@ -190,7 +195,7 @@ async function phaseSnapshots(): Promise<{ built: number; errors: number }> {
   const candidates = await getFixturesNeedingSnapshots(windowStart, windowEnd);
   if (candidates.length === 0) return { built: 0, errors: 0 };
 
-  const receipt = await acquire('oddspapi', 'odds', 'critical');
+  const receipt = await acquire('oddspapi', 'odds', 80); // Priority 80: Odds Snapshot
   if (!receipt.ok) {
     console.warn(`[Orchestrator] Snapshots skipped: ${receipt.reason}`);
     return { built: 0, errors: 0 };
@@ -310,24 +315,8 @@ async function phaseLeagueEvolution(): Promise<number> {
 
 // ─── Phase 7: Historical Surplus ────────────────────────────────────
 async function phaseHistorical(): Promise<number> {
-  let batches = 0;
-
-  for (const league of LEAGUE_PRIORITIES) {
-    const receipt = await acquire('apifootball', 'fixtures/historical', 'background');
-    if (!receipt.ok) break;
-
-    try {
-      await logCall('apifootball', 'fixtures/historical', 0, 200, {
-        leagueId: league.apiFootballId,
-        mode: 'historical_surplus',
-      });
-      batches += 1;
-    } catch {
-      break;
-    }
-  }
-
-  return batches;
+  const result = await runHistoricalIngestor();
+  return result.fixturesImported;
 }
 
 // ─── Main entry ─────────────────────────────────────────────────────
@@ -340,84 +329,149 @@ export async function runOrchestrator(): Promise<OrchestratorReport> {
   // Phase 0: Recovery — always runs first
   const recoveredStuckEvents = await phaseRecovery();
 
-  // Capture pre-run health
+  // Phase A: Adaptive allocation — compute which leagues get quota today
   const health = await getProviderHealth();
+  const apifootball = health.find((h) => h.provider === 'apifootball');
+  const remainingQuota = apifootball?.quotaRemaining ?? 100;
+  const quotaLimit = apifootball?.quotaLimit ?? 100;
 
-  // Phase 1: Fixture discovery
-  const newFixturesDiscovered = await phaseDiscovery();
+  // Sync new leagues from provider
+  const syncResult = await syncLeaguesFromProvider();
 
-  // Phase 2: Predictions (from existing SNAPSHOT_COMPLETE fixtures)
-  const predictionsGenerated = await phasePredictions();
+  // Update fixture volume estimates
+  await updateFixtureVolumes();
 
-  // Phase 3: T-60 snapshots
-  const snapResult = await phaseSnapshots();
+  // Compute allocation plan
+  const allocation = await computeAllocation(remainingQuota, quotaLimit);
 
-  // Phase 4: Settlement
-  const settlementsProcessed = await phaseSettlement();
+  const activeCount = allocation.activeLeagues.length;
+  const skippedCount = allocation.skippedLeagues.length;
 
-  // Phase 5: Metrics update (evidence engine)
-  const metricsUpdated = await phaseMetrics();
+  console.log(`[Orchestrator] Allocation: ${activeCount} active, ${skippedCount} skipped, mode=${allocation.mode}`);
 
-  // Phase 6: League evolution
-  const leaguesPromoted = await phaseLeagueEvolution();
+  // Check if we have enough quota for discovery
+  if (allocation.activeLeagues.length > 0 || allocation.mode === 'NORMAL') {
+    // Phase 4 (Now 1st): Settlement (Priority 100)
+    const settlementsProcessed = await phaseSettlement();
 
-  // Phase 7: Historical surplus (only if quota comfortable after all above)
-  const postHealth = await getProviderHealth();
-  const postAf = postHealth.find((h) => h.provider === 'apifootball')!;
-  let historicalBatchesRun = 0;
-  if (postAf.quotaPct < 75) {
-    historicalBatchesRun = await phaseHistorical();
-  }
+    // Phase 2 (Now 2nd): Predictions (Priority 90)
+    const predictionsGenerated = await phasePredictions();
 
-  // Get final state
-  const queueDepth = await getQueueDepth();
-  const leagueProgress = await getLeagueImportProgress();
-  const healthAfter = await getProviderHealth();
-  const durationMs = Date.now() - startTime;
+    // Phase 3 (Now 3rd): T-60 snapshots (Priority 80)
+    const snapResult = await phaseSnapshots();
 
-  // Audit the orchestrator run itself
-  await recordAuditEvent({
-    jobId,
-    triggerSource: 'orchestrator',
-    outcome: 'success',
-    durationMs,
-    metadata: {
+    // Phase 1 (Now 4th): Fixture discovery (Priority 60)
+    const newFixturesDiscovered = await phaseDiscovery();
+
+    // Phase 7 (Now 5th): Historical surplus (Priority 40)
+    let historicalBatchesRun = 0;
+    if (allocation.mode === 'NORMAL') {
+      historicalBatchesRun = await phaseHistorical();
+    }
+
+    // Phase 6 (Now 6th): League evolution / Metadata (Priority 20)
+    const leaguesPromoted = await phaseLeagueEvolution();
+
+    // Phase 5 (Now 7th): Metrics update (evidence engine)
+    const metricsUpdated = await phaseMetrics();
+
+    // Update efficiency scores for active leagues
+    for (const league of allocation.activeLeagues) {
+      await updateLeagueEfficiency(league.leagueId, league.leagueName, {
+        predictionCount: league.predictionCount,
+        apiRequestsUsed: league.apiRequestsUsed,
+        avgConfidence: league.avgConfidence,
+      }).catch(() => {});
+    }
+
+    // Get final state
+    const queueDepth = await getQueueDepth();
+    const leagueProgress = await getLeagueImportProgress();
+    const healthAfter = await getProviderHealth();
+    const durationMs = Date.now() - startTime;
+
+    // Audit
+    await recordAuditEvent({
+      jobId,
+      triggerSource: 'orchestrator',
+      outcome: 'success',
+      durationMs,
+      metadata: {
+        allocationMode: allocation.mode,
+        activeLeagues: activeCount,
+        skippedLeagues: skippedCount,
+        newFixturesDiscovered,
+        predictionsGenerated,
+        snapshotsBuilt: snapResult.built,
+        settlementsProcessed,
+        metricsUpdated,
+        leaguesPromoted,
+        historicalBatchesRun,
+        queueDepth,
+      },
+    });
+
+    console.log(`[Orchestrator] Pipeline complete in ${durationMs}ms`, {
+      recovered: recoveredStuckEvents,
+      allocationMode: allocation.mode,
+      active: activeCount,
+      skipped: skippedCount,
+      discovered: newFixturesDiscovered,
+      predictions: predictionsGenerated,
+      snapshots: snapResult,
+      settlements: settlementsProcessed,
+      metrics: metricsUpdated,
+      leagues: leaguesPromoted,
+      historical: historicalBatchesRun,
+      queue: queueDepth,
+    });
+
+    return {
+      recoveredStuckEvents,
+      queueDepth,
       newFixturesDiscovered,
-      predictionsGenerated,
       snapshotsBuilt: snapResult.built,
+      snapshotErrors: snapResult.errors,
+      predictionsGenerated,
       settlementsProcessed,
       metricsUpdated,
       leaguesPromoted,
       historicalBatchesRun,
-      queueDepth,
-    },
-  });
+      leaguesSynced: syncResult.registered,
+      activeLeagues: activeCount,
+      skippedLeagues: skippedCount,
+      allocationMode: allocation.mode,
+      providerHealth: healthAfter,
+      leagueProgress,
+      durationMs,
+    };
+  }
 
-  console.log(`[Orchestrator] Pipeline complete in ${durationMs}ms`, {
-    recovered: recoveredStuckEvents,
-    discovered: newFixturesDiscovered,
-    predictions: predictionsGenerated,
-    snapshots: snapResult,
-    settlements: settlementsProcessed,
-    metrics: metricsUpdated,
-    leagues: leaguesPromoted,
-    historical: historicalBatchesRun,
-    queue: queueDepth,
-  });
+  // Quota exhausted — minimal run
+  console.log('[Orchestrator] Quota critical — minimal pipeline run');
+
+  const queueDepthMin = await getQueueDepth();
+  const leagueProgressMin = await getLeagueImportProgress();
+  const healthAfterMin = await getProviderHealth();
+  const durationMsMin = Date.now() - startTime;
 
   return {
     recoveredStuckEvents,
-    queueDepth,
-    newFixturesDiscovered,
-    snapshotsBuilt: snapResult.built,
-    snapshotErrors: snapResult.errors,
-    predictionsGenerated,
-    settlementsProcessed,
-    metricsUpdated,
-    leaguesPromoted,
-    historicalBatchesRun,
-    providerHealth: healthAfter,
-    leagueProgress,
-    durationMs,
+    queueDepth: queueDepthMin,
+    newFixturesDiscovered: 0,
+    snapshotsBuilt: 0,
+    snapshotErrors: 0,
+    predictionsGenerated: 0,
+    settlementsProcessed: 0,
+    metricsUpdated: 0,
+    leaguesPromoted: 0,
+    historicalBatchesRun: 0,
+    leaguesSynced: syncResult.registered,
+    activeLeagues: activeCount,
+    skippedLeagues: skippedCount,
+    allocationMode: 'CRITICAL',
+    providerHealth: healthAfterMin,
+    leagueProgress: leagueProgressMin,
+    durationMs: durationMsMin,
   };
 }
