@@ -21,6 +21,11 @@ export interface SharpOddsForFixture {
       outcomes: Array<{ name: string; price: number; point?: number }>;
     }>;
   }>;
+}
+
+export interface SharpOddsResult {
+  odds: SharpOddsForFixture[] | null;
+  blocked: boolean;
   budgetUsed: number;
   budgetRemaining: number;
 }
@@ -30,7 +35,7 @@ export interface SharpOddsForFixture {
 export async function fetchSharpOdds(
   sport: string,
   regions = 'eu'
-): Promise<{ odds: SharpOddsForFixture[] | null; blocked: boolean; budgetUsed: number; budgetRemaining: number }> {
+): Promise<SharpOddsResult> {
   const budget = await getBudgetStatus();
 
   if (budget.blocked) {
