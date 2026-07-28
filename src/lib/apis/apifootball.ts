@@ -123,6 +123,89 @@ export const ApiFootballFixtureResponseItemSchema = z.object({
 // Single parameter or endpoint validation schemas
 export const ApiFootballFixturesResponseSchema = createApiFootballResponseSchema(z.array(ApiFootballFixtureResponseItemSchema));
 
+// -- EPIC 52 Stage B: Injury Schema --
+export const ApiFootballInjuryItemSchema = z.object({
+  player: z.object({
+    id: z.number(),
+    name: z.string(),
+    photo: z.string().optional(),
+    type: z.string().optional(),
+    reason: z.string().optional(),
+  }),
+  team: z.object({
+    id: z.number(),
+    name: z.string(),
+    logo: z.string().optional(),
+  }),
+  fixture: z.object({
+    id: z.number().optional(),
+    date: z.string().optional(),
+  }).optional(),
+  league: z.object({
+    id: z.number().optional(),
+    season: z.number().optional(),
+  }).optional(),
+});
+
+export const ApiFootballInjuriesResponseSchema = createApiFootballResponseSchema(z.array(ApiFootballInjuryItemSchema));
+
+export type ApiFootballInjuryItem = z.infer<typeof ApiFootballInjuryItemSchema>;
+
+// -- EPIC 52 Stage B: Lineup Schema --
+export const ApiFootballLineupItemSchema = z.object({
+  team: z.object({
+    id: z.number(),
+    name: z.string(),
+    logo: z.string().optional(),
+    colors: z.any().optional(),
+  }),
+  formation: z.string().optional(),
+  startXI: z.array(z.object({
+    player: z.object({
+      id: z.number(),
+      name: z.string(),
+      number: z.number().optional(),
+      pos: z.string().optional(),
+      grid: z.string().optional(),
+    }),
+  })),
+  substitutes: z.array(z.object({
+    player: z.object({
+      id: z.number(),
+      name: z.string(),
+      number: z.number().optional(),
+      pos: z.string().optional(),
+      grid: z.string().optional(),
+    }),
+  })).optional(),
+  coach: z.array(z.object({
+    id: z.number().optional(),
+    name: z.string().optional(),
+    photo: z.string().optional(),
+  })).optional(),
+});
+
+export const ApiFootballLineupsResponseSchema = createApiFootballResponseSchema(z.array(ApiFootballLineupItemSchema));
+
+export type ApiFootballLineupItem = z.infer<typeof ApiFootballLineupItemSchema>;
+
+// -- EPIC 52 Stage B: Venue (for weather coords) --
+export const ApiFootballVenueDetailSchema = z.object({
+  id: z.number().optional(),
+  name: z.string().optional(),
+  address: z.string().nullable().optional(),
+  city: z.string().nullable().optional(),
+  capacity: z.number().nullable().optional(),
+  surface: z.string().nullable().optional(),
+  image: z.string().nullable().optional(),
+  coordinates: z.object({
+    latitude: z.number().nullable().optional(),
+    longitude: z.number().nullable().optional(),
+  }).optional(),
+});
+
+export const ApiFootballVenueResponseSchema = createApiFootballResponseSchema(z.array(ApiFootballVenueDetailSchema));
+
 export type ApiFootballFixtureResponseItem = z.infer<typeof ApiFootballFixtureResponseItemSchema>;
 
 interface FetchOptions {
@@ -296,6 +379,41 @@ export class ApiFootballClient {
       ApiFootballFixturesResponseSchema,
       options
     );
+  }
+
+  /**
+   * EPIC 52 Stage B — Fetch current injuries for a team or fixture
+   */
+  public async getInjuries(
+    params: { team?: number; fixture?: number; league?: number; season?: number },
+    options?: FetchOptions
+  ): Promise<z.infer<typeof ApiFootballInjuriesResponseSchema>> {
+    const query: Record<string, string> = {};
+    if (params.team) query.team = String(params.team);
+    if (params.fixture) query.fixture = String(params.fixture);
+    if (params.league) query.league = String(params.league);
+    if (params.season) query.season = String(params.season);
+    return this.request('injuries', query, ApiFootballInjuriesResponseSchema, options);
+  }
+
+  /**
+   * EPIC 52 Stage B — Fetch lineups for a specific fixture
+   */
+  public async getLineups(
+    fixtureId: number,
+    options?: FetchOptions
+  ): Promise<z.infer<typeof ApiFootballLineupsResponseSchema>> {
+    return this.request('lineups', { fixture: String(fixtureId) }, ApiFootballLineupsResponseSchema, options);
+  }
+
+  /**
+   * EPIC 52 Stage B — Fetch venue details (for weather coordinates)
+   */
+  public async getVenue(
+    venueId: number,
+    options?: FetchOptions
+  ): Promise<z.infer<typeof ApiFootballVenueResponseSchema>> {
+    return this.request('venues', { id: String(venueId) }, ApiFootballVenueResponseSchema, options);
   }
 }
 
