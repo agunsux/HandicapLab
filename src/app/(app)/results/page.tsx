@@ -13,8 +13,8 @@ export default async function ResultsPage({
 }: {
   searchParams?: Promise<{ league?: string; market?: string }>;
 }) {
-  const params = await (searchParams || Promise.resolve({}));
-  const { league, market } = params || {};
+  const params = await (searchParams ?? Promise.resolve<{ league?: string; market?: string }>({}));
+  const { league, market } = params;
 
   const results = await fetchSettledResults({ league, market });
 
