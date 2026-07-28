@@ -1,25 +1,28 @@
-// EPIC 53 — Fixture State Machine
-// Single source of truth for every fixture's lifecycle.
-// Scheduler reads fixture_states instead of re-discovering every run.
+// EPIC 54 Stage B — Fixture Lifecycle State Machine (Extended)
+// Full autonomous lifecycle:
+//   DISCOVERED → HISTORICAL_READY → ENRICHMENT_PENDING → SNAPSHOT_PENDING
+//   → SNAPSHOT_COMPLETE → PREDICTION_GENERATED → PRE_MATCH → LIVE
+//   → HALFTIME → FULLTIME → SETTLEMENT_PENDING → SETTLED
+//   → METRICS_UPDATED → ARCHIVED
 //
-// State flow:
-//   DISCOVERED → HISTORICAL_READY → SNAPSHOT_READY → PREDICTED → LIVE
-//   → HALFTIME → FINISHED → SETTLED → ARCHIVED
-//
-// Transitions are tracked with timestamps for full audit trail.
+// Every transition is atomic, idempotent, and auditable.
 
 import { supabase } from '@/lib/supabase.server';
-import type { ScoredFixture } from '@/lib/crons/fixtureDiscovery';
 
 export type FixtureState =
   | 'DISCOVERED'
   | 'HISTORICAL_READY'
-  | 'SNAPSHOT_READY'
-  | 'PREDICTED'
+  | 'ENRICHMENT_PENDING'
+  | 'SNAPSHOT_PENDING'
+  | 'SNAPSHOT_COMPLETE'
+  | 'PREDICTION_GENERATED'
+  | 'PRE_MATCH'
   | 'LIVE'
   | 'HALFTIME'
-  | 'FINISHED'
+  | 'FULLTIME'
+  | 'SETTLEMENT_PENDING'
   | 'SETTLED'
+  | 'METRICS_UPDATED'
   | 'ARCHIVED';
 
 export interface FixtureStateRow {
@@ -40,17 +43,22 @@ export interface FixtureStateRow {
   updatedAt: string;
 }
 
-// Desired transitions per state
+// Valid transitions — single source of truth
 const VALID_TRANSITIONS: Record<FixtureState, FixtureState[]> = {
-  DISCOVERED:        ['HISTORICAL_READY', 'SNAPSHOT_READY'],
-  HISTORICAL_READY:  ['SNAPSHOT_READY'],
-  SNAPSHOT_READY:    ['PREDICTED'],
-  PREDICTED:         ['LIVE'],
-  LIVE:              ['HALFTIME', 'FINISHED'],
-  HALFTIME:          ['FINISHED'],
-  FINISHED:          ['SETTLED'],
-  SETTLED:           ['ARCHIVED'],
-  ARCHIVED:          [],
+  DISCOVERED:            ['HISTORICAL_READY', 'ENRICHMENT_PENDING'],
+  HISTORICAL_READY:      ['ENRICHMENT_PENDING'],
+  ENRICHMENT_PENDING:    ['SNAPSHOT_PENDING'],
+  SNAPSHOT_PENDING:      ['SNAPSHOT_COMPLETE'],
+  SNAPSHOT_COMPLETE:     ['PREDICTION_GENERATED'],
+  PREDICTION_GENERATED:  ['PRE_MATCH'],
+  PRE_MATCH:             ['LIVE'],
+  LIVE:                  ['HALFTIME', 'FULLTIME'],
+  HALFTIME:              ['FULLTIME'],
+  FULLTIME:              ['SETTLEMENT_PENDING'],
+  SETTLEMENT_PENDING:    ['SETTLED'],
+  SETTLED:               ['METRICS_UPDATED'],
+  METRICS_UPDATED:       ['ARCHIVED'],
+  ARCHIVED:              [],
 };
 
 function isValidTransition(from: FixtureState, to: FixtureState): boolean {
@@ -61,31 +69,46 @@ function stateTimestampColumn(state: FixtureState): string {
   const map: Record<string, string> = {
     DISCOVERED: 'discovered_at',
     HISTORICAL_READY: 'historical_ready_at',
-    SNAPSHOT_READY: 'snapshot_ready_at',
-    PREDICTED: 'predicted_at',
+    ENRICHMENT_PENDING: 'enrichment_pending_at',
+    SNAPSHOT_PENDING: 'snapshot_pending_at',
+    SNAPSHOT_COMPLETE: 'snapshot_complete_at',
+    PREDICTION_GENERATED: 'prediction_generated_at',
+    PRE_MATCH: 'pre_match_at',
     LIVE: 'live_at',
     HALFTIME: 'halftime_at',
-    FINISHED: 'finished_at',
+    FULLTIME: 'fulltime_at',
+    SETTLEMENT_PENDING: 'settlement_pending_at',
     SETTLED: 'settled_at',
+    METRICS_UPDATED: 'metrics_updated_at',
     ARCHIVED: 'archived_at',
   };
   return map[state] ?? 'updated_at';
 }
 
-// Upsert a fixture into the state machine (idempotent — preserves existing state)
-export async function upsertFixture(fixture: ScoredFixture): Promise<void> {
+// Upsert a fixture at DISCOVERED (idempotent — preserves existing state)
+export async function upsertFixture(opts: {
+  fixtureId: number | string;
+  leagueId: number;
+  leagueName: string;
+  season: number;
+  homeTeam: string;
+  awayTeam: string;
+  kickoff: string;
+  leagueTier: number;
+  priorityScore: number;
+}): Promise<void> {
   const now = new Date().toISOString();
 
   await supabase.from('fixture_states').upsert({
-    fixture_id: String(fixture.fixtureId),
-    league_id: fixture.leagueId,
-    league_name: fixture.leagueName,
-    season: new Date(fixture.kickoff).getFullYear(),
-    home_team: fixture.homeTeam,
-    away_team: fixture.awayTeam,
-    kickoff: fixture.kickoff.toISOString(),
-    league_tier: fixture.leagueTier,
-    priority_score: fixture.priorityScore,
+    fixture_id: String(opts.fixtureId),
+    league_id: opts.leagueId,
+    league_name: opts.leagueName,
+    season: opts.season,
+    home_team: opts.homeTeam,
+    away_team: opts.awayTeam,
+    kickoff: opts.kickoff,
+    league_tier: opts.leagueTier,
+    priority_score: opts.priorityScore,
     state: 'DISCOVERED',
     discovered_at: now,
     updated_at: now,
@@ -103,7 +126,6 @@ export async function transitionState(
     oddsBudgetSpent: number;
   }>
 ): Promise<boolean> {
-  // Fetch current state
   const { data: current } = await supabase
     .from('fixture_states')
     .select('state')
@@ -111,14 +133,13 @@ export async function transitionState(
     .single();
 
   if (!current) {
-    console.warn(`[FixtureState] Fixture ${fixtureId} not found in state machine`);
+    console.warn(`[FixtureState] Fixture ${fixtureId} not found`);
     return false;
   }
 
   const currentState = current.state as FixtureState;
-
   if (!isValidTransition(currentState, newState)) {
-    console.warn(`[FixtureState] Invalid transition: ${currentState} → ${newState} for fixture ${fixtureId}`);
+    console.warn(`[FixtureState] Invalid transition: ${currentState} → ${newState} for ${fixtureId}`);
     return false;
   }
 
@@ -139,7 +160,7 @@ export async function transitionState(
   return true;
 }
 
-// Mark snapshot dependency status for a fixture
+// Mark snapshot dependency status
 export async function markSnapshotDependency(
   fixtureId: string,
   source: 'odds' | 'weather' | 'injuries' | 'lineups' | 'rivalry',
@@ -152,7 +173,8 @@ export async function markSnapshotDependency(
     .eq('fixture_id', fixtureId);
 }
 
-// Query fixtures by state (for scheduler consumption)
+// ─── Queries ──────────────────────────────────────────────────────────────
+
 export async function getFixturesByState(
   states: FixtureState[],
   opts?: { limit?: number; minTier?: number }
@@ -163,44 +185,48 @@ export async function getFixturesByState(
     .in('state', states)
     .order('priority_score', { ascending: false });
 
-  if (opts?.minTier !== undefined) {
-    void query.lte('league_tier', opts.minTier);
-  }
-  if (opts?.limit !== undefined) {
-    void query.limit(opts.limit);
-  }
+  if (opts?.minTier !== undefined) void query.lte('league_tier', opts.minTier);
+  if (opts?.limit !== undefined) void query.limit(opts.limit);
 
   const { data } = await query;
-  if (!data) return [];
-
-  return data.map(mapRow);
+  return (data ?? []).map(mapRow);
 }
 
-// Fixtures that need snapshots (DISCOVERED + kickoff in critical window)
+// Fixtures needing snapshots (DISCOVERED / HISTORICAL_READY / ENRICHMENT_PENDING + kickoff in window)
 export async function getFixturesNeedingSnapshots(windowStart: Date, windowEnd: Date): Promise<FixtureStateRow[]> {
   const { data } = await supabase
     .from('fixture_states')
     .select('*')
-    .in('state', ['DISCOVERED', 'HISTORICAL_READY'])
+    .in('state', ['DISCOVERED', 'HISTORICAL_READY', 'ENRICHMENT_PENDING'])
     .gte('kickoff', windowStart.toISOString())
     .lte('kickoff', windowEnd.toISOString())
     .order('priority_score', { ascending: false });
 
-  if (!data) return [];
-  return data.map(mapRow);
+  return (data ?? []).map(mapRow);
 }
 
-// Fixtures that need post-match analysis (FINISHED, not yet SETTLED/ARCHIVED)
-export async function getFixturesNeedingPostMatch(): Promise<FixtureStateRow[]> {
+// Fixtures needing settlement (FULLTIME)
+export async function getFixturesNeedingSettlement(): Promise<FixtureStateRow[]> {
   const { data } = await supabase
     .from('fixture_states')
     .select('*')
-    .eq('state', 'FINISHED')
+    .eq('state', 'FULLTIME')
     .order('priority_score', { ascending: false })
     .limit(50);
 
-  if (!data) return [];
-  return data.map(mapRow);
+  return (data ?? []).map(mapRow);
+}
+
+// Fixtures needing metrics update (SETTLED)
+export async function getFixturesNeedingMetricsUpdate(): Promise<FixtureStateRow[]> {
+  const { data } = await supabase
+    .from('fixture_states')
+    .select('*')
+    .eq('state', 'SETTLED')
+    .order('priority_score', { ascending: false })
+    .limit(50);
+
+  return (data ?? []).map(mapRow);
 }
 
 function mapRow(row: Record<string, unknown>): FixtureStateRow {
@@ -223,55 +249,36 @@ function mapRow(row: Record<string, unknown>): FixtureStateRow {
   };
 }
 
-// Get overall import progress per league
+// ─── League Import Progress ───────────────────────────────────────────────
 export async function getLeagueImportProgress(): Promise<Array<{
   leagueId: number;
   leagueName: string;
   total: number;
   discovered: number;
-  historicalReady: number;
-  snapshotReady: number;
+  snapshotComplete: number;
   predicted: number;
-  finished: number;
+  fulltime: number;
   settled: number;
+  metricsUpdated: number;
 }>> {
-  const { data } = await supabase
-    .from('fixture_states')
-    .select('league_id, league_name, state');
-
+  const { data } = await supabase.from('fixture_states').select('league_id, league_name, state');
   if (!data) return [];
 
-  const groups = new Map<string, {
-    leagueId: number;
-    leagueName: string;
-    total: number;
-    discovered: number;
-    historicalReady: number;
-    snapshotReady: number;
-    predicted: number;
-    finished: number;
-    settled: number;
-  }>();
-
+  const groups = new Map<string, any>();
   for (const row of data) {
     const key = `${row.league_id}`;
     if (!groups.has(key)) {
-      groups.set(key, {
-        leagueId: row.league_id as number,
-        leagueName: row.league_name as string,
-        total: 0, discovered: 0, historicalReady: 0, snapshotReady: 0, predicted: 0, finished: 0, settled: 0,
-      });
+      groups.set(key, { leagueId: row.league_id, leagueName: row.league_name, total: 0, discovered: 0, snapshotComplete: 0, predicted: 0, fulltime: 0, settled: 0, metricsUpdated: 0 });
     }
     const g = groups.get(key)!;
     g.total += 1;
-    const state = row.state as FixtureState;
-    if (state === 'DISCOVERED') g.discovered += 1;
-    else if (state === 'HISTORICAL_READY') g.historicalReady += 1;
-    else if (state === 'SNAPSHOT_READY') g.snapshotReady += 1;
-    else if (state === 'PREDICTED') g.predicted += 1;
-    else if (state === 'SETTLED') g.settled += 1;
-    else if (state === 'FINISHED') g.finished += 1;
+    const s = row.state as FixtureState;
+    if (s === 'DISCOVERED' || s === 'HISTORICAL_READY' || s === 'ENRICHMENT_PENDING') g.discovered += 1;
+    else if (s === 'SNAPSHOT_COMPLETE' || s === 'PREDICTION_GENERATED') g.snapshotComplete += 1;
+    else if (s === 'PRE_MATCH') g.predicted += 1;
+    else if (s === 'FULLTIME' || s === 'SETTLEMENT_PENDING') g.fulltime += 1;
+    else if (s === 'SETTLED') g.settled += 1;
+    else if (s === 'METRICS_UPDATED' || s === 'ARCHIVED') g.metricsUpdated += 1;
   }
-
   return Array.from(groups.values());
 }
