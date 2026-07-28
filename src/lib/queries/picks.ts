@@ -74,13 +74,15 @@ export async function fetchTodayPicks(): Promise<PickRow[]> {
       pickLabel = `${pd.selection || ''}`;
     }
 
+    const matchData = Array.isArray(pd.matches) ? pd.matches[0] : pd.matches;
+
     picks.push({
       id: pd.prediction_id || crypto.randomUUID(),
       matchId: pd.fixture_id?.toString() || '',
-      competition: pd.matches?.league || '',
-      kickoff: pd.matches?.kickoff || '',
-      homeTeam: pd.matches?.home_team || '',
-      awayTeam: pd.matches?.away_team || '',
+      competition: (matchData as any)?.league || '',
+      kickoff: (matchData as any)?.kickoff || '',
+      homeTeam: (matchData as any)?.home_team || '',
+      awayTeam: (matchData as any)?.away_team || '',
       market: marketLow,
       pick: pickLabel,
       probability: Number(pd.predicted_probability || 0),
