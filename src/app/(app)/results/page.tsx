@@ -1,21 +1,23 @@
-const results = [
-  { date: '2026-07-27', league: 'EPL', fixture: 'Liverpool vs Chelsea', market: 'Moneyline', odds: 2.10, result: 'Won', profit: '+1.10', roi: '+52.4%', clv: '+2.1%', verified: true },
-  { date: '2026-07-27', league: 'La Liga', fixture: 'Atletico vs Valencia', market: 'AH -0.75', odds: 1.95, result: 'Half Win', profit: '+0.48', roi: '+22.9%', clv: '+1.8%', verified: true },
-  { date: '2026-07-26', league: 'Bundesliga', fixture: 'Dortmund vs Leipzig', market: 'O/U 2.5', odds: 1.85, result: 'Loss', profit: '-1.00', roi: '-54.1%', clv: '-0.5%', verified: true },
-  { date: '2026-07-26', league: 'Serie A', fixture: 'Juventus vs Napoli', market: 'BTTS', odds: 2.00, result: 'Won', profit: '+1.00', roi: '+50.0%', clv: '+3.2%', verified: true },
-  { date: '2026-07-25', league: 'EPL', fixture: 'Man Utd vs Spurs', market: 'Moneyline', odds: 1.90, result: 'Won', profit: '+0.90', roi: '+47.4%', clv: '+1.5%', verified: true },
-  { date: '2026-07-25', league: 'Ligue 1', fixture: 'PSG vs Lyon', market: 'AH -1.5', odds: 2.05, result: 'Loss', profit: '-1.00', roi: '-48.8%', clv: '-1.2%', verified: true },
-  { date: '2026-07-24', league: 'EPL', fixture: 'Arsenal vs Brighton', market: 'O/U 2.5', odds: 1.80, result: 'Won', profit: '+0.80', roi: '+44.4%', clv: '+2.4%', verified: true },
-  { date: '2026-07-24', league: 'La Liga', fixture: 'Barcelona vs Sevilla', market: 'Moneyline', odds: 1.72, result: 'Won', profit: '+0.72', roi: '+41.9%', clv: '+1.9%', verified: true },
-];
+import { fetchSettledResults } from '@/lib/queries/results';
 
 function resultColor(r: string) {
-  if (r === 'Won') return 'text-emerald-400';
-  if (r === 'Loss') return 'text-red-400';
-  return 'text-amber-400';
+  const low = r.toLowerCase();
+  if (low === 'won') return 'text-emerald-400';
+  if (low === 'loss') return 'text-red-400';
+  if (low === 'half win' || low === 'half_loss') return 'text-amber-400';
+  return 'text-slate-400';
 }
 
-export default function ResultsPage() {
+export default async function ResultsPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ league?: string; market?: string }>;
+}) {
+  const params = await (searchParams || Promise.resolve({}));
+  const { league, market } = params || {};
+
+  const results = await fetchSettledResults({ league, market });
+
   return (
     <div className="max-w-5xl mx-auto space-y-8">
       <div className="flex items-center justify-between">
@@ -23,60 +25,81 @@ export default function ResultsPage() {
           <h1 className="text-lg font-bold text-white font-mono uppercase tracking-widest">Results</h1>
           <p className="text-xs text-slate-500 font-mono mt-1">Settled predictions with verified outcomes</p>
         </div>
-        <div className="flex items-center gap-3">
-          <select className="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs font-mono text-slate-300">
-            <option>All Leagues</option>
-            <option>EPL</option>
-            <option>La Liga</option>
-            <option>Bundesliga</option>
-            <option>Serie A</option>
+        <form className="flex items-center gap-3">
+          <select
+            name="league"
+            className="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs font-mono text-slate-300"
+            defaultValue={league || ''}
+            onChange={(e) => e.target.form?.submit()}
+          >
+            <option value="">All Leagues</option>
+            <option value="English Premier League">EPL</option>
+            <option value="La Liga">La Liga</option>
+            <option value="Bundesliga">Bundesliga</option>
+            <option value="Serie A">Serie A</option>
+            <option value="Ligue 1">Ligue 1</option>
           </select>
-          <select className="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs font-mono text-slate-300">
-            <option>All Markets</option>
-            <option>Moneyline</option>
-            <option>Asian Handicap</option>
-            <option>Over/Under</option>
-            <option>BTTS</option>
+          <select
+            name="market"
+            className="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs font-mono text-slate-300"
+            defaultValue={market || ''}
+            onChange={(e) => e.target.form?.submit()}
+          >
+            <option value="">All Markets</option>
+            <option value="moneyline">Moneyline</option>
+            <option value="handicap">Asian Handicap</option>
+            <option value="over_under">Over/Under</option>
+            <option value="btts">BTTS</option>
           </select>
-        </div>
+        </form>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-slate-800">
-              <th className="text-left py-3 px-2 text-[10px] font-mono text-slate-500 uppercase tracking-widest">Date</th>
-              <th className="text-left py-3 px-2 text-[10px] font-mono text-slate-500 uppercase tracking-widest">League</th>
-              <th className="text-left py-3 px-2 text-[10px] font-mono text-slate-500 uppercase tracking-widest">Fixture</th>
-              <th className="text-left py-3 px-2 text-[10px] font-mono text-slate-500 uppercase tracking-widest">Market</th>
-              <th className="text-right py-3 px-2 text-[10px] font-mono text-slate-500 uppercase tracking-widest">Odds</th>
-              <th className="text-left py-3 px-2 text-[10px] font-mono text-slate-500 uppercase tracking-widest">Result</th>
-              <th className="text-right py-3 px-2 text-[10px] font-mono text-slate-500 uppercase tracking-widest">Profit</th>
-              <th className="text-right py-3 px-2 text-[10px] font-mono text-slate-500 uppercase tracking-widest">ROI</th>
-              <th className="text-right py-3 px-2 text-[10px] font-mono text-slate-500 uppercase tracking-widest">CLV</th>
-              <th className="text-center py-3 px-2 text-[10px] font-mono text-slate-500 uppercase tracking-widest">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {results.map((r, i) => (
-              <tr key={i} className="border-b border-slate-800/50 hover:bg-slate-800/20 transition-colors">
-                <td className="py-3 px-2 text-xs font-mono text-slate-400">{r.date}</td>
-                <td className="py-3 px-2 text-xs font-mono text-white">{r.league}</td>
-                <td className="py-3 px-2 text-xs font-medium text-white">{r.fixture}</td>
-                <td className="py-3 px-2 text-xs font-mono text-slate-400">{r.market}</td>
-                <td className="py-3 px-2 text-xs font-mono text-white text-right">{r.odds.toFixed(2)}</td>
-                <td className={`py-3 px-2 text-xs font-bold font-mono ${resultColor(r.result)}`}>{r.result}</td>
-                <td className="py-3 px-2 text-xs font-mono text-right text-white">{r.profit}</td>
-                <td className="py-3 px-2 text-xs font-mono text-right text-white">{r.roi}</td>
-                <td className="py-3 px-2 text-xs font-mono text-right text-emerald-400">{r.clv}</td>
-                <td className="py-3 px-2 text-center">
-                  <span className="text-emerald-400 text-xs">✓</span>
-                </td>
+      {results.length === 0 ? (
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center">
+          <div className="text-3xl mb-3">📋</div>
+          <p className="text-slate-400 text-sm font-mono">No settled results found.</p>
+          <p className="text-slate-600 text-xs font-mono mt-2">
+            Results appear here once predictions are settled.
+          </p>
+        </div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-slate-800">
+                <th className="text-left py-3 px-2 text-[10px] font-mono text-slate-500 uppercase tracking-widest">Date</th>
+                <th className="text-left py-3 px-2 text-[10px] font-mono text-slate-500 uppercase tracking-widest">League</th>
+                <th className="text-left py-3 px-2 text-[10px] font-mono text-slate-500 uppercase tracking-widest">Fixture</th>
+                <th className="text-left py-3 px-2 text-[10px] font-mono text-slate-500 uppercase tracking-widest">Market</th>
+                <th className="text-right py-3 px-2 text-[10px] font-mono text-slate-500 uppercase tracking-widest">Odds</th>
+                <th className="text-left py-3 px-2 text-[10px] font-mono text-slate-500 uppercase tracking-widest">Result</th>
+                <th className="text-right py-3 px-2 text-[10px] font-mono text-slate-500 uppercase tracking-widest">Profit</th>
+                <th className="text-right py-3 px-2 text-[10px] font-mono text-slate-500 uppercase tracking-widest">ROI</th>
+                <th className="text-right py-3 px-2 text-[10px] font-mono text-slate-500 uppercase tracking-widest">CLV</th>
+                <th className="text-center py-3 px-2 text-[10px] font-mono text-slate-500 uppercase tracking-widest">Status</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {results.map((r) => (
+                <tr key={r.id} className="border-b border-slate-800/50 hover:bg-slate-800/20 transition-colors">
+                  <td className="py-3 px-2 text-xs font-mono text-slate-400">{r.date}</td>
+                  <td className="py-3 px-2 text-xs font-mono text-white">{r.league}</td>
+                  <td className="py-3 px-2 text-xs font-medium text-white">{r.fixture}</td>
+                  <td className="py-3 px-2 text-xs font-mono text-slate-400">{r.market}</td>
+                  <td className="py-3 px-2 text-xs font-mono text-white text-right">{r.odds.toFixed(2)}</td>
+                  <td className={`py-3 px-2 text-xs font-bold font-mono ${resultColor(r.result)}`}>{r.result}</td>
+                  <td className="py-3 px-2 text-xs font-mono text-right text-white">{r.profit}</td>
+                  <td className="py-3 px-2 text-xs font-mono text-right text-white">{r.roi}</td>
+                  <td className="py-3 px-2 text-xs font-mono text-right text-emerald-400">{r.clv}</td>
+                  <td className="py-3 px-2 text-center">
+                    <span className="text-emerald-400 text-xs">{r.verified ? '✓' : '—'}</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
