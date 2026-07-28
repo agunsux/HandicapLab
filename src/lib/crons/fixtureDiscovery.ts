@@ -66,29 +66,31 @@ export async function discoverFixtures(): Promise<{
   const allFixtures: ScoredFixture[] = [];
   let skipped = 0;
 
+  // Load active AND unknown leagues (newly synced leagues start as 'unknown')
   const { data: leagues, error } = await supabase
-    .from('leagues')
+    .from('league_efficiency')
     .select('*')
-    .eq('is_active', true)
-    .order('priority_score', { ascending: false });
+    .in('season_status', ['active', 'unknown'])
+    .order('adaptive_priority', { ascending: false });
 
-  if (error || !leagues) {
-    console.error('[FixtureDiscovery] Failed to fetch active leagues:', error);
-    return { fixtures: [], skipped: 0, quotaOk: true };
+  // Cache quota once to avoid N+1 Supabase queries per league
+  const receiptCache = await acquire('apifootball', 'fixtures', 60);
+  const canFetch = receiptCache.ok;
+
+  if (!leagues || error || !canFetch) {
+    if (error) console.error('[FixtureDiscovery] Failed:', error.message);
+    if (!canFetch) console.warn('[FixtureDiscovery] Quota exhausted');
+    return { fixtures: [], skipped: 0, quotaOk: canFetch };
   }
 
   for (const league of leagues) {
-    const receipt = await acquire('apifootball', 'fixtures', 60); // Priority 60
-    if (!receipt.ok) {
-      skipped += 1;
-      continue;
-    }
+    // Use cached quota check — no N+1 Supabase queries
 
     try {
       const startTime = Date.now();
-      const response = await apiFootballClient.getFixtures(league.id, league.season || new Date().getFullYear());
+      const response = await apiFootballClient.getFixtures(league.league_id, new Date().getFullYear());
       await logCall('apifootball', 'fixtures', Date.now() - startTime, 200, {
-        leagueId: league.id,
+        leagueId: league.league_id,
         results: response.results,
       });
 
@@ -100,12 +102,12 @@ export async function discoverFixtures(): Promise<{
         // Skip already finished (FT, AET, PEN, CANC, ABD, POSTP)
         if (['FT', 'AET', 'PEN', 'CANC', 'ABD', 'POSTP'].includes(status)) continue;
 
-        const score = computePriorityScore(league.tier || 6, kickoff, now);
+        const score = computePriorityScore(league.league_priority || 6, kickoff, now);
         allFixtures.push({
           fixtureId: item.fixture.id,
-          leagueId: league.id,
-          leagueName: league.name,
-          leagueTier: league.tier || 6,
+          leagueId: league.league_id,
+          leagueName: league.league_name,
+          leagueTier: league.league_priority || 6,
           homeTeam: item.teams.home.name,
           homeTeamId: item.teams.home.id,
           awayTeam: item.teams.away.name,
@@ -116,7 +118,7 @@ export async function discoverFixtures(): Promise<{
         });
       }
     } catch (err) {
-      console.error(`[FixtureDiscovery] Failed for league ${league.name} (${league.id}):`, err);
+      console.error(`[FixtureDiscovery] Failed for league ${league.league_name} (${league.league_id}):`, err);
       skipped += 1;
     }
   }

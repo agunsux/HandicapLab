@@ -1,10 +1,9 @@
-// EPIC 53 Stage D — Historical Data Ingestor
+// EPIC 56 Stage D — Historical Data Ingestor (Dynamic)
 // Per-league, resumable, runs only on surplus quota.
 // Tracks progress so it never restarts from zero.
 
 import { supabase } from '@/lib/supabase.server';
 import { apiFootballClient } from '@/lib/apis/apifootball';
-import { LEAGUE_PRIORITIES } from '@/lib/config/leaguePriorities';
 import { acquire, logCall } from '@/lib/providers/quotaManager';
 
 export interface HistoricalProgress {
@@ -67,7 +66,7 @@ export async function importHistoricalBatch(
   leagueId: number,
   progress: HistoricalProgress
 ): Promise<{ imported: number; completed: boolean } | null> {
-  const receipt = await acquire('apifootball', 'fixtures/historical', 'background');
+  const receipt = await acquire('apifootball', 'fixtures/historical', 40); // Priority 40: Historical Import
   if (!receipt.ok) return null;
 
   try {
@@ -146,7 +145,7 @@ export async function importHistoricalBatch(
   }
 }
 
-// Main entry: process all leagues in priority order until quota runs low
+// Main entry: process all active leagues in priority order until quota runs low
 export async function runHistoricalIngestor(): Promise<{
   leaguesProcessed: number;
   fixturesImported: number;
@@ -156,14 +155,27 @@ export async function runHistoricalIngestor(): Promise<{
   let fixturesImported = 0;
   let completed = 0;
 
-  for (const league of LEAGUE_PRIORITIES) {
-    const receipt = await acquire('apifootball', 'fixtures/historical', 'background');
+  const { data: leagues, error } = await supabase
+    .from('league_efficiency')
+    .select('*')
+    .eq('season_status', 'active')
+    .order('adaptive_priority', { ascending: false });
+
+  if (error || !leagues) {
+    console.error('[HistoricalIngestor] Failed to fetch active leagues:', error);
+    return { leaguesProcessed, fixturesImported, completed };
+  }
+
+  for (const league of leagues) {
+    const receipt = await acquire('apifootball', 'fixtures/historical', 40);
     if (!receipt.ok) break;
 
-    const progress = await getOrCreateProgress(league.apiFootballId, league.name, league.season);
+    // Use per-league historical start season, default to current year
+    const startSeason = league.historical_start_season ?? new Date().getFullYear();
+    const progress = await getOrCreateProgress(league.league_id, league.league_name, startSeason);
     if (progress.status === 'completed') continue;
 
-    const result = await importHistoricalBatch(league.apiFootballId, progress);
+    const result = await importHistoricalBatch(league.league_id, progress);
     if (result === null) break; // quota exhausted
 
     leaguesProcessed += 1;

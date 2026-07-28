@@ -31,6 +31,9 @@ CREATE TABLE IF NOT EXISTS league_efficiency (
     CHECK (season_status IN ('active', 'off_season', 'unknown')),
   fixture_volume_7d INTEGER DEFAULT 0,    -- fixtures in next 7 days
 
+  -- Per-league historical start season (e.g. 2019 for PL, 2017 for Bundesliga)
+  historical_start_season INTEGER,
+
   -- Adaptive priority (composite of all factors, recalculated daily)
   adaptive_priority NUMERIC(10,6) DEFAULT 0,
 
