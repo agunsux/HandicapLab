@@ -9,7 +9,8 @@ export async function getMarketDataByMatchId(matchId: string): Promise<MatchMark
         matchId,
         moneyline: null,
         asianHandicap: null,
-        overUnder: null
+        overUnder: null,
+        btts: null
       };
     }
     return mapMarketOdds(predictions);
