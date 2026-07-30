@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { Space_Grotesk, IBM_Plex_Mono } from 'next/font/google';
 import './globals.css';
+import { Header } from '@/components/layout/Header';
+import { Footer } from '@/components/layout/Footer';
 
 const sansFont = Space_Grotesk({
   variable: '--font-sans',
@@ -31,8 +33,12 @@ export default function RootLayout({
       className={`${sansFont.variable} ${monoFont.variable} dark h-full antialiased`}
       style={{ colorScheme: 'dark' }}
     >
-      <body className="h-full bg-background text-foreground flex flex-col font-sans selection:bg-[var(--purple-soft)] selection:text-[var(--purple-text)]">
-        {children}
+      <body className="h-full bg-background text-foreground flex flex-col font-sans selection:bg-[var(--accent)]/30 selection:text-accent-foreground min-h-screen">
+        <Header />
+        <main className="flex-1 flex flex-col">
+          {children}
+        </main>
+        <Footer />
       </body>
     </html>
   );
