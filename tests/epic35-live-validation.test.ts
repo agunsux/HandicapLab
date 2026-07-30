@@ -181,7 +181,7 @@ describe('EPIC 35 — Live Validation Platform End-to-End Test Suite', () => {
 
       // Weekly Scientific Report
       const reportGen = new WeeklyReportGenerator({ store, schemaVersion: '1.0' });
-      const weeklyReport = await reportGen.run(undefined, 'corr-test');
+      const weeklyReport = await reportGen.run('corr-test');
       expect(weeklyReport).not.toBeNull();
       expect(weeklyReport?.markdown).toContain('Weekly Live Validation Report');
     });

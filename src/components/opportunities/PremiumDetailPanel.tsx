@@ -51,10 +51,10 @@ export function PremiumDetailPanel({ opportunity, isOpen, onClose }: PremiumDeta
             <div className="flex items-center justify-between p-6 border-b border-border bg-card">
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <Badge variant="premium" className="bg-premium-gold/20 text-premium-gold border-premium-gold/30 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1">
+                  <div className="bg-premium-gold/20 text-premium-gold border-premium-gold/30 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 border">
                     <ShieldCheck className="size-3" />
                     Verified Edge
-                  </Badge>
+                  </div>
                   <span className="text-xs font-medium text-muted-foreground">{opportunity.league}</span>
                 </div>
                 <h2 className="text-lg font-semibold tracking-tight">{opportunity.match}</h2>
@@ -153,7 +153,4 @@ export function PremiumDetailPanel({ opportunity, isOpen, onClose }: PremiumDeta
   );
 }
 
-// Simple internal Badge component to avoid importing missing variants if UI badge doesn't have them
-function Badge({ className, children, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={`inline-flex items-center ${className}`} {...props}>{children}</div>;
-}
+
