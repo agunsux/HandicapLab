@@ -213,7 +213,7 @@ interface SecretValidationResult {
 |--------|----------|---------|---------|
 | `API_FOOTBALL_KEY` | Monthly | 90 days | ApiFootballAdapter |
 | `FOOTBALL_DATA_KEY` | Monthly | 90 days | FootballDataAdapter |
-| `ODDS_API_KEY` | Monthly | 90 days | OddsApiAdapter |
+| `ODDSPAPI_KEY` | Monthly | 90 days | OddsApiAdapter |
 | `DATABASE_URL` | Quarterly | 365 days | Database connection |
 | `JWT_SECRET` | Quarterly | 365 days | Authentication |
 | `SLACK_WEBHOOK` | As needed | — | Notification Engine |

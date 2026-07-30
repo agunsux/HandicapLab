@@ -143,7 +143,7 @@ export class OddsApiProvider implements IOddsProvider {
 
   private getApiKey(): string {
 
-    return process.env.THE_ODDS_API_KEY ?? process.env.ODDSPAPI_KEY ?? '';
+    return process.env.ODDSPAPI_KEY ?? '';
   }
 
   private buildMarketsParam(marketTypes?: string[]): string {

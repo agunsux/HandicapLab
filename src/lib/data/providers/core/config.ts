@@ -26,7 +26,7 @@ const DEFAULT_CONFIG: ProviderApiConfig = {
   },
   theOddsApi: {
     baseUrl: 'https://api.the-odds-api.com/v4',
-    apiKey: process.env.THE_ODDS_API_KEY ?? process.env.ODDSPAPI_KEY ?? '',
+    apiKey: process.env.ODDSPAPI_KEY ?? '',
     rateLimitRequests: 30,
     rateLimitWindowMs: 60_000,
   },
@@ -48,6 +48,6 @@ export function setProviderConfig(overrides: Partial<ProviderApiConfig>): void {
 export function validateProviderConfig(): string[] {
   const missing: string[] = [];
   if (!providerConfig.apiFootball.apiKey) missing.push('API_FOOTBALL_KEY');
-  if (!providerConfig.theOddsApi.apiKey) missing.push('THE_ODDS_API_KEY / ODDSPAPI_KEY');
+  if (!providerConfig.theOddsApi.apiKey) missing.push('ODDSPAPI_KEY');
   return missing;
 }

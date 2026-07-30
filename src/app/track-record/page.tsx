@@ -55,7 +55,7 @@ export default function TrackRecordPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-slate-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] py-12 px-4 sm:px-6 lg:px-8 font-mono">
       <div className="max-w-7xl mx-auto">
         
         {/* Header */}
@@ -66,10 +66,10 @@ export default function TrackRecordPage() {
               <span>/</span>
               <span className="text-slate-400">Track Record</span>
             </div>
-            <h1 className="text-4xl font-extrabold text-white">
+            <h1 className="text-4xl font-extrabold text-[var(--foreground)]">
               Settled Track Record
             </h1>
-            <p className="text-slate-400 text-sm mt-2 max-w-xl">
+            <p className="text-[var(--text-2)] text-sm mt-2 max-w-xl">
               Fully transparent database of resolved predictions. We log every single outcome, odds change, and line shift.
             </p>
           </div>
@@ -107,6 +107,28 @@ export default function TrackRecordPage() {
             </div>
           </div>
         </header>
+
+        {/* Backtest / Live Section Panels */}
+        <div className="mb-6 flex gap-4">
+          <div className="flex-1 border border-[var(--purple-line)] bg-[var(--purple-soft)] p-4 rounded">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="bg-[var(--purple-soft)] text-[var(--purple-text)] border border-[var(--purple-line)] text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-widest">BACKTEST</span>
+              <span className="text-xs font-bold text-[var(--foreground)]">2023–2026</span>
+            </div>
+            <p className="text-[10px] text-[var(--text-3)]">
+              Walk-forward Dixon-Coles. Data historis, bukan hasil live.
+            </p>
+          </div>
+          <div className="flex-1 border border-[var(--green-line)] bg-[var(--green-soft)] p-4 rounded">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="bg-[var(--green-soft)] text-[var(--green-text)] border border-[var(--green-line)] text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-widest">LIVE</span>
+              <span className="text-xs font-bold text-[var(--foreground)]">SEJAK —</span>
+            </div>
+            <p className="text-[10px] text-[var(--text-3)]">
+              Prediksi real-time dari engine produksi.
+            </p>
+          </div>
+        </div>
 
         {/* Premium Upgrade Banner */}
         {!isPremium && (
@@ -149,6 +171,7 @@ export default function TrackRecordPage() {
                 <thead>
                   <tr className="border-b border-slate-800 bg-slate-950 text-slate-400 font-semibold text-xs tracking-wider uppercase">
                     <th className="p-4">Date</th>
+                    <th className="p-4">Source</th>
                     <th className="p-4">Match</th>
                     <th className="p-4">Market</th>
                     <th className="p-4">Recommended Pick</th>
@@ -165,10 +188,19 @@ export default function TrackRecordPage() {
 
                     return (
                       <tr key={sig.id} className="hover:bg-slate-850 transition">
-                        <td className="p-4 text-slate-450 font-mono text-xs whitespace-nowrap">
+                        <td className="p-4 text-[var(--text-3)] font-mono text-xs whitespace-nowrap">
                           {new Date(sig.published_at || sig.kickoff_time).toLocaleDateString()}
                         </td>
-                        <td className="p-4 font-bold text-slate-200">
+                        <td className="p-4">
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+                            sig.source === 'backtest'
+                              ? 'bg-[var(--purple-soft)] text-[var(--purple-text)] border border-[var(--purple-line)]'
+                              : 'bg-[var(--green-soft)] text-[var(--green-text)] border border-[var(--green-line)]'
+                          }`}>
+                            {sig.source === 'backtest' ? 'BACKTEST' : 'LIVE'}
+                          </span>
+                        </td>
+                        <td className="p-4 font-bold text-[var(--foreground)]">
                           {sig.match}
                         </td>
                         <td className="p-4">

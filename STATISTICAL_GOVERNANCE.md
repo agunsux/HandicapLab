@@ -19,6 +19,7 @@
 5. [Data Provenance Requirements](#5-data-provenance-requirements)
 6. [Feature Flag Gating](#6-feature-flag-gating)
 7. [Adherence & Auditing](#7-adherence--auditing)
+8. [Data Acquisition & Ablation Strategy](#8-data-acquisition--ablation-strategy)
 
 ---
 
@@ -66,7 +67,7 @@ CLV = mean( impliedProb(closingOdds) - impliedProb(takenOdds) ) × 100
 - **Interpretation:**  
   - `CLV > 0` → model beat the closing line (bet into steam)  
   - `CLV < 0` → model was shaded by the market (bet against steam)  
-- **CLV is NOT a predictor of future profitability** — see [Metric Display Thresholds](#3-metric-display-thresholds)  
+- **Priority:** CLV is the primary measure of model success, prioritizing over raw hit-rate or daily ROI. Consistently beating the Pinnacle Closing Line is the strongest indicator of long-term profitability.
 - **Provenance:** `CLV → Trades → Odds Snapshots → Provider Closing Prices`
 
 ### 1.4 Brier Score
@@ -337,19 +338,39 @@ This script checks:
 3. All dashboard components check feature flags before displaying premium metrics.
 4. Zero-data states use `"No verified data available"` not `0`.
 
-### 7.2 Violation Procedure
+### 7.2 Data Quality Audit
+Before evaluating any model performance (CLV, Brier, ROI), a mandatory Data Quality Audit must be run to prove the integrity of the inputs.
+The audit must report: Coverage, Missing %, Latency, Duplicate %, Outlier %, Timezone consistency, Cancelled matches, Postponed matches, Odds movement completeness, Historical depth, and Bookmaker coverage.
+
+### 7.3 Violation Procedure
 
 1. Any deviation from this document is filed as a **P1 bug**.
 2. The offending code is either fixed or reverted before the next release.
 3. The audit script output is attached to the release checklist.
 
-### 7.3 Change Process
+### 7.4 Change Process
 
 Changes to this document require:
 1. An Architecture Decision Record (ADR) explaining the change.
 2. Review by at least one other engineer.
 3. Updated implementation across all code paths.
 4. Updated audit script assertions.
+
+---
+
+## 8. Data Acquisition & Ablation Strategy
+
+Adding new data providers or features (e.g., xG, player injuries) costs money and introduces mapping complexity.
+
+### 8.1 Provider Minimization
+- Limit providers to avoid mapping errors. The canonical stack is `API-Football` (fixtures/stats) + `OddsPAPI` (odds).
+- **Pinnacle** is the sole ground truth for Closing Line Value. **SBOBET** may be used for Asian market comparison, but not as the primary ground truth.
+- Do not expand to worldwide leagues. Stick to the Whitelisted Top Leagues (EPL, Serie A, La Liga, Bundesliga, Ligue 1, Championship, Eredivisie, K League, J1 League, Liga 1).
+
+### 8.2 Measured Acquisition (Ablation Rule)
+New data points or features must prove their worth through rigorous ablation testing on a walk-forward validation set.
+- Do not buy or integrate new data (e.g., xG, player availability) unless an ablation test proves it significantly increases Brier Score, Log Loss, or CLV beyond standard noise.
+- The standard baseline is `Poisson + Dixon-Coles + ELO + Market Odds`. Any new feature must empirically beat this baseline to be adopted.
 
 ---
 

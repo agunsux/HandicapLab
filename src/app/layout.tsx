@@ -1,14 +1,15 @@
 import type { Metadata } from 'next';
-import { Outfit, JetBrains_Mono } from 'next/font/google';
+import { Space_Grotesk, IBM_Plex_Mono } from 'next/font/google';
 import './globals.css';
 
-const sansFont = Outfit({
+const sansFont = Space_Grotesk({
   variable: '--font-sans',
   subsets: ['latin'],
 });
 
-const monoFont = JetBrains_Mono({
+const monoFont = IBM_Plex_Mono({
   variable: '--font-mono',
+  weight: ['400', '500', '600'],
   subsets: ['latin'],
 });
 
@@ -30,7 +31,7 @@ export default function RootLayout({
       className={`${sansFont.variable} ${monoFont.variable} dark h-full antialiased`}
       style={{ colorScheme: 'dark' }}
     >
-      <body className="h-full bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-emerald-500/20 selection:text-emerald-400">
+      <body className="h-full bg-background text-foreground flex flex-col font-sans selection:bg-[var(--purple-soft)] selection:text-[var(--purple-text)]">
         {children}
       </body>
     </html>

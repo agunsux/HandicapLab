@@ -82,6 +82,20 @@ See [`docs/LEAKAGE_PREVENTION.md`](file:///c:/Users/RYZEN/.antigravity-ide/Handi
 
 ---
 
+## Environment Variables
+
+Copy the provided `.env.example` file to `.env` or `.env.local` to get started.
+
+### Required API Keys
+
+- `ODDSPAPI_KEY`: The canonical environment variable for **The Odds API** integration. This ensures a single source of truth across all environments (Preview, Production, Development). Do not use legacy alternatives like `THE_ODDS_API_KEY`.
+- `API_FOOTBALL_KEY`: Key for football data providers.
+
+### Startup Validation
+The application validates environment configuration strictly on startup via `src/lib/utils/envValidator.ts`. Missing critical keys like `ODDSPAPI_KEY` will result in a hard failure, ensuring production stability.
+
+---
+
 ## Development
 
 ```bash

@@ -28,3 +28,7 @@ For all upcoming sprints, enforce the following structured release flow:
 
 - **No Future Leakage**: Tidak boleh ada feature yang berasal dari data dengan timestamp ≥ kickoff pertandingan yang diprediksi.
 - **No extraordinary result without audit**: Jika ada ROI > 10%, atau peningkatan Brier > 10%, atau lonjakan performa yang tidak biasa, sistem harus otomatis meminta audit terhadap potensi leakage, definisi target, pembagian data, sample size, dan metodologi evaluasi.
+- **Single Source of Truth**: Wajib menggunakan `API-Football` untuk data fixture/statistik dan `OddsPAPI` untuk odds. Dilarang menambah provider baru.
+- **Bookmaker Hierarchy**: Wajib menggunakan **Pinnacle** sebagai acuan utama dan ground truth untuk perhitungan Closing Line Value (CLV). SBOBET hanya digunakan sebagai pembanding sekunder.
+- **League Whitelist**: Model hanya dieksekusi dan dievaluasi pada Top Leagues (Premier League, Championship, Serie A, Bundesliga, La Liga, Ligue 1, Eredivisie, J1 League, K League, Liga 1 Indonesia). Dilarang memprediksi seluruh dunia sebelum ROI stabil.
+- **CLV over ROI**: Evaluasi keberhasilan model diprioritaskan pada kemampuannya mengalahkan Closing Line Value, bukan sekadar hit rate hari ini.
