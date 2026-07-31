@@ -1,0 +1,7 @@
+League,Country,Seasons,Matches,Odds Completeness,Market Completeness,Prediction Readiness Score,Recommended
+Unknown,Unknown,2,13,0,0,75,False
+D1,Germany,3,918,0,0,75,False
+E0,England,4,1520,0,0,90,True
+F1,France,3,1140,0,0,90,True
+I1,Italy,3,1140,0,0,90,True
+SP1,Spain,4,1520,0,0,90,True
