@@ -1,25 +1,50 @@
 import type { Metadata } from 'next';
-import { Space_Grotesk, IBM_Plex_Mono } from 'next/font/google';
+import { Inter, IBM_Plex_Mono } from 'next/font/google';
 import './globals.css';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 
-const sansFont = Space_Grotesk({
+const sansFont = Inter({
   variable: '--font-sans',
   subsets: ['latin'],
+  display: 'swap',
 });
 
 const monoFont = IBM_Plex_Mono({
   variable: '--font-mono',
   weight: ['400', '500', '600'],
   subsets: ['latin'],
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
-  title: 'HandicapLab | Verified Football Predictions',
+  metadataBase: new URL('https://handicaplab.com'),
+  title: {
+    default: 'HandicapLab | Football Market Intelligence',
+    template: '%s | HandicapLab',
+  },
   description:
-    'Verified profitable betting intelligence backed by long-term historical evidence. Transparent track record, Pinnacle closing line value, and continuously verified predictions.',
-  keywords: 'verified betting predictions, football picks, ROI tracked, closing line value, Pinnacle odds, historical validation, profitable betting',
+    'Professional football market intelligence. Identify statistical inefficiencies and betting market edges with quantitative modeling, closing line value, and transparent historical validation.',
+  keywords:
+    'football market intelligence, betting edge, closing line value, CLV, expected value, EV, quantitative modeling, Asian handicap, value betting, sports analytics',
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    siteName: 'HandicapLab',
+    title: 'HandicapLab | Football Market Intelligence',
+    description:
+      'Professional football market intelligence. Identify statistical inefficiencies and betting market edges with quantitative modeling.',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'HandicapLab | Football Market Intelligence',
+    description:
+      'Professional football market intelligence. Identify statistical inefficiencies and betting market edges with quantitative modeling.',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
