@@ -20,13 +20,13 @@ export interface ProviderApiConfig {
 const DEFAULT_CONFIG: ProviderApiConfig = {
   apiFootball: {
     baseUrl: 'https://v3.football.api-sports.io',
-    apiKey: process.env.API_FOOTBALL_KEY ?? '',
+    apiKey: process.env.API_FOOTBALL_KEY || process.env.APIFOOTBALL_KEY || '',
     rateLimitRequests: 10,
     rateLimitWindowMs: 60_000,
   },
   theOddsApi: {
     baseUrl: 'https://api.the-odds-api.com/v4',
-    apiKey: process.env.ODDSPAPI_KEY ?? '',
+    apiKey: process.env.ODDSPAPI_KEY || process.env.ODDS_PAPI_KEY || process.env.THESTATS_API_KEY || '',
     rateLimitRequests: 30,
     rateLimitWindowMs: 60_000,
   },

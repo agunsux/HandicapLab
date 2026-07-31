@@ -75,7 +75,7 @@ export class OddsApiClient {
   private apiKey: string;
 
   constructor() {
-    const key = process.env.ODDSPAPI_KEY;
+    const key = process.env.ODDSPAPI_KEY || process.env.ODDS_PAPI_KEY || process.env.THESTATS_API_KEY;
     if (!key) {
       // In production/runtime, lack of key is fatal for live operations.
       // We do not fallback to hardcoded keys.
@@ -90,7 +90,7 @@ export class OddsApiClient {
 
   private ensureApiKey(): void {
     if (!this.apiKey) {
-      console.error('[OddsApiClient] Error: ODDSPAPI_KEY environment variable is not defined.');
+      console.error('[OddsApiClient] Error: ODDSPAPI_KEY / ODDS_PAPI_KEY / THESTATS_API_KEY environment variable is not defined.');
       throw new ApiError('API key is missing in environment variables.', 'auth', 401);
     }
   }
