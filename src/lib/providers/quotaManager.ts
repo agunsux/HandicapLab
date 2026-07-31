@@ -6,7 +6,7 @@
 import { supabase } from '@/lib/supabase.server';
 
 // ─── API Cost Registry ──────────────────────────────────────────────
-export type Provider = 'apifootball' | 'oddspapi';
+export type Provider = 'apifootball' | 'oddspapi' | 'thestatsapi';
 
 export interface EndpointCost {
   provider: Provider;
@@ -23,8 +23,14 @@ export const API_COST_REGISTRY: EndpointCost[] = [
   { provider: 'apifootball', endpoint: 'injuries',        cost: 1 },
   { provider: 'apifootball', endpoint: 'lineups',         cost: 1 },
   { provider: 'apifootball', endpoint: 'venues',          cost: 1 },
+  { provider: 'apifootball', endpoint: 'health',          cost: 1 },
   // OddsPapi endpoints
   { provider: 'oddspapi',    endpoint: 'odds',            cost: 1 },
+  { provider: 'oddspapi',    endpoint: 'health',          cost: 1 },
+  // TheStatsAPI endpoints
+  { provider: 'thestatsapi', endpoint: 'fixtures',        cost: 1 },
+  { provider: 'thestatsapi', endpoint: 'standings',       cost: 1 },
+  { provider: 'thestatsapi', endpoint: 'health',          cost: 1 },
 ];
 
 function getCost(provider: Provider, endpoint: string): number {
@@ -35,6 +41,9 @@ function getCost(provider: Provider, endpoint: string): number {
 function getProviderLimit(provider: Provider): number {
   if (provider === 'apifootball') {
     return parseInt(process.env.QUOTA_APIFOOTBALL_DAILY || '100', 10);
+  }
+  if (provider === 'thestatsapi') {
+    return parseInt(process.env.QUOTA_THESTATSAPI_DAILY || '1000', 10);
   }
   return parseInt(process.env.QUOTA_ODDSPAPI_MONTHLY || '250', 10);
 }
@@ -70,7 +79,7 @@ export type Priority = number; // 0-100 (100 is highest)
 // ─── Internals ──────────────────────────────────────────────────────
 function getResetPeriod(provider: Provider): { startOf: Date } {
   const now = new Date();
-  if (provider === 'apifootball') {
+  if (provider === 'apifootball' || provider === 'thestatsapi') {
     // Daily reset (midnight UTC)
     const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
     return { startOf: start };
@@ -189,7 +198,7 @@ export async function logCall(
 }
 
 export async function getProviderHealth(): Promise<ProviderHealth[]> {
-  const providers: Provider[] = ['apifootball', 'oddspapi'];
+  const providers: Provider[] = ['apifootball', 'oddspapi', 'thestatsapi'];
   const results: ProviderHealth[] = [];
 
   for (const provider of providers) {

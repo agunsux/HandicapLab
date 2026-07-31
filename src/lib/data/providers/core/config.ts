@@ -2,14 +2,33 @@
 // Location: src/lib/data/providers/core/config.ts
 // No process.env reads outside this file.
 
+export enum SupportedMarket {
+  MONEYLINE = 'h2h',
+  ASIAN_HANDICAP = 'spreads',
+  OVER_UNDER = 'totals',
+  BTTS = 'btts',
+}
+
+export enum SharpBookmaker {
+  PINNACLE = 'pinnacle',
+  CIRCA = 'circasports',
+  SBOBET = 'sbobet',
+}
+
 export interface ProviderApiConfig {
-  apiFootball: {
+  theStatsApi: {
     baseUrl: string;
     apiKey: string;
     rateLimitRequests: number;
     rateLimitWindowMs: number;
   };
-  theOddsApi: {
+  oddsPapi: {
+    baseUrl: string;
+    apiKey: string;
+    rateLimitRequests: number;
+    rateLimitWindowMs: number;
+  };
+  apiFootball: {
     baseUrl: string;
     apiKey: string;
     rateLimitRequests: number;
@@ -18,16 +37,22 @@ export interface ProviderApiConfig {
 }
 
 const DEFAULT_CONFIG: ProviderApiConfig = {
+  theStatsApi: {
+    baseUrl: 'https://api.thestatsapi.com/v1', // Update to correct Base URL if needed
+    apiKey: process.env.THESTATS_API_KEY || '',
+    rateLimitRequests: 60,
+    rateLimitWindowMs: 60_000,
+  },
+  oddsPapi: {
+    baseUrl: 'https://api.the-odds-api.com/v4',
+    apiKey: process.env.ODDSPAPI_KEY || process.env.ODDS_PAPI_KEY || '',
+    rateLimitRequests: 30,
+    rateLimitWindowMs: 60_000,
+  },
   apiFootball: {
     baseUrl: 'https://v3.football.api-sports.io',
     apiKey: process.env.API_FOOTBALL_KEY || process.env.APIFOOTBALL_KEY || '',
     rateLimitRequests: 10,
-    rateLimitWindowMs: 60_000,
-  },
-  theOddsApi: {
-    baseUrl: 'https://api.the-odds-api.com/v4',
-    apiKey: process.env.ODDSPAPI_KEY || process.env.ODDS_PAPI_KEY || process.env.THESTATS_API_KEY || '',
-    rateLimitRequests: 30,
     rateLimitWindowMs: 60_000,
   },
 };
@@ -40,14 +65,16 @@ export function getProviderConfig(): ProviderApiConfig {
 
 export function setProviderConfig(overrides: Partial<ProviderApiConfig>): void {
   providerConfig = {
+    theStatsApi: { ...providerConfig.theStatsApi, ...overrides.theStatsApi },
+    oddsPapi: { ...providerConfig.oddsPapi, ...overrides.oddsPapi },
     apiFootball: { ...providerConfig.apiFootball, ...overrides.apiFootball },
-    theOddsApi: { ...providerConfig.theOddsApi, ...overrides.theOddsApi },
   };
 }
 
 export function validateProviderConfig(): string[] {
   const missing: string[] = [];
+  if (!providerConfig.theStatsApi.apiKey) missing.push('THESTATS_API_KEY');
+  if (!providerConfig.oddsPapi.apiKey) missing.push('ODDSPAPI_KEY');
   if (!providerConfig.apiFootball.apiKey) missing.push('API_FOOTBALL_KEY');
-  if (!providerConfig.theOddsApi.apiKey) missing.push('ODDSPAPI_KEY');
   return missing;
 }

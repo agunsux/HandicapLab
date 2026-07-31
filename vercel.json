@@ -2,36 +2,20 @@
   "framework": "nextjs",
   "crons": [
     {
-      "path": "/api/cron/live-validation/scheduler",
-      "schedule": "0 0 * * *"
+      "path": "/api/cron/discovery",
+      "schedule": "10 0 * * *"
     },
     {
-      "path": "/api/cron/live-validation/settlement",
-      "schedule": "0 1 * * *"
+      "path": "/api/cron/odds",
+      "schedule": "20 0 * * *"
     },
     {
-      "path": "/api/cron/live-validation/metrics",
-      "schedule": "0 2 * * *"
+      "path": "/api/cron/enrichment",
+      "schedule": "30 0 * * *"
     },
     {
-      "path": "/api/cron/live-validation/archive",
-      "schedule": "0 3 * * *"
-    },
-    {
-      "path": "/api/cron/pipeline",
-      "schedule": "0 6 * * *"
-    },
-    {
-      "path": "/api/cron/pipeline",
-      "schedule": "0 12 * * *"
-    },
-    {
-      "path": "/api/cron/pipeline",
-      "schedule": "0 18 * * *"
-    },
-    {
-      "path": "/api/cron/pipeline",
-      "schedule": "0 22 * * *"
+      "path": "/api/cron/settlement",
+      "schedule": "40 0 * * *"
     }
   ]
 }

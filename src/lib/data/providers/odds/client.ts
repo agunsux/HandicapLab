@@ -7,7 +7,7 @@ import { HttpClient, RateLimiter, CircuitBreaker, Cache } from '@/lib/http';
 import { getProviderConfig } from '../core/config';
 
 export function createOddsApiClient(): HttpClient {
-  const config = getProviderConfig().theOddsApi;
+  const config = getProviderConfig().oddsPapi;
   const rateLimiter = new RateLimiter({
     maxRequests: config.rateLimitRequests,
     windowMs: config.rateLimitWindowMs,
