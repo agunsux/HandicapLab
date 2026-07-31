@@ -29,8 +29,8 @@ export function createApiFootballClient(): HttpClient {
     {
       baseUrl: config.baseUrl,
       defaultHeaders: {
-        'x-rapidapi-key': config.apiKey,
-        'x-rapidapi-host': 'v3.football.api-sports.io',
+        'x-apisports-key': config.apiKey,
+        'Accept': 'application/json',
       },
       defaultTimeoutMs: 15_000,
       defaultRetries: 2,
