@@ -1,10 +1,16 @@
 import Link from 'next/link';
+import { headers } from 'next/headers';
 import { supabase } from '@/lib/supabase.server';
 import { OpportunitiesTable, Opportunity } from '@/components/opportunities/OpportunitiesTable';
+import { determineUserAccess } from '@/lib/signals/visibility';
 
 export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
+  const headersList = await headers();
+  const userId = headersList.get('x-user-id') || undefined;
+  const { isPremium, dailyLimit } = await determineUserAccess(userId);
+
   // Fetch today's best value bets from the database
   const { data: predictions } = await supabase
     .from('predictions')
@@ -14,12 +20,12 @@ export default async function HomePage() {
     .limit(10);
 
   // Map to Opportunity type for the table
-  const mappedOpportunities: Opportunity[] = (predictions || []).map((p: any) => {
+  let mappedOpportunities: Opportunity[] = (predictions || []).map((p: any) => {
     let signal: 'VALUE' | 'WATCH' | 'PASS' = 'PASS';
     if (p.expected_value >= 3.0) signal = 'VALUE';
     else if (p.expected_value >= 1.0) signal = 'WATCH';
 
-    return {
+    const opp: Opportunity = {
       id: p.id,
       match: `${p.fixtures?.home_team} vs ${p.fixtures?.away_team}`,
       league: p.fixtures?.competition_name || 'Unknown',
@@ -37,7 +43,22 @@ export default async function HomePage() {
       signal,
       isStale: false
     };
+
+    if (!isPremium) {
+      opp.edge = undefined as any;
+      opp.ev = undefined as any;
+      opp.fairOdds = undefined as any;
+      opp.marketOdds = undefined as any;
+      opp.modelProb = undefined as any;
+      opp.selection = 'HIDDEN';
+    }
+
+    return opp;
   });
+
+  if (!isPremium) {
+    mappedOpportunities = mappedOpportunities.slice(0, dailyLimit);
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-background">

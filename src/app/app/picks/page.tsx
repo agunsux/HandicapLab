@@ -2,10 +2,16 @@ import React from 'react';
 import { supabase } from '@/lib/supabase.server';
 import { OpportunitiesTable, Opportunity } from '@/components/opportunities/OpportunitiesTable';
 import { FilterBar } from '@/components/app-shell/FilterBar';
+import { headers } from 'next/headers';
+import { determineUserAccess } from '@/lib/signals/visibility';
 
 export const dynamic = 'force-dynamic';
 
 export default async function PicksPage() {
+  const headersList = await headers();
+  const userId = headersList.get('x-user-id') || undefined;
+  const { isPremium, dailyLimit } = await determineUserAccess(userId);
+
   // Fetch today's best value bets from the database
   const { data: predictions } = await supabase
     .from('predictions')
@@ -15,13 +21,13 @@ export default async function PicksPage() {
     .limit(50);
 
   // Map to new Opportunity type for the table
-  const mappedOpportunities: Opportunity[] = (predictions || []).map((p: any) => {
+  let mappedOpportunities: Opportunity[] = (predictions || []).map((p: any) => {
     // Basic signal logic based on EV
     let signal: 'VALUE' | 'WATCH' | 'PASS' = 'PASS';
     if (p.expected_value >= 3.0) signal = 'VALUE';
     else if (p.expected_value >= 1.0) signal = 'WATCH';
 
-    return {
+    const opp: Opportunity = {
       id: p.id,
       match: `${p.fixtures?.home_team} vs ${p.fixtures?.away_team}`,
       league: p.fixtures?.competition_name || 'Unknown',
@@ -31,15 +37,30 @@ export default async function PicksPage() {
       market: p.market,
       selection: p.selection,
       line: p.selection.includes('Handicap') ? p.selection.split(' ').pop() || '-' : '-',
-      modelProb: (p.home_win_prob || p.model_probability || 0), // fallback if needed
+      modelProb: (p.home_win_prob || p.model_probability || 0),
       marketOdds: p.odds || 0.00,
       fairOdds: p.fair_odds || 0.00,
       edge: p.expected_value || 0,
-      ev: p.expected_value || 0, // Using EV identically to edge for now based on previous mapping
+      ev: p.expected_value || 0,
       signal,
       isStale: false // to be connected to actual stale logic
     };
+
+    if (!isPremium) {
+      opp.edge = undefined as any;
+      opp.ev = undefined as any;
+      opp.fairOdds = undefined as any;
+      opp.marketOdds = undefined as any;
+      opp.modelProb = undefined as any;
+      opp.selection = 'HIDDEN';
+    }
+
+    return opp;
   });
+
+  if (!isPremium) {
+    mappedOpportunities = mappedOpportunities.slice(0, dailyLimit);
+  }
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto flex flex-col min-h-full">
