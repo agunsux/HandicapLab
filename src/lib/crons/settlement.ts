@@ -142,6 +142,73 @@ export async function runSettlementCron(): Promise<any> {
 
       tradesSettled++;
     }
+
+    // 4. Settle daily_picks for this match (EPIC 58)
+    let hash = 0;
+    const strId = String(match.id);
+    for (let j = 0; j < strId.length; j++) {
+      hash = ((hash << 5) - hash) + strId.charCodeAt(j);
+      hash = hash & hash;
+    }
+    const fixtureBigInt = Math.abs(hash) + 1000000000;
+
+    const { data: dailyPicks, error: dpErr } = await supabase
+      .from('daily_picks')
+      .select('*')
+      .eq('fixture_id', fixtureBigInt)
+      .eq('status', 'PENDING');
+
+    if (dailyPicks && dailyPicks.length > 0) {
+      for (const pick of dailyPicks) {
+        // Evaluate Win/Loss based on actual scores
+        let pickResult: 'WON' | 'LOST' | 'PUSH' = 'LOST';
+        const hGoals = homeGoals;
+        const aGoals = awayGoals;
+        const p = pick.prediction;
+
+        if (pick.market_type === 'MONEYLINE') {
+          if (hGoals > aGoals && p === 'home') pickResult = 'WON';
+          else if (hGoals === aGoals && p === 'draw') pickResult = 'WON';
+          else if (hGoals < aGoals && p === 'away') pickResult = 'WON';
+        } else if (pick.market_type === 'ASIAN_HANDICAP') {
+          // Assuming we can fetch the line from odds_snapshots
+          // Or just skip true resolution if line isn't present in pick. For now, we'll assume a basic win/loss is resolved externally or mark pending
+          // Since we don't have the line explicitly in daily_picks, we can fetch it from odds_snapshots
+          const { data: snap } = await supabase.from('odds_snapshots').select('ah_home_line').eq('fixture_id', fixtureBigInt).limit(1).maybeSingle();
+          if (snap?.ah_home_line !== undefined) {
+             const line = snap.ah_home_line;
+             const margin = hGoals - aGoals + (p === 'home' ? line : -line);
+             if (margin > 0) pickResult = 'WON';
+             else if (margin === 0) pickResult = 'PUSH';
+          }
+        } else if (pick.market_type === 'OVER_UNDER') {
+          const { data: snap } = await supabase.from('odds_snapshots').select('ou_line').eq('fixture_id', fixtureBigInt).limit(1).maybeSingle();
+          if (snap?.ou_line !== undefined) {
+             const line = snap.ou_line;
+             if (hGoals + aGoals > line && p === 'over') pickResult = 'WON';
+             else if (hGoals + aGoals < line && p === 'under') pickResult = 'WON';
+             else if (hGoals + aGoals === line) pickResult = 'PUSH';
+          }
+        } else if (pick.market_type === 'BTTS') {
+          if (hGoals > 0 && aGoals > 0 && p === 'btts_yes') pickResult = 'WON';
+          else if ((hGoals === 0 || aGoals === 0) && p === 'btts_no') pickResult = 'WON';
+        }
+
+        const profitLoss = pickResult === 'WON' ? (pick.market_odds ? pick.market_odds - 1 : 0.9) : (pickResult === 'PUSH' ? 0 : -1);
+
+        await supabase
+          .from('daily_picks')
+          .update({
+            status: pickResult,
+            actual_score: `${hGoals}-${aGoals}`,
+            profit_loss: profitLoss,
+            settled_at: new Date().toISOString()
+          })
+          .eq('id', pick.id);
+
+        // Track Record logic is handled by a nightly aggregation cron usually, or we can trigger it here
+      }
+    }
   }
 
   return {

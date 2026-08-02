@@ -8,9 +8,9 @@ export interface MarketOdds {
 
 export interface EdgePick {
   matchId: string;
-  marketType: 'ML' | 'AH' | 'OU';
-  line: string;             // e.g. "0.0", "-0.5", "2.5", "1X2"
-  outcome: 'home' | 'draw' | 'away' | 'over' | 'under';
+  marketType: 'ML' | 'AH' | 'OU' | 'BTTS';
+  line?: string;             // e.g. "0.0", "-0.5", "2.5", "1X2"
+  outcome: 'home' | 'draw' | 'away' | 'over' | 'under' | 'btts_yes' | 'btts_no';
   modelProbability: number;
   marketOdds: number;
   impliedProbability: number;

@@ -14,6 +14,10 @@ export interface Prediction {
   pAway: number;
   expectedGoalsHome?: number;
   expectedGoalsAway?: number;
+  pOver25?: number;
+  pUnder25?: number;
+  pBttsYes?: number;
+  pBttsNo?: number;
 }
 
 export interface PredictionModel {

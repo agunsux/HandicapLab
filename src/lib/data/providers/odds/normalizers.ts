@@ -46,6 +46,8 @@ function mapMarketKeyToType(key: string): MarketType {
       return 'asian_handicap';
     case 'totals':
       return 'over_under';
+    case 'btts':
+      return 'btts';
     default:
       return 'moneyline';
   }
@@ -81,6 +83,9 @@ export function normalizeOddsSnapshot(
       priceHome = outcome.price;
     } else if (outcome.name === 'Under') {
       priceAway = outcome.price;
+    } else if (marketType === 'btts') {
+      if (outcome.name === 'Yes') priceHome = outcome.price;
+      if (outcome.name === 'No') priceAway = outcome.price;
     }
   }
 

@@ -1,6 +1,6 @@
 export interface MatchFeatures {
   matchId: string;
-  marketType: 'AH' | 'OU' | 'ML';
+  marketType: 'AH' | 'OU' | 'ML' | 'BTTS';
   kickoffAt: Date;
   homeFormLast5: number[];
   awayFormLast5: number[];

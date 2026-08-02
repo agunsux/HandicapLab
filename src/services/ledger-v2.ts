@@ -73,7 +73,7 @@ export class LedgerV2Service {
    */
   static async writePrediction(
     match: LedgerMatch,
-    marketType: 'ML' | 'AH' | 'OU',
+    marketType: 'ML' | 'AH' | 'OU' | 'BTTS',
     probOutput: LedgerProbabilityOutput,
     marketOdds: LedgerMarketOdds,
     topPick: LedgerTopPick | null,
@@ -126,7 +126,7 @@ export class LedgerV2Service {
         snapshot_time: snapshotTime,
         league: match.league,
         season: match.season,
-        market: marketType === 'ML' ? 'moneyline' : marketType === 'AH' ? 'asian_handicap' : 'over_under',
+        market: marketType === 'ML' ? 'moneyline' : marketType === 'AH' ? 'asian_handicap' : marketType === 'OU' ? 'over_under' : 'btts',
         selection: topPick ? topPick.outcome : null,
         line: marketOdds.line !== undefined ? String(marketOdds.line) : null,
         odds: topPick ? Number(topPick.marketOdds) : null,

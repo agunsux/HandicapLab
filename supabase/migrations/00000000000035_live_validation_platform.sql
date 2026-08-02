@@ -65,8 +65,8 @@ CREATE INDEX IF NOT EXISTS idx_prediction_snapshots_fixture ON public.prediction
 CREATE INDEX IF NOT EXISTS idx_prediction_snapshots_kickoff ON public.prediction_snapshots(kickoff);
 CREATE INDEX IF NOT EXISTS idx_prediction_snapshots_league ON public.prediction_snapshots(league);
 
--- 2. odds_snapshots
-CREATE TABLE IF NOT EXISTS public.odds_snapshots (
+-- 2. live_odds_snapshots
+CREATE TABLE IF NOT EXISTS public.live_odds_snapshots (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   fixture_id TEXT NOT NULL,
   phase TEXT NOT NULL CHECK (phase IN ('opening', 'prediction', 'closing')),
@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS public.odds_snapshots (
   correlation_id TEXT NOT NULL
 );
 
-CREATE INDEX IF NOT EXISTS idx_odds_snapshots_fixture_phase ON public.odds_snapshots(fixture_id, phase);
+CREATE INDEX IF NOT EXISTS idx_live_odds_snapshots_fixture_phase ON public.live_odds_snapshots(fixture_id, phase);
 
 -- 3. settlements
 CREATE TABLE IF NOT EXISTS public.settlements (
@@ -250,8 +250,8 @@ CREATE TRIGGER trg_immutable_prediction_snapshots
   BEFORE UPDATE OR DELETE ON public.prediction_snapshots
   FOR EACH ROW EXECUTE FUNCTION public.enforce_live_validation_immutability();
 
-CREATE TRIGGER trg_immutable_odds_snapshots
-  BEFORE UPDATE OR DELETE ON public.odds_snapshots
+CREATE TRIGGER trg_immutable_live_odds_snapshots
+  BEFORE UPDATE OR DELETE ON public.live_odds_snapshots
   FOR EACH ROW EXECUTE FUNCTION public.enforce_live_validation_immutability();
 
 CREATE TRIGGER trg_immutable_settlements

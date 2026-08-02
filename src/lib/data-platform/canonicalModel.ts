@@ -34,8 +34,8 @@ export interface CanonicalFixture {
 export interface CanonicalOdds {
   fixtureId: string;
   provider: string;
-  marketType: 'ML' | 'AH' | 'OU';
-  selection: 'home' | 'draw' | 'away' | 'over' | 'under';
+  marketType: 'ML' | 'AH' | 'OU' | 'BTTS';
+  selection: 'home' | 'draw' | 'away' | 'over' | 'under' | 'btts_yes' | 'btts_no';
   line?: number | null;
   oddsDecimal: number;
   impliedProbability: number;

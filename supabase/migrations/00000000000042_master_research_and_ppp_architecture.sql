@@ -10,7 +10,7 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 -- 1. MODEL RELEASES & RESEARCH PROVENANCE REGISTRY
 -- -----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS public.model_versions (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     version_tag VARCHAR(32) NOT NULL UNIQUE, -- e.g. 'Poisson-v1.2-cal'
     git_commit_hash VARCHAR(40) NOT NULL,
     brier_score NUMERIC(6, 4) NOT NULL,
@@ -22,6 +22,10 @@ CREATE TABLE IF NOT EXISTS public.model_versions (
 );
 
 -- Ensure Prediction DOI and Research Notes Columns in prediction_ledger
+CREATE TABLE IF NOT EXISTS public.prediction_ledger (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid()
+);
+
 ALTER TABLE public.prediction_ledger
     ADD COLUMN IF NOT EXISTS doi_id VARCHAR(64) UNIQUE,
     ADD COLUMN IF NOT EXISTS ci_lower NUMERIC(5, 4),
@@ -66,7 +70,7 @@ SET ppp_discount_factor = EXCLUDED.ppp_discount_factor;
 
 -- Country Confidence Audit Log
 CREATE TABLE IF NOT EXISTS public.country_confidence_audits (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL,
     session_id VARCHAR(64) NOT NULL,
     evaluated_country VARCHAR(2) REFERENCES public.pricing_regions(country_code),

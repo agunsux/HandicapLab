@@ -114,7 +114,7 @@ export class MatchSettler {
         let clv: number | null = null;
         let profit = 0.0;
         let hit = false;
-        let chosenOutcome: 'home' | 'draw' | 'away' | 'over' | 'under' = 'home';
+        let chosenOutcome: string = 'home';
         let chosenLine = '0.0';
 
         if (picks.length > 0) {
@@ -122,14 +122,14 @@ export class MatchSettler {
           const topPick = picks[0];
           clv = topPick.clv;
           chosenOutcome = topPick.outcome;
-          chosenLine = topPick.line;
+          chosenLine = topPick.line || '0.0';
 
           // Kelly Criterion recommendation stake size
           const stake = topPick.kellyStake > 0 ? topPick.kellyStake : 0.05; // 5% default if zero
           profit = ProfitCalculator.calculate(
             topPick.outcome,
-            pred.market_type as 'ML' | 'AH' | 'OU',
-            topPick.line,
+            pred.market_type as 'ML' | 'AH' | 'OU' | 'BTTS',
+            topPick.line || '0.0',
             stake,
             topPick.marketOdds,
             homeGoals,

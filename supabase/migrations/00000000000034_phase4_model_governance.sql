@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS public.model_registry (
 
 -- 2. Model Cryptographic Fingerprints Table
 CREATE TABLE IF NOT EXISTS public.model_fingerprints (
-  model_id TEXT PRIMARY KEY REFERENCES public.model_registry(id) ON DELETE CASCADE,
+  model_id UUID PRIMARY KEY REFERENCES public.model_registry(id) ON DELETE CASCADE,
   dataset_sha TEXT NOT NULL,
   feature_schema_sha TEXT NOT NULL,
   feature_transform_sha TEXT NOT NULL,
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS public.model_fingerprints (
 
 -- 3. Model Provider Snapshots Table
 CREATE TABLE IF NOT EXISTS public.model_provider_snapshots (
-  model_id TEXT PRIMARY KEY REFERENCES public.model_registry(id) ON DELETE CASCADE,
+  model_id UUID PRIMARY KEY REFERENCES public.model_registry(id) ON DELETE CASCADE,
   provider TEXT NOT NULL,
   version TEXT NOT NULL,
   endpoint TEXT NOT NULL,
@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS public.model_provider_snapshots (
 -- 4. Model Audit Trail Table (Immutable Log)
 CREATE TABLE IF NOT EXISTS public.model_audit_trail (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  model_id TEXT NOT NULL REFERENCES public.model_registry(id),
+  model_id UUID NOT NULL REFERENCES public.model_registry(id),
   from_state TEXT NOT NULL,
   to_state TEXT NOT NULL,
   actor TEXT NOT NULL DEFAULT 'SYSTEM_MLOPS',
@@ -52,10 +52,20 @@ CREATE TABLE IF NOT EXISTS public.model_audit_trail (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- 5. Active Champion Pointer Table
+-- 5. Model Feature Importance Matrix
+CREATE TABLE IF NOT EXISTS public.model_feature_importance (
+  model_id UUID NOT NULL REFERENCES public.model_registry(id) ON DELETE CASCADE,
+  feature_name TEXT NOT NULL,
+  importance_score NUMERIC NOT NULL,
+  rank INT NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY (model_id, feature_name)
+);
+
+-- 6. Active Champion Pointer Table
 CREATE TABLE IF NOT EXISTS public.champion_pointers (
   id TEXT PRIMARY KEY DEFAULT 'active_champion',
-  model_id TEXT NOT NULL REFERENCES public.model_registry(id),
+  model_id UUID NOT NULL REFERENCES public.model_registry(id),
   promoted_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   promoted_by TEXT NOT NULL DEFAULT 'SYSTEM_GOVERNANCE',
   reason TEXT

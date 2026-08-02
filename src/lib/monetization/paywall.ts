@@ -2,8 +2,8 @@ import { EdgePick } from '../engines/edge-scanner/types';
 
 export interface PaywalledEdgePick {
   matchId: string;
-  marketType: 'ML' | 'AH' | 'OU';
-  line: string;
+  marketType: 'ML' | 'AH' | 'OU' | 'BTTS';
+  line?: string;
   outcome: string;
   modelProbability: number | null;
   marketOdds: number;

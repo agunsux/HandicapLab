@@ -25,6 +25,10 @@ export class DixonColesModelWrapper implements PredictionModel {
     let pHome = 0;
     let pDraw = 0;
     let pAway = 0;
+    let pOver25 = 0;
+    let pUnder25 = 0;
+    let pBttsYes = 0;
+    let pBttsNo = 0;
 
     for (let h = 0; h <= 10; h++) {
       for (let a = 0; a <= 10; a++) {
@@ -32,6 +36,12 @@ export class DixonColesModelWrapper implements PredictionModel {
         if (h > a) pHome += p;
         else if (h === a) pDraw += p;
         else pAway += p;
+
+        if (h + a > 2.5) pOver25 += p;
+        else pUnder25 += p;
+
+        if (h > 0 && a > 0) pBttsYes += p;
+        else pBttsNo += p;
       }
     }
 
@@ -45,7 +55,11 @@ export class DixonColesModelWrapper implements PredictionModel {
       pDraw: Number(drawProbability.toFixed(4)),
       pAway: Number(awayProbability.toFixed(4)),
       expectedGoalsHome: raw.homeLambda,
-      expectedGoalsAway: raw.awayLambda
+      expectedGoalsAway: raw.awayLambda,
+      pOver25: Number(pOver25.toFixed(4)),
+      pUnder25: Number(pUnder25.toFixed(4)),
+      pBttsYes: Number(pBttsYes.toFixed(4)),
+      pBttsNo: Number(pBttsNo.toFixed(4))
     };
   }
 

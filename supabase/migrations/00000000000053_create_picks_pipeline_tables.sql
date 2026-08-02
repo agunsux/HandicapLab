@@ -6,7 +6,7 @@
 -- ---------- daily_picks ----------
 CREATE TABLE IF NOT EXISTS public.daily_picks (
   id                 UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  fixture_id         BIGINT NOT NULL,
+  fixture_id         UUID NOT NULL,
   league             TEXT,
   home_team          TEXT,
   away_team          TEXT,
@@ -41,26 +41,32 @@ CREATE INDEX IF NOT EXISTS idx_daily_picks_fixture  ON public.daily_picks (fixtu
 CREATE INDEX IF NOT EXISTS idx_daily_picks_kickoff  ON public.daily_picks (kickoff_utc);
 
 -- ---------- odds_snapshots (append-only, for CLV) ----------
-CREATE TABLE IF NOT EXISTS public.odds_snapshots (
-  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  fixture_id      BIGINT NOT NULL,
-  bookmaker       TEXT NOT NULL,
-  snapshot_label  TEXT NOT NULL CHECK (snapshot_label IN ('opening','midday','closing')),
-  ah_home_line    DOUBLE PRECISION,
-  ah_home_odds    DOUBLE PRECISION,
-  ah_away_odds    DOUBLE PRECISION,
-  ou_line         DOUBLE PRECISION,
-  ou_over_odds    DOUBLE PRECISION,
-  ou_under_odds   DOUBLE PRECISION,
-  ml_home         DOUBLE PRECISION,
-  ml_draw         DOUBLE PRECISION,
-  ml_away         DOUBLE PRECISION,
-  snapshot_time   TIMESTAMPTZ NOT NULL DEFAULT now()
-);
+-- Instead of recreating the table (which already exists from phase 3),
+-- we safely add the required columns for the daily picks pipeline.
+ALTER TABLE public.odds_snapshots
+  ADD COLUMN IF NOT EXISTS fixture_id      UUID,
+  ADD COLUMN IF NOT EXISTS snapshot_label  TEXT CHECK (snapshot_label IN ('opening','midday','closing')),
+  ADD COLUMN IF NOT EXISTS ah_home_line    DOUBLE PRECISION,
+  ADD COLUMN IF NOT EXISTS ah_home_odds    DOUBLE PRECISION,
+  ADD COLUMN IF NOT EXISTS ah_away_odds    DOUBLE PRECISION,
+  ADD COLUMN IF NOT EXISTS ou_line         DOUBLE PRECISION,
+  ADD COLUMN IF NOT EXISTS ou_over_odds    DOUBLE PRECISION,
+  ADD COLUMN IF NOT EXISTS ou_under_odds   DOUBLE PRECISION,
+  ADD COLUMN IF NOT EXISTS ml_home         DOUBLE PRECISION,
+  ADD COLUMN IF NOT EXISTS ml_draw         DOUBLE PRECISION,
+  ADD COLUMN IF NOT EXISTS ml_away         DOUBLE PRECISION,
+  ADD COLUMN IF NOT EXISTS snapshot_time   TIMESTAMPTZ DEFAULT now();
 
+-- Ensure backward compatibility with existing data
 CREATE INDEX IF NOT EXISTS idx_odds_snap_fixture ON public.odds_snapshots (fixture_id);
 CREATE INDEX IF NOT EXISTS idx_odds_snap_time    ON public.odds_snapshots (snapshot_time DESC);
 CREATE INDEX IF NOT EXISTS idx_odds_snap_book    ON public.odds_snapshots (bookmaker);
+
+-- Add Unique Constraint for idempotent insertion
+ALTER TABLE public.odds_snapshots
+  DROP CONSTRAINT IF EXISTS odds_snapshots_unique;
+ALTER TABLE public.odds_snapshots
+  ADD CONSTRAINT odds_snapshots_unique UNIQUE (fixture_id, bookmaker, snapshot_label);
 
 -- ---------- track_record (single row, updated nightly) ----------
 CREATE TABLE IF NOT EXISTS public.track_record (

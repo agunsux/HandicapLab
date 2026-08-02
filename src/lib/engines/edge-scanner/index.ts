@@ -37,7 +37,7 @@ export class EdgeScanner {
    */
   public static scan(
     matchId: string,
-    marketType: 'ML' | 'AH' | 'OU',
+    marketType: 'ML' | 'AH' | 'OU' | 'BTTS',
     modelOutput: ProbabilityOutput,
     marketOdds: MarketOdds,
     closingOdds?: MarketOdds,
@@ -48,7 +48,7 @@ export class EdgeScanner {
     if (modelOutput.leagueId) {
       const config = getLeagueConfigById(modelOutput.leagueId) || getLeagueConfig(Number(modelOutput.leagueId));
       if (config && config.marketSuitability) {
-        if (config.marketSuitability[marketType] === false) {
+        if ((config.marketSuitability as any)[marketType] === false) {
           isSuitable = false;
         }
       }
@@ -128,6 +128,11 @@ export class EdgeScanner {
       // For Over/Under, homeOdds represents Over and awayOdds represents Under
       evaluateOutcome('over', lineKey, pOver, marketOdds.homeOdds, closingOdds?.homeOdds);
       evaluateOutcome('under', lineKey, pUnder, marketOdds.awayOdds, closingOdds?.awayOdds);
+    } else if (marketType === 'BTTS' as any) {
+      // Scan BTTS outcomes
+      // For BTTS, homeOdds represents Yes and awayOdds represents No
+      evaluateOutcome('btts_yes' as any, 'BTTS', modelOutput.pBttsYes || 0, marketOdds.homeOdds, closingOdds?.homeOdds);
+      evaluateOutcome('btts_no' as any, 'BTTS', modelOutput.pBttsNo || 0, marketOdds.awayOdds, closingOdds?.awayOdds);
     }
 
     // Sort by expected value descending

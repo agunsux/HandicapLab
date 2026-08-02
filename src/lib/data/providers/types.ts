@@ -1,7 +1,7 @@
 // Shared types for all data providers — Market Intelligence System
 // No provider-specific implementation lives here.
 
-export type MarketType = 'asian_handicap' | 'over_under' | 'moneyline';
+export type MarketType = 'asian_handicap' | 'over_under' | 'moneyline' | 'btts';
 
 export type Side = 'home' | 'away' | 'draw';
 

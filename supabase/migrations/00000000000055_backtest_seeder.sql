@@ -2,7 +2,7 @@
 -- Adds source tracking, backtest_summary table, and live_start_date
 
 ALTER TABLE daily_picks ADD COLUMN IF NOT EXISTS source TEXT DEFAULT 'live';
-ALTER TABLE public_ledger ADD COLUMN IF NOT EXISTS source TEXT DEFAULT 'live';
+ALTER TABLE public_prediction_ledger ADD COLUMN IF NOT EXISTS source TEXT DEFAULT 'live';
 CREATE TABLE IF NOT EXISTS backtest_summary (
   id INT PRIMARY KEY DEFAULT 1,
   seasons TEXT,

@@ -14,8 +14,8 @@ export class ProfitCalculator {
    * @param actualAway Actual goals scored by away team
    */
   public static calculate(
-    outcome: 'home' | 'draw' | 'away' | 'over' | 'under',
-    marketType: 'ML' | 'AH' | 'OU',
+    outcome: string,
+    marketType: 'ML' | 'AH' | 'OU' | 'BTTS',
     line: string,
     stake: number,
     odds: number,
@@ -46,6 +46,11 @@ export class ProfitCalculator {
         const isOver = totalGoals > lineNum;
         result = (outcome === 'over' && isOver) || (outcome === 'under' && !isOver) ? 'win' : 'loss';
       }
+    } else if (marketType === 'BTTS') {
+      const bothScored = actualHome > 0 && actualAway > 0;
+      if (outcome === 'btts_yes' && bothScored) result = 'win';
+      else if (outcome === 'btts_no' && !bothScored) result = 'win';
+      else result = 'loss';
     }
 
     if (result === 'win') {

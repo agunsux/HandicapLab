@@ -17,7 +17,7 @@ export class FeatureEngine {
   static async build(
     matchId: string,
     kickoffAt: Date,
-    marketType: 'AH' | 'OU' | 'ML' = 'ML'
+    marketType: 'AH' | 'OU' | 'ML' | 'BTTS' = 'ML'
   ): Promise<MatchFeatures> {
     // 1. HARD GATE: Assert no future data leakage
     await LeakageGuard.assertNoFutureData(matchId, kickoffAt);

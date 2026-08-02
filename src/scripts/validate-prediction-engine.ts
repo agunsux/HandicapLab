@@ -31,8 +31,8 @@ const SEASONS = [
   { name: '2024-2025', file: '2024-2025.csv' }
 ];
 
-const DATA_DIR = path.join(process.cwd(), 'data', 'EPL');
-const ARTIFACT_DIR = 'C:/Users/RYZEN/.gemini/antigravity-ide/brain/9913ad05-a9a5-4629-9d5f-8913e0abe47a';
+const DATA_DIR = path.join(process.cwd(), 'data', 'bronze', 'football_data');
+const ARTIFACT_DIR = 'C:/Users/RYZEN/.gemini/antigravity-ide/brain/cd7f985e-23ac-4e8b-8dae-e7582a95ad64';
 
 // Seedable PRNG for reproducibility (Rule #1)
 class SeededRandom {

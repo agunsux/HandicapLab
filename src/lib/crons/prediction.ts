@@ -83,7 +83,7 @@ export async function runPredictionCron(): Promise<any> {
 
         // Run market types in parallel for this match
         await Promise.all(
-          (['ML', 'AH', 'OU'] as const).map(async (marketType) => {
+          (['ML', 'AH', 'OU', 'BTTS'] as const).map(async (marketType) => {
             try {
               const startTime = Date.now();
               const features = await FeatureEngine.build(match.id, kickoffDate, marketType);
@@ -282,6 +282,41 @@ export async function runPredictionCron(): Promise<any> {
                 timestamp: new Date().toISOString()
               });
 
+              // 10. Insert into daily_picks (EPIC 58)
+              // Generate deterministic BIGINT from match.id
+              let hash = 0;
+              const strId = String(match.id);
+              for (let j = 0; j < strId.length; j++) {
+                hash = ((hash << 5) - hash) + strId.charCodeAt(j);
+                hash = hash & hash;
+              }
+              const fixtureBigInt = Math.abs(hash) + 1000000000;
+
+              // Map market type to daily_picks enum
+              let mappedMarketType = marketType === 'ML' ? 'MONEYLINE' : (marketType === 'AH' ? 'ASIAN_HANDICAP' : (marketType === 'OU' ? 'OVER_UNDER' : 'BTTS'));
+
+              const dailyPickPayload = {
+                fixture_id: fixtureBigInt,
+                league: match.league,
+                home_team: match.home_team,
+                away_team: match.away_team,
+                kickoff_utc: match.kickoff,
+                market_type: mappedMarketType,
+                prediction: topPick ? topPick.outcome : 'NONE',
+                model_probability: topPick ? topPick.modelProbability : null,
+                fair_odds: topPick ? Number((1 / topPick.modelProbability).toFixed(4)) : null,
+                market_odds: topPick ? topPick.marketOdds : null,
+                market_bookmaker: 'Pinnacle',
+                edge_pct: topPick ? Number(((topPick.modelProbability - topPick.impliedProbability) * 100).toFixed(2)) : null,
+                confidence: probOutput.confidence ? probOutput.confidence.confidenceScore : null,
+                verdict: decision === 'BET' ? 'LAYAK' : (decision === 'HOLD' ? 'PANTAU' : 'LEWATI'),
+                reasoning: decisionReason,
+                status: 'PENDING',
+                source: 'live'
+              };
+
+              await supabase.from('daily_picks').upsert(dailyPickPayload, { onConflict: 'fixture_id, market_type, source' });
+
               results.push({ matchId: match.id, marketType, success: true });
             } catch (err: any) {
               console.error(`Error in prediction pipeline for match ${match.id} ${marketType}:`, err);
@@ -296,7 +331,7 @@ export async function runPredictionCron(): Promise<any> {
   return { success: true, results };
 }
 
-async function generateOddsSnapshot(matchId: string, marketType: 'ML' | 'AH' | 'OU', prob: any): Promise<MarketOdds> {
+async function generateOddsSnapshot(matchId: string, marketType: 'ML' | 'AH' | 'OU' | 'BTTS', prob: any): Promise<MarketOdds> {
   // Try to load real odds from database
   const { data: dbOdds } = await supabase
     .from('odds_snapshots')
@@ -337,12 +372,19 @@ async function generateOddsSnapshot(matchId: string, marketType: 'ML' | 'AH' | '
       homeOdds: Number((1 / ((prob.pAhHome['-0.5'] || 0.5) * deviation)).toFixed(2)),
       awayOdds: Number((1 / ((prob.pAhAway['-0.5'] || 0.5) * deviation)).toFixed(2)),
     };
-  } else {
+  } else if (marketType === 'OU') {
     return {
       bookmaker: 'pinnacle',
       line: 2.5,
       homeOdds: Number((1 / ((prob.pOver['2.5'] || 0.5) * deviation)).toFixed(2)),
       awayOdds: Number((1 / ((prob.pUnder['2.5'] || 0.5) * deviation)).toFixed(2)),
+    };
+  } else {
+    // BTTS
+    return {
+      bookmaker: 'pinnacle',
+      homeOdds: Number((1 / ((prob.pBttsYes || 0.5) * deviation)).toFixed(2)),
+      awayOdds: Number((1 / ((prob.pBttsNo || 0.5) * deviation)).toFixed(2)), // We store Yes in home, No in away for fallback
     };
   }
 }

@@ -10,7 +10,7 @@ export interface ModelVersion {
 
 export interface ProbabilityOutput {
   matchId: string;
-  marketType: 'AH' | 'OU' | 'ML';
+  marketType: 'AH' | 'OU' | 'ML' | 'BTTS';
   leagueId?: string;
   
   // Moneyline (1X2)

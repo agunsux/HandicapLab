@@ -160,6 +160,7 @@ vi.mock('../src/lib/supabase.server', () => {
       }),
       insert: vi.fn().mockImplementation(() => chain),
       update: vi.fn().mockImplementation(() => chain),
+      upsert: vi.fn().mockImplementation(() => chain),
       then: builder.then
     };
     return chain;
@@ -182,7 +183,8 @@ describe('Cron Infrastructure', () => {
     it('runs prediction pipeline and stores prediction + snapshot', async () => {
       const result = await runPredictionCron();
       expect(result.success).toBe(true);
-      expect(result.results.length).toBe(3); // ML, AH, OU
+      expect(result.results.length).toBe(4); // ML, AH, OU, BTTS
+      expect(result.results[0].error).toBeUndefined();
       expect(result.results[0].success).toBe(true);
       expect(supabase.from).toHaveBeenCalledWith('predictions');
       expect(supabase.from).toHaveBeenCalledWith('odds_history');
