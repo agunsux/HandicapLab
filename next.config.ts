@@ -6,6 +6,30 @@ const nextConfig: NextConfig = {
     root: __dirname,
   },
   serverExternalPackages: ['duckdb'],
+  async redirects() {
+    return [
+      {
+        source: '/dashboard',
+        destination: '/app',
+        permanent: true,
+      },
+      {
+        source: '/signals',
+        destination: '/app/picks',
+        permanent: true,
+      },
+      {
+        source: '/live',
+        destination: '/app/picks',
+        permanent: true,
+      },
+      {
+        source: '/ledger',
+        destination: '/app/ledger',
+        permanent: true,
+      }
+    ];
+  },
   async headers() {
     return [
       {

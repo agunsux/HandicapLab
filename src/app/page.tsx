@@ -1,15 +1,10 @@
 import Link from 'next/link';
-import { ArrowRight, Activity, Database, HeartPulse } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { supabase } from '@/lib/supabase.server';
-import { getProviderHealth } from '@/lib/providers/quotaManager';
 import { OpportunitiesTable, Opportunity } from '@/components/opportunities/OpportunitiesTable';
 
 export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
-  const healthData = await getProviderHealth();
-  
   // Fetch today's best value bets from the database
   const { data: predictions } = await supabase
     .from('predictions')
@@ -19,97 +14,87 @@ export default async function HomePage() {
     .limit(10);
 
   // Map to Opportunity type for the table
-  const mappedOpportunities: Opportunity[] = (predictions || []).map((p: any) => ({
-    id: p.id,
-    match: `${p.fixtures?.home_team} vs ${p.fixtures?.away_team}`,
-    league: p.fixtures?.competition_name || 'Unknown',
-    time: new Date(p.fixtures?.kickoff_time).toLocaleString(),
-    market: p.market,
-    selection: p.selection,
-    bookmaker: p.bookmaker || 'Pinnacle',
-    odds: p.odds?.toFixed(2) || '0.00',
-    fairOdds: p.fair_odds?.toFixed(2) || '0.00',
-    edge: p.expected_value || 0,
-    confidence: p.confidence_grade || 'C',
-  }));
+  const mappedOpportunities: Opportunity[] = (predictions || []).map((p: any) => {
+    let signal: 'VALUE' | 'WATCH' | 'PASS' = 'PASS';
+    if (p.expected_value >= 3.0) signal = 'VALUE';
+    else if (p.expected_value >= 1.0) signal = 'WATCH';
+
+    return {
+      id: p.id,
+      match: `${p.fixtures?.home_team} vs ${p.fixtures?.away_team}`,
+      league: p.fixtures?.competition_name || 'Unknown',
+      time: new Date(p.fixtures?.kickoff_time).toLocaleString(undefined, { 
+        month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' 
+      }),
+      market: p.market,
+      selection: p.selection,
+      line: p.selection.includes('Handicap') ? p.selection.split(' ').pop() || '-' : '-',
+      modelProb: (p.home_win_prob || p.model_probability || 0),
+      marketOdds: p.odds || 0.00,
+      fairOdds: p.fair_odds || 0.00,
+      edge: p.expected_value || 0,
+      ev: p.expected_value || 0, 
+      signal,
+      isStale: false
+    };
+  });
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-background">
+      {/* ============ HEADER ============ */}
+      <header className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
+        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+          <Link href="/" className="font-mono font-bold tracking-tight text-foreground">
+            HANDICAPLAB
+          </Link>
+          <nav className="hidden md:flex gap-6 text-sm font-medium">
+            <Link href="/methodology" className="text-muted-foreground hover:text-foreground transition-colors">Methodology</Link>
+            <Link href="/pricing" className="text-muted-foreground hover:text-foreground transition-colors">Pricing</Link>
+          </nav>
+          <div className="flex items-center gap-4">
+            <Link href="/login" className="text-sm font-medium text-foreground hover:text-primary transition-colors">Log in</Link>
+            <Link href="/app" className="text-sm font-medium bg-foreground text-background px-4 py-2 rounded-md hover:bg-foreground/90 transition-colors">Open App</Link>
+          </div>
+        </div>
+      </header>
+
       {/* ============ HERO ============ */}
-      <section className="relative pt-12 pb-8 px-4 border-b">
+      <section className="pt-12 pb-8 px-4 border-b border-border">
         <div className="container mx-auto max-w-6xl">
-          <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-foreground mb-4">
-            Prematch Value Opportunities
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground mb-3 font-mono uppercase">
+            Sports Data, Not Sports Hype.
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl">
-            Live expected value edges for Moneyline, Asian Handicap, Over/Under, and BTTS.
+          <p className="text-base text-muted-foreground max-w-2xl">
+            Identify statistical inefficiencies and betting market edges with quantitative modeling. Below is a live preview of today's market pulse.
           </p>
         </div>
       </section>
 
-      {/* ============ SYSTEM STATUS DASHBOARD ============ */}
-      <section className="py-8 bg-muted/10 border-b border-border px-4">
-        <div className="container mx-auto max-w-6xl">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white p-6 rounded-xl border flex items-center gap-4">
-              <div className="p-3 bg-blue-100 rounded-lg text-blue-600">
-                <Database className="w-6 h-6" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-500 font-medium uppercase">Pipeline Status</p>
-                <p className="font-bold text-lg">Active (5 Stages)</p>
-              </div>
-            </div>
-            
-            <div className="bg-white p-6 rounded-xl border flex items-center gap-4">
-              <div className="p-3 bg-green-100 rounded-lg text-green-600">
-                <Activity className="w-6 h-6" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-500 font-medium uppercase">API Usage Today</p>
-                <p className="font-bold text-lg">
-                  {healthData.reduce((acc, h) => acc + h.quotaUsed, 0)} Requests
-                </p>
-              </div>
-            </div>
-
-            <div className="bg-white p-6 rounded-xl border flex flex-col justify-center">
-              <div className="flex items-center gap-2 mb-2">
-                <HeartPulse className="w-5 h-5 text-gray-400" />
-                <p className="text-sm text-gray-500 font-medium uppercase">Provider Health</p>
-              </div>
-              <div className="flex gap-2 text-xs">
-                {healthData.map(h => (
-                  <span key={h.provider} className={`px-2 py-1 rounded-md ${h.healthy ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                    {h.provider.toUpperCase()}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ============ LIVE PREVIEW ============ */}
+      {/* ============ LIVE OPPORTUNITIES PREVIEW ============ */}
       <section className="py-12 px-4 flex-1">
         <div className="container mx-auto max-w-6xl">
-          <div className="flex justify-between items-end mb-6">
-            <div>
-              <h2 className="text-2xl font-bold tracking-tight">Today's Best Value Bets</h2>
-            </div>
-            <Button variant="outline" asChild>
-              <Link href="/admin/system">View Admin Dashboard</Link>
-            </Button>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold tracking-tight text-foreground">Live Market Pulse</h2>
+            <Link href="/app/picks" className="text-sm font-medium text-primary hover:underline">View All Opportunities &rarr;</Link>
           </div>
 
-          {mappedOpportunities.length > 0 ? (
-            <OpportunitiesTable data={mappedOpportunities} previewMode={false} />
-          ) : (
-            <div className="text-center py-20 border rounded-xl bg-gray-50">
-              <p className="text-gray-500">No value opportunities discovered yet for today.</p>
-              <p className="text-sm text-gray-400 mt-2">Pipeline runs every 30 minutes.</p>
-            </div>
-          )}
+          <div className="flex gap-2 mb-4 overflow-x-auto pb-1 scrollbar-none items-center border-b border-border">
+            <button className="px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors border-b-2 -mb-[1px] border-primary text-foreground">All</button>
+            <button className="px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors border-b-2 -mb-[1px] border-transparent text-muted-foreground hover:text-foreground">Moneyline</button>
+            <button className="px-4 py-2 text-sm font-medium whitespace-nowrap transition-colors border-b-2 -mb-[1px] border-transparent text-muted-foreground hover:text-foreground">Asian Handicap</button>
+          </div>
+
+          <OpportunitiesTable data={mappedOpportunities} previewMode={true} />
+          
+          <div className="mt-8 text-center p-8 border border-border rounded-xl bg-card">
+            <h3 className="text-lg font-bold mb-2">Access Full Market Intelligence</h3>
+            <p className="text-muted-foreground text-sm mb-6 max-w-md mx-auto">
+              Join HandicapLab to access live data across 12+ leagues, deeper analytical models, and historical track record validation.
+            </p>
+            <Link href="/pricing" className="inline-flex items-center justify-center px-6 py-2.5 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors">
+              View Pricing Plans
+            </Link>
+          </div>
         </div>
       </section>
     </div>

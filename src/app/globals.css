@@ -29,12 +29,12 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
 
-  /* Semantic accent palette (muted pastel, Pantone-inspired) */
+  /* Semantic accent palette */
   --color-terracotta: var(--accent-terracotta);
-  --color-soft-purple: var(--accent-soft-purple);
-  --color-sage: var(--accent-sage);
-  --color-gold: var(--premium-gold);
-  --color-lavender: var(--accent-lavender);
+  --color-positive: var(--accent-positive);
+  --color-warning: var(--accent-warning);
+  --color-error: var(--accent-error);
+  --color-muted-green: var(--accent-muted-green);
 
   /* Elevation */
   --shadow-elevation-1: 0 1px 2px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.2);
@@ -49,50 +49,49 @@
 
 :root {
   /*
-   * HandicapLab v3 — "Quiet Intelligence" Design System
-   * Deep Forest / Rich Evergreen / Charcoal Green background.
-   * Muted pastel Pantone-inspired semantic accents.
+   * HandicapLab v4 — "Professional Betting Intelligence Terminal"
+   * Dark Smoky Blue / near-black background
    */
-  --background: #0E1410;        /* Deep Forest — near-black green */
-  --foreground: #EDF1EC;        /* Soft off-white */
+  --background: #0B1117;        
+  --foreground: #E8ECEB;        
 
-  --card: #141C16;              /* Rich Evergreen surface */
-  --card-foreground: #EDF1EC;
+  --card: #111A22;              /* Surface */
+  --card-foreground: #E8ECEB;
 
-  --popover: #161F18;
-  --popover-foreground: #EDF1EC;
+  --popover: #17232C;           /* Secondary Surface */
+  --popover-foreground: #E8ECEB;
 
-  --border: #24301F;            /* Charcoal Green border */
-  --input: #2A3826;
-  --ring: rgba(163, 190, 140, 0.35);
+  --border: #24333D;            
+  --input: #17232C;
+  --ring: rgba(117, 181, 139, 0.35); /* Positive Green */
 
-  /* Primary — Sage / Pastel Green (confidence, positive EV) */
-  --primary: #A3BE8C;
-  --primary-foreground: #0E1410;
+  /* Primary */
+  --primary: #8D9AA1;           /* Secondary Text as neutral primary */
+  --primary-foreground: #0B1117;
 
-  /* Secondary — Terracotta (warnings, premium highlights) */
-  --secondary: #D08A6B;
-  --secondary-foreground: #1A0F0A;
+  /* Secondary */
+  --secondary: #17232C;
+  --secondary-foreground: #E8ECEB;
 
-  --muted: #1A231C;
-  --muted-foreground: #9AA79B;
+  --muted: #111A22;
+  --muted-foreground: #8D9AA1;  /* Secondary Text */
 
-  /* Accent — Soft Purple (premium highlights, status) */
-  --accent: #A99BC9;
-  --accent-foreground: #17121F;
+  /* Accent */
+  --accent: #17232C;
+  --accent-foreground: #E8ECEB;
 
-  --destructive: #D97B7B;
-  --destructive-foreground: #1F0F0F;
+  --destructive: #B96D68;       /* Error */
+  --destructive-foreground: #0B1117;
 
   /* Semantic accent tokens */
-  --accent-terracotta: #D08A6B;
-  --accent-soft-purple: #A99BC9;
-  --accent-sage: #A3BE8C;
-  --premium-gold: #D7B26D;
-  --accent-lavender: #A99BC9;
+  --accent-terracotta: #C8785F;
+  --accent-positive: #75B58B;
+  --accent-warning: #C89B61;
+  --accent-error: #B96D68;
+  --accent-muted-green: #5F9F78;
 
-  /* Premium rounded corners 12-16px */
-  --radius: 0.75rem;
+  /* Premium rounded corners 4-8px for more restrained analytical feel */
+  --radius: 0.5rem;
 }
 
 @layer base {
@@ -100,47 +99,22 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1, "cv11" 1, "tnum" 1; /* Tabular nums for data */
   }
-
-  /* Smooth scrolling for anchor links */
-  html {
-    scroll-behavior: smooth;
+  
+  /* Scrollbar styles for dense tables */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
   }
-
-  /* Tabular figures for data-heavy tables */
-  .tabular-nums {
-    font-variant-numeric: tabular-nums;
+  ::-webkit-scrollbar-track {
+    background: transparent;
   }
-
-  /* Visible focus states for accessibility (WCAG AA) */
-  :focus-visible {
-    outline: 2px solid var(--ring);
-    outline-offset: 2px;
+  ::-webkit-scrollbar-thumb {
+    @apply bg-border rounded-full;
   }
-
-  /* Respect reduced motion preferences */
-  @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-      scroll-behavior: auto !important;
-    }
-  }
-}
-
-/* Elevation utility classes */
-@layer utilities {
-  .elevation-1 {
-    box-shadow: var(--shadow-elevation-1);
-  }
-  .elevation-2 {
-    box-shadow: var(--shadow-elevation-2);
-  }
-  .elevation-3 {
-    box-shadow: var(--shadow-elevation-3);
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground;
   }
 }

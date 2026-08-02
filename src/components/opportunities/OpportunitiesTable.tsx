@@ -1,7 +1,9 @@
 'use client';
 
-import { ArrowRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import React, { useState } from 'react';
+import { ArrowRight, AlertTriangle, CheckCircle2, MinusCircle } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { OpportunityDetailPanel } from './OpportunityDetailPanel';
 
 export type Opportunity = {
   id: string;
@@ -10,91 +12,114 @@ export type Opportunity = {
   time: string;
   market: string;
   selection: string;
-  bookmaker: string;
-  odds: string;
-  fairOdds: string;
+  line: string;
+  modelProb: number;
+  marketOdds: number;
+  fairOdds: number;
   edge: number;
-  confidence: 'A+' | 'A' | 'B+' | 'B';
+  ev: number;
+  signal: 'VALUE' | 'WATCH' | 'PASS';
+  isStale?: boolean;
 };
 
 interface OpportunitiesTableProps {
   data: Opportunity[];
-  onRowClick?: (opp: Opportunity) => void;
   previewMode?: boolean;
 }
 
-export function OpportunitiesTable({ data, onRowClick, previewMode = false }: OpportunitiesTableProps) {
-  const getConfidenceColor = (grade: string) => {
-    switch (grade) {
-      case 'A+': return 'bg-primary/20 text-primary border-primary/30';
-      case 'A': return 'bg-primary/10 text-primary border-primary/20';
-      case 'B+': return 'bg-accent/20 text-accent-foreground border-accent/30';
-      default: return 'bg-muted text-muted-foreground border-border';
+export function OpportunitiesTable({ data, previewMode = false }: OpportunitiesTableProps) {
+  const [selectedOpp, setSelectedOpp] = useState<Opportunity | null>(null);
+
+  const getSignalConfig = (signal: string) => {
+    switch (signal) {
+      case 'VALUE': return { color: 'text-[#75B58B]', bg: 'bg-[#75B58B]/10', icon: CheckCircle2 };
+      case 'WATCH': return { color: 'text-[#C89B61]', bg: 'bg-[#C89B61]/10', icon: AlertTriangle };
+      case 'PASS': default: return { color: 'text-muted-foreground', bg: 'bg-muted/30', icon: MinusCircle };
     }
   };
 
   return (
-    <div className="w-full overflow-x-auto rounded-xl border border-border bg-card shadow-sm">
-      <table className="w-full text-sm text-left">
-        <thead className="text-xs text-muted-foreground uppercase bg-muted/50 border-b border-border font-medium">
+    <>
+    <div className="w-full overflow-x-auto border-y sm:border sm:rounded-md border-border bg-card">
+      <table className="w-full text-sm text-left whitespace-nowrap">
+        <thead className="text-[10px] sm:text-xs text-muted-foreground uppercase bg-muted/40 border-b border-border font-mono tracking-wider">
           <tr>
-            <th className="px-4 py-3 sm:px-6">Match</th>
-            <th className="px-4 py-3 sm:px-6">Market</th>
-            <th className="px-4 py-3 sm:px-6 hidden md:table-cell">Bookmaker</th>
-            <th className="px-4 py-3 sm:px-6 text-right">Odds</th>
-            <th className="px-4 py-3 sm:px-6 text-right hidden sm:table-cell">Fair Odds</th>
-            <th className="px-4 py-3 sm:px-6 text-right">Edge</th>
-            <th className="px-4 py-3 sm:px-6 text-center">Confidence</th>
-            <th className="px-4 py-3 sm:px-6 text-right">Action</th>
+            <th className="px-3 py-2.5 sm:px-4 sm:py-3 font-semibold">Match</th>
+            <th className="px-3 py-2.5 sm:px-4 sm:py-3 font-semibold">Market</th>
+            <th className="px-3 py-2.5 sm:px-4 sm:py-3 font-semibold text-right">Line</th>
+            <th className="px-3 py-2.5 sm:px-4 sm:py-3 font-semibold text-right hidden sm:table-cell">Model Prob</th>
+            <th className="px-3 py-2.5 sm:px-4 sm:py-3 font-semibold text-right">Mkt Odds</th>
+            <th className="px-3 py-2.5 sm:px-4 sm:py-3 font-semibold text-right hidden sm:table-cell">Fair Odds</th>
+            <th className="px-3 py-2.5 sm:px-4 sm:py-3 font-semibold text-right hidden md:table-cell">Edge</th>
+            <th className="px-3 py-2.5 sm:px-4 sm:py-3 font-semibold text-right">EV</th>
+            <th className="px-3 py-2.5 sm:px-4 sm:py-3 font-semibold text-center">Signal</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-border">
-          {data.map((opp) => (
-            <tr 
-              key={opp.id} 
-              className={`hover:bg-muted/30 transition-colors group ${onRowClick ? 'cursor-pointer' : ''}`}
-              onClick={() => onRowClick && onRowClick(opp)}
-            >
-              <td className="px-4 py-4 sm:px-6 whitespace-nowrap">
-                <div className="font-semibold text-foreground tracking-tight">{opp.match}</div>
-                <div className="text-xs text-muted-foreground mt-0.5">{opp.league} • {opp.time}</div>
-              </td>
-              <td className="px-4 py-4 sm:px-6 whitespace-nowrap">
-                <div className="font-medium text-foreground">{opp.selection}</div>
-                <div className="text-xs text-muted-foreground mt-0.5">{opp.market}</div>
-              </td>
-              <td className="px-4 py-4 sm:px-6 whitespace-nowrap hidden md:table-cell">
-                <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-background border border-border text-xs font-medium">
-                  {opp.bookmaker}
-                </div>
-              </td>
-              <td className="px-4 py-4 sm:px-6 whitespace-nowrap text-right font-mono font-medium text-foreground">
-                {opp.odds}
-              </td>
-              <td className="px-4 py-4 sm:px-6 whitespace-nowrap text-right font-mono text-muted-foreground hidden sm:table-cell">
-                {opp.fairOdds}
-              </td>
-              <td className="px-4 py-4 sm:px-6 whitespace-nowrap text-right font-mono font-semibold text-primary">
-                {opp.edge > 0 ? '+' : ''}{opp.edge}%
-              </td>
-              <td className="px-4 py-4 sm:px-6 whitespace-nowrap text-center">
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border ${getConfidenceColor(opp.confidence)}`}>
-                  {opp.confidence}
-                </span>
-              </td>
-              <td className="px-4 py-4 sm:px-6 whitespace-nowrap text-right">
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="text-muted-foreground group-hover:text-foreground opacity-0 group-hover:opacity-100 transition-all"
-                >
-                  Analyze <ArrowRight className="ml-1.5 size-4" />
-                </Button>
-              </td>
-            </tr>
-          ))}
+        <tbody className="divide-y divide-border/50 font-mono text-sm">
+          {data.map((opp) => {
+            const signalConfig = getSignalConfig(opp.signal);
+            const SignalIcon = signalConfig.icon;
+            
+            return (
+              <tr 
+                key={opp.id} 
+                className={cn(
+                  "hover:bg-muted/20 transition-colors group cursor-pointer",
+                  opp.isStale ? "opacity-60 grayscale" : ""
+                )}
+                onClick={() => setSelectedOpp(opp)}
+              >
+                <td className="px-3 py-2.5 sm:px-4 sm:py-3">
+                  <div className="font-sans font-medium text-foreground">{opp.match}</div>
+                  <div className="font-sans text-xs text-muted-foreground mt-0.5">{opp.league} • {opp.time}</div>
+                </td>
+                <td className="px-3 py-2.5 sm:px-4 sm:py-3">
+                  <div className="text-foreground">{opp.selection}</div>
+                  <div className="font-sans text-xs text-muted-foreground mt-0.5">{opp.market}</div>
+                </td>
+                <td className="px-3 py-2.5 sm:px-4 sm:py-3 text-right text-foreground">
+                  {opp.line}
+                </td>
+                <td className="px-3 py-2.5 sm:px-4 sm:py-3 text-right text-muted-foreground hidden sm:table-cell">
+                  {(opp.modelProb * 100).toFixed(1)}%
+                </td>
+                <td className="px-3 py-2.5 sm:px-4 sm:py-3 text-right text-foreground">
+                  {opp.marketOdds.toFixed(2)}
+                </td>
+                <td className="px-3 py-2.5 sm:px-4 sm:py-3 text-right text-muted-foreground hidden sm:table-cell">
+                  {opp.fairOdds.toFixed(2)}
+                </td>
+                <td className={cn(
+                  "px-3 py-2.5 sm:px-4 sm:py-3 text-right hidden md:table-cell",
+                  opp.edge > 0 ? "text-[#75B58B]" : "text-muted-foreground"
+                )}>
+                  {opp.edge > 0 ? '+' : ''}{opp.edge.toFixed(1)}%
+                </td>
+                <td className="px-3 py-2.5 sm:px-4 sm:py-3 text-right font-semibold text-foreground">
+                  {opp.ev.toFixed(2)}%
+                </td>
+                <td className="px-3 py-2.5 sm:px-4 sm:py-3 text-center">
+                  <div className={cn(
+                    "inline-flex items-center justify-center px-2 py-1 rounded text-xs font-sans font-bold",
+                    signalConfig.bg,
+                    signalConfig.color
+                  )}>
+                    <SignalIcon className="w-3.5 h-3.5 mr-1" />
+                    {opp.isStale ? 'STALE' : opp.signal}
+                  </div>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
+    
+    <OpportunityDetailPanel 
+      opportunity={selectedOpp} 
+      isOpen={!!selectedOpp} 
+      onClose={() => setSelectedOpp(null)} 
+    />
+    </>
   );
 }
