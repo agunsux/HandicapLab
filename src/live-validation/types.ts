@@ -20,6 +20,33 @@ export type RollingWindowDays = 7 | 30 | 90 | 365;
 
 export const ROLLING_WINDOWS: RollingWindowDays[] = [7, 30, 90, 365];
 
+export interface LivePipelineTelemetry {
+  pipeline_run_id: string;
+  match_id: string;
+  live_status: string;
+  score: string;
+  match_minute: number;
+  provider: string;
+  source_timestamp: string;
+  odds_timestamp: string;
+  prediction_timestamp: string;
+  data_age_ms: number;
+  model_version: string;
+  feature_version: string;
+  calibration_version: string;
+  calibration_status: string;
+  odds_snapshot_id: string;
+  feature_snapshot_id: string;
+  prediction_snapshot_id: string;
+  ev: number;
+  edge: number;
+  recommendation: 'VALUE_BET' | 'NO_VALUE_DETECTED';
+  recommendation_reason: string;
+  requests_consumed: number;
+  requests_failed: number;
+  provider_budget_status: string;
+}
+
 /** Audit fields required on every persisted record (Data Model requirement). */
 export interface AuditFields {
   /** ISO timestamp the record was created */

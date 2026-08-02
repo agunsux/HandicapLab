@@ -47,6 +47,7 @@ export interface MatchInput {
   };
 }
 
+
 export interface PredictionOutput {
   matchId: string;
   ml_home_prob: number;
@@ -54,8 +55,10 @@ export interface PredictionOutput {
   ml_away_prob: number;
   ou_over_prob: number;
   ou_under_prob: number;
+  ou_push_prob?: number;
   ah_home_prob: number;
   ah_away_prob: number;
+  ah_push_prob?: number;
   sh_ou_over_prob: number;
   sh_ou_under_prob: number;
   btts_yes_prob: number;
@@ -67,6 +70,8 @@ export interface PredictionOutput {
   ood_score: number;
 
   model_version: string;
+  calibration_version: string;
+  feature_version: string;
   topPositiveFactors: string[];
   topNegativeFactors: string[];
   features?: Feature[];
@@ -181,8 +186,10 @@ export function generatePrediction(
     ml_away_prob: poisson.awayProb,
     ou_over_prob: poisson.overProb,
     ou_under_prob: poisson.underProb,
+    ou_push_prob: poisson.ouPushProb,
     ah_home_prob: poisson.ahHomeProb,
     ah_away_prob: poisson.ahAwayProb,
+    ah_push_prob: poisson.ahPushProb,
     sh_ou_over_prob: 1 - sh_ou_under_prob,
     sh_ou_under_prob: sh_ou_under_prob,
     btts_yes_prob: poisson.bttsYesProb,
@@ -198,6 +205,8 @@ export function generatePrediction(
     final_confidence,
     ood_score,
     model_version: 'v0.5-ai',
+    calibration_version: 'CALIBRATION_INSUFFICIENT_DATA', // To be updated when actual calibration is applied
+    feature_version: 'f-v1.2',
     topPositiveFactors: pm ? ['Form & Strength Adjusted', ...positive] : positive,
     topNegativeFactors: negative,
     features: shUnderFeatures,

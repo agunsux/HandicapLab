@@ -21,6 +21,7 @@ export interface FairOddsCalculation {
   selection: LiveSelection;
   line: number;
   modelProb: number;
+  modelPushProb?: number;
   marketImpliedProb: number;
   modelFairOdds: number;
   bookmakerOdds: number;
@@ -57,21 +58,31 @@ export function calculateOverround(quote: MarketQuoteInput): number {
 export function computeFairOdds(
   quote: MarketQuoteInput,
   selection: LiveSelection,
-  modelProb: number
+  modelProbInput: number | { win: number; push: number }
 ): FairOddsCalculation {
   const bookmakerOdds = selection === 'draw' ? (quote.priceDraw ?? 0) : (selection === 'home' || selection === 'over' ? quote.priceHome : quote.priceAway);
   const marketImpliedProb = calculateImpliedProb(quote, selection);
-  const modelFairOdds = modelProb > 0 ? Number((1 / modelProb).toFixed(3)) : 999;
-  const probEdge = Number((modelProb - marketImpliedProb).toFixed(4));
+
+  const winProb = typeof modelProbInput === 'number' ? modelProbInput : modelProbInput.win;
+  const pushProb = typeof modelProbInput === 'number' ? 0 : modelProbInput.push;
+  const effectiveProb = winProb + 0.5 * pushProb;
+  const lossProb = 1 - winProb - pushProb;
+
+  const modelFairOdds = effectiveProb > 0 ? Number((1 / effectiveProb).toFixed(3)) : 999;
+  const probEdge = Number((effectiveProb - marketImpliedProb).toFixed(4));
   const oddsEdge = Number((bookmakerOdds - modelFairOdds).toFixed(3));
-  const expectedValue = Number((modelProb * bookmakerOdds - 1).toFixed(4));
+
+  // EV = WinProb * (Odds - 1) - LossProb * 1 + PushProb * 0
+  const expectedValue = Number((winProb * (bookmakerOdds - 1) - lossProb).toFixed(4));
+
   const overround = Number(calculateOverround(quote).toFixed(4));
 
   return {
     market: quote.market,
     selection,
     line: quote.line,
-    modelProb: Number(modelProb.toFixed(4)),
+    modelProb: Number(effectiveProb.toFixed(4)),
+    modelPushProb: pushProb > 0 ? Number(pushProb.toFixed(4)) : undefined,
     marketImpliedProb: Number(marketImpliedProb.toFixed(4)),
     modelFairOdds,
     bookmakerOdds,

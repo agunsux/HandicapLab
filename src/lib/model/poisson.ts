@@ -8,10 +8,12 @@ export interface PoissonOutput {
   awayProb: number;
   overProb: number;
   underProb: number;
+  ouPushProb: number;
   bttsYesProb: number;
   bttsNoProb: number;
   ahHomeProb: number;
   ahAwayProb: number;
+  ahPushProb: number;
 }
 
 /**
@@ -27,6 +29,8 @@ export function calculatePoissonProbabilities(
   let draw = 0;
   let awayWin = 0;
   let overOU = 0;
+  let underOU = 0;
+  let ouPush = 0;
   let bttsYes = 0;
   
   // Asian Handicap cover probabilities
@@ -54,6 +58,8 @@ export function calculatePoissonProbabilities(
 
       // Over/Under
       if (h + a > ouLine) overOU += p;
+      else if (h + a === ouLine) ouPush += p;
+      else underOU += p;
 
       // BTTS (Both Teams to Score)
       if (h >= 1 && a >= 1) bttsYes += p;
@@ -75,19 +81,22 @@ export function calculatePoissonProbabilities(
   const drawProb = draw / (totalMl || 1);
   const awayProb = awayWin / (totalMl || 1);
 
-  // Asian Handicap cover probability (push count is split equally or treated as half win/half refund)
-  const ahHomeProb = homeCover + 0.5 * pushCount;
+  // Treat the base ahHomeProb as the pure win probability
+  const ahHomeProb = homeCover;
+  const ahAwayProb = 1 - (homeCover + pushCount);
 
   return {
     homeProb,
     drawProb,
     awayProb,
     overProb: overOU,
-    underProb: 1 - overOU,
+    underProb: underOU,
+    ouPushProb: ouPush,
     bttsYesProb: bttsYes,
     bttsNoProb: 1 - bttsYes,
     ahHomeProb,
-    ahAwayProb: 1 - ahHomeProb
+    ahAwayProb,
+    ahPushProb: pushCount
   };
 }
 

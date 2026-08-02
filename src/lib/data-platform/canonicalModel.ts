@@ -107,3 +107,52 @@ export interface CanonicalEvent {
   eventVersion: string;
   correlationId?: string;
 }
+
+export interface FeatureSnapshot {
+  match_id: string;
+  timestamp: string;
+  features: Record<string, number | string>;
+  feature_version: string;
+}
+
+export interface PredictionSnapshot {
+  match_id: string;
+  timestamp: string;
+  model_version: string;
+  calibration_version?: string;
+  feature_version?: string;
+  calibration_status?: string;
+  market: 'moneyline' | 'asian_handicap' | 'over_under' | 'btts';
+  selection: string; // e.g. 'home', 'away', 'draw', 'over', 'under', 'home_ah'
+  probability: number;
+  raw_probability?: number;
+  win_probability?: number;
+  push_probability?: number;
+  loss_probability?: number;
+  fair_odds: number;
+  confidence: number;
+  data_age_ms?: number;
+  odds_snapshot_id?: string;
+  feature_snapshot_id?: string;
+}
+
+export interface ValueAssessment {
+  match_id: string;
+  market: 'moneyline' | 'asian_handicap' | 'over_under' | 'btts';
+  selection: string;
+  line: number;
+  market_odds: number;
+  model_probability: number;
+  fair_odds: number;
+  implied_probability: number;
+  edge: number;
+  ev: number;
+  value_flag: boolean;
+  threshold_version: string;
+  timestamp: string;
+  reason?: string;
+  rejection_reason?: string;
+  calibration_status?: string;
+  data_age_ms?: number;
+  prediction_id?: string;
+}
