@@ -10,6 +10,8 @@ const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_P
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
+type FootballDataCSVRow = Record<string, string>;
+
 async function main() {
   const dataDir = path.join(process.cwd(), 'data', 'bronze', 'football_data');
   if (!fs.existsSync(dataDir)) {
@@ -32,7 +34,7 @@ async function main() {
   for (const file of files) {
     console.log(`[Ingester] Processing ${file}...`);
     const content = fs.readFileSync(path.join(dataDir, file), 'utf-8');
-    const records = csv.parse(content, { columns: true, skip_empty_lines: true });
+    const records = csv.parse(content, { columns: true, skip_empty_lines: true }) as FootballDataCSVRow[];
 
     for (let i = 0; i < records.length; i++) {
       const row = records[i];
