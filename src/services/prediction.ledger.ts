@@ -34,6 +34,7 @@ export async function processAndStorePrediction(matchId: string, input: MatchInp
   const expectedGoalsTotal = prediction.expected_goals_home + prediction.expected_goals_away;
 
   const isNew = await checkIsNewSchema();
+  const numericConfidence = Number((prediction.final_confidence || 0.50).toFixed(4));
 
   // 2. Store prediction into Supabase 'predictions' table
   let insertPayload: Record<string, unknown>;
@@ -55,6 +56,7 @@ export async function processAndStorePrediction(matchId: string, input: MatchInp
         expected_goals: Number(expectedGoalsTotal.toFixed(2)),
         confidence: confidenceStr,
       },
+      confidence: numericConfidence,
       model_version: prediction.model_version || 'v0.5-ai',
       feature_version: 'basic-v1',
       generated_at: new Date().toISOString(),
@@ -73,7 +75,7 @@ export async function processAndStorePrediction(matchId: string, input: MatchInp
       over_prob: prediction.ou_over_prob,
       ou_confidence: ouConf,
       expected_goals: Number(expectedGoalsTotal.toFixed(2)),
-      confidence: confidenceStr,
+      confidence: numericConfidence,
       model_version: prediction.model_version || 'v0.5-ai',
     };
   }

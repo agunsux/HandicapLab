@@ -145,7 +145,7 @@ export async function runPredictionCron(): Promise<any> {
                 edge_pct: topPick ? Number(((topPick.modelProbability - topPick.impliedProbability) * 100).toFixed(2)) : null,
                 expected_value: topPick ? Number(topPick.expectedValue.toFixed(4)) : null,
                 entry_odds: topPick ? topPick.marketOdds : null,
-                confidence: probOutput.confidence ? probOutput.confidence.confidenceScore : null,
+                confidence: probOutput.confidence ? Number((probOutput.confidence.confidenceScore / 100).toFixed(4)) : null,
                 model_confidence: probOutput.confidence ? Number(probOutput.confidence.modelConfidence.toFixed(4)) : null,
                 data_confidence: probOutput.confidence ? Number(probOutput.confidence.dataConfidence.toFixed(4)) : null,
                 market_confidence: probOutput.confidence ? Number(probOutput.confidence.marketConfidence.toFixed(4)) : null,

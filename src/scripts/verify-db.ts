@@ -51,20 +51,18 @@ async function verify() {
   }
 
   // Step 6 Paper Trading Check
-  const { data: paperTrades } = await supabase
+  const { data: paperTrades, error: ptError } = await supabase
     .from('paper_trades')
-    .select('id, market_type, confidence, status, created_at');
+    .select('id, market_type, status, created_at')
+    .ilike('status', 'pending');
+    
+  if (ptError) console.error('Paper Trades Error:', ptError);
     
   console.log(`Pending Paper Trades: ${paperTrades?.length || 0}`);
   
   if (paperTrades && paperTrades.length > 0) {
-    const tradeMarkets = new Set(paperTrades.map(p => p.market_type));
+    const tradeMarkets = new Set(paperTrades.map((p: any) => p.market_type));
     console.log('Paper Trade Markets:', Array.from(tradeMarkets).join(', '));
-    const tradeConfs = paperTrades.map((p: any) => p.confidence).filter(c => c !== null && c !== undefined);
-    if (tradeConfs.length > 0) {
-      const sum = tradeConfs.reduce((a,b)=>a+b,0);
-      console.log(`Average Trade Confidence: ${sum / tradeConfs.length}`);
-    }
   }
 }
 

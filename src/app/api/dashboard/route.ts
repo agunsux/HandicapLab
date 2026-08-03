@@ -110,7 +110,10 @@ export async function GET(request: NextRequest) {
       const predObj = mlPred ? (typeof mlPred.prediction === 'object' && mlPred.prediction ? (mlPred.prediction as any) : {}) : {};
       const conf = predObj.confidence || {};
 
-      const confidenceScore = conf.confidenceScore !== undefined ? conf.confidenceScore : (mlPred?.confidence ?? 65);
+      let rawConfidence = conf.confidenceScore !== undefined ? conf.confidenceScore : (mlPred?.confidence ?? 0.65);
+      if (rawConfidence <= 1) rawConfidence = rawConfidence * 100;
+      const confidenceScore = Math.round(rawConfidence);
+
       const dataQualityScore = conf.dataQualityScore !== undefined ? conf.dataQualityScore : 82;
       const rawRec = conf.recommendationStatus || 'Recommended';
 
@@ -130,9 +133,23 @@ export async function GET(request: NextRequest) {
 
       const values: any[] = [];
       
-      if (mlPred && mlPred.selection) {
-        const prob = mlPred.model_probability || 0.61;
-        const odds = mlPred.entry_odds || 1.92;
+      let mlSelection = mlPred?.selection;
+      if (mlPred && !mlSelection && mlPred.prediction) {
+        const p = mlPred.prediction as any;
+        const h = p.home_prob || 0;
+        const d = p.draw_prob || 0;
+        const a = p.away_prob || 0;
+        const maxProb = Math.max(h, d, a);
+        if (maxProb > 0) {
+          if (maxProb === h) mlSelection = match.home_team;
+          else if (maxProb === a) mlSelection = match.away_team;
+          else mlSelection = 'Draw';
+        }
+      }
+      
+      if (mlPred && mlSelection) {
+        const prob = mlPred.model_probability || (mlPred.prediction as any)?.home_prob || 0.61;
+        const odds = mlPred.entry_odds || (mlPred.odds_snapshot as any)?.homeOdds || 1.92;
         const implied = odds ? Number((1 / odds).toFixed(4)) : 0.52;
         const edge = mlPred.edge_pct || 9.0;
         const ev = mlPred.expected_value || 0.17;
@@ -142,7 +159,7 @@ export async function GET(request: NextRequest) {
 
         values.push({
           market: 'ML',
-          selection: mlPred.selection,
+          selection: mlSelection,
           odds,
           fairOdds,
           probability: prob,

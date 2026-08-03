@@ -1,21 +1,19 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { 
-  LayoutDashboard, 
-  Target, 
-  Trophy, 
-  Activity, 
-  BarChart2, 
-  BookOpen,
+import {
+  LayoutDashboard,
+  Target,
+  Scale,
+  LineChart,
+  Trophy,
+  CircleDot,
+  User,
   Settings,
   ChevronLeft,
   ChevronRight,
-  TrendingUp,
-  CircleDot,
-  User
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -25,106 +23,116 @@ interface NavItem {
   icon: React.ElementType;
 }
 
-interface NavGroup {
-  label: string;
-  items: NavItem[];
-}
-
-const NAV_GROUPS: NavGroup[] = [
-  {
-    label: 'CORE INTELLIGENCE',
-    items: [
-      { name: 'Terminal Dashboard', href: '/app/dashboard', icon: LayoutDashboard },
-      { name: 'Value Opportunities', href: '/app/picks', icon: Target },
-    ],
-  },
-  {
-    label: 'PERFORMANCE',
-    items: [
-      { name: 'Track Record & CLV', href: '/app/performance', icon: BarChart2 },
-    ],
-  },
+const NAV_ITEMS: NavItem[] = [
+  { name: 'Dashboard', href: '/app/dashboard', icon: LayoutDashboard },
+  { name: 'Value Bets', href: '/app/value-bets', icon: Target },
+  { name: 'Asian Handicap', href: '/app/markets/asian-handicap', icon: Scale },
+  { name: 'Over / Under', href: '/app/markets/over-under', icon: LineChart },
+  { name: 'Moneyline', href: '/app/markets/moneyline', icon: Trophy },
+  { name: 'BTTS', href: '/app/markets/btts', icon: CircleDot },
 ];
 
-export function Sidebar({ collapsed, setCollapsed }: { collapsed: boolean, setCollapsed: (val: boolean) => void }) {
+const FOOTER_ITEMS: NavItem[] = [
+  { name: 'Profile', href: '/app/profile', icon: User },
+  { name: 'Settings', href: '/app/settings', icon: Settings },
+];
+
+/**
+ * Grok-style sidebar:
+ *  - Collapsed (~64px, icon-only) by default.
+ *  - Expands on hover or via the pin toggle; collapses on mouse-leave
+ *    when unpinned. Preference is persisted in localStorage.
+ */
+export function Sidebar({ setCollapsed }: { collapsed: boolean; setCollapsed: (val: boolean) => void }) {
   const pathname = usePathname();
+  const [pinned, setPinned] = useState(false);
+  const [hovered, setHovered] = useState(false);
 
-  // Remember collapsed state
+  // Collapsed by default (Grok style) — restore persisted pin preference.
   useEffect(() => {
-    const savedState = localStorage.getItem('handicaplab-sidebar-collapsed');
-    if (savedState) {
-      setCollapsed(savedState === 'true');
+    const saved = localStorage.getItem('handicaplab-sidebar-collapsed');
+    if (saved !== null) {
+      setPinned(saved !== 'true');
     }
-  }, [setCollapsed]);
+  }, []);
 
-  const toggleCollapse = () => {
-    const newState = !collapsed;
-    setCollapsed(newState);
-    localStorage.setItem('handicaplab-sidebar-collapsed', String(newState));
+  // Effective state: expanded when pinned, or temporarily when hovered.
+  const expanded = pinned || hovered;
+
+  useEffect(() => {
+    setCollapsed(!expanded);
+  }, [expanded, setCollapsed]);
+
+  const togglePin = () => {
+    const next = !pinned;
+    setPinned(next);
+    localStorage.setItem('handicaplab-sidebar-collapsed', String(!next));
   };
 
+  const isActive = (href: string) =>
+    pathname === href || (href !== '/app/dashboard' && pathname.startsWith(href));
+
+  const renderItems = (items: NavItem[]) =>
+    items.map((item) => {
+      const active = isActive(item.href);
+      return (
+        <Link
+          key={item.href}
+          href={item.href}
+          title={!expanded ? item.name : undefined}
+          className={cn(
+            'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
+            !expanded && 'justify-center px-0',
+            active
+              ? 'bg-muted text-foreground'
+              : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
+          )}
+        >
+          <item.icon className={cn('h-[18px] w-[18px] shrink-0', active && 'text-primary')} />
+          {expanded && <span className="truncate">{item.name}</span>}
+        </Link>
+      );
+    });
+
   return (
-    <aside 
+    <aside
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       className={cn(
-        "flex flex-col h-screen border-r border-border bg-card transition-all duration-300 z-20 hidden md:flex",
-        collapsed ? "w-16" : "w-64"
+        'flex flex-col h-screen border-r border-border bg-card transition-[width] duration-200 ease-out z-30 hidden md:flex',
+        expanded ? 'w-56' : 'w-16'
       )}
     >
+      {/* Brand */}
       <div className="flex h-14 items-center justify-between px-4 border-b border-border shrink-0">
-        {!collapsed && (
-          <Link href="/app" className="font-display font-bold tracking-tight text-foreground truncate">
-            HANDICAPLAB
+        {expanded ? (
+          <Link href="/app" className="font-display font-bold tracking-tight text-foreground text-sm">
+            HandicapLab
           </Link>
-        )}
-        {collapsed && (
-          <Link href="/app" className="font-display font-bold text-foreground mx-auto">
-            HL
-          </Link>
+        ) : (
+          <span className="font-display font-bold text-foreground mx-auto tracking-tight text-sm">HL</span>
         )}
       </div>
 
-      <div className="flex-1 overflow-y-auto py-6 scrollbar-none">
-        {NAV_GROUPS.map((group, i) => (
-          <div key={group.label} className={cn("mb-8", collapsed ? "px-2" : "px-3")}>
-            {!collapsed && (
-              <h3 className="mb-3 px-3 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground font-mono">
-                {group.label}
-              </h3>
-            )}
-            <div className="space-y-0.5">
-              {group.items.map((item) => {
-                const isActive = pathname === item.href || (item.href !== '/app/dashboard' && pathname.startsWith(item.href));
-                return (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    title={collapsed ? item.name : undefined}
-                    className={cn(
-                      "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors border-l-2",
-                      isActive 
-                        ? "bg-muted text-foreground border-terracotta" 
-                        : "text-muted-foreground hover:bg-muted/50 hover:text-foreground border-transparent",
-                      collapsed && "justify-center px-0 border-l-0"
-                    )}
-                  >
-                    <item.icon className={cn("h-4 w-4 shrink-0", isActive ? "text-primary" : "")} />
-                    {!collapsed && <span>{item.name}</span>}
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-        ))}
+      {/* Navigation */}
+      <div className="flex-1 overflow-y-auto py-4 scrollbar-none">
+        <div className={cn('space-y-0.5', expanded ? 'px-3' : 'px-2')}>
+          {renderItems(NAV_ITEMS)}
+        </div>
+        <div className={cn('my-4 border-t border-border', expanded ? 'mx-4' : 'mx-2')} />
+        <div className={cn('space-y-0.5', expanded ? 'px-3' : 'px-2')}>
+          {renderItems(FOOTER_ITEMS)}
+        </div>
       </div>
 
+      {/* Pin toggle */}
       <div className="p-3 border-t border-border mt-auto">
         <button
-          onClick={toggleCollapse}
+          onClick={togglePin}
           className="flex w-full items-center justify-center rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
-          title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          title={pinned ? 'Unpin sidebar' : 'Pin sidebar'}
         >
-          {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-          {!collapsed && <span className="ml-2 text-sm font-medium">Collapse</span>}
+          {expanded ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
         </button>
       </div>
     </aside>

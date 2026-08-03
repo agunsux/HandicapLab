@@ -53,28 +53,28 @@
 }
 
 :root {
-  /* Epic Color Tokens */
-  --surface-void: #0D1219;
-  --surface-panel: #161D26;
-  --surface-raised: #202A36;
-  --surface-border: #2B3542;
+  /* Calm Dark Slate Palette */
+  --surface-void: #0F172A;
+  --surface-panel: #1E293B;
+  --surface-raised: #273449;
+  --surface-border: #334155;
 
-  --text-primary: #E8EBEF;
-  --text-muted: #8C96A6;
-  --text-faint: #5B6472;
+  --text-primary: #F1F5F9;
+  --text-muted: #94A3B8;
+  --text-faint: #64748B;
 
-  --action-blue: #3E8EF7;
-  --action-blue-hover: #5B9FF9;
+  --action-blue: #60A5FA;
+  --action-blue-hover: #7DB7FB;
 
-  --signal-positive: #2F9E6E;
-  --signal-positive-strong: #43C98A;
-  --signal-positive-bg: #12241C;
+  --signal-positive: #22C55E;
+  --signal-positive-strong: #4ADE80;
+  --signal-positive-bg: #12261B;
 
-  --accent-terracotta: #B5714F;
-  --accent-terracotta-muted: #8A5A42;
+  --accent-terracotta: #C2410C;
+  --accent-terracotta-muted: #9A3412;
 
-  --status-warning: #C9A15A;
-  --status-stale: #5B6472;
+  --status-warning: #D9A35C;
+  --status-stale: #64748B;
 
   /* Shadcn Mapping */
   --background: var(--surface-void);        

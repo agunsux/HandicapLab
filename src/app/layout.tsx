@@ -1,8 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter, Inter_Tight, IBM_Plex_Mono } from 'next/font/google';
 import './globals.css';
-import { Header } from '@/components/layout/Header';
-import { Footer } from '@/components/layout/Footer';
+import { NavigationChrome } from '@/components/layout/NavigationChrome';
 
 const sansFont = Inter({
   variable: '--font-sans',
@@ -65,11 +64,10 @@ export default function RootLayout({
       style={{ colorScheme: 'dark' }}
     >
       <body className="h-full bg-background text-foreground flex flex-col font-sans selection:bg-accent/30 selection:text-accent-foreground min-h-screen">
-        <Header />
+        <NavigationChrome />
         <main className="flex-1 flex flex-col">
           {children}
         </main>
-        <Footer />
       </body>
     </html>
   );
