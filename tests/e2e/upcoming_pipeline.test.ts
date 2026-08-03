@@ -29,6 +29,8 @@ describe('Upcoming Pipeline E2E', () => {
 
     expect(isReplayMode).toBe(true);
     expect(matchInput).toBeDefined();
+    
+    if (!matchInput) throw new Error("Match input should not be undefined");
 
     // 3. E2E Pipeline on Deterministic Data
     matchInput.matchId = 'replay-upcoming-123';

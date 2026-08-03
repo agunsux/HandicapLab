@@ -12,6 +12,7 @@ const NAV_ITEMS = [
   { href: '/live', label: "Today's Opportunities" },
   { href: '/markets', label: 'Markets' },
   { href: '/models', label: 'Models' },
+  { href: '/ledger', label: 'Public Ledger' },
   { href: '/performance', label: 'Performance' },
   { href: '/pricing', label: 'Pricing' },
   { href: '/blog', label: 'Blog' },

@@ -21,7 +21,11 @@ export class PerformanceAttribution {
     const isLoss = status === 'lost';
     
     const confidence = Number(signal.confidence || 0.75);
-    const odds = Number(signal.odds || 1.95);
+    const odds = Number(signal.odds);
+    if (isNaN(odds) || odds <= 1.0) {
+      console.warn('MISSING_ODDS: Cannot attribute performance without real odds.');
+      return;
+    }
     
     const confidenceBucket = this.getConfidenceBucket(confidence);
     const oddsRange = this.getOddsRange(odds);

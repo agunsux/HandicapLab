@@ -59,51 +59,19 @@ export class FootballIntelligenceService {
           kickoff = data.matches.kickoff;
         }
       }
-    } catch {
-      // Graceful fallback to mock prediction
+    } catch (err: unknown) {
+      console.error('[FootballIntelligenceService] getMatchIntelligence failed to fetch prediction:', err);
     }
-
     if (!rawPrediction) {
-      rawPrediction = {
-        id: 'mock-pred-1001',
-        match_id: matchId,
-        prediction: { pHome: 0.58, pDraw: 0.22, pAway: 0.20 },
-        model_version: 'ensemble-platt-v1',
-        feature_version: 'Gold_v1',
-        prediction_timestamp: kickoff
-      };
+      return null; // Return null if no real prediction exists
     }
 
-    // Default bookmaker odds snapshot if not provided
-    const oddsSnapshot: BookmakerOddsSnapshot = providedOdds || {
-      bookmaker: 'Pinnacle',
-      moneyline: {
-        home: { opening: 1.82, current: 1.84 },
-        draw: { opening: 3.50, current: 3.65 },
-        away: { opening: 4.80, current: 4.50 }
-      },
-      asianHandicap: {
-        '-0.25': {
-          home: { opening: 1.95, current: 1.98 },
-          away: { opening: 1.88, current: 1.85 }
-        }
-      },
-      overUnder: {
-        '2.5': {
-          over: { opening: 1.90, current: 1.88 },
-          under: { opening: 1.92, current: 1.95 }
-        }
-      },
-      btts: {
-        yes: { opening: 1.75, current: 1.72 },
-        no: { opening: 2.10, current: 2.15 }
-      },
-      doubleChance: {
-        homeDraw: { opening: 1.22, current: 1.25 },
-        awayDraw: { opening: 2.05, current: 2.00 },
-        homeAway: { opening: 1.28, current: 1.30 }
-      }
-    };
+    // Explicit rejection if no odds provided
+    if (!providedOdds) {
+      throw new Error('MISSING_ODDS: Real market odds are required for intelligence generation.');
+    }
+    
+    const oddsSnapshot: BookmakerOddsSnapshot = providedOdds;
 
     // 2. Perform Inference & Calibration (Prediction/Probability Engine)
     const t0 = performance.now();

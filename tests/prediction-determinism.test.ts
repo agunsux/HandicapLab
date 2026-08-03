@@ -54,7 +54,7 @@ describe('runPredictionCron determinism', () => {
     vi.clearAllMocks();
   });
 
-  it('should generate identical odds snapshots on multiple runs', async () => {
+  it('should deterministically enforce MISSING_ODDS canonical contract without synthetic fallback', async () => {
     const mockMatches = [
       { id: 'match_123', status: 'upcoming', kickoff: '2026-07-06T18:00:00Z', league_id: '39', league: 'Premier League' },
     ];
@@ -82,6 +82,13 @@ describe('runPredictionCron determinism', () => {
           };
         }),
         update: vi.fn().mockImplementation(() => {
+          return {
+            select: vi.fn().mockReturnThis(),
+            single: vi.fn().mockResolvedValue({ data: { id: 'new_pred_id' }, error: null }),
+            maybeSingle: vi.fn().mockResolvedValue({ data: { id: 'new_pred_id' }, error: null }),
+          };
+        }),
+        upsert: vi.fn().mockImplementation(() => {
           return {
             select: vi.fn().mockReturnThis(),
             single: vi.fn().mockResolvedValue({ data: { id: 'new_pred_id' }, error: null }),
@@ -158,12 +165,13 @@ describe('runPredictionCron determinism', () => {
 
     await runPredictionCron();
 
-    expect(collectedOddsHistory1.length).toBeGreaterThan(0);
-    expect(collectedOddsHistory2.length).toBe(collectedOddsHistory1.length);
+    // Assert that synthetic fallbacks were NOT generated
+    expect(collectedOddsHistory1.length).toBe(0);
+    expect(collectedOddsHistory2.length).toBe(0);
     
-    // Assert that the generated odds values are identical (proving determinism)
-    for (let i = 0; i < collectedOddsHistory1.length; i++) {
-      expect(collectedOddsHistory1[i].odds).toBe(collectedOddsHistory2[i].odds);
-    }
+    // Assert that the new canonical contract was followed for MISSING_ODDS
+    expect(mockFrom).toHaveBeenCalledWith('prediction_ledger');
+    expect(mockFrom).toHaveBeenCalledWith('prediction_decisions');
+    expect(mockFrom).toHaveBeenCalledWith('daily_picks');
   });
 });

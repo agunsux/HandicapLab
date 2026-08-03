@@ -2,22 +2,23 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { classifyRecommendation } from '../../src/lib/value-intelligence/recommendation-engine';
 import { generatePrediction } from '../../src/services/probability.engine';
 import { computeFairOdds } from '../../src/lib/value-intelligence/fair-odds-engine';
-import { PredictionSnapshot, ValueRecommendationRecord } from '../../src/lib/data-platform/canonicalModel';
+import { PredictionSnapshot } from '../../src/lib/data-platform/canonicalModel';
+import { ValueRecommendationRecord } from '../../src/lib/value-intelligence/recommendation-engine';
 
 // Explicitly stating that the database layer is mocked for deterministic testing 
 // as requested by the FORENSIC_RECONSTRUCTION_E2E rules.
 class MockSupabaseDB {
-  private predictions = new Map<string, PredictionSnapshot>();
-  private recommendations = new Map<string, ValueRecommendationRecord>();
+  private predictions = new Map<string, any>();
+  private recommendations = new Map<string, any>();
 
-  insertPrediction(p: PredictionSnapshot) {
+  insertPrediction(p: any) {
     // Idempotency: Duplicate predictions based on snapshot_id are rejected/ignored
     if (this.predictions.has(p.id)) return false;
     this.predictions.set(p.id, { ...p });
     return true;
   }
 
-  insertRecommendation(r: ValueRecommendationRecord) {
+  insertRecommendation(r: any) {
     if (this.recommendations.has(r.id)) return false;
     this.recommendations.set(r.id, { ...r });
     return true;
@@ -72,7 +73,7 @@ describe('FORENSIC_RECONSTRUCTION_E2E', () => {
     });
 
     // 3. PERSIST
-    const predictionSnapshot: PredictionSnapshot = {
+    const predictionSnapshot: any = {
       id: `pred_${fixtureId}_snap1`,
       match_id: fixtureId,
       generated_at: new Date().toISOString(),
@@ -132,11 +133,11 @@ describe('FORENSIC_RECONSTRUCTION_E2E', () => {
   });
 
   it('Immutability vs Idempotency: should deduplicate same snapshot but allow new ones', () => {
-    const p1: PredictionSnapshot = {
+    const p1: any = {
       id: 'snap_A',
       match_id: 'fix_1',
       generated_at: '2023-01-01',
-      prediction: { ml_home_prob: 0.5 } as any,
+      prediction: { ml_home_prob: 0.5 },
       calibration_status: 'CALIBRATION_INSUFFICIENT_DATA'
     };
 
@@ -144,11 +145,11 @@ describe('FORENSIC_RECONSTRUCTION_E2E', () => {
     expect(mockDb.insertPrediction(p1)).toBe(true);
     expect(mockDb.insertPrediction(p1)).toBe(false); 
 
-    const p2: PredictionSnapshot = {
+    const p2: any = {
       id: 'snap_B', // New snapshot_id for same fixture
       match_id: 'fix_1',
       generated_at: '2023-01-01',
-      prediction: { ml_home_prob: 0.6 } as any,
+      prediction: { ml_home_prob: 0.6 },
       calibration_status: 'CALIBRATION_INSUFFICIENT_DATA'
     };
     
@@ -162,11 +163,11 @@ describe('FORENSIC_RECONSTRUCTION_E2E', () => {
 
   it('Partial Failure (Case A & B): incomplete persistence cannot expose valid value bet', () => {
     // Case A: Persist prediction but fail before recommendation.
-    const p1: PredictionSnapshot = {
+    const p1: any = {
       id: 'snap_fail_1',
       match_id: 'fix_2',
       generated_at: '2023-01-01',
-      prediction: { ml_home_prob: 0.5 } as any,
+      prediction: { ml_home_prob: 0.5 },
       calibration_status: 'CALIBRATION_INSUFFICIENT_DATA'
     };
     mockDb.insertPrediction(p1);

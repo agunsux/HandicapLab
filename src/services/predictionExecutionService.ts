@@ -69,55 +69,62 @@ export class PredictionExecutionService {
         });
 
         // Determine selection and probabilities based on marketType
+        if (!oddsSnapshot) {
+          throw new Error('MISSING_ODDS: Cannot execute prediction without real market odds.');
+        }
+        
         let selection = 'home';
         let calibratedProb = predictionOutput.pHome;
-        let rawProb = predictionOutput.pHome; // approximation of raw/pre-calibrated for ledger
-        let marketOddsValue = oddsSnapshot ? (oddsSnapshot.homeOdds || 1.95) : 1.95;
+        let rawProb = predictionOutput.pHome; 
+        let marketOddsValue: number | undefined = oddsSnapshot.homeOdds;
 
         if (marketType === 'ML') {
-          // Select highest probability outcome
           if (predictionOutput.pDraw > predictionOutput.pHome && predictionOutput.pDraw > predictionOutput.pAway) {
             selection = 'draw';
             calibratedProb = predictionOutput.pDraw;
             rawProb = predictionOutput.pDraw;
-            marketOddsValue = oddsSnapshot ? (oddsSnapshot.drawOdds || 3.40) : 3.40;
+            marketOddsValue = oddsSnapshot.drawOdds;
           } else if (predictionOutput.pAway > predictionOutput.pHome && predictionOutput.pAway > predictionOutput.pDraw) {
             selection = 'away';
             calibratedProb = predictionOutput.pAway;
             rawProb = predictionOutput.pAway;
-            marketOddsValue = oddsSnapshot ? (oddsSnapshot.awayOdds || 2.80) : 2.80;
+            marketOddsValue = oddsSnapshot.awayOdds;
           }
         } else if (marketType === 'AH') {
-          const lineKey = oddsSnapshot && oddsSnapshot.line !== undefined ? String(oddsSnapshot.line) : '-0.5';
+          const lineKey = oddsSnapshot.line !== undefined ? String(oddsSnapshot.line) : '-0.5';
           const pH = predictionOutput.pAhHome[lineKey] || 0.5;
           const pA = predictionOutput.pAhAway[lineKey] || 0.5;
           if (pH >= pA) {
             selection = 'home';
             calibratedProb = pH;
             rawProb = pH;
-            marketOddsValue = oddsSnapshot ? (oddsSnapshot.homeOdds || 1.95) : 1.95;
+            marketOddsValue = oddsSnapshot.homeOdds;
           } else {
             selection = 'away';
             calibratedProb = pA;
             rawProb = pA;
-            marketOddsValue = oddsSnapshot ? (oddsSnapshot.awayOdds || 1.95) : 1.95;
+            marketOddsValue = oddsSnapshot.awayOdds;
           }
         } else {
           // Over Under
-          const lineKey = oddsSnapshot && oddsSnapshot.line !== undefined ? String(oddsSnapshot.line) : '2.5';
+          const lineKey = oddsSnapshot.line !== undefined ? String(oddsSnapshot.line) : '2.5';
           const pO = predictionOutput.pOver[lineKey] || 0.5;
           const pU = predictionOutput.pUnder[lineKey] || 0.5;
           if (pO >= pU) {
             selection = 'over';
             calibratedProb = pO;
             rawProb = pO;
-            marketOddsValue = oddsSnapshot ? (oddsSnapshot.homeOdds || 1.95) : 1.95;
+            marketOddsValue = oddsSnapshot.homeOdds;
           } else {
             selection = 'under';
             calibratedProb = pU;
             rawProb = pU;
-            marketOddsValue = oddsSnapshot ? (oddsSnapshot.awayOdds || 1.95) : 1.95;
+            marketOddsValue = oddsSnapshot.awayOdds;
           }
+        }
+
+        if (!marketOddsValue) {
+          throw new Error(`MISSING_ODDS: No odds available for selection ${selection} in market ${marketType}.`);
         }
 
         const ev = calibratedProb * marketOddsValue - 1.0;

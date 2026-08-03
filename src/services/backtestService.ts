@@ -95,15 +95,13 @@ export class BacktestService {
 
         const oddsMap: Record<string, number> = {};
         if (!bookOdds || bookOdds.length === 0) {
-          oddsMap['home'] = 1.95;
-          oddsMap['draw'] = 3.40;
-          oddsMap['away'] = 2.80;
-        } else {
-          // Get the latest odds captured before kickoff
-          const latestBook = bookOdds[bookOdds.length - 1];
-          for (const o of latestBook.market_odds || []) {
-            oddsMap[o.selection] = Number(o.decimal_odds);
-          }
+          continue; // MISSING_ODDS -> SKIP
+        }
+        
+        // Get the latest odds captured before kickoff
+        const latestBook = bookOdds[bookOdds.length - 1];
+        for (const o of latestBook.market_odds || []) {
+          oddsMap[o.selection] = Number(o.decimal_odds);
         }
 
         // Mock prediction probabilities representing model output at that time
@@ -114,7 +112,10 @@ export class BacktestService {
         };
 
         // Standard 1X2 Moneyline check
-        const homeOdds = oddsMap['home'] || 1.95;
+        const homeOdds = oddsMap['home'];
+        if (!homeOdds) {
+          continue; // MISSING_ODDS -> SKIP
+        }
         const rawEdge = mockProb.pHome * homeOdds - 1.0;
 
         if (rawEdge >= minEV) {

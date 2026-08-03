@@ -321,9 +321,11 @@ export class OddsPlatformService {
     // Calculate Consensus Overround
     const norm = OddsNormalizer.normalize(averages);
 
+    if (Object.keys(averages).length === 0) return;
+
     // Save consensus lines
-    const avgVal = Object.values(averages)[0] || 1.95;
-    const medVal = Object.values(medians)[0] || 1.95;
+    const avgVal = Object.values(averages)[0];
+    const medVal = Object.values(medians)[0];
 
     await supabase.from('consensus_lines').upsert({
       fixture_id: fixtureId,

@@ -180,14 +180,21 @@ describe('Cron Infrastructure', () => {
   });
 
   describe('Prediction Cron', () => {
-    it('runs prediction pipeline and stores prediction + snapshot', async () => {
+    it('handles MISSING_ODDS through canonical provenance chain', async () => {
       const result = await runPredictionCron();
       expect(result.success).toBe(true);
       expect(result.results.length).toBe(4); // ML, AH, OU, BTTS
-      expect(result.results[0].error).toBeUndefined();
-      expect(result.results[0].success).toBe(true);
-      expect(supabase.from).toHaveBeenCalledWith('predictions');
-      expect(supabase.from).toHaveBeenCalledWith('odds_history');
+      expect(result.results[0].error).toBe('MISSING_ODDS');
+      
+      // Validate provenance chain for SKIP
+      expect(supabase.from).toHaveBeenCalledWith('prediction_ledger');
+      expect(supabase.from).toHaveBeenCalledWith('prediction_decisions');
+      expect(supabase.from).toHaveBeenCalledWith('daily_picks');
+      
+      // Ensure synthetic odds did NOT bypass rejection (no models or trades generated)
+      // We can assert that the cron successfully completed its MISSING_ODDS logic for all markets
+      // We can assert that the cron successfully completed its MISSING_ODDS logic for all markets
+      expect(result.results.every((r: any) => r.error === 'MISSING_ODDS')).toBe(true);
     });
   });
 

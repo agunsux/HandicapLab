@@ -1,74 +1,104 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { classifyRecommendation } from '../../../../lib/value-intelligence/recommendation-engine';
-import { generateValueExplanation } from '../../../../lib/value-intelligence/explainability';
+import { supabase } from '../../../../lib/supabase.server';
+import { LEAGUE_REGISTRY } from '../../../../lib/crons/leagueRegistry';
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const category = searchParams.get('category') || undefined;
-    const league = searchParams.get('league') || undefined;
+    const leagueParam = searchParams.get('league') || undefined;
+    const timestamp = searchParams.get('timestamp') || undefined; // For REPLAY support
 
-    // Sample active fixtures for value intelligence recommendations
-    const mockFixtures = [
-      {
-        fixtureId: 'v-101',
-        league: 'Premier League',
-        season: '2025-2026',
-        homeTeam: 'Arsenal',
-        awayTeam: 'Chelsea',
-        kickoff: new Date(Date.now() + 7200000).toISOString(),
-        quote: { market: 'asian_handicap' as const, line: -0.5, priceHome: 1.98, priceAway: 1.92, bookmaker: 'pinnacle' },
-        selection: 'home' as const,
-        modelProb: 0.585,
-        confidence: 0.72,
-      },
-      {
-        fixtureId: 'v-102',
-        league: 'La Liga',
-        season: '2025-2026',
-        homeTeam: 'Real Madrid',
-        awayTeam: 'Barcelona',
-        kickoff: new Date(Date.now() + 10800000).toISOString(),
-        quote: { market: 'moneyline' as const, line: 0, priceHome: 2.15, priceDraw: 3.50, priceAway: 3.30, bookmaker: 'pinnacle' },
-        selection: 'home' as const,
-        modelProb: 0.525,
-        confidence: 0.68,
-      },
-      {
-        fixtureId: 'v-103',
-        league: 'Bundesliga',
-        season: '2025-2026',
-        homeTeam: 'Bayern Munich',
-        awayTeam: 'Dortmund',
-        kickoff: new Date(Date.now() + 14400000).toISOString(),
-        quote: { market: 'over_under' as const, line: 2.5, priceHome: 1.95, priceAway: 1.95, bookmaker: 'pinnacle' },
-        selection: 'over' as const,
-        modelProb: 0.590,
-        confidence: 0.74,
-      },
-    ];
+    // Base query on the materialized daily_picks view
+    let query = supabase
+      .from('daily_picks')
+      .select('*')
+      .eq('status', 'PENDING');
+      
+    // Point-in-time Replay vs Real Provider Run
+    if (timestamp) {
+      // Replay mode: only consider picks generated BEFORE the evaluation_time
+      query = query.lte('created_at', timestamp);
+    } else {
+      // Real provider run: only consider upcoming fixtures
+      query = query.gt('kickoff_utc', new Date().toISOString());
+    }
 
-    const recommendations = mockFixtures.map(f => {
-      const rec = classifyRecommendation(f);
-      const explanation = generateValueExplanation(rec);
+    if (leagueParam) {
+      query = query.ilike('league', leagueParam);
+    }
+
+    const { data: picks, error } = await query;
+
+    if (error) {
+      throw new Error(`Database error: ${error.message}`);
+    }
+
+    if (!picks) {
+      return NextResponse.json({ success: true, count: 0, data: [] });
+    }
+
+    // Filter valid fixtures through the League Registry to ensure they belong to active/supported leagues
+    const validLeagues = LEAGUE_REGISTRY.filter(l => l.status === 'ACTIVE' || l.status === 'BETA').map(l => l.name.toLowerCase());
+    
+    let filteredPicks = picks.filter(p => validLeagues.includes((p.league || '').toLowerCase()));
+
+    // Map daily_picks back to ValueRecommendationRecord interface
+    let recommendations = filteredPicks.map(p => {
+      // Map verdict back to category
+      let mappedCategory = 'PASS';
+      let actionable = false;
+      if (p.verdict === 'LAYAK') {
+        mappedCategory = p.edge_pct && p.edge_pct >= 4 ? 'STRONG_VALUE' : 'VALUE';
+        actionable = true;
+      } else if (p.verdict === 'PANTAU') {
+        mappedCategory = 'WATCHLIST';
+      } else {
+        mappedCategory = p.rejection_reason === 'MISSING_ODDS' ? 'PASS' : 'NO_VALUE';
+      }
+
+      const marketMapping: Record<string, string> = {
+        'MONEYLINE': 'moneyline',
+        'ASIAN_HANDICAP': 'asian_handicap',
+        'OVER_UNDER': 'over_under',
+        'BTTS': 'btts'
+      };
+
       return {
-        ...rec,
-        explanation,
+        id: p.id,
+        fixtureId: String(p.fixture_id),
+        league: p.league,
+        season: 'Current', // Not strictly stored in daily_picks, could be derived from date
+        homeTeam: p.home_team,
+        awayTeam: p.away_team,
+        kickoff: p.kickoff_utc,
+        market: marketMapping[p.market_type] || p.market_type,
+        selection: p.prediction,
+        line: 0, // Fallback since line is decoupled in DB right now
+        modelProb: p.model_probability || 0,
+        marketProb: p.market_odds ? (1 / p.market_odds) : 0,
+        probEdge: (p.edge_pct || 0) / 100,
+        modelFairOdds: p.fair_odds || 0,
+        bookmakerOdds: p.market_odds || 0,
+        expectedValue: (p.edge_pct || 0) / 100, // edge_pct correlates directly to EV here
+        clvProjection: ((p.edge_pct || 0) / 100) * 0.65,
+        category: mappedCategory,
+        confidence: (p.confidence || 0) / 100,
+        confidenceBucket: (p.confidence || 0) >= 70 ? 'HIGH' : ((p.confidence || 0) >= 58 ? 'MEDIUM' : 'LOW'),
+        actionable,
+        reason: p.reasoning || (p as any).rejection_reason || '',
+        evidence: { cohortSize: 0, historicWinRate: 0, historicRoi: 0, significance: 'NOT_YET_VALIDATED' } // Calibration
       };
     });
 
-    let filtered = recommendations;
     if (category) {
-      filtered = filtered.filter(r => r.category === category);
-    }
-    if (league) {
-      filtered = filtered.filter(r => r.league.toLowerCase() === league.toLowerCase());
+      recommendations = recommendations.filter(r => r.category === category);
     }
 
     return NextResponse.json({
       success: true,
-      count: filtered.length,
-      data: filtered,
+      count: recommendations.length,
+      data: recommendations,
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);

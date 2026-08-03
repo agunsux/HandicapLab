@@ -28,7 +28,8 @@ export class StrategyDecayMonitor {
     for (const sig of signals) {
       const isWin = sig.status === 'won';
       const isLoss = sig.status === 'lost';
-      const odds = Number(sig.odds || 1.95);
+      const odds = Number(sig.odds);
+      if (isNaN(odds) || odds <= 1.0) continue; // MISSING_ODDS -> SKIP
       const clv = Number(sig.clv_percentage !== null ? sig.clv_percentage : (sig.clv !== null ? sig.clv * 100 : 0));
 
       if (isWin) {

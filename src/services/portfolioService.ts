@@ -103,20 +103,24 @@ export class PortfolioService {
       const candidatesList = Array.from(uniqueMatchCandidates.values());
 
       // Map to CandidateEdge format
-      const optimizerInput: CandidateEdge[] = candidatesList.map(e => {
+      const optimizerInput: CandidateEdge[] = candidatesList.reduce((acc, e) => {
         const explanation = e.explanation_json || {};
         const oddsInfo = explanation.oddsInfo as Record<string, unknown> | undefined;
-        const odds = Number(oddsInfo?.odds || 1.95);
-        return {
-          matchId: e.match_id,
-          league: e.matches?.league || 'Unknown League',
-          kickoff: e.matches?.kickoff || new Date().toISOString(),
-          bookmaker: e.bookmaker,
-          odds,
-          probability: e.model_probability,
-          expectedValue: e.expected_value
-        };
-      });
+        const odds = Number(oddsInfo?.odds);
+        
+        if (!isNaN(odds) && odds > 1.0) {
+          acc.push({
+            matchId: e.match_id,
+            league: e.matches?.league || 'Unknown League',
+            kickoff: e.matches?.kickoff || new Date().toISOString(),
+            bookmaker: e.bookmaker,
+            odds,
+            probability: e.model_probability,
+            expectedValue: e.expected_value
+          });
+        }
+        return acc;
+      }, [] as CandidateEdge[]);
 
       // 2. Compute stakes using optimizer model
       let allocations: StakingAllocation[] = [];

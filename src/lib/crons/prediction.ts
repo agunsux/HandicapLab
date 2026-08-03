@@ -91,7 +91,60 @@ export async function runPredictionCron(): Promise<any> {
                 oddsSnapshot: { bookmaker: 'pinnacle' }
               });
 
-              const marketOdds = await generateOddsSnapshot(match.id, marketType, probOutput);
+              const marketOdds = await generateOddsSnapshot(match.id, marketType);
+              
+              let mappedMarketType = marketType === 'ML' ? 'MONEYLINE' : (marketType === 'AH' ? 'ASIAN_HANDICAP' : (marketType === 'OU' ? 'OVER_UNDER' : 'BTTS'));
+
+              if (!marketOdds) {
+                // Record MISSING_ODDS rejection cleanly through canonical lineage
+                const { data: ledgerEntry, error: ledgerErr } = await supabase
+                  .from('prediction_ledger')
+                  .upsert({
+                    match_id: String(match.id),
+                    competition_id: leagueConfig.apiFootballId,
+                    market: marketType,
+                    decision: 'SKIP',
+                    decision_reason: 'MISSING_ODDS',
+                    model_version: 'prematch-v1'
+                  }, { onConflict: 'match_id, market' })
+                  .select('id')
+                  .maybeSingle();
+
+                if (ledgerErr) {
+                  console.error('Error upserting prediction_ledger for MISSING_ODDS:', ledgerErr);
+                }
+                
+                const ledgerId = ledgerEntry?.id;
+
+                if (ledgerId) {
+                  await supabase
+                    .from('prediction_decisions')
+                    .upsert({
+                      prediction_ledger_id: ledgerId,
+                      decision: 'SKIP',
+                      reason_category: 'MISSING_ODDS',
+                      reason_text: 'Missing market odds in snapshot.'
+                    }, { onConflict: 'prediction_ledger_id' });
+                }
+
+                await supabase.from('daily_picks').upsert({
+                  fixture_id: String(match.id),
+                  league: match.league,
+                  home_team: match.home_team,
+                  away_team: match.away_team,
+                  kickoff_utc: match.kickoff,
+                  market_type: mappedMarketType,
+                  verdict: 'LEWATI',
+                  reasoning: 'Missing market odds in snapshot.',
+                  rejection_reason: 'MISSING_ODDS',
+                  status: 'PENDING',
+                  source: 'live'
+                }, { onConflict: 'fixture_id, market_type, source' });
+                
+                results.push({ matchId: match.id, marketType, error: 'MISSING_ODDS' });
+                return; // Gracefully skip this market
+              }
+
               const picks = EdgeScanner.scan(match.id, marketType, probOutput, marketOdds);
               const topPick = picks[0];
 
@@ -283,20 +336,10 @@ export async function runPredictionCron(): Promise<any> {
               });
 
               // 10. Insert into daily_picks (EPIC 58)
-              // Generate deterministic BIGINT from match.id
-              let hash = 0;
-              const strId = String(match.id);
-              for (let j = 0; j < strId.length; j++) {
-                hash = ((hash << 5) - hash) + strId.charCodeAt(j);
-                hash = hash & hash;
-              }
-              const fixtureBigInt = Math.abs(hash) + 1000000000;
-
-              // Map market type to daily_picks enum
-              let mappedMarketType = marketType === 'ML' ? 'MONEYLINE' : (marketType === 'AH' ? 'ASIAN_HANDICAP' : (marketType === 'OU' ? 'OVER_UNDER' : 'BTTS'));
+              // Map market type to daily_picks enum (mappedMarketType already defined above)
 
               const dailyPickPayload = {
-                fixture_id: fixtureBigInt,
+                fixture_id: String(match.id),
                 league: match.league,
                 home_team: match.home_team,
                 away_team: match.away_team,
@@ -331,7 +374,7 @@ export async function runPredictionCron(): Promise<any> {
   return { success: true, results };
 }
 
-async function generateOddsSnapshot(matchId: string, marketType: 'ML' | 'AH' | 'OU' | 'BTTS', prob: any): Promise<MarketOdds> {
+async function generateOddsSnapshot(matchId: string, marketType: 'ML' | 'AH' | 'OU' | 'BTTS'): Promise<MarketOdds | null> {
   // Try to load real odds from database
   const { data: dbOdds } = await supabase
     .from('odds_snapshots')
@@ -352,39 +395,6 @@ async function generateOddsSnapshot(matchId: string, marketType: 'ML' | 'AH' | '
     };
   }
 
-  // Deterministic seeded fallback deviation (using matchId + marketType hash)
-  const seedString = `${matchId}_${marketType}`;
-  const hash = crypto.createHash('md5').update(seedString).digest('hex');
-  const seedValue = parseInt(hash.substring(0, 8), 16) / 0xffffffff;
-  const deviation = 0.92 + seedValue * 0.18;
-
-  if (marketType === 'ML') {
-    return {
-      bookmaker: 'pinnacle',
-      homeOdds: Number((1 / (prob.pHome * deviation)).toFixed(2)),
-      drawOdds: Number((1 / (prob.pDraw * deviation)).toFixed(2)),
-      awayOdds: Number((1 / (prob.pAway * deviation)).toFixed(2)),
-    };
-  } else if (marketType === 'AH') {
-    return {
-      bookmaker: 'pinnacle',
-      line: -0.5,
-      homeOdds: Number((1 / ((prob.pAhHome['-0.5'] || 0.5) * deviation)).toFixed(2)),
-      awayOdds: Number((1 / ((prob.pAhAway['-0.5'] || 0.5) * deviation)).toFixed(2)),
-    };
-  } else if (marketType === 'OU') {
-    return {
-      bookmaker: 'pinnacle',
-      line: 2.5,
-      homeOdds: Number((1 / ((prob.pOver['2.5'] || 0.5) * deviation)).toFixed(2)),
-      awayOdds: Number((1 / ((prob.pUnder['2.5'] || 0.5) * deviation)).toFixed(2)),
-    };
-  } else {
-    // BTTS
-    return {
-      bookmaker: 'pinnacle',
-      homeOdds: Number((1 / ((prob.pBttsYes || 0.5) * deviation)).toFixed(2)),
-      awayOdds: Number((1 / ((prob.pBttsNo || 0.5) * deviation)).toFixed(2)), // We store Yes in home, No in away for fallback
-    };
-  }
+  // REAL_PROVIDER_RUN: No fallback. If odds are missing, we explicitly return null to reject.
+  return null;
 }
