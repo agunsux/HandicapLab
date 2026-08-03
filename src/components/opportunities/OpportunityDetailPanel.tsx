@@ -28,9 +28,9 @@ export function OpportunityDetailPanel({ opportunity, isOpen, onClose }: Opportu
 
   const getSignalConfig = (signal: string) => {
     switch (signal) {
-      case 'VALUE': return { color: 'text-[#75B58B]', bg: 'bg-[#75B58B]/10', icon: CheckCircle2 };
-      case 'WATCH': return { color: 'text-[#C89B61]', bg: 'bg-[#C89B61]/10', icon: AlertTriangle };
-      case 'PASS': default: return { color: 'text-muted-foreground', bg: 'bg-muted/30', icon: MinusCircle };
+      case 'VALUE': return { color: 'text-signal-positive', bg: 'bg-signal-positive-bg border-signal-positive/20', icon: CheckCircle2 };
+      case 'WATCH': return { color: 'text-signal-watch', bg: 'bg-signal-watch-bg border-signal-watch/20', icon: AlertTriangle };
+      case 'PASS': default: return { color: 'text-muted-foreground', bg: 'bg-muted/30 border-border', icon: MinusCircle };
     }
   };
 
@@ -55,25 +55,25 @@ export function OpportunityDetailPanel({ opportunity, isOpen, onClose }: Opportu
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed inset-y-0 right-0 w-full max-w-md bg-card border-l border-border z-50 shadow-2xl flex flex-col"
+            className="fixed inset-y-0 right-0 w-full max-w-md bg-card border-l border-border z-50 shadow-2xl flex flex-col font-sans"
           >
-            <div className="flex items-start justify-between p-4 md:p-6 border-b border-border bg-card shrink-0">
+            <div className="flex items-start justify-between p-6 border-b border-border bg-card shrink-0">
               <div>
-                <div className="flex items-center gap-2 mb-2">
+                <div className="flex items-center gap-3 mb-3">
                   <div className={cn(
-                    "px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 rounded",
+                    "px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest flex items-center gap-1 rounded border",
                     signalConfig.bg,
                     signalConfig.color
                   )}>
                     <SignalIcon className="w-3 h-3" />
                     {opportunity.isStale ? 'STALE' : opportunity.signal}
                   </div>
-                  <span className="text-xs font-mono text-muted-foreground">{opportunity.league}</span>
+                  <span className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">{opportunity.league}</span>
                 </div>
-                <h2 className="text-lg md:text-xl font-bold tracking-tight text-foreground leading-tight">
+                <h2 className="text-xl font-display font-bold tracking-tight text-foreground leading-tight mb-1">
                   {opportunity.match}
                 </h2>
-                <div className="text-xs text-muted-foreground mt-1">
+                <div className="text-xs font-mono text-muted-foreground uppercase tracking-widest">
                   {opportunity.time}
                 </div>
               </div>
@@ -82,33 +82,33 @@ export function OpportunityDetailPanel({ opportunity, isOpen, onClose }: Opportu
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
+            <div className="flex-1 overflow-y-auto p-6 space-y-8">
               
               {/* Core Opportunity Box */}
-              <div className="bg-background rounded-lg p-4 border border-border">
-                <div className="text-xs font-mono text-muted-foreground uppercase tracking-wide mb-1">
+              <div className="bg-background rounded-lg p-5 border border-border shadow-elevation-1">
+                <div className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest mb-1.5">
                   Target Selection
                 </div>
-                <div className="text-xl font-bold text-foreground mb-4">
+                <div className="text-xl font-medium text-foreground mb-6 font-display">
                   {opportunity.selection} <span className="text-muted-foreground font-normal text-base ml-1">({opportunity.market})</span>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border/50">
+                <div className="grid grid-cols-2 gap-y-6 gap-x-4 pt-5 border-t border-border">
                   <div>
-                    <div className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mb-1">Model Probability</div>
-                    <div className="font-mono font-medium text-foreground">{(opportunity.modelProb * 100).toFixed(1)}%</div>
+                    <div className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest mb-1.5">Model Prob</div>
+                    <div className="font-mono font-medium text-foreground text-sm">{(opportunity.modelProb * 100).toFixed(1)}%</div>
                   </div>
                   <div>
-                    <div className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mb-1">Fair Odds</div>
-                    <div className="font-mono font-medium text-foreground">{opportunity.fairOdds.toFixed(2)}</div>
+                    <div className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest mb-1.5">Fair Odds</div>
+                    <div className="font-mono font-medium text-foreground text-sm">{opportunity.fairOdds.toFixed(2)}</div>
                   </div>
                   <div>
-                    <div className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mb-1">Market Odds</div>
-                    <div className="font-mono font-bold text-foreground">{opportunity.marketOdds.toFixed(2)}</div>
+                    <div className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest mb-1.5">Market Odds</div>
+                    <div className="font-mono font-bold text-foreground text-sm">{opportunity.marketOdds.toFixed(2)}</div>
                   </div>
                   <div>
-                    <div className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider mb-1">Expected Value</div>
-                    <div className={cn("font-mono font-bold", opportunity.ev > 0 ? "text-[#75B58B]" : "text-muted-foreground")}>
+                    <div className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest mb-1.5">Expected Value</div>
+                    <div className={cn("font-mono font-bold text-sm", opportunity.ev > 0 ? "text-signal-positive" : "text-muted-foreground")}>
                       {opportunity.ev > 0 ? '+' : ''}{opportunity.ev.toFixed(2)}%
                     </div>
                   </div>
@@ -117,24 +117,24 @@ export function OpportunityDetailPanel({ opportunity, isOpen, onClose }: Opportu
 
               {/* Data Quality & Diagnostics */}
               <div className="space-y-4">
-                <h3 className="text-xs font-mono font-semibold uppercase tracking-wider text-muted-foreground">Diagnostics & Quality</h3>
+                <h3 className="text-[10px] font-mono font-bold uppercase tracking-widest text-muted-foreground">Diagnostics & Quality</h3>
                 
                 <div className="space-y-3">
-                  <div className="flex items-start gap-3 p-3 rounded bg-muted/30 border border-border/50">
+                  <div className="flex items-start gap-4 p-4 rounded bg-background border border-border">
                     <Activity className="w-4 h-4 text-primary mt-0.5" />
                     <div>
-                      <div className="text-sm font-medium text-foreground">Data Freshness</div>
-                      <div className="text-xs text-muted-foreground mt-1">
+                      <div className="text-sm font-medium text-foreground mb-1">Data Freshness</div>
+                      <div className="text-xs text-muted-foreground leading-relaxed">
                         Odds snapshot recorded {Math.floor(Math.random() * 15) + 1} minutes ago. Pipeline state verified.
                       </div>
                     </div>
                   </div>
                   
-                  <div className="flex items-start gap-3 p-3 rounded bg-muted/30 border border-border/50">
-                    <BarChart2 className="w-4 h-4 text-[#C89B61] mt-0.5" />
+                  <div className="flex items-start gap-4 p-4 rounded bg-background border border-border">
+                    <BarChart2 className="w-4 h-4 text-signal-watch mt-0.5" />
                     <div>
-                      <div className="text-sm font-medium text-foreground">Calibration Status</div>
-                      <div className="text-xs text-muted-foreground mt-1">
+                      <div className="text-sm font-medium text-foreground mb-1">Calibration Status</div>
+                      <div className="text-xs font-mono text-muted-foreground bg-muted inline-block px-1.5 py-0.5 rounded mt-1">
                         CALIBRATION_INSUFFICIENT_DATA
                       </div>
                     </div>
@@ -143,11 +143,11 @@ export function OpportunityDetailPanel({ opportunity, isOpen, onClose }: Opportu
               </div>
               
               {/* Action */}
-              <div className="pt-6 border-t border-border">
+              <div className="pt-8 border-t border-border">
                 <button 
                   className={cn(
-                    "w-full py-3 rounded-md text-sm font-bold flex items-center justify-center transition-colors",
-                    opportunity.signal === 'VALUE' ? "bg-foreground text-background hover:bg-foreground/90" : "bg-muted text-muted-foreground cursor-not-allowed"
+                    "w-full py-3.5 rounded-md text-sm font-medium flex items-center justify-center transition-colors font-display tracking-wide",
+                    opportunity.signal === 'VALUE' ? "bg-primary text-primary-foreground hover:bg-action-blue-hover" : "bg-muted text-muted-foreground cursor-not-allowed border border-border"
                   )}
                   disabled={opportunity.signal !== 'VALUE'}
                 >

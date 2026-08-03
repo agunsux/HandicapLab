@@ -14,7 +14,8 @@ import {
   ChevronLeft,
   ChevronRight,
   TrendingUp,
-  CircleDot
+  CircleDot,
+  User
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -31,33 +32,16 @@ interface NavGroup {
 
 const NAV_GROUPS: NavGroup[] = [
   {
-    label: 'CORE',
+    label: 'CORE INTELLIGENCE',
     items: [
-      { name: 'Overview', href: '/app', icon: LayoutDashboard },
-      { name: 'Opportunities', href: '/app/picks', icon: Target },
-      { name: 'Matches', href: '/app/matches', icon: Trophy },
+      { name: 'Terminal Dashboard', href: '/app/dashboard', icon: LayoutDashboard },
+      { name: 'Value Opportunities', href: '/app/picks', icon: Target },
     ],
   },
   {
-    label: 'MARKETS',
+    label: 'PERFORMANCE',
     items: [
-      { name: 'Moneyline', href: '/app/markets/moneyline', icon: CircleDot },
-      { name: 'Asian Handicap', href: '/app/markets/asian-handicap', icon: TrendingUp },
-      { name: 'Over / Under', href: '/app/markets/over-under', icon: Activity },
-    ],
-  },
-  {
-    label: 'INTELLIGENCE',
-    items: [
-      { name: 'Performance', href: '/app/ledger', icon: BarChart2 },
-      { name: 'Model', href: '/app/analysis', icon: Activity },
-      { name: 'Research', href: '/research', icon: BookOpen },
-    ],
-  },
-  {
-    label: 'ACCOUNT',
-    items: [
-      { name: 'Profile', href: '/app/settings', icon: Settings },
+      { name: 'Track Record & CLV', href: '/app/performance', icon: BarChart2 },
     ],
   },
 ];
@@ -82,45 +66,45 @@ export function Sidebar({ collapsed, setCollapsed }: { collapsed: boolean, setCo
   return (
     <aside 
       className={cn(
-        "flex flex-col h-screen border-r border-border bg-background transition-all duration-300 z-20 hidden md:flex",
+        "flex flex-col h-screen border-r border-border bg-card transition-all duration-300 z-20 hidden md:flex",
         collapsed ? "w-16" : "w-64"
       )}
     >
       <div className="flex h-14 items-center justify-between px-4 border-b border-border shrink-0">
         {!collapsed && (
-          <Link href="/app" className="font-mono font-bold tracking-tight text-foreground truncate">
+          <Link href="/app" className="font-display font-bold tracking-tight text-foreground truncate">
             HANDICAPLAB
           </Link>
         )}
         {collapsed && (
-          <Link href="/app" className="font-mono font-bold text-foreground mx-auto">
+          <Link href="/app" className="font-display font-bold text-foreground mx-auto">
             HL
           </Link>
         )}
       </div>
 
-      <div className="flex-1 overflow-y-auto py-4 scrollbar-none">
+      <div className="flex-1 overflow-y-auto py-6 scrollbar-none">
         {NAV_GROUPS.map((group, i) => (
-          <div key={group.label} className={cn("mb-6", collapsed ? "px-2" : "px-4")}>
+          <div key={group.label} className={cn("mb-8", collapsed ? "px-2" : "px-3")}>
             {!collapsed && (
-              <h3 className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+              <h3 className="mb-3 px-3 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground font-mono">
                 {group.label}
               </h3>
             )}
-            <div className="space-y-1">
+            <div className="space-y-0.5">
               {group.items.map((item) => {
-                const isActive = pathname === item.href || (item.href !== '/app' && pathname.startsWith(item.href));
+                const isActive = pathname === item.href || (item.href !== '/app/dashboard' && pathname.startsWith(item.href));
                 return (
                   <Link
                     key={item.name}
                     href={item.href}
                     title={collapsed ? item.name : undefined}
                     className={cn(
-                      "flex items-center gap-3 rounded-md px-2 py-2 text-sm font-medium transition-colors",
+                      "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors border-l-2",
                       isActive 
-                        ? "bg-muted text-foreground" 
-                        : "text-muted-foreground hover:bg-muted/50 hover:text-foreground",
-                      collapsed && "justify-center"
+                        ? "bg-muted text-foreground border-terracotta" 
+                        : "text-muted-foreground hover:bg-muted/50 hover:text-foreground border-transparent",
+                      collapsed && "justify-center px-0 border-l-0"
                     )}
                   >
                     <item.icon className={cn("h-4 w-4 shrink-0", isActive ? "text-primary" : "")} />

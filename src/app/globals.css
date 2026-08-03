@@ -31,10 +31,15 @@
 
   /* Semantic accent palette */
   --color-terracotta: var(--accent-terracotta);
-  --color-positive: var(--accent-positive);
-  --color-warning: var(--accent-warning);
-  --color-error: var(--accent-error);
-  --color-muted-green: var(--accent-muted-green);
+  --color-terracotta-muted: var(--accent-terracotta-muted);
+  
+  /* Signal colors */
+  --color-signal-positive: var(--signal-positive);
+  --color-signal-positive-strong: var(--signal-positive-strong);
+  --color-signal-positive-bg: var(--signal-positive-bg);
+  
+  --color-status-warning: var(--status-warning);
+  --color-status-stale: var(--status-stale);
 
   /* Elevation */
   --shadow-elevation-1: 0 1px 2px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.2);
@@ -48,49 +53,59 @@
 }
 
 :root {
-  /*
-   * HandicapLab v4 — "Professional Betting Intelligence Terminal"
-   * Dark Smoky Blue / near-black background
-   */
-  --background: #0B1117;        
-  --foreground: #E8ECEB;        
+  /* Epic Color Tokens */
+  --surface-void: #0D1219;
+  --surface-panel: #161D26;
+  --surface-raised: #202A36;
+  --surface-border: #2B3542;
 
-  --card: #111A22;              /* Surface */
-  --card-foreground: #E8ECEB;
+  --text-primary: #E8EBEF;
+  --text-muted: #8C96A6;
+  --text-faint: #5B6472;
 
-  --popover: #17232C;           /* Secondary Surface */
-  --popover-foreground: #E8ECEB;
+  --action-blue: #3E8EF7;
+  --action-blue-hover: #5B9FF9;
 
-  --border: #24333D;            
-  --input: #17232C;
-  --ring: rgba(117, 181, 139, 0.35); /* Positive Green */
+  --signal-positive: #2F9E6E;
+  --signal-positive-strong: #43C98A;
+  --signal-positive-bg: #12241C;
 
-  /* Primary */
-  --primary: #8D9AA1;           /* Secondary Text as neutral primary */
-  --primary-foreground: #0B1117;
+  --accent-terracotta: #B5714F;
+  --accent-terracotta-muted: #8A5A42;
 
-  /* Secondary */
-  --secondary: #17232C;
-  --secondary-foreground: #E8ECEB;
+  --status-warning: #C9A15A;
+  --status-stale: #5B6472;
 
-  --muted: #111A22;
-  --muted-foreground: #8D9AA1;  /* Secondary Text */
+  /* Shadcn Mapping */
+  --background: var(--surface-void);        
+  --foreground: var(--text-primary);        
 
-  /* Accent */
-  --accent: #17232C;
-  --accent-foreground: #E8ECEB;
+  --card: var(--surface-panel);
+  --card-foreground: var(--text-primary);
 
-  --destructive: #B96D68;       /* Error */
+  --popover: var(--surface-panel);
+  --popover-foreground: var(--text-primary);
+
+  --border: var(--surface-border);            
+  --input: var(--surface-panel);
+  --ring: var(--action-blue);
+
+  --primary: var(--action-blue);
+  --primary-foreground: #FFFFFF;
+
+  --secondary: var(--surface-raised);
+  --secondary-foreground: var(--text-primary);
+
+  --muted: var(--surface-raised);
+  --muted-foreground: var(--text-muted);
+
+  --accent: var(--surface-raised);
+  --accent-foreground: var(--text-primary);
+
+  --destructive: #B96D68;
   --destructive-foreground: #0B1117;
 
-  /* Semantic accent tokens */
-  --accent-terracotta: #C8785F;
-  --accent-positive: #75B58B;
-  --accent-warning: #C89B61;
-  --accent-error: #B96D68;
-  --accent-muted-green: #5F9F78;
-
-  /* Premium rounded corners 4-8px for more restrained analytical feel */
+  /* Premium rounded corners */
   --radius: 0.5rem;
 }
 

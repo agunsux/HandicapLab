@@ -31,7 +31,7 @@ export function TopBar() {
         
         <button className="text-muted-foreground hover:text-foreground transition-colors p-1 relative">
           <Bell className="w-5 h-5" />
-          <span className="absolute top-1 right-1 w-2 h-2 bg-accent-terracotta rounded-full"></span>
+          <span className="absolute top-1 right-1 w-2 h-2 bg-terracotta rounded-full"></span>
         </button>
         
         <div className="h-8 w-8 rounded-full bg-secondary border border-border flex items-center justify-center text-secondary-foreground cursor-pointer hover:border-primary/50 transition-colors">

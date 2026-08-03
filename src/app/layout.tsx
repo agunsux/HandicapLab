@@ -1,11 +1,17 @@
 import type { Metadata } from 'next';
-import { Inter, IBM_Plex_Mono } from 'next/font/google';
+import { Inter, Inter_Tight, IBM_Plex_Mono } from 'next/font/google';
 import './globals.css';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 
 const sansFont = Inter({
   variable: '--font-sans',
+  subsets: ['latin'],
+  display: 'swap',
+});
+
+const displayFont = Inter_Tight({
+  variable: '--font-display',
   subsets: ['latin'],
   display: 'swap',
 });
@@ -55,10 +61,10 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${sansFont.variable} ${monoFont.variable} dark h-full antialiased`}
+      className={`${sansFont.variable} ${displayFont.variable} ${monoFont.variable} dark h-full antialiased`}
       style={{ colorScheme: 'dark' }}
     >
-      <body className="h-full bg-background text-foreground flex flex-col font-sans selection:bg-[var(--accent)]/30 selection:text-accent-foreground min-h-screen">
+      <body className="h-full bg-background text-foreground flex flex-col font-sans selection:bg-accent/30 selection:text-accent-foreground min-h-screen">
         <Header />
         <main className="flex-1 flex flex-col">
           {children}
