@@ -122,10 +122,11 @@ export class LedgerV2Service {
         id: predictionUuid, // Backward compatibility PK
         prediction_uuid: predictionUuid,
         match_id: String(match.id),
-        kickoff_time: match.kickoff || match.kickoff_time,
+        fixture_id: String(match.id), // Added for 0035 migration compatibility
+        kickoff_time: match.kickoff || match.kickoff_time || new Date().toISOString(),
         snapshot_time: snapshotTime,
-        league: match.league,
-        season: match.season,
+        league: match.league || 'unknown',
+        season: match.season ? String(match.season) : '2024',
         market: marketType === 'ML' ? 'moneyline' : marketType === 'AH' ? 'asian_handicap' : marketType === 'OU' ? 'over_under' : 'btts',
         selection: topPick ? topPick.outcome : null,
         line: marketOdds.line !== undefined ? String(marketOdds.line) : null,
@@ -133,14 +134,32 @@ export class LedgerV2Service {
         opening_odds: topPick ? Number(topPick.marketOdds) : null,
         closing_odds: null,
         
+        // Old 0003 columns
         probability_home: probOutput.pHome,
         probability_draw: probOutput.pDraw,
         probability_away: probOutput.pAway,
-        expected_goals_home: (typeof probOutput.expectedGoals === 'object' && probOutput.expectedGoals !== null) ? (probOutput.expectedGoals as { home: number; away: number }).home : null,
-        expected_goals_away: (typeof probOutput.expectedGoals === 'object' && probOutput.expectedGoals !== null) ? (probOutput.expectedGoals as { home: number; away: number }).away : null,
+        expected_goals_home: (typeof probOutput.expectedGoals === 'object' && probOutput.expectedGoals !== null) ? (probOutput.expectedGoals as { home: number; away: number }).home : 0,
+        expected_goals_away: (typeof probOutput.expectedGoals === 'object' && probOutput.expectedGoals !== null) ? (probOutput.expectedGoals as { home: number; away: number }).away : 0,
         confidence_score: probOutput.confidence ? Number(probOutput.confidence.confidenceScore) : null,
         data_quality_score: probOutput.confidence ? Number(probOutput.confidence.dataQualityScore) : null,
         recommendation_label: convictionLabel,
+        
+        // 0035 columns
+        home_team: match.homeTeam || match.home_team || 'home',
+        away_team: match.awayTeam || match.away_team || 'away',
+        kickoff: match.kickoff || match.kickoff_time || new Date().toISOString(),
+        feature_version: '1.0.0',
+        calibration_version: '1.0.0',
+        research_manifest_version: '1.0.0',
+        prediction_timestamp: snapshotTime,
+        home_prob: probOutput.pHome,
+        draw_prob: probOutput.pDraw,
+        away_prob: probOutput.pAway,
+        expected_value: 0,
+        idempotency_key: `${predictionUuid}-${snapshotTime}`,
+        correlation_id: predictionUuid,
+        input_hash: hashFingerprint || 'hash',
+        chain_hash: 'hash',
         
         model_version: 'prematch-v1',
         engine_version: '1.0.0',
@@ -180,7 +199,7 @@ export class LedgerV2Service {
           expected_goals: probOutput.expectedGoals,
           confidence: probOutput.confidence
         },
-        confidence: probOutput.confidence ? Math.round(probOutput.confidence.finalConfidence * 100) : null,
+        confidence: probOutput.confidence ? Math.round(probOutput.confidence.finalConfidence * 100) : 0,
         
         created_by: 'cron',
         source_system: 'handicaplab',
