@@ -32,8 +32,8 @@ export function OpportunitiesTable({ data, previewMode = false }: OpportunitiesT
 
   const getSignalConfig = (signal: string) => {
     switch (signal) {
-      case 'VALUE': return { color: 'text-signal-positive', bg: 'bg-signal-positive-bg border-signal-positive/20', icon: CheckCircle2 };
-      case 'WATCH': return { color: 'text-signal-watch', bg: 'bg-signal-watch-bg border-signal-watch/20', icon: AlertTriangle };
+      case 'VALUE': return { color: 'text-signal-high', bg: 'bg-signal-high-bg border-signal-high', icon: CheckCircle2 };
+      case 'WATCH': return { color: 'text-signal-medium', bg: 'bg-signal-medium-bg border-signal-medium', icon: AlertTriangle };
       case 'PASS': default: return { color: 'text-muted-foreground', bg: 'bg-muted/30 border-border', icon: MinusCircle };
     }
   };
@@ -58,7 +58,6 @@ export function OpportunitiesTable({ data, previewMode = false }: OpportunitiesT
         <tbody className="divide-y divide-border font-mono text-[11px] sm:text-xs">
           {data.map((opp) => {
             const signalConfig = getSignalConfig(opp.signal);
-            const SignalIcon = signalConfig.icon;
             
             return (
               <tr 
@@ -91,20 +90,25 @@ export function OpportunitiesTable({ data, previewMode = false }: OpportunitiesT
                 </td>
                 <td className={cn(
                   "px-3 py-2 sm:py-2.5 text-right hidden md:table-cell font-medium",
-                  opp.edge > 0 ? "text-signal-positive" : "text-muted-foreground"
+                  opp.edge > 0 ? "text-foreground" : "text-muted-foreground"
                 )}>
                   {opp.edge > 0 ? '+' : ''}{opp.edge.toFixed(1)}%
                 </td>
-                <td className="px-3 py-2 sm:py-2.5 text-right font-bold text-foreground">
+                <td className={cn(
+                  "px-3 py-2 sm:py-2.5 text-right font-bold",
+                  opp.ev >= 3.0 ? "text-signal-high" : opp.ev >= 1.0 ? "text-signal-medium" : "text-foreground"
+                )}>
                   {opp.ev.toFixed(2)}%
                 </td>
                 <td className="px-3 py-2 sm:py-2.5 text-center">
                   <div className={cn(
                     "inline-flex items-center justify-center px-1.5 py-0.5 rounded text-[10px] font-sans font-bold tracking-widest border uppercase",
-                    signalConfig.bg,
-                    signalConfig.color
+                    opp.signal === 'VALUE' && 'signal-high',
+                    opp.signal === 'WATCH' && 'signal-medium static',
+                    signalConfig.color,
+                    opp.signal === 'PASS' && signalConfig.bg
                   )}>
-                    {opp.isStale ? 'STALE' : opp.signal}
+                    {opp.isStale ? 'STALE' : opp.signal === 'VALUE' ? 'HIGH' : opp.signal === 'WATCH' ? 'MEDIUM' : opp.signal}
                   </div>
                 </td>
               </tr>

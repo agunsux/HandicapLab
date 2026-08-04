@@ -16,6 +16,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Logo } from '@/components/ui/Logo';
 
 interface NavItem {
   name: string;
@@ -37,18 +38,11 @@ const FOOTER_ITEMS: NavItem[] = [
   { name: 'Settings', href: '/app/settings', icon: Settings },
 ];
 
-/**
- * Grok-style sidebar:
- *  - Collapsed (~64px, icon-only) by default.
- *  - Expands on hover or via the pin toggle; collapses on mouse-leave
- *    when unpinned. Preference is persisted in localStorage.
- */
 export function Sidebar({ setCollapsed }: { collapsed: boolean; setCollapsed: (val: boolean) => void }) {
   const pathname = usePathname();
   const [pinned, setPinned] = useState(false);
   const [hovered, setHovered] = useState(false);
 
-  // Collapsed by default (Grok style) — restore persisted pin preference.
   useEffect(() => {
     const saved = localStorage.getItem('handicaplab-sidebar-collapsed');
     if (saved !== null) {
@@ -56,7 +50,6 @@ export function Sidebar({ setCollapsed }: { collapsed: boolean; setCollapsed: (v
     }
   }, []);
 
-  // Effective state: expanded when pinned, or temporarily when hovered.
   const expanded = pinned || hovered;
 
   useEffect(() => {
@@ -81,14 +74,14 @@ export function Sidebar({ setCollapsed }: { collapsed: boolean; setCollapsed: (v
           href={item.href}
           title={!expanded ? item.name : undefined}
           className={cn(
-            'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors',
-            !expanded && 'justify-center px-0',
+            'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors border-l-2',
+            !expanded ? 'justify-center px-0 border-l-0' : '',
             active
-              ? 'bg-muted text-foreground'
-              : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
+              ? 'border-terracotta text-foreground bg-muted/20'
+              : 'border-transparent text-muted-foreground hover:bg-muted/10 hover:text-foreground'
           )}
         >
-          <item.icon className={cn('h-[18px] w-[18px] shrink-0', active && 'text-primary')} />
+          <item.icon className={cn('h-[18px] w-[18px] shrink-0', active && 'text-terracotta')} />
           {expanded && <span className="truncate">{item.name}</span>}
         </Link>
       );
@@ -105,13 +98,16 @@ export function Sidebar({ setCollapsed }: { collapsed: boolean; setCollapsed: (v
     >
       {/* Brand */}
       <div className="flex h-14 items-center justify-between px-4 border-b border-border shrink-0">
-        {expanded ? (
-          <Link href="/app" className="font-display font-bold tracking-tight text-foreground text-sm">
-            HandicapLab
-          </Link>
-        ) : (
-          <span className="font-display font-bold text-foreground mx-auto tracking-tight text-sm">HL</span>
-        )}
+        <Link href="/app" className="flex items-center gap-2 overflow-hidden w-full">
+          {expanded ? (
+            <>
+              <Logo className="h-6 w-6" />
+              <span className="font-display font-bold tracking-tight text-foreground text-sm truncate">HandicapLab</span>
+            </>
+          ) : (
+            <Logo className="h-6 w-6 mx-auto" />
+          )}
+        </Link>
       </div>
 
       {/* Navigation */}
@@ -129,7 +125,7 @@ export function Sidebar({ setCollapsed }: { collapsed: boolean; setCollapsed: (v
       <div className="p-3 border-t border-border mt-auto">
         <button
           onClick={togglePin}
-          className="flex w-full items-center justify-center rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+          className="flex w-full items-center justify-center rounded-md p-2 text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-colors"
           title={pinned ? 'Unpin sidebar' : 'Pin sidebar'}
         >
           {expanded ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}

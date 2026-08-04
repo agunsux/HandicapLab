@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { Search, Bell, ChevronDown, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Logo } from '@/components/ui/Logo';
 
 const MARKET_FILTERS = [
   { label: 'All', href: '/app/value-bets' },
@@ -35,12 +36,10 @@ export function TopBar() {
       <div className="flex items-center gap-4 min-w-0 flex-1">
         <Link
           href="/app"
-          className="flex items-center gap-2 font-display font-bold tracking-tight text-foreground text-sm shrink-0"
+          className="flex md:hidden items-center gap-2 font-display font-bold tracking-tight text-foreground text-sm shrink-0"
           aria-label="HandicapLab home"
         >
-          <span className="flex h-6 w-6 items-center justify-center rounded bg-secondary text-[10px] font-semibold text-secondary-foreground">
-            HL
-          </span>
+          <Logo className="h-6 w-6" />
           <span className="hidden sm:inline">HandicapLab</span>
         </Link>
 
@@ -50,8 +49,8 @@ export function TopBar() {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search teams, leagues, marketsâ€¦"
-            className="h-8 w-full rounded-md border border-border bg-card pl-8 pr-3 text-sm text-foreground placeholder:text-muted-foreground outline-none transition-colors focus:border-primary/60 focus:ring-2 focus:ring-primary/20"
+            placeholder="Search teams, leagues, markets…"
+            className="h-8 w-full rounded-md border border-border bg-card pl-8 pr-3 text-sm text-foreground placeholder:text-muted-foreground outline-none transition-colors focus:border-terracotta/60 focus:ring-2 focus:ring-terracotta/20"
           />
         </form>
       </div>
@@ -101,7 +100,7 @@ export function TopBar() {
         {/* Notifications */}
         <button className="relative rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors" aria-label="Notifications">
           <Bell className="h-[18px] w-[18px]" />
-          <span className="absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full bg-terracotta" />
+          <span className="absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full bg-status-warning" />
         </button>
 
         {/* Avatar + plan */}
