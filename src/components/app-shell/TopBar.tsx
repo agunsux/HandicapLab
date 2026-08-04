@@ -49,7 +49,7 @@ export function TopBar() {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search teams, leagues, markets…"
+            placeholder="Search teams, leagues, marketsâ€¦"
             className="h-8 w-full rounded-md border border-border bg-card pl-8 pr-3 text-sm text-foreground placeholder:text-muted-foreground outline-none transition-colors focus:border-terracotta/60 focus:ring-2 focus:ring-terracotta/20"
           />
         </form>
