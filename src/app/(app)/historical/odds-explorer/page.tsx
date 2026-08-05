@@ -94,7 +94,7 @@ export default function OddsExplorerPage() {
             </span>
           </div>
           <p className="text-xs text-[#9CA3AF] mt-1 font-sans">
-            Filter 2.1M historical odds records across Pinnacle, SBOBET, and Bet365 with CLV tracking.
+            Filter 21,660 historical odds records across Pinnacle, SBOBET, and Bet365 with CLV tracking.
           </p>
         </div>
 

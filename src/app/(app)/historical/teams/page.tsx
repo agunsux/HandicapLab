@@ -25,7 +25,7 @@ export default function TeamsListPage() {
             <h1 className="text-xl font-bold text-[#F0FDF4]">Canonical Teams Directory</h1>
           </div>
           <p className="text-xs text-[#9CA3AF] mt-1 font-sans">
-            Explore 3,400+ canonical club entities resolved across all historical providers.
+            Explore 29 canonical EPL club entities resolved across 7 historical seasons.
           </p>
         </div>
 

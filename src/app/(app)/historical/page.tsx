@@ -18,14 +18,14 @@ import {
 import { SearchBar } from '@/components/ui/SearchBar';
 
 const HISTORICAL_MODULES = [
-  { id: 'competitions', title: 'Competitions', count: '120+ Leagues', desc: 'Browse 7 seasons of Premier League, La Liga, Serie A, Bundesliga & Tier 1 data.', href: '/historical/competitions', icon: Trophy, accent: 'from-[#10B981]/20 to-transparent' },
-  { id: 'teams', title: 'Teams', count: '3,400+ Clubs', desc: 'Canonical entity analytics, rolling xG form, ELO ratings, and historical performance.', href: '/historical/teams', icon: Users, accent: 'from-[#3B82F6]/20 to-transparent' },
-  { id: 'matches', title: 'Matches', count: '180,000+ Matches', desc: 'Deep match explorer with shots map, minute-by-minute xG accumulation, and lineups.', href: '/historical/matches', icon: Calendar, accent: 'from-[#F59E0B]/20 to-transparent' },
-  { id: 'players', title: 'Players', count: '84,000+ Players', desc: 'Individual player stats, expected goals, assists, and disciplinary history.', href: '/historical/players', icon: UserCheck, accent: 'from-[#8B5CF6]/20 to-transparent' },
-  { id: 'odds-explorer', title: 'Odds Explorer', count: '2.1M Odds Rows', desc: 'Query Pinnacle opening & closing lines, Steam/Drift line movement, and CLV analysis.', href: '/historical/odds-explorer', icon: LineChart, isKiller: true, accent: 'from-[#10B981]/30 to-transparent' },
-  { id: 'h2h', title: 'Head-to-Head', count: '45,000 Pairs', desc: 'Pairwise historical head-to-head records, goal averages, and matchup trends.', href: '/historical/h2h', icon: GitCompare, accent: 'from-[#EC4899]/20 to-transparent' },
-  { id: 'trends', title: 'Trends', count: '890 Trends', desc: 'League-wide scoring shifts, home advantage decay, and market overround dynamics.', href: '/historical/trends', icon: TrendingDown, accent: 'from-[#14B8A6]/20 to-transparent' },
-  { id: 'records', title: 'Records', count: '120 Records', desc: 'All-time winning streaks, peak xG performances, and market inefficiency spikes.', href: '/historical/records', icon: Award, accent: 'from-[#F59E0B]/20 to-transparent' },
+  { id: 'competitions', title: 'Competitions', count: 'Tier 1 Core', desc: 'Browse 7 seasons of Premier League, La Liga, Serie A, Bundesliga & Tier 1 data.', href: '/historical/competitions', icon: Trophy, accent: 'from-[#10B981]/20 to-transparent' },
+  { id: 'teams', title: 'Teams', count: '29 EPL Clubs', desc: 'Canonical entity analytics, rolling xG form, ELO ratings, and historical performance.', href: '/historical/teams', icon: Users, accent: 'from-[#3B82F6]/20 to-transparent' },
+  { id: 'matches', title: 'Matches', count: '2,660 Fixtures', desc: 'Deep match explorer with shots map, minute-by-minute xG accumulation, and lineups.', href: '/historical/matches', icon: Calendar, accent: 'from-[#F59E0B]/20 to-transparent' },
+  { id: 'players', title: 'Players', count: 'EPL Roster', desc: 'Individual player stats, expected goals, assists, and disciplinary history.', href: '/historical/players', icon: UserCheck, accent: 'from-[#8B5CF6]/20 to-transparent' },
+  { id: 'odds-explorer', title: 'Odds Explorer', count: '21.6K Odds Rows', desc: 'Query Pinnacle opening & closing lines, Steam/Drift line movement, and CLV analysis.', href: '/historical/odds-explorer', icon: LineChart, isKiller: true, accent: 'from-[#10B981]/30 to-transparent' },
+  { id: 'h2h', title: 'Head-to-Head', count: 'EPL Matchups', desc: 'Pairwise historical head-to-head records, goal averages, and matchup trends.', href: '/historical/h2h', icon: GitCompare, accent: 'from-[#EC4899]/20 to-transparent' },
+  { id: 'trends', title: 'Trends', count: '7-Season Analytics', desc: 'League-wide scoring shifts, home advantage decay, and market overround dynamics.', href: '/historical/trends', icon: TrendingDown, accent: 'from-[#14B8A6]/20 to-transparent' },
+  { id: 'records', title: 'Records', count: 'Settled Ledgers', desc: 'All-time winning streaks, peak xG performances, and market inefficiency spikes.', href: '/historical/records', icon: Award, accent: 'from-[#F59E0B]/20 to-transparent' },
 ];
 
 export default function HistoricalLandingPage() {
