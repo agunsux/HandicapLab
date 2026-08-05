@@ -70,8 +70,8 @@ export default function DashboardPage() {
     },
     { 
       label: 'Kelly Exposure', 
-      value: isBuilding ? 'Building Track Record' : '3.2%', 
-      sub: isBuilding ? `Requires 50 settled (${stats?.settled_count || 0}/50)` : 'Quarter Kelly', 
+      value: isBuilding ? 'Building Track Record' : 'Quarter Kelly', 
+      sub: isBuilding ? `Requires 50 settled (${stats?.settled_count || 0}/50)` : 'Kelly Fraction', 
       icon: Wallet 
     },
   ];
