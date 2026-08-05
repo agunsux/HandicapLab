@@ -1,77 +1,95 @@
-export type MarketType = 'AH' | 'OU' | 'ML' | 'BTTS';
-export type UserTier = 'free' | 'pro' | 'elite';
+export type MarketType = 'asian_handicap' | 'over_under' | 'moneyline' | 'btts';
 export type OddsFormat = 'decimal' | 'american' | 'fractional';
+export type SignalType = 'value' | 'steam' | 'drift' | 'reverse_line' | 'sharp';
+export type UserTier = 'free' | 'pro' | 'elite';
+export type MatchStatus = 'SCHEDULED' | 'LIVE' | 'HALFTIME' | 'FINISHED' | 'POSTPONED';
 
 export interface Match {
   id: string;
   homeTeam: string;
   awayTeam: string;
   league: string;
-  leagueSlug?: string;
-  kickoff: string;
-  status: 'SCHEDULED' | 'LIVE' | 'IN_PLAY' | 'FINISHED';
+  country: string;
+  kickoff: string; // ISO datetime
+  status: MatchStatus;
+  score?: { home: number; away: number };
   minute?: number;
-  homeScore?: number;
-  awayScore?: number;
-}
-
-export interface OddsItem {
-  bookmaker: string;
-  selection: string;
-  price: number;
-  previousPrice?: number;
-  line?: string;
-  changePercent?: number; // Positive = steamed, Negative = drifted
 }
 
 export interface MatchOdds {
   matchId: string;
+  bookmaker: string;
   market: MarketType;
-  items: OddsItem[];
+  selection: string;
+  odds: number;
+  line?: number;
+  volume?: number;
+  timestamp: string;
+  previousOdds?: number;
+  changePercent?: number;
+  items?: any[]; // Backwards compatibility for UI table views
 }
 
 export interface Signal {
   id: string;
   matchId: string;
-  homeTeam: string;
-  awayTeam: string;
-  league: string;
-  kickoff: string;
-  marketType: MarketType;
+  type: SignalType;
+  market: MarketType;
   selection: string;
-  bookmaker: string;
+  confidence: number; // 0-100
+  ev: number; // expected value %
   odds: number;
   fairOdds: number;
-  ev: number; // e.g. 8.5 for +8.5%
-  confidence: number; // 0-100
-  sharpMoney: number; // 0-100
-  expiryTime: string;
+  edge: number;
+  bookmaker: string;
+  timestamp: string;
+  expiresAt: string;
   reason: string;
-  publicMoneyPercent: number;
+  sharpMoneyIndicator?: number;
+  sharpMoney?: number;
+  expiryTime?: string;
+  lineMovement?: 'steam' | 'drift' | 'stable';
+  publicMoneyPercent?: number;
+  // Compatibility properties for UI display
+  homeTeam?: string;
+  awayTeam?: string;
+  league?: string;
+  kickoff?: string;
+  marketType?: string;
+  signalCategory?: string;
   isHighValue?: boolean;
-  signalCategory?: 'Value' | 'Steam' | 'Drift' | 'Sharp' | 'Reverse Line';
 }
 
 export interface MarketDepth {
   matchId: string;
   market: MarketType;
-  bestOdds: number;
-  volumeWeightedOdds: number;
-  liquidityScore: number; // 0-100
-  bookmakersCount: number;
-}
-
-export interface DailyPerformance {
-  date: string;
-  pnl: number;
-  cumulative: number;
+  selections: {
+    name: string;
+    bestOdds: number;
+    bookmaker: string;
+    volumeWeightedOdds: number;
+    liquidityScore: number;
+  }[];
 }
 
 export interface PerformanceStats {
-  days: number;
-  totalBets: number;
-  winRate: number; // e.g. 58.4 for 58.4%
-  cumulativePnL: number; // in units
-  roi: number; // e.g. 12.8 for 12.8%
-  dailyHistory: DailyPerformance[];
+  days?: number;
+  date?: string;
+  profit?: number;
+  cumulative?: number;
+  bets?: number;
+  winRate?: number;
+  totalBets?: number;
+  cumulativePnL?: number;
+  roi?: number;
+  dailyHistory?: { date: string; pnl: number; cumulative: number }[];
+}
+
+export interface UserProfile {
+  tier: UserTier;
+  credits: number;
+  watchlist: string[];
+  alertsEnabled: boolean;
+  preferredMarkets: MarketType[];
+  preferredOddsFormat: OddsFormat;
 }

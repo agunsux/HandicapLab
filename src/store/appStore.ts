@@ -14,20 +14,19 @@ export interface AppState {
   activePage: string;
 }
 
-const STORAGE_KEY = 'sth_app_store_v1';
+const STORAGE_KEY = 'sth-storage';
 
 const defaultState: AppState = {
   userTier: 'free',
-  selectedMarkets: ['AH', 'OU', 'ML', 'BTTS'],
+  selectedMarkets: ['asian_handicap', 'over_under', 'moneyline', 'btts'],
   selectedLeagues: [],
   oddsFormat: 'decimal',
   autoRefresh: true,
   watchlist: [],
-  sidebarOpen: true,
+  sidebarOpen: false,
   activePage: 'dashboard',
 };
 
-// Global event bus for lightweight reactivity across components
 type Listener = () => void;
 const listeners: Set<Listener> = new Set();
 
@@ -55,7 +54,9 @@ export const appStore = {
 
   subscribe: (listener: Listener) => {
     listeners.add(listener);
-    return () => listeners.delete(listener);
+    return () => {
+      listeners.delete(listener);
+    };
   },
 
   setUserTier: (userTier: UserTier) => {

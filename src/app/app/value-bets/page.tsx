@@ -16,9 +16,9 @@ export default function ValueBetsPage() {
   const [activeSignal, setActiveSignal] = useState<Signal | null>(null);
   const [addedToSlip, setAddedToSlip] = useState<Record<string, boolean>>({});
 
-  const filteredSignals = (signals || []).filter((sig) => {
+  const filteredSignals = (signals || []).filter((sig: Signal) => {
     if (selectedCategory === 'All') return true;
-    return sig.signalCategory === selectedCategory;
+    return sig.signalCategory === selectedCategory || sig.type === selectedCategory.toLowerCase();
   });
 
   const handleAddToSlip = (sig: Signal) => {

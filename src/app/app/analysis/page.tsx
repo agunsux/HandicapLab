@@ -22,7 +22,8 @@ export default function AnalysisPage() {
   const [days, setDays] = useState(30);
   const { data: perf, isLoading } = usePerformance(days);
 
-  const dailyHistory = perf?.dailyHistory || [];
+  const pnlData = perf as any;
+  const dailyHistory = pnlData?.dailyHistory || [];
 
   return (
     <div className="flex flex-col space-y-6 pb-8">
@@ -67,7 +68,7 @@ export default function AnalysisPage() {
             <Target className="h-4 w-4 text-[#10B981]" />
           </div>
           <div className="mt-3 text-3xl font-display font-bold text-[#F0FDF4]">
-            {isLoading ? '...' : perf?.totalBets || 0}
+            {isLoading ? '...' : pnlData?.totalBets || 0}
           </div>
           <p className="mt-1 text-[11px] text-[#9CA3AF]">Settled trades in {days}d</p>
         </div>
@@ -79,7 +80,7 @@ export default function AnalysisPage() {
             <Percent className="h-4 w-4 text-[#10B981]" />
           </div>
           <div className="mt-3 text-3xl font-display font-bold text-[#10B981]">
-            {isLoading ? '...' : `${perf?.winRate || 0}%`}
+            {isLoading ? '...' : `${pnlData?.winRate || 0}%`}
           </div>
           <p className="mt-1 text-[11px] text-[#9CA3AF]">Model hit rate</p>
         </div>
@@ -91,7 +92,7 @@ export default function AnalysisPage() {
             <TrendingUp className="h-4 w-4 text-[#10B981]" />
           </div>
           <div className="mt-3 text-3xl font-display font-bold text-[#10B981]">
-            {isLoading ? '...' : `+${perf?.cumulativePnL || 0} u`}
+            {isLoading ? '...' : `+${pnlData?.cumulativePnL || 0} u`}
           </div>
           <p className="mt-1 text-[11px] text-[#9CA3AF]">Quarter Kelly compounding</p>
         </div>
@@ -103,7 +104,7 @@ export default function AnalysisPage() {
             <DollarSign className="h-4 w-4 text-[#F59E0B]" />
           </div>
           <div className="mt-3 text-3xl font-display font-bold text-[#F59E0B]">
-            {isLoading ? '...' : `+${perf?.roi || 0}%`}
+            {isLoading ? '...' : `+${pnlData?.roi || 0}%`}
           </div>
           <p className="mt-1 text-[11px] text-[#9CA3AF]">Return on turnover</p>
         </div>
@@ -202,7 +203,7 @@ export default function AnalysisPage() {
                 }}
               />
               <Bar dataKey="pnl" radius={[4, 4, 0, 0]}>
-                {dailyHistory.map((entry, index) => (
+                {dailyHistory.map((entry: any, index: number) => (
                   <Cell
                     key={`cell-${index}`}
                     fill={entry.pnl >= 0 ? '#10B981' : '#EF4444'}

@@ -7,7 +7,7 @@ import { EngineStatusWidget } from '@/components/engine/EngineStatusWidget';
 import { EVBadge } from '@/components/ui/EVBadge';
 import { useMatches, useOdds } from '@/hooks/useApi';
 import { useAppStore } from '@/store/appStore';
-import { MatchOdds } from '@/types';
+import { MatchOdds, Match } from '@/types';
 
 type MarketCategory = 'asian-handicap' | 'over-under' | 'moneyline' | 'btts';
 
@@ -97,10 +97,10 @@ export function MarketPage({ market, description }: MarketPageProps) {
         </div>
       ) : (
         <div className="space-y-4">
-          {matches.map((match) => {
+          {matches.map((match: Match) => {
             const isExpanded = expandedMatches[match.id] ?? true;
             const isWatched = watchlist.includes(match.id);
-            const matchOdds = oddsData?.find((o) => o.market === currentMarketKey) || oddsData?.[0];
+            const matchOdds = oddsData?.find((o: any) => o.market === currentMarketKey) || oddsData?.[0];
 
             return (
               <div
@@ -124,7 +124,7 @@ export function MarketPage({ market, description }: MarketPageProps) {
                     {match.status === 'LIVE' && (
                       <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#10B981]/10 text-[#10B981] text-[10px] font-bold">
                         <span className="h-1.5 w-1.5 rounded-full bg-[#10B981] animate-ping" />
-                        LIVE {match.homeScore}-{match.awayScore} ({match.minute}')
+                        LIVE {match.score?.home ?? 0}-{match.score?.away ?? 0} ({match.minute}')
                       </span>
                     )}
                   </div>
@@ -169,7 +169,7 @@ export function MarketPage({ market, description }: MarketPageProps) {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-[#1F2937]/50 font-mono">
-                        {matchOdds?.items.map((item, idx) => {
+                        {matchOdds?.items?.map((item: any, idx: number) => {
                           const change = item.changePercent || 0;
                           const isSteamed = change > 0;
                           const isDrifted = change < 0;

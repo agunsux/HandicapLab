@@ -7,7 +7,7 @@ import { useLiveMatches, useSignals, usePerformance } from '@/hooks/useApi';
 import { useAppStore } from '@/store/appStore';
 import { EngineStatusWidget } from '@/components/engine/EngineStatusWidget';
 import { EVBadge } from '@/components/ui/EVBadge';
-import { PaywallBlurOverlay } from '@/components/ui/PaywallBlurOverlay';
+import { Signal, Match } from '@/types';
 
 export default function DashboardPage() {
   const { userTier } = useAppStore();
@@ -17,14 +17,14 @@ export default function DashboardPage() {
 
   // Compute stat card metrics
   const liveCount = liveMatches ? liveMatches.length : 0;
-  const activeSignals = signals ? signals.filter((s) => s.ev > 0) : [];
+  const activeSignals = signals ? signals.filter((s: Signal) => s.ev > 0) : [];
   const activeSignalsCount = activeSignals.length;
   
   const avgEdge = activeSignalsCount > 0
-    ? (activeSignals.reduce((acc, curr) => acc + curr.ev, 0) / activeSignalsCount).toFixed(1)
+    ? (activeSignals.reduce((acc: number, curr: Signal) => acc + curr.ev, 0) / activeSignalsCount).toFixed(1)
     : '0.0';
 
-  const pnl7d = perf ? perf.cumulativePnL : 0;
+  const pnl7d = (perf as any)?.cumulativePnL || 0;
 
   return (
     <div className="flex flex-col space-y-6 pb-8">
@@ -160,7 +160,7 @@ export default function DashboardPage() {
 
         {liveMatches && liveMatches.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {liveMatches.slice(0, 3).map((match) => (
+            {liveMatches.slice(0, 3).map((match: Match) => (
               <div
                 key={match.id}
                 className="rounded-lg border border-[#1F2937] bg-[#0B0F0E] p-4 flex flex-col justify-between space-y-3"
@@ -176,7 +176,7 @@ export default function DashboardPage() {
                 <div className="flex items-center justify-between text-sm font-semibold text-[#F0FDF4]">
                   <div className="flex-1 truncate">{match.homeTeam}</div>
                   <div className="px-3 font-mono font-bold text-[#10B981]">
-                    {match.homeScore ?? 0} - {match.awayScore ?? 0}
+                    {match.score?.home ?? 0} - {match.score?.away ?? 0}
                   </div>
                   <div className="flex-1 text-right truncate">{match.awayTeam}</div>
                 </div>
@@ -216,7 +216,7 @@ export default function DashboardPage() {
         </div>
 
         <div className="space-y-3">
-          {signals && signals.slice(0, 5).map((sig) => {
+          {signals && signals.slice(0, 5).map((sig: Signal) => {
             const isLocked = userTier === 'free' && sig.confidence > 70;
 
             return (
@@ -226,12 +226,12 @@ export default function DashboardPage() {
               >
                 <div className={`flex flex-col sm:flex-row sm:items-center gap-3 flex-1 ${isLocked ? 'filter blur-[4px] opacity-40 select-none pointer-events-none' : ''}`}>
                   <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-[#10B981]/10 border border-[#10B981]/30 text-[#10B981] text-xs font-bold w-fit">
-                    {sig.marketType}
+                    {sig.marketType || sig.market}
                   </span>
 
                   <div>
                     <div className="text-sm font-semibold text-[#F0FDF4]">
-                      {sig.homeTeam} vs {sig.awayTeam}
+                      {sig.homeTeam || 'Home'} vs {sig.awayTeam || 'Away'}
                     </div>
                     <div className="text-xs text-[#9CA3AF]">
                       Selection: <span className="text-[#F0FDF4] font-medium">{sig.selection}</span> ({sig.bookmaker})
