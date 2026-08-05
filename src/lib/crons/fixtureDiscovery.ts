@@ -88,8 +88,8 @@ export async function discoverFixtures(): Promise<{
 
     try {
       const startTime = Date.now();
-      // Free plan supports seasons 2022-2024. Try 2024 as latest accessible.
-      const season = Math.min(new Date().getFullYear() - 1, 2024);
+      // Season calculation: use current calendar year for active season fixtures
+      const season = new Date().getFullYear();
       const response = await apiFootballClient.getFixtures(league.league_id, season);
       await logCall('apifootball', 'fixtures', Date.now() - startTime, 200, {
         leagueId: league.league_id,

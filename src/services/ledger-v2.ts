@@ -5,6 +5,8 @@ import { MatchFeatures } from '../lib/engines/feature-engine/types';
 
 export interface LedgerMatch {
   id: string | number;
+  home_team?: string;
+  away_team?: string;
   kickoff?: string | Date;
   kickoff_time?: string | Date;
   league?: string;
