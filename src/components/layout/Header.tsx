@@ -3,9 +3,10 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, Search, ShieldCheck, User } from 'lucide-react';
+import { Menu, Search, ShieldCheck, User, Bell } from 'lucide-react';
 import { PRIMARY_NAV } from '@/config/navigation';
 import { cn } from '@/lib/utils';
+import { useAppStore } from '@/store/appStore';
 
 interface HeaderProps {
   onMenuClick?: () => void;
@@ -13,15 +14,28 @@ interface HeaderProps {
 
 export function Header({ onMenuClick }: HeaderProps) {
   const pathname = usePathname();
+  const { userTier, setUserTier } = useAppStore();
+
+  const tierColors = {
+    free: 'bg-[#1F2937] text-[#9CA3AF] border-[#1F2937]',
+    pro: 'bg-[#10B981]/10 text-[#10B981] border-[#10B981]/30',
+    elite: 'bg-[#F59E0B]/10 text-[#F59E0B] border-[#F59E0B]/30',
+  };
+
+  const cycleTier = () => {
+    if (userTier === 'free') setUserTier('pro');
+    else if (userTier === 'pro') setUserTier('elite');
+    else setUserTier('free');
+  };
 
   return (
-    <header className="h-[64px] fixed top-0 left-0 right-0 z-40 bg-[#0A0B0F]/80 backdrop-blur-md border-b border-[#1F232C] px-4 sm:px-6 flex items-center justify-between">
+    <header className="h-[64px] fixed top-0 left-0 right-0 z-40 bg-[#0B0F0E]/90 backdrop-blur-md border-b border-[#1F2937] px-4 sm:px-6 flex items-center justify-between">
       {/* Brand & Left Actions */}
       <div className="flex items-center gap-4">
         {onMenuClick && (
           <button
             onClick={onMenuClick}
-            className="sm:hidden flex h-8 w-8 items-center justify-center rounded-lg text-[#8B92A8] hover:bg-[#1A1D24] hover:text-[#F0F1F5] transition-colors"
+            className="lg:hidden flex h-8 w-8 items-center justify-center rounded-lg text-[#9CA3AF] hover:bg-[#111827] hover:text-[#F0FDF4] transition-colors"
             aria-label="Open mobile menu"
           >
             <Menu className="h-5 w-5" />
@@ -29,11 +43,11 @@ export function Header({ onMenuClick }: HeaderProps) {
         )}
 
         <Link href="/" className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-lg bg-[#6366F1] flex items-center justify-center font-display font-bold text-white text-xs shadow-sm">
+          <div className="h-8 w-8 rounded-lg bg-[#10B981] flex items-center justify-center font-display font-bold text-black text-xs shadow-sm">
             HL
           </div>
-          <span className="font-display font-bold text-base tracking-tight text-[#F0F1F5]">
-            Handicap<span className="text-[#6366F1]">Lab</span>
+          <span className="font-display font-bold text-base tracking-tight text-[#F0FDF4]">
+            Handicap<span className="text-[#10B981]">Lab</span>
           </span>
         </Link>
       </div>
@@ -48,7 +62,7 @@ export function Header({ onMenuClick }: HeaderProps) {
               href={nav.href}
               className={cn(
                 'text-xs font-medium transition-colors',
-                isActive ? 'text-[#6366F1] font-semibold' : 'text-[#8B92A8] hover:text-[#F0F1F5]'
+                isActive ? 'text-[#10B981] font-semibold' : 'text-[#9CA3AF] hover:text-[#F0FDF4]'
               )}
             >
               {nav.label}
@@ -57,28 +71,42 @@ export function Header({ onMenuClick }: HeaderProps) {
         })}
       </nav>
 
-      {/* Right Controls: Search, Tier, Profile */}
+      {/* Right Controls: Search, Tier Badge (Clickable to test), Bell, Profile */}
       <div className="flex items-center gap-3">
         <div className="relative hidden sm:block">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#5A6070]" />
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#9CA3AF]" />
           <input
             type="text"
-            placeholder="Search teams, leagues..."
-            className="h-8 w-44 lg:w-56 rounded-lg bg-[#111318] border border-[#1F232C] pl-8 pr-3 text-xs text-[#F0F1F5] placeholder-[#5A6070] focus:border-[#6366F1] focus:outline-none transition-colors"
+            placeholder="Search matches, leagues..."
+            className="h-8 w-44 lg:w-56 rounded-lg bg-[#111827] border border-[#1F2937] pl-8 pr-3 text-xs text-[#F0FDF4] placeholder-[#9CA3AF]/60 focus:border-[#10B981] focus:outline-none transition-colors"
           />
         </div>
 
-        <Link
-          href="/pricing"
-          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#6366F1]/10 border border-[#6366F1]/30 text-[#818CF8] text-xs font-medium hover:bg-[#6366F1]/20 transition-colors"
+        {/* User Tier Badge (Clickable toggle for easy testing) */}
+        <button
+          onClick={cycleTier}
+          title="Click to cycle plan tier (Free -> Pro -> Elite)"
+          className={cn(
+            'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer',
+            tierColors[userTier]
+          )}
         >
           <ShieldCheck className="h-3.5 w-3.5" />
-          <span className="hidden sm:inline">Quant Tier</span>
-        </Link>
+          <span>{userTier} Tier</span>
+        </button>
+
+        {/* Bell Icon with Pulse Dot */}
+        <div className="relative">
+          <button className="h-8 w-8 rounded-full bg-[#111827] border border-[#1F2937] flex items-center justify-center text-[#9CA3AF] hover:text-[#F0FDF4] transition-colors">
+            <Bell className="h-4 w-4" />
+          </button>
+          <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-[#10B981] animate-ping" />
+          <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-[#10B981]" />
+        </div>
 
         <Link
           href="/app/profile"
-          className="h-8 w-8 rounded-full bg-[#1A1D24] border border-[#1F232C] flex items-center justify-center text-[#8B92A8] hover:text-[#F0F1F5] transition-colors"
+          className="h-8 w-8 rounded-full bg-[#111827] border border-[#1F2937] flex items-center justify-center text-[#9CA3AF] hover:text-[#F0FDF4] transition-colors"
         >
           <User className="h-4 w-4" />
         </Link>

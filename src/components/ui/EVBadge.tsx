@@ -6,12 +6,14 @@ import { cn } from '@/lib/utils';
 
 interface EVBadgeProps {
   ev?: number;
+  evPercent?: number;
   locked?: boolean;
   size?: 'sm' | 'md' | 'lg';
   className?: string;
 }
 
-export function EVBadge({ ev = 0, locked = false, size = 'md', className }: EVBadgeProps) {
+export function EVBadge({ ev, evPercent, locked = false, size = 'md', className }: EVBadgeProps) {
+  const effectiveEv = ev !== undefined ? ev : (evPercent !== undefined ? evPercent : 0);
   if (locked) {
     return (
       <span
@@ -27,8 +29,11 @@ export function EVBadge({ ev = 0, locked = false, size = 'md', className }: EVBa
     );
   }
 
-  const isPositive = ev > 0;
-  const isZero = ev === 0;
+  const isPositive = effectiveEv > 0;
+  const isZero = effectiveEv === 0;
+
+  // Format percent cleanly whether passed as 8.55 or 0.0855
+  const formattedVal = effectiveEv > 1 || effectiveEv < -1 ? effectiveEv.toFixed(1) : (effectiveEv * 100).toFixed(1);
 
   return (
     <span
@@ -44,7 +49,7 @@ export function EVBadge({ ev = 0, locked = false, size = 'md', className }: EVBa
       )}
     >
       {isPositive ? '+' : ''}
-      {(ev * 100).toFixed(1)}% EV
+      {formattedVal}% EV
     </span>
   );
 }

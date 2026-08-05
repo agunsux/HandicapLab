@@ -1,169 +1,268 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React from 'react';
 import Link from 'next/link';
-import { ArrowRight, Activity, Gauge, Target, Wallet, Shield } from 'lucide-react';
+import { Activity, Target, TrendingUp, Flame, ArrowRight, Shield, Zap } from 'lucide-react';
+import { useLiveMatches, useSignals, usePerformance } from '@/hooks/useApi';
+import { useAppStore } from '@/store/appStore';
 import { EngineStatusWidget } from '@/components/engine/EngineStatusWidget';
-import { ValueBetsFeed } from '@/components/terminal/ValueBetsFeed';
-
-interface DashboardStats {
-  building: boolean;
-  settled_count: number;
-  required_settled_count?: number;
-  brier_score?: number;
-  clv?: number;
-  portfolio_ev?: number;
-  marketCounts?: Record<string, number>;
-}
+import { EVBadge } from '@/components/ui/EVBadge';
+import { PaywallBlurOverlay } from '@/components/ui/PaywallBlurOverlay';
 
 export default function DashboardPage() {
-  const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [topBets, setTopBets] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { userTier } = useAppStore();
+  const { data: liveMatches, isLoading: loadingLive } = useLiveMatches();
+  const { data: signals, isLoading: loadingSignals } = useSignals();
+  const { data: perf, isLoading: loadingPerf } = usePerformance(7);
 
-  useEffect(() => {
-    async function loadDashboard() {
-      try {
-        const [statsRes, signalsRes] = await Promise.all([
-          fetch('/api/v1/stats/dashboard'),
-          fetch('/api/v1/signals?limit=5')
-        ]);
+  // Compute stat card metrics
+  const liveCount = liveMatches ? liveMatches.length : 0;
+  const activeSignals = signals ? signals.filter((s) => s.ev > 0) : [];
+  const activeSignalsCount = activeSignals.length;
+  
+  const avgEdge = activeSignalsCount > 0
+    ? (activeSignals.reduce((acc, curr) => acc + curr.ev, 0) / activeSignalsCount).toFixed(1)
+    : '0.0';
 
-        const statsJson = await statsRes.json();
-        const signalsJson = await signalsRes.json();
-
-        if (statsJson.success) setStats(statsJson.data);
-        if (signalsJson.success) setTopBets(signalsJson.data || []);
-      } catch (err) {
-        console.error('Failed to load dashboard data:', err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadDashboard();
-
-    const interval = setInterval(loadDashboard, 300000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const isBuilding = !stats || stats.building;
-
-  const metrics = [
-    { 
-      label: 'Avg CLV (7d)', 
-      value: isBuilding ? 'Building Track Record' : `+${((stats?.clv || 0) * 100).toFixed(1)}%`, 
-      sub: isBuilding ? `Requires 50 settled (${stats?.settled_count || 0}/50)` : 'Pinnacle close', 
-      icon: Gauge 
-    },
-    { 
-      label: 'Model Brier', 
-      value: isBuilding ? 'Building Track Record' : `${stats?.brier_score?.toFixed(3)}`, 
-      sub: isBuilding ? `Requires 50 settled (${stats?.settled_count || 0}/50)` : 'Calibration', 
-      icon: Activity 
-    },
-    { 
-      label: 'Portfolio EV', 
-      value: isBuilding ? 'Building Track Record' : `+${((stats?.portfolio_ev || 0) * 100).toFixed(1)}%`, 
-      sub: isBuilding ? `Requires 50 settled (${stats?.settled_count || 0}/50)` : 'Edge-weighted', 
-      icon: Target 
-    },
-    { 
-      label: 'Kelly Exposure', 
-      value: isBuilding ? 'Building Track Record' : 'Quarter Kelly', 
-      sub: isBuilding ? `Requires 50 settled (${stats?.settled_count || 0}/50)` : 'Kelly Fraction', 
-      icon: Wallet 
-    },
-  ];
-
-  const marketCounts = stats?.marketCounts || { AH: 0, OU: 0, ML: 0, BTTS: 0 };
+  const pnl7d = perf ? perf.cumulativePnL : 0;
 
   return (
     <div className="flex flex-col space-y-6 pb-8">
-      {/* Page header */}
-      <div>
-        <h1 className="text-xl font-display font-semibold tracking-tight text-[#F0F1F5]">Dashboard</h1>
-        <p className="mt-1 text-sm text-[#8B92A8]">
-          Market intelligence summary — calibrated probabilities, expected value and closing line value.
-        </p>
+      {/* Page Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-display font-bold tracking-tight text-[#F0FDF4]">
+            Dashboard
+          </h1>
+          <p className="mt-1 text-sm text-[#9CA3AF]">
+            Real-time market intelligence, live match momentum, and quantitative value signals.
+          </p>
+        </div>
+
+        <Link
+          href="/pricing"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#10B981] hover:bg-[#10B981]/90 text-black font-bold text-xs transition-colors self-start sm:self-auto shadow-sm"
+        >
+          <Shield className="h-4 w-4" />
+          <span>Active Plan: {userTier.toUpperCase()}</span>
+        </Link>
       </div>
 
       {/* Autonomous Engine Heartbeat */}
       <EngineStatusWidget />
 
-      {/* Hero metrics */}
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        {metrics.map((m) => (
-          <div key={m.label} className="rounded-xl border border-[#1F232C] bg-[#111318] p-4">
-            <div className="flex items-center gap-2">
-              <m.icon className="h-4 w-4 text-[#8B92A8]" />
-              <span className="text-[10px] font-medium uppercase tracking-widest text-[#8B92A8]">
-                {m.label}
-              </span>
+      {/* 4 Stat Cards Grid */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Card 1: Live Matches */}
+        <div className="rounded-xl border border-[#1F2937] bg-[#111827] p-5 shadow-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold uppercase tracking-wider text-[#9CA3AF]">
+              Live Matches
+            </span>
+            <div className="h-8 w-8 rounded-lg bg-[#10B981]/10 border border-[#10B981]/30 flex items-center justify-center text-[#10B981]">
+              <Activity className="h-4 w-4" />
             </div>
-            <div className={`mt-3 font-semibold tracking-tight ${isBuilding ? 'text-xs text-amber-400' : 'text-2xl tabular-nums text-[#F0F1F5]'}`}>
-              {m.value}
-            </div>
-            <div className="mt-1 text-xs text-[#5A6070]">{m.sub}</div>
           </div>
-        ))}
-      </div>
+          <div className="mt-3 flex items-baseline gap-2">
+            <span className="text-3xl font-display font-bold text-[#F0FDF4]">
+              {loadingLive ? '...' : liveCount}
+            </span>
+            <span className="text-xs font-semibold text-[#10B981] flex items-center gap-1">
+              <span className="h-2 w-2 rounded-full bg-[#10B981] animate-ping" /> In-play
+            </span>
+          </div>
+          <p className="mt-1 text-[11px] text-[#9CA3AF]">Active fixtures monitored</p>
+        </div>
 
-      {/* Market coverage */}
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        {([
-          { key: 'AH', label: 'Asian Handicap', href: '/app/markets/asian-handicap' },
-          { key: 'OU', label: 'Over / Under', href: '/app/markets/over-under' },
-          { key: 'ML', label: 'Moneyline', href: '/app/markets/moneyline' },
-          { key: 'BTTS', label: 'BTTS', href: '/app/markets/btts' },
-        ]).map((mk) => {
-          const count = marketCounts[mk.key] || 0;
-          return (
-            <Link
-              key={mk.key}
-              href={mk.href}
-              className="group flex items-center justify-between rounded-xl border border-[#1F232C] bg-[#111318] px-4 py-3 transition-colors hover:border-[#2A2F3A] hover:bg-[#1A1D24]/50"
+        {/* Card 2: Active Signals */}
+        <div className="rounded-xl border border-[#1F2937] bg-[#111827] p-5 shadow-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold uppercase tracking-wider text-[#9CA3AF]">
+              Active Signals
+            </span>
+            <div className="h-8 w-8 rounded-lg bg-[#F59E0B]/10 border border-[#F59E0B]/30 flex items-center justify-center text-[#F59E0B]">
+              <Target className="h-4 w-4" />
+            </div>
+          </div>
+          <div className="mt-3 flex items-baseline gap-2">
+            <span className="text-3xl font-display font-bold text-[#F0FDF4]">
+              {loadingSignals ? '...' : activeSignalsCount}
+            </span>
+            <span className="text-xs font-semibold text-[#F59E0B]">EV &gt; 0%</span>
+          </div>
+          <p className="mt-1 text-[11px] text-[#9CA3AF]">High confidence edges</p>
+        </div>
+
+        {/* Card 3: Avg Edge */}
+        <div className="rounded-xl border border-[#1F2937] bg-[#111827] p-5 shadow-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold uppercase tracking-wider text-[#9CA3AF]">
+              Avg Edge
+            </span>
+            <div className="h-8 w-8 rounded-lg bg-[#10B981]/10 border border-[#10B981]/30 flex items-center justify-center text-[#10B981]">
+              <TrendingUp className="h-4 w-4" />
+            </div>
+          </div>
+          <div className="mt-3 flex items-baseline gap-2">
+            <span className="text-3xl font-display font-bold text-[#10B981]">
+              +{loadingSignals ? '...' : avgEdge}%
+            </span>
+          </div>
+          <p className="mt-1 text-[11px] text-[#9CA3AF]">Model expected value</p>
+        </div>
+
+        {/* Card 4: 7-Day P/L */}
+        <div className="rounded-xl border border-[#1F2937] bg-[#111827] p-5 shadow-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold uppercase tracking-wider text-[#9CA3AF]">
+              7-Day P/L
+            </span>
+            <div
+              className={`h-8 w-8 rounded-lg border flex items-center justify-center ${
+                pnl7d >= 0
+                  ? 'bg-[#10B981]/10 border-[#10B981]/30 text-[#10B981]'
+                  : 'bg-[#EF4444]/10 border-[#EF4444]/30 text-[#EF4444]'
+              }`}
             >
-              <div>
-                <div className="text-sm font-medium text-[#F0F1F5]">{mk.label}</div>
-                <div className="mt-0.5 text-xs text-[#8B92A8]">{count} active signals</div>
-              </div>
-              <ArrowRight className="h-4 w-4 text-[#8B92A8] transition-transform group-hover:translate-x-0.5" />
-            </Link>
-          );
-        })}
+              <Zap className="h-4 w-4" />
+            </div>
+          </div>
+          <div className="mt-3 flex items-baseline gap-2">
+            <span
+              className={`text-3xl font-display font-bold ${
+                pnl7d >= 0 ? 'text-[#10B981]' : 'text-[#EF4444]'
+              }`}
+            >
+              {loadingPerf ? '...' : `${pnl7d >= 0 ? '+' : ''}${pnl7d} u`}
+            </span>
+          </div>
+          <p className="mt-1 text-[11px] text-[#9CA3AF]">Cumulative track record</p>
+        </div>
       </div>
 
-      {/* Top EV today */}
-      <div>
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-[10px] font-semibold uppercase tracking-widest text-[#8B92A8]">
-            Highest EV Today
-          </h2>
+      {/* Section: Live Now */}
+      <div className="rounded-xl border border-[#1F2937] bg-[#111827] p-6 shadow-sm">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-2.5">
+            <div className="h-7 w-7 rounded-lg bg-[#F59E0B]/10 border border-[#F59E0B]/30 flex items-center justify-center text-[#F59E0B]">
+              <Flame className="h-4 w-4" />
+            </div>
+            <h2 className="text-lg font-bold text-[#F0FDF4]">Live Now</h2>
+          </div>
+
           <Link
-            href="/app/value-bets"
-            className="inline-flex items-center gap-1 text-xs font-medium text-[#818CF8] hover:text-[#6366F1] transition-colors"
+            href="/app/markets/asian-handicap"
+            className="text-xs font-semibold text-[#10B981] hover:text-[#10B981]/80 flex items-center gap-1 transition-colors"
           >
-            All opportunities <ArrowRight className="h-3 w-3" />
+            View all <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
 
-        {topBets.length === 0 ? (
-          <div className="rounded-xl border border-[#1F232C] bg-[#111318]/40 p-8 text-center">
-            <p className="text-sm text-[#8B92A8]">
-              Engine is scanning. No validated opportunities for this window yet.
-            </p>
+        {liveMatches && liveMatches.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {liveMatches.slice(0, 3).map((match) => (
+              <div
+                key={match.id}
+                className="rounded-lg border border-[#1F2937] bg-[#0B0F0E] p-4 flex flex-col justify-between space-y-3"
+              >
+                <div className="flex items-center justify-between text-xs text-[#9CA3AF]">
+                  <span>{match.league}</span>
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#10B981]/10 text-[#10B981] font-bold text-[10px]">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#10B981] animate-ping" />
+                    LIVE {match.minute ? `'${match.minute}` : ''}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between text-sm font-semibold text-[#F0FDF4]">
+                  <div className="flex-1 truncate">{match.homeTeam}</div>
+                  <div className="px-3 font-mono font-bold text-[#10B981]">
+                    {match.homeScore ?? 0} - {match.awayScore ?? 0}
+                  </div>
+                  <div className="flex-1 text-right truncate">{match.awayTeam}</div>
+                </div>
+
+                <Link
+                  href={`/app/markets/asian-handicap?matchId=${match.id}`}
+                  className="w-full text-center py-1.5 rounded-md bg-[#111827] border border-[#1F2937] text-xs text-[#9CA3AF] hover:text-[#F0FDF4] hover:border-[#10B981]/50 transition-colors"
+                >
+                  View Odds Movement
+                </Link>
+              </div>
+            ))}
           </div>
         ) : (
-          <ValueBetsFeed bets={topBets} />
+          <div className="text-center py-8 text-xs text-[#9CA3AF]">
+            No live fixtures currently in play. Next matches scheduled shortly.
+          </div>
         )}
       </div>
 
-      {/* Research note */}
-      <div className="flex items-start gap-3 rounded-xl border border-[#1F232C] bg-[#111318] p-4">
-        <Shield className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" />
-        <p className="text-xs leading-relaxed text-[#8B92A8]">
-          HandicapLab quantitative models operate under strict data governance. Pinnacle remains the ground truth for Closing Line Value (CLV) evaluation.
-        </p>
+      {/* Section: Latest Signals */}
+      <div className="rounded-xl border border-[#1F2937] bg-[#111827] p-6 shadow-sm relative overflow-hidden">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-2.5">
+            <div className="h-7 w-7 rounded-lg bg-[#10B981]/10 border border-[#10B981]/30 flex items-center justify-center text-[#10B981]">
+              <Target className="h-4 w-4" />
+            </div>
+            <h2 className="text-lg font-bold text-[#F0FDF4]">Latest Signals</h2>
+          </div>
+
+          <Link
+            href="/app/value-bets"
+            className="text-xs font-semibold text-[#10B981] hover:text-[#10B981]/80 flex items-center gap-1 transition-colors"
+          >
+            All signals <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+
+        <div className="space-y-3">
+          {signals && signals.slice(0, 5).map((sig) => {
+            const isLocked = userTier === 'free' && sig.confidence > 70;
+
+            return (
+              <div
+                key={sig.id}
+                className="relative rounded-lg border border-[#1F2937] bg-[#0B0F0E] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+              >
+                <div className={`flex flex-col sm:flex-row sm:items-center gap-3 flex-1 ${isLocked ? 'filter blur-[4px] opacity-40 select-none pointer-events-none' : ''}`}>
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-md bg-[#10B981]/10 border border-[#10B981]/30 text-[#10B981] text-xs font-bold w-fit">
+                    {sig.marketType}
+                  </span>
+
+                  <div>
+                    <div className="text-sm font-semibold text-[#F0FDF4]">
+                      {sig.homeTeam} vs {sig.awayTeam}
+                    </div>
+                    <div className="text-xs text-[#9CA3AF]">
+                      Selection: <span className="text-[#F0FDF4] font-medium">{sig.selection}</span> ({sig.bookmaker})
+                    </div>
+                  </div>
+                </div>
+
+                <div className={`flex items-center gap-3 ${isLocked ? 'filter blur-[4px] opacity-40 select-none pointer-events-none' : ''}`}>
+                  <div className="text-right">
+                    <div className="text-xs text-[#9CA3AF]">Odds</div>
+                    <div className="text-sm font-mono font-bold text-[#F0FDF4]">{sig.odds.toFixed(2)}</div>
+                  </div>
+                  <EVBadge evPercent={sig.ev} size="md" />
+                </div>
+
+                {/* Free Tier Lock Blur Overlay */}
+                {isLocked && (
+                  <div className="absolute inset-0 z-10 flex items-center justify-between px-4 bg-[#0B0F0E]/40 rounded-lg">
+                    <span className="text-xs text-[#9CA3AF] font-medium">High confidence signal locked</span>
+                    <Link
+                      href="/pricing"
+                      className="inline-flex items-center gap-1 px-3 py-1 rounded-md bg-[#F59E0B] text-black text-xs font-bold hover:bg-[#F59E0B]/90 transition-colors shadow-sm"
+                    >
+                      PRO Badge Required
+                    </Link>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
