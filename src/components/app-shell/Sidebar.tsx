@@ -6,9 +6,6 @@ import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
   Target,
-  Scale,
-  LineChart,
-  Trophy,
   CircleDot,
   User,
   Settings,
@@ -17,6 +14,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Logo } from '@/components/ui/Logo';
+import { ROUTES, APP_SIDEBAR_NAV } from '@/config/navigation';
 
 interface NavItem {
   name: string;
@@ -24,46 +22,50 @@ interface NavItem {
   icon: React.ElementType;
 }
 
-const NAV_ITEMS: NavItem[] = [
-  { name: 'Dashboard', href: '/app/dashboard', icon: LayoutDashboard },
-  { name: 'Value Bets', href: '/app/value-bets', icon: Target },
-  { name: 'Asian Handicap', href: '/app/markets/asian-handicap', icon: Scale },
-  { name: 'Over / Under', href: '/app/markets/over-under', icon: LineChart },
-  { name: 'Moneyline', href: '/app/markets/moneyline', icon: Trophy },
-  { name: 'BTTS', href: '/app/markets/btts', icon: CircleDot },
-];
+const getIconForRoute = (href: string) => {
+  if (href === ROUTES.dashboard) return LayoutDashboard;
+  if (href === ROUTES.valueBets) return Target;
+  return CircleDot;
+};
+
+const NAV_ITEMS: NavItem[] = APP_SIDEBAR_NAV.map((item) => ({
+  name: item.label,
+  href: item.href,
+  icon: getIconForRoute(item.href),
+}));
 
 const FOOTER_ITEMS: NavItem[] = [
-  { name: 'Profile', href: '/app/profile', icon: User },
-  { name: 'Settings', href: '/app/settings', icon: Settings },
+  { name: 'Profile', href: ROUTES.profile, icon: User },
+  { name: 'Settings', href: ROUTES.settings, icon: Settings },
 ];
 
 export function Sidebar({ setCollapsed }: { collapsed: boolean; setCollapsed: (val: boolean) => void }) {
   const pathname = usePathname();
-  const [pinned, setPinned] = useState(false);
-  const [hovered, setHovered] = useState(false);
+  // Default to expanded (false) until client mounts
+  const [isCollapsed, setIsCollapsedState] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     const saved = localStorage.getItem('handicaplab-sidebar-collapsed');
-    if (saved !== null) {
-      setPinned(saved !== 'true');
+    if (saved === 'true') {
+      setIsCollapsedState(true);
+      setCollapsed(true);
     }
-  }, []);
+  }, [setCollapsed]);
 
-  const expanded = pinned || hovered;
-
-  useEffect(() => {
-    setCollapsed(!expanded);
-  }, [expanded, setCollapsed]);
-
-  const togglePin = () => {
-    const next = !pinned;
-    setPinned(next);
-    localStorage.setItem('handicaplab-sidebar-collapsed', String(!next));
+  const toggleSidebar = () => {
+    const next = !isCollapsed;
+    setIsCollapsedState(next);
+    setCollapsed(next);
+    localStorage.setItem('handicaplab-sidebar-collapsed', String(next));
   };
 
   const isActive = (href: string) =>
     pathname === href || (href !== '/app/dashboard' && pathname.startsWith(href));
+
+  // Determine expansion purely by state, not hover
+  const expanded = mounted ? !isCollapsed : true;
 
   const renderItems = (items: NavItem[]) =>
     items.map((item) => {
@@ -73,62 +75,64 @@ export function Sidebar({ setCollapsed }: { collapsed: boolean; setCollapsed: (v
           key={item.href}
           href={item.href}
           title={!expanded ? item.name : undefined}
+          aria-label={item.name}
           className={cn(
-            'flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors border-l-2',
-            !expanded ? 'justify-center px-0 border-l-0' : '',
+            'flex items-center rounded-md py-2 font-medium transition-colors border-l-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta/20',
+            !expanded ? 'justify-center px-0 border-l-0' : 'gap-3 px-3',
             active
-              ? 'border-terracotta text-foreground bg-muted/20'
-              : 'border-transparent text-muted-foreground hover:bg-muted/10 hover:text-foreground'
+              ? 'border-terracotta text-terracotta bg-terracotta/10'
+              : 'border-transparent text-muted-foreground hover:bg-muted/50 hover:text-foreground'
           )}
         >
-          <item.icon className={cn('h-[18px] w-[18px] shrink-0', active && 'text-terracotta')} />
-          {expanded && <span className="truncate">{item.name}</span>}
+          <div className="flex h-[18px] w-[18px] shrink-0 items-center justify-center">
+            <item.icon className="h-full w-full" />
+          </div>
+          {expanded && <span className="truncate text-sm">{item.name}</span>}
         </Link>
       );
     });
 
   return (
     <aside
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
       className={cn(
-        'flex flex-col h-screen border-r border-border bg-card transition-[width] duration-200 ease-out z-30 hidden md:flex',
-        expanded ? 'w-56' : 'w-16'
+        'flex flex-col h-screen border-r border-border bg-card transition-[width] duration-200 ease-in-out z-30 hidden md:flex',
+        expanded ? 'w-[240px]' : 'w-16'
       )}
     >
       {/* Brand */}
-      <div className="flex h-14 items-center justify-between px-4 border-b border-border shrink-0">
-        <Link href="/app" className="flex items-center gap-2 overflow-hidden w-full">
-          {expanded ? (
-            <>
-              <Logo className="h-6 w-6" />
-              <span className="font-display font-bold tracking-tight text-foreground text-sm truncate">HandicapLab</span>
-            </>
-          ) : (
-            <Logo className="h-6 w-6 mx-auto" />
+      <div className="flex h-14 items-center px-4 border-b border-border shrink-0">
+        <Link 
+          href="/app" 
+          className={cn("flex items-center gap-2 overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta/20 rounded", !expanded && "justify-center w-full")}
+          aria-label="Home"
+        >
+          <Logo className="h-6 w-6 shrink-0" />
+          {expanded && (
+            <span className="font-display font-bold tracking-tight text-foreground text-sm truncate">HandicapLab</span>
           )}
         </Link>
       </div>
 
       {/* Navigation */}
       <div className="flex-1 overflow-y-auto py-4 scrollbar-none">
-        <div className={cn('space-y-0.5', expanded ? 'px-3' : 'px-2')}>
+        <div className={cn('space-y-1', expanded ? 'px-3' : 'px-2')}>
           {renderItems(NAV_ITEMS)}
         </div>
         <div className={cn('my-4 border-t border-border', expanded ? 'mx-4' : 'mx-2')} />
-        <div className={cn('space-y-0.5', expanded ? 'px-3' : 'px-2')}>
+        <div className={cn('space-y-1', expanded ? 'px-3' : 'px-2')}>
           {renderItems(FOOTER_ITEMS)}
         </div>
       </div>
 
-      {/* Pin toggle */}
+      {/* Collapse control */}
       <div className="p-3 border-t border-border mt-auto">
         <button
-          onClick={togglePin}
-          className="flex w-full items-center justify-center rounded-md p-2 text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-colors"
-          title={pinned ? 'Unpin sidebar' : 'Pin sidebar'}
+          onClick={toggleSidebar}
+          aria-label={expanded ? "Collapse sidebar" : "Expand sidebar"}
+          title={expanded ? "Collapse sidebar" : "Expand sidebar"}
+          className="flex w-full items-center justify-center rounded-md p-2 text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terracotta/20"
         >
-          {expanded ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+          {expanded ? <ChevronLeft className="h-5 w-5" /> : <ChevronRight className="h-5 w-5" />}
         </button>
       </div>
     </aside>

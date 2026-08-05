@@ -1,35 +1,10 @@
 import Link from 'next/link';
-
-const PRODUCT_LINKS = [
-  { href: '/dashboard', label: 'Dashboard' },
-  { href: '/live', label: "Today's Opportunities" },
-  { href: '/markets', label: 'Markets' },
-  { href: '/models', label: 'Models' },
-  { href: '/performance', label: 'Performance' },
-  { href: '/pricing', label: 'Pricing' },
-];
-
-const RESOURCE_LINKS = [
-  { href: '/blog', label: 'Blog' },
-  { href: '/resources', label: 'Resources' },
-  { href: '/methodology', label: 'Methodology' },
-  { href: '/track-record', label: 'Track Record' },
-  { href: '/trust-center', label: 'Trust Center' },
-  { href: '/validation', label: 'Validation' },
-];
-
-const COMPANY_LINKS = [
-  { href: '/about', label: 'About' },
-  { href: '/terms', label: 'Terms' },
-  { href: '/privacy', label: 'Privacy' },
-  { href: '/security', label: 'Security' },
-  { href: '/responsible-gambling', label: 'Responsible Gambling' },
-];
+import { FOOTER_NAV } from '@/config/navigation';
 
 export function Footer() {
   return (
     <footer className="border-t border-border bg-background mt-auto">
-      <div className="container mx-auto px-4 py-14">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-14 max-w-7xl">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
@@ -51,7 +26,7 @@ export function Footer() {
           <div>
             <h3 className="text-sm font-semibold text-foreground mb-4">Product</h3>
             <ul className="space-y-2.5">
-              {PRODUCT_LINKS.map((link) => (
+              {FOOTER_NAV.product.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
@@ -68,7 +43,7 @@ export function Footer() {
           <div>
             <h3 className="text-sm font-semibold text-foreground mb-4">Resources</h3>
             <ul className="space-y-2.5">
-              {RESOURCE_LINKS.map((link) => (
+              {FOOTER_NAV.resources.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
@@ -82,21 +57,23 @@ export function Footer() {
           </div>
 
           {/* Company */}
-          <div>
-            <h3 className="text-sm font-semibold text-foreground mb-4">Company</h3>
-            <ul className="space-y-2.5">
-              {COMPANY_LINKS.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {FOOTER_NAV.company.length > 0 && (
+            <div>
+              <h3 className="text-sm font-semibold text-foreground mb-4">Company</h3>
+              <ul className="space-y-2.5">
+                {FOOTER_NAV.company.map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
 
         {/* Trust / Guarantee strip */}

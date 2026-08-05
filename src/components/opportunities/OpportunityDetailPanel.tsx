@@ -3,11 +3,11 @@
 import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ShieldCheck, Activity, BarChart2, CheckCircle2, AlertTriangle, MinusCircle, Check } from 'lucide-react';
-import { Opportunity } from './OpportunitiesTable';
+import { PremiumOpportunity } from './OpportunitiesTable';
 import { cn } from '@/lib/utils';
 
 interface OpportunityDetailPanelProps {
-  opportunity: Opportunity | null;
+  opportunity: PremiumOpportunity | null;
   isOpen: boolean;
   onClose: () => void;
 }

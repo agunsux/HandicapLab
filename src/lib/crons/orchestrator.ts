@@ -35,7 +35,7 @@ import { recordAuditEvent, audited } from '@/lib/crons/auditTrail';
 import { runEvidenceEngine } from '@/lib/crons/evidenceEngine';
 import { runLeagueEvolution } from '@/lib/crons/leagueEvolution';
 import { supabase } from '@/lib/supabase.server';
-import { processAndStorePrediction } from '@/services/prediction.ledger';
+import { PredictionExecutionService } from '@/services/predictionExecutionService';
 import { computeAllocation, updateFixtureVolumes, updateLeagueEfficiency } from '@/lib/crons/adaptiveScheduler';
 import { syncLeaguesFromProvider, getActiveLeagues } from '@/lib/config/leagueRegistry';
 import { runHistoricalIngestor } from '@/lib/crons/historicalIngestor';
@@ -166,16 +166,23 @@ async function phasePredictions(): Promise<number> {
         },
       };
 
-      // Store prediction via the existing prediction ledger
+      // Fetch fixture from DB to pass to executeAndRecord
+      const { data: matchRow } = await supabase.from('matches').select('*').eq('id', f.fixtureId).single();
+      
       const prediction = await audited(
         `prediction-${f.fixtureId}-${Date.now()}`,
         'orchestrator',
-        () => processAndStorePrediction(f.fixtureId, matchInput),
+        () => PredictionExecutionService.executeAndRecord(
+          matchRow,
+          matchInput as any,
+          'ML',
+          { homeOdds: matchInput.odds_home, drawOdds: matchInput.odds_draw, awayOdds: matchInput.odds_away, bookmaker: 'Pinnacle' }
+        ),
         { fixtureId: f.fixtureId, leagueId: f.leagueId, provider: 'prediction_engine', endpoint: 'generatePrediction' }
       );
 
       await transitionState(f.fixtureId, 'PREDICTION_GENERATED');
-      await enqueue('prediction_due', f.fixtureId, { predictionId: prediction?.id });
+      await enqueue('prediction_due', f.fixtureId, { predictionId: prediction?.championHash });
       generated += 1;
     } catch (err) {
       console.error(`[Orchestrator] Prediction failed for fixture ${f.fixtureId}:`, err);

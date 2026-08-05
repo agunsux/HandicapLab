@@ -7,13 +7,7 @@ import { Search, Bell, ChevronDown, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Logo } from '@/components/ui/Logo';
 
-const MARKET_FILTERS = [
-  { label: 'All', href: '/app/value-bets' },
-  { label: 'AH', href: '/app/markets/asian-handicap' },
-  { label: 'O/U', href: '/app/markets/over-under' },
-  { label: 'ML', href: '/app/markets/moneyline' },
-  { label: 'BTTS', href: '/app/markets/btts' },
-];
+import { PRIMARY_NAV } from '@/config/navigation';
 
 const DATE_FILTERS = ['Today', 'Tomorrow', 'Custom'] as const;
 
@@ -76,10 +70,10 @@ export function TopBar() {
           ))}
         </nav>
 
-        {/* Market quick filters */}
-        <nav className="hidden md:flex items-center gap-0.5 rounded-md border border-border bg-card p-0.5" aria-label="Market filters">
-          {MARKET_FILTERS.map((m) => {
-            const active = pathname === m.href;
+        {/* Primary Nav in TopBar */}
+        <nav className="hidden md:flex items-center gap-0.5 rounded-md border border-border bg-card p-0.5" aria-label="Primary Nav">
+          {PRIMARY_NAV.map((m) => {
+            const active = pathname === m.href || pathname.startsWith(m.href + '/');
             return (
               <Link
                 key={m.href}

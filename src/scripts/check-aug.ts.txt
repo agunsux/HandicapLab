@@ -1,0 +1,15 @@
+import { createClient } from '@supabase/supabase-js';
+import * as dotenv from 'dotenv';
+import path from 'path';
+
+dotenv.config({ path: path.resolve(process.cwd(), '.env') });
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL || '', process.env.SUPABASE_SERVICE_ROLE_KEY || '');
+
+async function checkAugust() {
+  const { data: m } = await supabase.from('matches').select('*').gte('kickoff', '2026-08-01').lte('kickoff', '2026-08-10');
+  console.log(`Matches Aug 1 - Aug 10, 2026: ${m?.length || 0}`);
+  if ((m?.length || 0) > 0) {
+    console.log(m.map((x: any) => `${x.league} | ${x.home_team} vs ${x.away_team} | ${x.kickoff}`));
+  }
+}
+checkAugust().catch(console.error);

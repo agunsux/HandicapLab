@@ -145,9 +145,9 @@ export class LedgerV2Service {
         recommendation_label: convictionLabel,
         
         // 0035 columns
-        home_team: match.homeTeam || match.home_team || 'home',
-        away_team: match.awayTeam || match.away_team || 'away',
-        kickoff: match.kickoff || match.kickoff_time || new Date().toISOString(),
+        home_team: match.home_team || 'home',
+        away_team: match.away_team || 'away',
+        kickoff: match.kickoff || new Date().toISOString(),
         feature_version: '1.0.0',
         calibration_version: '1.0.0',
         research_manifest_version: '1.0.0',

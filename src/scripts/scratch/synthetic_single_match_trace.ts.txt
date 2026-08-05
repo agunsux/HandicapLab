@@ -1,0 +1,65 @@
+import { PredictionExecutionService } from '../services/predictionExecutionService';
+import { supabase } from '../lib/supabase.server';
+
+async function runTrace() {
+  console.log('=== STAGE E: SINGLE MATCH TRACE ===');
+
+  const { data: fixtures, error: fError } = await supabase
+    .from('matches')
+    .select('*')
+    .limit(1);
+
+  if (fError || !fixtures || fixtures.length === 0) {
+    console.error('Failed to find fixture:', fError || 'No fixtures found');
+    process.exit(1);
+  }
+
+  const fixture = fixtures[0];
+  console.log(`[1] Selected Fixture: ${fixture.home_team} vs ${fixture.away_team} (${fixture.id})`);
+
+  console.log('[2] Running Prediction Engine...');
+  
+  // Create mock features and odds snapshot
+  const features = {
+    featureVersion: 'basic-v1',
+    homeTeamStrength: 0.6,
+    awayTeamStrength: 0.4,
+    homeForm: 1.5,
+    awayForm: 1.2,
+    homeAttack: 1.5,
+    homeDefense: 1.0,
+    awayAttack: 1.2,
+    awayDefense: 1.1,
+    homeRestDays: 5,
+    awayRestDays: 4,
+    homeTravelKm: 0,
+    isHomeAdvantage: true,
+    leagueAvgGoals: 2.8
+  };
+  
+  const oddsSnapshot = {
+    homeOdds: 2.10,
+    awayOdds: 3.60,
+    drawOdds: 3.40,
+    pinnacle_odds: 2.10,
+    bet365_odds: 2.05,
+    market_average: 2.08,
+    implied_prob: 0.48
+  };
+
+  const { championHash } = await PredictionExecutionService.executeAndRecord(
+    { id: fixture.id, kickoff: fixture.kickoff, home_team: fixture.home_team, away_team: fixture.away_team } as any,
+    features,
+    'ML',
+    oddsSnapshot
+  );
+
+  console.log('[3] Engine Output (Hash):', championHash);
+  console.log('\n[SUCCESS] The Engine -> Database pipeline is verified. You should now see this in the UI.');
+  process.exit(0);
+}
+
+runTrace().catch(e => {
+  console.error(e);
+  process.exit(1);
+});

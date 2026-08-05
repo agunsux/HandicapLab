@@ -1,0 +1,73 @@
+import { supabase } from '../lib/supabase.server';
+import { processAndStorePrediction } from '../services/prediction.ledger';
+
+async function runRealTrace() {
+  console.log('--- PIPELINE VERIFICATION ---');
+
+  // Fetch ANY match from matches table
+  const { data: matches, error: matchErr } = await supabase
+    .from('matches')
+    .select('id, home_team, away_team, kickoff')
+    .limit(1);
+
+  if (matchErr || !matches || matches.length === 0) {
+    console.log('No matches found in DB! Cannot verify UI.');
+    process.exit(1);
+  }
+
+  const match = matches[0];
+  const fixtureId = match.id;
+  console.log(`\nREAL MATCH FOUND:`);
+  console.log(`Match: ${match.home_team} vs ${match.away_team}`);
+  console.log(`Kickoff: ${match.kickoff}`);
+  console.log(`Match ID (UUID): ${fixtureId}`);
+
+  // We will feed it realistic features and odds
+  const matchInput = {
+    odds_home: 2.1,
+    odds_draw: 3.4,
+    odds_away: 3.2,
+    ah_line: -0.25,
+    ou_line: 2.5,
+    btts_odds: 1.8,
+    xg_home: 1.6,
+    xg_away: 1.2,
+    shots_home: 14,
+    shots_away: 10,
+    shots_on_target_home: 5,
+    shots_on_target_away: 3,
+    form_home: 0.7,
+    form_away: 0.5,
+    last_5_avg_goals_home: 1.8,
+    last_5_avg_goals_away: 1.2,
+    preMatchFeatures: {
+      homeTeamStrength: 0.6,
+      awayTeamStrength: 0.5,
+      homeForm: 0.7,
+      awayForm: 0.5,
+      h2hHomeWinRate: 0.4,
+      h2hAwayWinRate: 0.3,
+      h2hDrawRate: 0.3,
+    }
+  };
+
+  // Run Model
+  console.log(`\n--- RUNNING PREDICTION ENGINE ---`);
+  const prediction = await processAndStorePrediction(fixtureId, matchInput);
+  
+  if (prediction) {
+    console.log(`\nREAL PREDICTION PERSISTED SUCCESSFULLY TO 'predictions' TABLE!`);
+    console.log(`ID: ${prediction.id}`);
+    const predObj = typeof prediction.prediction === 'object' ? prediction.prediction : prediction;
+    console.log(`Probability Home: ${predObj.home_prob || predObj.pHome}`);
+    console.log(`Fair Odds: ${predObj.fair_odds || 'Not specified'}`);
+    console.log(`Expected Value: ${prediction.expected_value || 'Not specified'}`);
+  } else {
+    console.log(`BLOCKED - Prediction Engine failed to persist.`);
+  }
+
+  console.log('\n--- PIPELINE TRACE COMPLETE ---');
+  process.exit(0);
+}
+
+runRealTrace().catch(e => { console.error(e); process.exit(1); });

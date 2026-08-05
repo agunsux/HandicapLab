@@ -4,12 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Logo } from '@/components/ui/Logo';
 import { cn } from '@/lib/utils';
-
-const NAV_ITEMS = [
-  { href: '/app/value-bets', label: 'Value Bets' },
-  { href: '/markets', label: 'Matches' },
-  { href: '/research', label: 'Insights' },
-];
+import { PRIMARY_NAV } from '@/config/navigation';
 
 export function Header() {
   const pathname = usePathname();
@@ -19,7 +14,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/70">
-      <div className="container mx-auto px-4 h-16 flex items-center justify-between max-w-7xl">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between max-w-7xl">
         {/* Brand Lockup */}
         <Link href="/" className="flex items-center gap-3 shrink-0 group" aria-label="HandicapLab home">
           <Logo className="w-10 h-10 text-foreground group-hover:text-foreground/90 transition-colors" />
@@ -35,7 +30,7 @@ export function Header() {
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-1 text-sm font-medium text-muted-foreground" aria-label="Primary">
-          {NAV_ITEMS.map((item) => (
+          {PRIMARY_NAV.map((item) => (
             <Link
               key={item.href}
               href={item.href}

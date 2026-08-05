@@ -1,0 +1,32 @@
+import { createClient } from '@supabase/supabase-js';
+import * as dotenv from 'dotenv';
+dotenv.config({ path: '.env' });
+
+const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
+
+async function diagnose() {
+  // 1. Find Everton vs Arsenal match
+  const { data: matches } = await supabase.from('matches')
+    .select('*')
+    .or('home_team.ilike.%everton%,away_team.ilike.%everton%');
+
+  const suspicious = matches?.filter(m => m.home_team.toLowerCase().includes('arsenal') || m.away_team.toLowerCase().includes('arsenal') || m.league === 'Ligue 1' || (m.home_team === 'Everton' && m.away_team === 'Arsenal'));
+
+  console.log('Suspicious Matches:', JSON.stringify(suspicious, null, 2));
+
+  if (!suspicious || suspicious.length === 0) {
+    // If not found, let's find all predictions that have leakage
+    const { data: preds } = await supabase.from('predictions')
+      .select('id, match_id, generated_at, matches(id, home_team, away_team, kickoff)');
+    
+    const leaky = preds?.filter(p => p.matches && p.generated_at && new Date(p.generated_at).getTime() > new Date(p.matches.kickoff).getTime());
+    console.log('Leaky predictions count:', leaky?.length);
+    console.log('Sample leaky prediction:', leaky?.[0]);
+  } else {
+    const matchId = suspicious[0].id;
+    const { data: preds } = await supabase.from('predictions').select('*').eq('match_id', matchId);
+    console.log('Predictions for suspicious match:', preds);
+  }
+}
+
+diagnose().catch(console.error);

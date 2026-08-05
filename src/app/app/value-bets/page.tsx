@@ -1,5 +1,6 @@
-import { DEMO_VALUE_BETS } from '@/app/app/_data/terminal';
-import { ValueBetsFeed } from '@/components/terminal/ValueBetsFeed';
+import { getSecureOpportunities } from '@/services/opportunities.service';
+import { OpportunitiesTable } from '@/components/opportunities/OpportunitiesTable';
+import { headers } from 'next/headers';
 
 export const metadata = {
   title: 'Value Bets',
@@ -13,6 +14,10 @@ export default async function ValueBetsPage({
   searchParams: Promise<{ q?: string }>;
 }) {
   const { q } = await searchParams;
+  const headersList = await headers();
+  const userId = headersList.get('x-user-id') || undefined;
+
+  const mappedOpportunities = await getSecureOpportunities(userId, 50);
 
   return (
     <div className="flex flex-col h-full space-y-5 pb-8">
@@ -27,11 +32,11 @@ export default async function ValueBetsPage({
           </p>
         </div>
         <span className="hidden sm:block text-xs text-muted-foreground tabular-nums">
-          {DEMO_VALUE_BETS.length} opportunities
+          {mappedOpportunities.length} opportunities
         </span>
       </div>
 
-      <ValueBetsFeed bets={DEMO_VALUE_BETS} searchQuery={q || ''} />
+      <OpportunitiesTable data={mappedOpportunities} />
     </div>
   );
 }

@@ -70,10 +70,10 @@ export async function GET(request: Request) {
       throw matchesError;
     }
 
-    // 3. Query ensembled predictions from the database
+    // 3. Query ensembled predictions from the canonical ledger
     const { data: predictions, error: predsError } = await supabase
-      .from('predictions')
-      .select('*')
+      .from('prediction_ledger_v3')
+      .select('*, matches(home_team, away_team, league, tournament_stage)')
       .order('prediction_timestamp', { ascending: true })
       .range(offset, offset + limit - 1);
 
@@ -109,14 +109,18 @@ export async function GET(request: Request) {
     }
 
     for (const pred of predictions || []) {
-      const matchId = pred.match_id || pred.id; // Fallback to prediction ID if match_id is null
-      const matchKey = `${pred.home_team} vs ${pred.away_team}`;
+      const matchId = pred.match_id;
+      const homeTeam = pred.matches?.home_team || pred.home_team || 'Home';
+      const awayTeam = pred.matches?.away_team || pred.away_team || 'Away';
+      const matchKey = `${homeTeam} vs ${awayTeam}`;
+      const cohortTag = getCohortTag(pred.matches?.league || 39, pred.matches?.tournament_stage);
+      
       if (!grouped[matchKey]) {
         grouped[matchKey] = {
           matchId,
           match: matchKey,
           kickoff: pred.prediction_timestamp,
-          league: pred.cohort_tag || 'EPL',
+          league: cohortTag || 'EPL',
           prediction: { home: null, draw: null, away: null },
           asianHandicap: { line: 'N/A', confidence: null, odds: 0.0, fairOdds: null, edge: 0.0 },
           overUnder: { line: 'N/A', over: null, under: null, odds: 0.0, fairOdds: null, edge: 0.0 },
@@ -125,49 +129,42 @@ export async function GET(request: Request) {
         };
       }
 
-      const predObj = typeof pred.prediction === 'object' && pred.prediction ? (pred.prediction as any) : {};
-
       // Check if this match is locked for FREE user
       const isMatchLocked = !entitlements.hasFullEdgeData && !revealedMatches.includes(matchId);
       grouped[matchKey].isLocked = isMatchLocked;
 
       if (pred.market_type === 'ML') {
-        const homeProb = predObj.pHome || predObj.home_prob || 0.4;
-        const drawProb = predObj.pDraw || predObj.draw_prob || 0.25;
-        const awayProb = predObj.pAway || predObj.away_prob || 0.35;
-
-        // Keep odds calculation public, but mask probability
-        grouped[matchKey].prediction = {
-          home: isMatchLocked ? null : Math.round(homeProb * 100),
-          draw: isMatchLocked ? null : Math.round(drawProb * 100),
-          away: isMatchLocked ? null : Math.round(awayProb * 100),
-          homeOdds: Number((1.1 / homeProb).toFixed(2)),
-          drawOdds: Number((1.15 / drawProb).toFixed(2)),
-          awayOdds: Number((1.1 / awayProb).toFixed(2))
-        };
+        // V3 stores selected probability in calibrated_probability
+        const p = pred.calibrated_probability || 0.4;
         
-        // Map confidence object to color dot
-        const finalConf = predObj.confidence?.finalConfidence;
-        if (finalConf !== undefined) {
-          grouped[matchKey].confidence = finalConf >= 0.75 ? '🟢 High' : finalConf >= 0.60 ? '🟡 Medium' : '⚪ Low';
-        }
+        // Map confidence from explainability_json
+        const finalConf = pred.explainability_json?.modelInfo?.confidenceScore || 50;
+        grouped[matchKey].confidence = finalConf >= 75 ? '🟢 High' : finalConf >= 60 ? '🟡 Medium' : '⚪ Low';
+
+        grouped[matchKey].prediction = {
+          home: isMatchLocked ? null : Math.round((pred.selection === 'home' ? p : 0.3) * 100),
+          draw: isMatchLocked ? null : Math.round((pred.selection === 'draw' ? p : 0.25) * 100),
+          away: isMatchLocked ? null : Math.round((pred.selection === 'away' ? p : 0.35) * 100),
+          homeOdds: pred.selection === 'home' ? pred.market_odds : 2.5,
+          drawOdds: pred.selection === 'draw' ? pred.market_odds : 3.0,
+          awayOdds: pred.selection === 'away' ? pred.market_odds : 2.8,
+        };
       } else if (pred.market_type === 'AH') {
-        const line = predObj.ah_line !== undefined ? predObj.ah_line : -0.75;
-        const lineStr = line > 0 ? `+${line}` : `${line}`;
-        const ahProb = predObj.ah_prob ?? (predObj.pAhHome?.[String(line)] || 0.5);
-        const ahOdds = predObj.ah_odds || 1.95;
+        const lineStr = pred.line > 0 ? `+${pred.line}` : `${pred.line || -0.5}`;
+        const ahProb = pred.calibrated_probability || 0.5;
+        const ahOdds = pred.market_odds || 1.95;
 
         grouped[matchKey].asianHandicap = {
-          line: `${pred.home_team} ${lineStr}`,
+          line: `${homeTeam} ${lineStr}`,
           confidence: isMatchLocked ? null : Math.round(ahProb * 100),
           odds: ahOdds,
           fairOdds: isMatchLocked ? null : Number((1 / ahProb).toFixed(2)),
           edge: isMatchLocked ? null : Number(((ahOdds * ahProb - 1) * 100).toFixed(1))
         };
       } else if (pred.market_type === 'OU') {
-        const line = predObj.ou_line !== undefined ? predObj.ou_line : 2.5;
-        const overProb = predObj.over_prob ?? (predObj.pOver?.[String(line)] || 0.5);
-        const ouOdds = predObj.ou_odds || 1.91;
+        const line = pred.line || 2.5;
+        const overProb = pred.calibrated_probability || 0.5;
+        const ouOdds = pred.market_odds || 1.91;
 
         grouped[matchKey].overUnder = {
           line: `O/U ${line}`,

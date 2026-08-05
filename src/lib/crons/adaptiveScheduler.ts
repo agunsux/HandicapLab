@@ -172,8 +172,13 @@ export async function computeAllocation(
   remainingQuota: number,
   quotaLimit: number
 ): Promise<AllocationPlan> {
-  const leagues = await loadAllLeagueEfficiency();
+  let leagues = await loadAllLeagueEfficiency();
   const pct = (remainingQuota / Math.max(1, quotaLimit)) * 100;
+
+  // HARD SCOPE: Target TOP-5 / APPROVED LEAGUES ONLY
+  // Do not silently expand to all active leagues.
+  const TOP_5_LEAGUE_IDS = [39, 140, 135, 78, 61];
+  leagues = leagues.filter(l => TOP_5_LEAGUE_IDS.includes(l.leagueId));
 
   let mode: 'NORMAL' | 'ECONOMY' | 'CRITICAL' = 'NORMAL';
   if (pct <= 10) mode = 'CRITICAL';
