@@ -1,72 +1,59 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { supabase } from '@/lib/supabase.server';
 import { PublicLedgerEngine } from '../../../../lib/public-ledger/ledger-engine';
 import { PublicVerifierEngine } from '../../../../lib/public-ledger/verifier-engine';
 
 export async function GET(req: NextRequest) {
   try {
-    const mockPublicPredictions = [
-      PublicLedgerEngine.appendSettlement(
-        PublicLedgerEngine.createPublicRecord({
-          predictionNumber: 1,
-          fixtureId: 'pub-fix-101',
-          league: 'Premier League',
-          homeTeam: 'Arsenal',
-          awayTeam: 'Chelsea',
-          kickoff: new Date(Date.now() - 86400000).toISOString(),
-          market: 'asian_handicap',
-          selection: 'home',
-          modelProb: 0.585,
-          ciLower: 0.54,
-          ciUpper: 0.62,
-          modelFairOdds: 1.709,
-          bookmakerOdds: 2.05,
-          probEdge: 0.08,
-          expectedValue: 0.199,
-          recommendation: 'STRONG_VALUE',
-          modelVersion: 'v1.40.0',
-          featureVersion: 'f-v2.5',
-        }),
-        1.95,
-        'WIN'
-      ),
-      PublicLedgerEngine.appendSettlement(
-        PublicLedgerEngine.createPublicRecord({
-          predictionNumber: 2,
-          fixtureId: 'pub-fix-102',
-          league: 'La Liga',
-          homeTeam: 'Real Madrid',
-          awayTeam: 'Barcelona',
-          kickoff: new Date(Date.now() - 172800000).toISOString(),
-          market: 'moneyline',
-          selection: 'home',
-          modelProb: 0.530,
-          ciLower: 0.48,
-          ciUpper: 0.58,
-          modelFairOdds: 1.887,
-          bookmakerOdds: 2.15,
-          probEdge: 0.05,
-          expectedValue: 0.139,
-          recommendation: 'VALUE',
-          modelVersion: 'v1.40.0',
-          featureVersion: 'f-v2.5',
-        }),
-        2.10,
-        'WIN'
-      ),
-    ];
+    const { data: dbRecords, error } = await supabase
+      .from('prediction_ledger_v3')
+      .select('*, matches!inner(id, home_team, away_team, league, kickoff, status)')
+      .order('prediction_timestamp', { ascending: false })
+      .limit(50);
 
-    const recordsWithVerification = mockPublicPredictions.map(rec => ({
-      ...rec,
-      verificationCertificate: PublicVerifierEngine.verifyRecord(rec),
-    }));
+    if (error) throw error;
+
+    const records = (dbRecords || []).map((row: any, i: number) => {
+      const match = row.matches;
+      const p = row.calibrated_probability || 0.5;
+      const odds = row.market_odds || 2.0;
+      const ev = row.expected_value ?? (p * odds - 1);
+      const fairOdds = p > 0 ? Number((1 / p).toFixed(3)) : 2.0;
+
+      const baseRecord = PublicLedgerEngine.createPublicRecord({
+        predictionNumber: i + 1,
+        fixtureId: String(match?.id || row.match_id),
+        league: match?.league || 'League',
+        homeTeam: match?.home_team || 'Home',
+        awayTeam: match?.away_team || 'Away',
+        kickoff: match?.kickoff || row.prediction_timestamp,
+        market: row.market_type,
+        selection: row.selection || 'home',
+        modelProb: p,
+        ciLower: Math.max(0.01, p - 0.05),
+        ciUpper: Math.min(0.99, p + 0.05),
+        modelFairOdds: fairOdds,
+        bookmakerOdds: odds,
+        probEdge: Number((p - (1 / odds)).toFixed(3)),
+        expectedValue: Number(ev.toFixed(3)),
+        recommendation: ev > 0.05 ? 'STRONG_VALUE' : 'VALUE',
+        modelVersion: row.model_id || 'v1.40.0',
+        featureVersion: row.feature_version || 'f-v2.5',
+      });
+
+      return {
+        ...baseRecord,
+        verificationCertificate: PublicVerifierEngine.verifyRecord(baseRecord),
+      };
+    });
 
     return NextResponse.json({
       success: true,
-      count: recordsWithVerification.length,
-      data: recordsWithVerification,
+      data: records,
+      count: records.length,
     });
-  } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    return NextResponse.json({ success: false, error: message }, { status: 500 });
+  } catch (error: any) {
+    console.error('Public Ledger Predictions Route Error:', error);
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }

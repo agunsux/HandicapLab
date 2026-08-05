@@ -1,16 +1,16 @@
 import { MarketPage } from '@/components/terminal/MarketPage';
 
 export const metadata = {
-  title: 'BTTS',
+  title: 'Moneyline',
   description:
-    'Both Teams To Score value opportunities — BTTS probability versus market pricing.',
+    'Moneyline 1X2 value opportunities — model win probabilities versus bookmaker market odds.',
 };
 
-export default function BttsPage() {
+export default function MoneylinePage() {
   return (
     <MarketPage
-      market="btts"
-      description="Value opportunities on Both Teams To Score, with model probability vs market odds."
+      market="moneyline"
+      description="1X2 Moneyline value opportunities, benchmarked against market odds."
     />
   );
 }

@@ -1,7 +1,7 @@
 import { MarketPage } from '@/components/terminal/MarketPage';
 
 export const metadata = {
-  title: 'BTTS',
+  title: 'Both Teams To Score (BTTS)',
   description:
     'Both Teams To Score value opportunities — BTTS probability versus market pricing.',
 };

@@ -9,7 +9,7 @@ export const metadata = {
 export default function AsianHandicapPage() {
   return (
     <MarketPage
-      market="asian_handicap"
+      market="asian-handicap"
       description="Value opportunities across Asian Handicap lines, benchmarked against Pinnacle."
     />
   );

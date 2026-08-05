@@ -1,29 +1,134 @@
-import { DEMO_VALUE_BETS, MarketType, MARKET_LABELS } from '@/app/app/_data/terminal';
-import { ValueBetsFeed } from './ValueBetsFeed';
+'use client';
+
+import { useEffect, useState } from 'react';
+import { EngineStatusWidget } from '@/components/engine/EngineStatusWidget';
+
+type MarketCategory = 'asian-handicap' | 'over-under' | 'moneyline' | 'btts';
+
+const MARKET_TITLE_MAP: Record<MarketCategory, string> = {
+  'asian-handicap': 'Asian Handicap',
+  'over-under': 'Over / Under',
+  'moneyline': 'Moneyline',
+  'btts': 'Both Teams to Score (BTTS)',
+};
 
 interface MarketPageProps {
-  market: MarketType;
+  market: MarketCategory;
   description: string;
 }
 
+interface MarketRow {
+  id: string;
+  home: string;
+  away: string;
+  league: string;
+  kickoff: string;
+  market: string;
+  selection: string;
+  line?: number;
+  modelProb?: number;
+  marketOdds?: number;
+  fairOdds?: number;
+  ev?: number;
+  locked: boolean;
+}
+
 export function MarketPage({ market, description }: MarketPageProps) {
-  const marketBets = DEMO_VALUE_BETS.filter((b) => b.market === market);
+  const [rows, setRows] = useState<MarketRow[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadMarketData() {
+      try {
+        const res = await fetch(`/api/v1/markets/${market}`);
+        const json = await res.json();
+        if (json.success) {
+          setRows(json.data || []);
+        }
+      } catch (err) {
+        console.error(`Failed to fetch ${market} market data:`, err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadMarketData();
+
+    // Auto-refresh every 5 minutes per §3 contract
+    const interval = setInterval(loadMarketData, 300000);
+    return () => clearInterval(interval);
+  }, [market]);
+
+  const hasLineColumn = market === 'asian-handicap' || market === 'over-under';
 
   return (
-    <div className="flex flex-col space-y-5 pb-8">
-      <div className="flex items-end justify-between">
+    <div className="flex flex-col h-full space-y-5 pb-8">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
         <div>
           <h1 className="text-xl font-display font-semibold tracking-tight text-foreground">
-            {MARKET_LABELS[market]}
+            {MARKET_TITLE_MAP[market]}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">{description}</p>
         </div>
-        <span className="hidden sm:block text-xs text-muted-foreground tabular-nums">
-          {marketBets.length} opportunities
-        </span>
+        <EngineStatusWidget compact />
       </div>
 
-      <ValueBetsFeed bets={DEMO_VALUE_BETS} marketFilter={market} />
+      {/* Table / Empty State */}
+      {loading ? (
+        <div className="rounded-lg border border-border/70 bg-card p-12 text-center text-sm text-muted-foreground animate-pulse">
+          Loading {MARKET_TITLE_MAP[market]} market data...
+        </div>
+      ) : rows.length === 0 ? (
+        <div className="rounded-lg border border-border/70 bg-card/60 p-12 text-center">
+          <p className="text-sm text-muted-foreground">
+            Engine is scanning. No validated opportunities for this window yet.
+          </p>
+        </div>
+      ) : (
+        <div className="overflow-x-auto rounded-lg border border-border bg-card shadow-sm">
+          <table className="w-full text-left text-xs">
+            <thead className="border-b border-border bg-muted/40 text-[11px] uppercase tracking-wider text-muted-foreground">
+              <tr>
+                <th className="px-4 py-3">Match</th>
+                <th className="px-4 py-3">Selection</th>
+                {hasLineColumn && <th className="px-4 py-3">Line</th>}
+                <th className="px-4 py-3 text-right">Model Prob</th>
+                <th className="px-4 py-3 text-right">Market Odds</th>
+                <th className="px-4 py-3 text-right">Fair Odds</th>
+                <th className="px-4 py-3 text-right">Expected Value</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border/60">
+              {rows.map((r) => (
+                <tr key={r.id} className="hover:bg-muted/20 transition-colors">
+                  <td className="px-4 py-3 font-medium text-foreground">
+                    <div>{r.home} vs {r.away}</div>
+                    <div className="text-[10px] text-muted-foreground">{r.league} · {new Date(r.kickoff).toLocaleString()}</div>
+                  </td>
+                  <td className="px-4 py-3 font-medium text-foreground capitalize">{r.selection}</td>
+                  {hasLineColumn && (
+                    <td className="px-4 py-3 tabular-nums text-muted-foreground">
+                      {r.line !== undefined ? (r.line > 0 ? `+${r.line}` : r.line) : '—'}
+                    </td>
+                  )}
+                  <td className="px-4 py-3 text-right tabular-nums">
+                    {r.locked ? <span className="text-amber-500 font-mono">🔒 Locked</span> : `${((r.modelProb || 0) * 100).toFixed(1)}%`}
+                  </td>
+                  <td className="px-4 py-3 text-right tabular-nums">
+                    {r.locked ? <span className="text-amber-500 font-mono">🔒 Locked</span> : r.marketOdds?.toFixed(2)}
+                  </td>
+                  <td className="px-4 py-3 text-right tabular-nums">
+                    {r.locked ? <span className="text-amber-500 font-mono">🔒 Locked</span> : r.fairOdds?.toFixed(2)}
+                  </td>
+                  <td className="px-4 py-3 text-right tabular-nums font-semibold text-emerald-500">
+                    {r.locked ? <span className="text-amber-500 font-mono">🔒 Locked</span> : `+${((r.ev || 0) * 100).toFixed(1)}%`}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }

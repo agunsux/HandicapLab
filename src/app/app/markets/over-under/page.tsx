@@ -9,7 +9,7 @@ export const metadata = {
 export default function OverUnderPage() {
   return (
     <MarketPage
-      market="over_under"
+      market="over-under"
       description="Value opportunities on goal totals, with model probability vs market odds."
     />
   );
