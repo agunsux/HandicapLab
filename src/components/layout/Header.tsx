@@ -1,65 +1,87 @@
 'use client';
 
+import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Logo } from '@/components/ui/Logo';
-import { cn } from '@/lib/utils';
+import { Menu, Search, ShieldCheck, User } from 'lucide-react';
 import { PRIMARY_NAV } from '@/config/navigation';
+import { cn } from '@/lib/utils';
 
-export function Header() {
+interface HeaderProps {
+  onMenuClick?: () => void;
+}
+
+export function Header({ onMenuClick }: HeaderProps) {
   const pathname = usePathname();
 
-  const isActive = (href: string) =>
-    pathname === href || pathname.startsWith(href + '/');
-
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/70">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between max-w-7xl">
-        {/* Brand Lockup */}
-        <Link href="/" className="flex items-center gap-3 shrink-0 group" aria-label="HandicapLab home">
-          <Logo className="w-10 h-10 text-foreground group-hover:text-foreground/90 transition-colors" />
-          <div className="flex flex-col">
-            <span className="font-display font-bold tracking-tight text-foreground text-lg leading-none">
-              HANDICAPLAB
-            </span>
-            <span className="text-[10px] text-terracotta font-mono font-medium tracking-wide mt-0.5">
-              Where Odds Meet Evidence.
-            </span>
+    <header className="h-[64px] fixed top-0 left-0 right-0 z-40 bg-[#0A0B0F]/80 backdrop-blur-md border-b border-[#1F232C] px-4 sm:px-6 flex items-center justify-between">
+      {/* Brand & Left Actions */}
+      <div className="flex items-center gap-4">
+        {onMenuClick && (
+          <button
+            onClick={onMenuClick}
+            className="sm:hidden flex h-8 w-8 items-center justify-center rounded-lg text-[#8B92A8] hover:bg-[#1A1D24] hover:text-[#F0F1F5] transition-colors"
+            aria-label="Open mobile menu"
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+        )}
+
+        <Link href="/" className="flex items-center gap-2">
+          <div className="h-8 w-8 rounded-lg bg-[#6366F1] flex items-center justify-center font-display font-bold text-white text-xs shadow-sm">
+            HL
           </div>
+          <span className="font-display font-bold text-base tracking-tight text-[#F0F1F5]">
+            Handicap<span className="text-[#6366F1]">Lab</span>
+          </span>
+        </Link>
+      </div>
+
+      {/* Nav Links (Desktop) */}
+      <nav className="hidden md:flex items-center gap-6">
+        {PRIMARY_NAV.map((nav) => {
+          const isActive = pathname === nav.href;
+          return (
+            <Link
+              key={nav.label}
+              href={nav.href}
+              className={cn(
+                'text-xs font-medium transition-colors',
+                isActive ? 'text-[#6366F1] font-semibold' : 'text-[#8B92A8] hover:text-[#F0F1F5]'
+              )}
+            >
+              {nav.label}
+            </Link>
+          );
+        })}
+      </nav>
+
+      {/* Right Controls: Search, Tier, Profile */}
+      <div className="flex items-center gap-3">
+        <div className="relative hidden sm:block">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#5A6070]" />
+          <input
+            type="text"
+            placeholder="Search teams, leagues..."
+            className="h-8 w-44 lg:w-56 rounded-lg bg-[#111318] border border-[#1F232C] pl-8 pr-3 text-xs text-[#F0F1F5] placeholder-[#5A6070] focus:border-[#6366F1] focus:outline-none transition-colors"
+          />
+        </div>
+
+        <Link
+          href="/pricing"
+          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#6366F1]/10 border border-[#6366F1]/30 text-[#818CF8] text-xs font-medium hover:bg-[#6366F1]/20 transition-colors"
+        >
+          <ShieldCheck className="h-3.5 w-3.5" />
+          <span className="hidden sm:inline">Quant Tier</span>
         </Link>
 
-        {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-1 text-sm font-medium text-muted-foreground" aria-label="Primary">
-          {PRIMARY_NAV.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                'px-3 py-2 rounded-md transition-colors hover:text-foreground hover:bg-muted/50',
-                isActive(item.href) && 'text-foreground bg-muted/60'
-              )}
-              aria-current={isActive(item.href) ? 'page' : undefined}
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-
-        {/* Right actions */}
-        <div className="flex items-center gap-4 shrink-0">
-          <Link
-            href="/login"
-            className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors hidden sm:block"
-          >
-            Sign In
-          </Link>
-          <Link 
-            href="/pricing" 
-            className="px-4 py-2 text-sm font-semibold bg-terracotta text-white rounded-md hover:bg-terracotta-muted transition-colors"
-          >
-            Pro / Account
-          </Link>
-        </div>
+        <Link
+          href="/app/profile"
+          className="h-8 w-8 rounded-full bg-[#1A1D24] border border-[#1F232C] flex items-center justify-center text-[#8B92A8] hover:text-[#F0F1F5] transition-colors"
+        >
+          <User className="h-4 w-4" />
+        </Link>
       </div>
     </header>
   );
