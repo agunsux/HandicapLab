@@ -3,7 +3,8 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, Search, ShieldCheck, User, Bell } from 'lucide-react';
+import { Menu, ShieldCheck, User, Bell } from 'lucide-react';
+import { SearchBar } from '@/components/ui/SearchBar';
 import { PRIMARY_NAV } from '@/config/navigation';
 import { cn } from '@/lib/utils';
 import { useAppStore } from '@/store/appStore';
@@ -73,13 +74,9 @@ export function Header({ onMenuClick }: HeaderProps) {
 
       {/* Right Controls: Search, Tier Badge (Clickable to test), Bell, Profile */}
       <div className="flex items-center gap-3">
-        <div className="relative hidden sm:block">
-          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#9CA3AF]" />
-          <input
-            type="text"
-            placeholder="Search matches, leagues..."
-            className="h-8 w-44 lg:w-56 rounded-lg bg-[#111827] border border-[#1F2937] pl-8 pr-3 text-xs text-[#F0FDF4] placeholder-[#9CA3AF]/60 focus:border-[#10B981] focus:outline-none transition-colors"
-          />
+        {/* Search Bar with ⌘K Spotlight */}
+        <div className="hidden sm:block">
+          <SearchBar />
         </div>
 
         {/* User Tier Badge (Clickable toggle for easy testing) */}

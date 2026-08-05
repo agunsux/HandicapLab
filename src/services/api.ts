@@ -6,11 +6,35 @@ import {
   MarketDepth,
   PerformanceStats,
   MarketType,
-  SignalType,
 } from '@/types';
 
-// Axios Instance 1: football-data.org
-const footballDataClient = axios.create({
+import {
+  generateMockMatches,
+  generateMockOdds,
+  generateMockSignals,
+  generateMockPerformance,
+  generateMockMatchStats,
+  generateMockPredictions,
+  generateMockMarketDepth,
+} from './mockEngine';
+
+// Re-export mock functions for components or tests importing directly from api.ts
+export {
+  generateMockMatches,
+  generateMockOdds,
+  generateMockSignals,
+  generateMockPerformance,
+  generateMockMatchStats,
+  generateMockPredictions,
+  generateMockMarketDepth,
+};
+
+// ==========================================
+// 1. API CLIENT DEFINITIONS (5 EXTERNAL PROVIDERS)
+// ==========================================
+
+// API 1: football-data.org (Matches & Schedules)
+export const footballDataClient = axios.create({
   baseURL: 'https://api.football-data.org/v4',
   headers: {
     'X-Auth-Token':
@@ -21,25 +45,53 @@ const footballDataClient = axios.create({
   timeout: 10000,
 });
 
-// Axios Instance 2: API-Football via RapidAPI
-const rapidApiClient = axios.create({
-  baseURL: 'https://api-football-v1.p.rapidapi.com/v3',
+// API 2: API-Football (API-Sports DIRECT — not RapidAPI)
+export const apiFootball = axios.create({
+  baseURL: 'https://v3.football.api-sports.io',
   headers: {
-    'X-RapidAPI-Key':
-      process.env.VITE_RAPIDAPI_KEY || process.env.NEXT_PUBLIC_RAPIDAPI_KEY || '',
-    'X-RapidAPI-Host': 'api-football-v1.p.rapidapi.com',
+    'x-apisports-key':
+      process.env.VITE_APIFOOTBALL_KEY ||
+      process.env.NEXT_PUBLIC_APIFOOTBALL_KEY ||
+      process.env.API_FOOTBALL_KEY ||
+      '',
   },
   timeout: 10000,
 });
 
-// Axios Instance 3: The Odds API
-const oddsApiClient = axios.create({
+// API 3: TheStatsAPI (xG, Advanced Analytics, Form)
+export const theStatsApi = axios.create({
+  baseURL: 'https://api.thestatsapi.com/api',
+  headers: {
+    'Authorization': `Bearer ${
+      process.env.VITE_THESTATS_API_KEY ||
+      process.env.NEXT_PUBLIC_THESTATS_API_KEY ||
+      ''
+    }`,
+  },
+  timeout: 10000,
+});
+
+// API 4: The Odds API (Bookmaker Odds)
+export const oddsApiClient = axios.create({
   baseURL: 'https://api.the-odds-api.com/v4',
   timeout: 15000,
 });
 
-// Axios Instance 4: Internal Value Engine
-const valueEngineClient = axios.create({
+// API 5: OddsPAPI (Odds Comparison, Line Movements)
+export const oddsPapi = axios.create({
+  baseURL: 'https://api.oddspapi.com/v1',
+  headers: {
+    'x-api-key':
+      process.env.VITE_ODDS_PAPI_KEY ||
+      process.env.NEXT_PUBLIC_ODDS_PAPI_KEY ||
+      process.env.ODDSPAPI_KEY ||
+      '',
+  },
+  timeout: 10000,
+});
+
+// Internal Value Engine Client
+export const valueEngineClient = axios.create({
   baseURL:
     process.env.VITE_VALUE_ENGINE_URL ||
     process.env.NEXT_PUBLIC_VALUE_ENGINE_URL ||
@@ -47,60 +99,96 @@ const valueEngineClient = axios.create({
   timeout: 8000,
 });
 
-// Mock Generators
-export function generateMockMatches(count: number = 12): Match[] {
-  const teams = [
-    { home: 'Man City', away: 'Liverpool', league: 'Premier League', country: 'England' },
-    { home: 'Real Madrid', away: 'Barcelona', league: 'La Liga', country: 'Spain' },
-    { home: 'Bayern Munich', away: 'Borussia Dortmund', league: 'Bundesliga', country: 'Germany' },
-    { home: 'Juventus', away: 'Inter Milan', league: 'Serie A', country: 'Italy' },
-    { home: 'PSG', away: 'Marseille', league: 'Ligue 1', country: 'France' },
-    { home: 'Ajax', away: 'PSV Eindhoven', league: 'Eredivisie', country: 'Netherlands' },
-    { home: 'Arsenal', away: 'Chelsea', league: 'Premier League', country: 'England' },
-    { home: 'Atletico Madrid', away: 'Sevilla', league: 'La Liga', country: 'Spain' },
-    { home: 'AC Milan', away: 'Napoli', league: 'Serie A', country: 'Italy' },
-    { home: 'Leverkusen', away: 'RB Leipzig', league: 'Bundesliga', country: 'Germany' },
-    { home: 'Lyon', away: 'Monaco', league: 'Ligue 1', country: 'France' },
-    { home: 'Tottenham', away: 'Manchester United', league: 'Premier League', country: 'England' },
-  ];
+// Helper to check if API key exists and is valid (not empty/placeholder)
+function isKeyValid(key?: string): boolean {
+  if (!key) return false;
+  const k = key.trim().toLowerCase();
+  return k.length > 5 && !k.includes('your_') && !k.includes('placeholder');
+}
 
-  return teams.slice(0, count).map((t, idx) => {
-    const isLive = idx === 1 || idx === 3;
-    const isFinished = idx === 5;
+// ==========================================
+// 2. TRANSFORMER FUNCTIONS
+// ==========================================
+
+export function transformFootballDataMatches(data: any): Match[] {
+  if (!data?.matches?.length) return [];
+  return data.matches.map((m: any) => ({
+    id: String(m.id),
+    homeTeam: m.homeTeam?.name || 'Home Team',
+    awayTeam: m.awayTeam?.name || 'Away Team',
+    league: m.competition?.name || 'Premier League',
+    country: m.area?.name || 'Europe',
+    kickoff: m.utcDate || new Date().toISOString(),
+    status: m.status === 'IN_PLAY' || m.status === 'PAUSED' ? 'LIVE' : m.status || 'SCHEDULED',
+    minute: m.minute,
+    score: m.score?.fullTime?.home !== null ? { home: m.score.fullTime.home, away: m.score.fullTime.away } : undefined,
+  }));
+}
+
+export function transformApiFootballFixtures(response: any[]): Match[] {
+  if (!response?.length) return [];
+  return response.map((item: any) => {
+    const f = item.fixture || {};
+    const t = item.teams || {};
+    const g = item.goals || {};
+    const l = item.league || {};
+    const isLive = ['1H', '2H', 'HT', 'ET', 'P', 'LIVE'].includes(f.status?.short);
+    
     return {
-      id: `m-${101 + idx}`,
-      homeTeam: t.home,
-      awayTeam: t.away,
-      league: t.league,
-      country: t.country,
-      kickoff: new Date(Date.now() + (idx - 2) * 3600000 * 6).toISOString(),
-      status: isLive ? 'LIVE' : isFinished ? 'FINISHED' : 'SCHEDULED',
-      minute: isLive ? 34 + idx * 12 : undefined,
-      score: isLive || isFinished ? { home: 1 + (idx % 2), away: idx % 3 } : undefined,
+      id: String(f.id),
+      homeTeam: t.home?.name || 'Home',
+      awayTeam: t.away?.name || 'Away',
+      league: l.name || 'League',
+      country: l.country || 'International',
+      kickoff: f.date || new Date().toISOString(),
+      status: isLive ? 'LIVE' : f.status?.short === 'FT' ? 'FINISHED' : 'SCHEDULED',
+      minute: f.status?.elapsed || undefined,
+      score: isLive || f.status?.short === 'FT' ? { home: g.home ?? 0, away: g.away ?? 0 } : undefined,
     };
   });
 }
 
-export function generateMockOdds(matchId: string): MatchOdds[] {
-  const bookies = ['Pinnacle', 'Bet365', 'Betfair', 'SBOBet', 'MaxBet', '188Bet'];
-  const markets: MarketType[] = ['asian_handicap', 'over_under', 'moneyline', 'btts'];
+export function transformTheStatsMatches(data: any): Match[] {
+  const matches = Array.isArray(data) ? data : data?.data || data?.matches || [];
+  if (!matches.length) return [];
+  return matches.map((m: any, idx: number) => ({
+    id: String(m.id || `tsm-${idx}`),
+    homeTeam: m.home_team?.name || m.homeTeam || 'Home',
+    awayTeam: m.away_team?.name || m.awayTeam || 'Away',
+    league: m.league_name || m.league || 'League',
+    country: m.country || 'World',
+    kickoff: m.match_time || m.kickoff || new Date().toISOString(),
+    status: m.status === 'live' ? 'LIVE' : m.status === 'ended' ? 'FINISHED' : 'SCHEDULED',
+    minute: m.minute,
+    score: m.score ? { home: m.score.home, away: m.score.away } : undefined,
+  }));
+}
+
+export function transformOddsApi(data: any[]): MatchOdds[] {
+  if (!Array.isArray(data) || !data.length) return [];
   const result: MatchOdds[] = [];
 
-  markets.forEach((market) => {
-    bookies.forEach((b) => {
-      const baseOdds = Number((1.75 + Math.random() * 1.4).toFixed(2));
-      const change = Number(((Math.random() - 0.48) * 8).toFixed(1));
-      result.push({
-        matchId,
-        bookmaker: b,
-        market,
-        selection: market === 'moneyline' ? 'Home Win' : market === 'over_under' ? 'Over 2.5' : market === 'btts' ? 'BTTS Yes' : 'Home -0.5',
-        odds: baseOdds,
-        line: market === 'asian_handicap' ? -0.5 : market === 'over_under' ? 2.5 : undefined,
-        volume: Math.floor(Math.random() * 50000 + 5000),
-        timestamp: new Date().toISOString(),
-        previousOdds: Number((baseOdds - change * 0.02).toFixed(2)),
-        changePercent: change,
+  data.forEach((match: any) => {
+    match.bookmakers?.forEach((b: any) => {
+      b.markets?.forEach((m: any) => {
+        m.outcomes?.forEach((o: any) => {
+          result.push({
+            matchId: match.id,
+            bookmaker: b.title || b.key,
+            market:
+              m.key === 'h2h'
+                ? 'moneyline'
+                : m.key === 'totals'
+                ? 'over_under'
+                : m.key === 'spreads'
+                ? 'asian_handicap'
+                : 'btts',
+            selection: o.name,
+            odds: o.price,
+            line: o.point,
+            timestamp: b.last_update || new Date().toISOString(),
+          });
+        });
       });
     });
   });
@@ -108,215 +196,328 @@ export function generateMockOdds(matchId: string): MatchOdds[] {
   return result;
 }
 
-export function generateMockSignals(count: number = 10): Signal[] {
-  const matches = generateMockMatches(count);
-  const signalTypes: SignalType[] = ['value', 'steam', 'drift', 'reverse_line', 'sharp'];
-  const markets: MarketType[] = ['asian_handicap', 'over_under', 'moneyline', 'btts'];
-  const bookies = ['Pinnacle', 'SBOBet', 'Bet365', 'Betfair'];
-
-  return matches.map((m, idx) => {
-    const market = markets[idx % markets.length];
-    const type = signalTypes[idx % signalTypes.length];
-    const odds = Number((1.85 + (idx % 4) * 0.15).toFixed(2));
-    const fairOdds = Number((odds * 0.91).toFixed(2));
-    const ev = Number(((1 / fairOdds - 1 / odds) * 100 * 1.8).toFixed(1));
-    const confidence = 65 + (idx * 3) % 30;
-
-    return {
-      id: `sig-${101 + idx}`,
-      matchId: m.id,
-      type,
-      market,
-      selection: `${m.homeTeam} ${market === 'asian_handicap' ? '-0.75' : market === 'over_under' ? 'Over 2.5' : 'Win'}`,
-      confidence,
-      ev,
-      odds,
-      fairOdds,
-      edge: Number((ev * 0.85).toFixed(1)),
-      bookmaker: bookies[idx % bookies.length],
-      timestamp: new Date().toISOString(),
-      expiresAt: '2h 15m',
-      reason: `Sharp volume surge detected on ${bookies[idx % bookies.length]} line. Model projected fair odds at ${fairOdds.toFixed(2)} vs market price ${odds.toFixed(2)}.`,
-      sharpMoneyIndicator: 70 + (idx * 7) % 28,
-      lineMovement: type === 'steam' ? 'steam' : type === 'drift' ? 'drift' : 'stable',
-      publicMoneyPercent: 30 + (idx * 5) % 40,
-      // Compatibility UI props
-      homeTeam: m.homeTeam,
-      awayTeam: m.awayTeam,
-      league: m.league,
-      kickoff: m.kickoff,
-      marketType: market === 'asian_handicap' ? 'AH' : market === 'over_under' ? 'OU' : market === 'moneyline' ? 'ML' : 'BTTS',
-      signalCategory: type.toUpperCase().replace('_', ' '),
-      isHighValue: ev > 8.0,
-    };
-  });
+export function transformOddsPapi(data: any): MatchOdds[] {
+  const items = Array.isArray(data) ? data : data?.odds || data?.data || [];
+  if (!items.length) return [];
+  return items.map((o: any, idx: number) => ({
+    matchId: String(o.match_id || o.fixture_id || `op-${idx}`),
+    bookmaker: o.bookmaker || 'Pinnacle',
+    market: o.market || 'asian_handicap',
+    selection: o.selection || 'Home Win',
+    odds: Number(o.odds || o.price || 1.90),
+    line: o.line,
+    timestamp: o.timestamp || new Date().toISOString(),
+  }));
 }
 
-export function generateMockPerformance(days: number = 30): PerformanceStats[] {
-  let cum = 0;
-  return Array.from({ length: days }).map((_, idx) => {
-    const date = new Date(Date.now() - (days - 1 - idx) * 86400000).toISOString().split('T')[0];
-    const profit = Number(((Math.random() - 0.42) * 4.2).toFixed(2));
-    cum += profit;
-    return {
-      date,
-      profit,
-      cumulative: Number(cum.toFixed(2)),
-      bets: Math.floor(Math.random() * 6 + 1),
-      winRate: Number((52 + Math.random() * 14).toFixed(1)),
-    };
+export function transformApiFootballOdds(data: any[]): MatchOdds[] {
+  if (!data?.length) return [];
+  const result: MatchOdds[] = [];
+
+  data.forEach((item: any) => {
+    const fixtureId = String(item.fixture?.id);
+    item.bookmakers?.forEach((b: any) => {
+      b.bets?.forEach((bet: any) => {
+        const market: MarketType =
+          bet.name?.toLowerCase().includes('handicap')
+            ? 'asian_handicap'
+            : bet.name?.toLowerCase().includes('over/under')
+            ? 'over_under'
+            : bet.name?.toLowerCase().includes('both teams')
+            ? 'btts'
+            : 'moneyline';
+
+        bet.values?.forEach((val: any) => {
+          result.push({
+            matchId: fixtureId,
+            bookmaker: b.name,
+            market,
+            selection: val.value,
+            odds: Number(val.odd),
+            timestamp: new Date().toISOString(),
+          });
+        });
+      });
+    });
   });
+
+  return result;
 }
 
-// Service Functions (Real API Call with Fallback)
+// ==========================================
+// 3. SERVICE FUNCTIONS WITH FALLBACK CHAINS
+// ==========================================
 
 export async function fetchMatches(dateFrom?: string, dateTo?: string): Promise<Match[]> {
-  try {
-    const res = await footballDataClient.get('/matches', {
-      params: { dateFrom, dateTo },
-    });
-    if (res.data?.matches?.length > 0) {
-      return res.data.matches.map((m: any) => ({
-        id: String(m.id),
-        homeTeam: m.homeTeam.name,
-        awayTeam: m.awayTeam.name,
-        league: m.competition.name,
-        country: m.area?.name || 'Europe',
-        kickoff: m.utcDate,
-        status: m.status === 'IN_PLAY' || m.status === 'PAUSED' ? 'LIVE' : m.status,
-        minute: m.minute,
-        score: m.score?.fullTime?.home !== null ? { home: m.score.fullTime.home, away: m.score.fullTime.away } : undefined,
-      }));
+  // Try 1: football-data.org
+  const fdKey = process.env.VITE_FOOTBALL_DATA_API_KEY || process.env.NEXT_PUBLIC_FOOTBALL_DATA_API_KEY;
+  if (isKeyValid(fdKey)) {
+    try {
+      const res = await footballDataClient.get('/matches', { params: { dateFrom, dateTo } });
+      const matches = transformFootballDataMatches(res.data);
+      if (matches.length > 0) return matches;
+    } catch (err) {
+      console.warn('[API Service] football-data.org failed, trying API-Football:', err);
     }
-  } catch (err) {
-    console.warn('[API Service] fetchMatches failed, using fallback mock data:', err);
   }
-  return generateMockMatches();
+
+  // Try 2: API-Football (Direct API-Sports)
+  const afKey =
+    process.env.VITE_APIFOOTBALL_KEY ||
+    process.env.NEXT_PUBLIC_APIFOOTBALL_KEY ||
+    process.env.API_FOOTBALL_KEY;
+  if (isKeyValid(afKey)) {
+    try {
+      const res = await apiFootball.get('/fixtures', {
+        params: { date: dateFrom || new Date().toISOString().split('T')[0], timezone: 'Europe/London' },
+      });
+      const matches = transformApiFootballFixtures(res.data?.response);
+      if (matches.length > 0) return matches;
+    } catch (err) {
+      console.warn('[API Service] API-Football failed, trying TheStatsAPI:', err);
+    }
+  }
+
+  // Try 3: TheStatsAPI
+  const tsKey = process.env.VITE_THESTATS_API_KEY || process.env.NEXT_PUBLIC_THESTATS_API_KEY;
+  if (isKeyValid(tsKey)) {
+    try {
+      const res = await theStatsApi.get('/football/matches', {
+        params: { date: dateFrom || new Date().toISOString().split('T')[0] },
+      });
+      const matches = transformTheStatsMatches(res.data);
+      if (matches.length > 0) return matches;
+    } catch (err) {
+      console.warn('[API Service] TheStatsAPI failed:', err);
+    }
+  }
+
+  // Final Fallback: Mock Engine (FAZE 1 Active)
+  console.warn('[API Service] API key not configured — using mock data');
+  return generateMockMatches(12, dateFrom || 'today');
 }
 
 export async function fetchLiveMatches(): Promise<Match[]> {
-  try {
-    const res = await footballDataClient.get('/matches', {
-      params: { status: 'LIVE,IN_PLAY' },
-    });
-    if (res.data?.matches?.length > 0) {
-      return res.data.matches.map((m: any) => ({
-        id: String(m.id),
-        homeTeam: m.homeTeam.name,
-        awayTeam: m.awayTeam.name,
-        league: m.competition.name,
-        country: m.area?.name || 'Europe',
-        kickoff: m.utcDate,
-        status: 'LIVE',
-        minute: m.minute || 45,
-        score: { home: m.score?.fullTime?.home ?? 1, away: m.score?.fullTime?.away ?? 0 },
-      }));
+  // Try 1: football-data.org LIVE
+  const fdKey = process.env.VITE_FOOTBALL_DATA_API_KEY || process.env.NEXT_PUBLIC_FOOTBALL_DATA_API_KEY;
+  if (isKeyValid(fdKey)) {
+    try {
+      const res = await footballDataClient.get('/matches', { params: { status: 'LIVE,IN_PLAY' } });
+      const matches = transformFootballDataMatches(res.data);
+      if (matches.length > 0) return matches;
+    } catch (err) {
+      console.warn('[API Service] football-data.org live failed:', err);
     }
-  } catch (err) {
-    console.warn('[API Service] fetchLiveMatches failed, using fallback mock data:', err);
   }
-  return generateMockMatches().filter((m) => m.status === 'LIVE');
+
+  // Try 2: API-Football live
+  const afKey = process.env.VITE_APIFOOTBALL_KEY || process.env.NEXT_PUBLIC_APIFOOTBALL_KEY || process.env.API_FOOTBALL_KEY;
+  if (isKeyValid(afKey)) {
+    try {
+      const res = await apiFootball.get('/fixtures', { params: { live: 'all' } });
+      const matches = transformApiFootballFixtures(res.data?.response);
+      if (matches.length > 0) return matches;
+    } catch (err) {
+      console.warn('[API Service] API-Football live failed:', err);
+    }
+  }
+
+  // Try 3: OddsPAPI live
+  const opKey = process.env.VITE_ODDS_PAPI_KEY || process.env.NEXT_PUBLIC_ODDS_PAPI_KEY || process.env.ODDSPAPI_KEY;
+  if (isKeyValid(opKey)) {
+    try {
+      const res = await oddsPapi.get('/matches/live');
+      const matches = transformTheStatsMatches(res.data);
+      if (matches.length > 0) return matches;
+    } catch (err) {
+      console.warn('[API Service] OddsPAPI live failed:', err);
+    }
+  }
+
+  // Final Fallback: Mock Engine
+  console.warn('[API Service] API key not configured — using mock data');
+  return generateMockMatches(12).filter((m) => m.status === 'LIVE');
 }
 
 export async function fetchCompetitions(): Promise<any[]> {
-  try {
-    const res = await footballDataClient.get('/competitions');
-    return res.data?.competitions || [];
-  } catch {
-    return [{ id: 2021, name: 'Premier League' }, { id: 2014, name: 'La Liga' }];
-  }
-}
-
-export async function fetchMatchStats(fixtureId: number): Promise<any> {
-  try {
-    const res = await rapidApiClient.get('/fixtures/statistics', {
-      params: { fixture: fixtureId },
-    });
-    return res.data?.response || null;
-  } catch {
-    return { xG: { home: 1.84, away: 0.92 } };
-  }
-}
-
-export async function fetchTeamForm(teamId: number, last: number = 5): Promise<any> {
-  try {
-    const res = await rapidApiClient.get('/teams/statistics', {
-      params: { team: teamId, last },
-    });
-    return res.data?.response || null;
-  } catch {
-    return { form: 'WWDLW' };
-  }
-}
-
-export async function fetchPredictions(fixtureId: number): Promise<any> {
-  try {
-    const res = await rapidApiClient.get('/predictions', {
-      params: { fixture: fixtureId },
-    });
-    return res.data?.response || null;
-  } catch {
-    return { advice: 'Combo Double chance : Home or Draw' };
-  }
-}
-
-export async function fetchOdds(sport: string = 'soccer_epl', regions: string = 'eu'): Promise<MatchOdds[]> {
-  try {
-    const apiKey = process.env.VITE_ODDS_API_KEY || process.env.NEXT_PUBLIC_ODDS_API_KEY;
-    if (apiKey) {
-      const res = await oddsApiClient.get(`/sports/${sport}/odds`, {
-        params: { apiKey, regions, markets: 'h2h,totals,spreads,btts', oddsFormat: 'decimal' },
-      });
-      if (res.data?.length > 0) {
-        const result: MatchOdds[] = [];
-        res.data.forEach((match: any) => {
-          match.bookmakers?.forEach((b: any) => {
-            b.markets?.forEach((m: any) => {
-              m.outcomes?.forEach((o: any) => {
-                result.push({
-                  matchId: match.id,
-                  bookmaker: b.title,
-                  market: m.key === 'h2h' ? 'moneyline' : m.key === 'totals' ? 'over_under' : m.key === 'spreads' ? 'asian_handicap' : 'btts',
-                  selection: o.name,
-                  odds: o.price,
-                  line: o.point,
-                  timestamp: b.last_update,
-                });
-              });
-            });
-          });
-        });
-        if (result.length > 0) return result;
-      }
+  const fdKey = process.env.VITE_FOOTBALL_DATA_API_KEY || process.env.NEXT_PUBLIC_FOOTBALL_DATA_API_KEY;
+  if (isKeyValid(fdKey)) {
+    try {
+      const res = await footballDataClient.get('/competitions');
+      if (res.data?.competitions?.length > 0) return res.data.competitions;
+    } catch (err) {
+      console.warn('[API Service] fetchCompetitions failed:', err);
     }
-  } catch (err) {
-    console.warn('[API Service] fetchOdds failed, using fallback mock data:', err);
   }
-  return generateMockOdds('m-101');
+  return [
+    { id: 2021, name: 'Premier League', code: 'PL' },
+    { id: 2014, name: 'La Liga', code: 'PD' },
+    { id: 2002, name: 'Bundesliga', code: 'BL1' },
+    { id: 2019, name: 'Serie A', code: 'SA' },
+    { id: 2015, name: 'Ligue 1', code: 'FL1' },
+  ];
+}
+
+export async function fetchMatchStats(fixtureId: number | string): Promise<any> {
+  const afKey = process.env.VITE_APIFOOTBALL_KEY || process.env.NEXT_PUBLIC_APIFOOTBALL_KEY || process.env.API_FOOTBALL_KEY;
+  if (isKeyValid(afKey)) {
+    try {
+      const res = await apiFootball.get('/fixtures/statistics', { params: { fixture: fixtureId } });
+      if (res.data?.response?.length > 0) return res.data.response;
+    } catch (err) {
+      console.warn('[API Service] fetchMatchStats API-Football failed:', err);
+    }
+  }
+
+  const tsKey = process.env.VITE_THESTATS_API_KEY || process.env.NEXT_PUBLIC_THESTATS_API_KEY;
+  if (isKeyValid(tsKey)) {
+    try {
+      const res = await theStatsApi.get(`/football/matches/${fixtureId}/stats`);
+      if (res.data) return res.data;
+    } catch (err) {
+      console.warn('[API Service] fetchMatchStats TheStatsAPI failed:', err);
+    }
+  }
+
+  console.warn('[API Service] API key not configured — using mock data');
+  return generateMockMatchStats(fixtureId);
+}
+
+export async function fetchTeamForm(teamId: number | string, last: number = 5): Promise<any> {
+  const afKey = process.env.VITE_APIFOOTBALL_KEY || process.env.NEXT_PUBLIC_APIFOOTBALL_KEY || process.env.API_FOOTBALL_KEY;
+  if (isKeyValid(afKey)) {
+    try {
+      const res = await apiFootball.get('/teams/statistics', { params: { team: teamId, last, season: 2025 } });
+      if (res.data?.response) return res.data.response;
+    } catch (err) {
+      console.warn('[API Service] fetchTeamForm API-Football failed:', err);
+    }
+  }
+
+  const tsKey = process.env.VITE_THESTATS_API_KEY || process.env.NEXT_PUBLIC_THESTATS_API_KEY;
+  if (isKeyValid(tsKey)) {
+    try {
+      const res = await theStatsApi.get(`/football/teams/${teamId}/form`);
+      if (res.data) return res.data;
+    } catch (err) {
+      console.warn('[API Service] fetchTeamForm TheStatsAPI failed:', err);
+    }
+  }
+
+  return { form: 'WWDLW', goalsScored: 2.1, goalsConceded: 0.8 };
+}
+
+export async function fetchPredictions(fixtureId: number | string): Promise<any> {
+  const afKey = process.env.VITE_APIFOOTBALL_KEY || process.env.NEXT_PUBLIC_APIFOOTBALL_KEY || process.env.API_FOOTBALL_KEY;
+  if (isKeyValid(afKey)) {
+    try {
+      const res = await apiFootball.get('/predictions', { params: { fixture: fixtureId } });
+      if (res.data?.response?.length > 0) return res.data.response[0];
+    } catch (err) {
+      console.warn('[API Service] fetchPredictions API-Football failed:', err);
+    }
+  }
+
+  const tsKey = process.env.VITE_THESTATS_API_KEY || process.env.NEXT_PUBLIC_THESTATS_API_KEY;
+  if (isKeyValid(tsKey)) {
+    try {
+      const res = await theStatsApi.get('/football/predictions', { params: { match_id: fixtureId } });
+      if (res.data) return res.data;
+    } catch (err) {
+      console.warn('[API Service] fetchPredictions TheStatsAPI failed:', err);
+    }
+  }
+
+  console.warn('[API Service] API key not configured — using mock data');
+  return generateMockPredictions(fixtureId);
+}
+
+export async function fetchOdds(
+  sport: string = 'soccer_epl',
+  regions: string = 'eu',
+  tick: number = 0
+): Promise<MatchOdds[]> {
+  // Try 1: The Odds API
+  const oddsKey =
+    process.env.VITE_THE_ODDS_API_KEY ||
+    process.env.VITE_ODDS_API_KEY ||
+    process.env.NEXT_PUBLIC_ODDS_API_KEY;
+  if (isKeyValid(oddsKey)) {
+    try {
+      const res = await oddsApiClient.get(`/sports/${sport}/odds`, {
+        params: { apiKey: oddsKey, regions, markets: 'h2h,totals,spreads,btts', oddsFormat: 'decimal' },
+      });
+      const odds = transformOddsApi(res.data);
+      if (odds.length > 0) return odds;
+    } catch (err) {
+      console.warn('[API Service] The Odds API failed, trying OddsPAPI:', err);
+    }
+  }
+
+  // Try 2: OddsPAPI
+  const opKey = process.env.VITE_ODDS_PAPI_KEY || process.env.NEXT_PUBLIC_ODDS_PAPI_KEY || process.env.ODDSPAPI_KEY;
+  if (isKeyValid(opKey)) {
+    try {
+      const res = await oddsPapi.get('/odds');
+      const odds = transformOddsPapi(res.data);
+      if (odds.length > 0) return odds;
+    } catch (err) {
+      console.warn('[API Service] OddsPAPI failed, trying API-Football odds:', err);
+    }
+  }
+
+  // Try 3: API-Football (odds)
+  const afKey = process.env.VITE_APIFOOTBALL_KEY || process.env.NEXT_PUBLIC_APIFOOTBALL_KEY || process.env.API_FOOTBALL_KEY;
+  if (isKeyValid(afKey)) {
+    try {
+      const res = await apiFootball.get('/odds', { params: { date: new Date().toISOString().split('T')[0] } });
+      const odds = transformApiFootballOdds(res.data?.response);
+      if (odds.length > 0) return odds;
+    } catch (err) {
+      console.warn('[API Service] API-Football odds failed:', err);
+    }
+  }
+
+  // Final Fallback: Mock Engine
+  console.warn('[API Service] API key not configured — using mock data');
+  return generateMockOdds('m-101', tick);
 }
 
 export async function fetchOddsHistory(eventId: string): Promise<any> {
-  try {
-    const apiKey = process.env.VITE_ODDS_API_KEY || process.env.NEXT_PUBLIC_ODDS_API_KEY;
-    const res = await oddsApiClient.get(`/historical/events/${eventId}/odds`, {
-      params: { apiKey },
-    });
-    return res.data || null;
-  } catch {
-    return { history: [] };
+  const opKey = process.env.VITE_ODDS_PAPI_KEY || process.env.NEXT_PUBLIC_ODDS_PAPI_KEY || process.env.ODDSPAPI_KEY;
+  if (isKeyValid(opKey)) {
+    try {
+      const res = await oddsPapi.get('/odds/movement', { params: { match_id: eventId } });
+      if (res.data) return res.data;
+    } catch (err) {
+      console.warn('[API Service] OddsPAPI movement failed:', err);
+    }
   }
+
+  const oddsKey = process.env.VITE_THE_ODDS_API_KEY || process.env.VITE_ODDS_API_KEY || process.env.NEXT_PUBLIC_ODDS_API_KEY;
+  if (isKeyValid(oddsKey)) {
+    try {
+      const res = await oddsApiClient.get(`/historical/sports/soccer_epl/odds`, {
+        params: { apiKey: oddsKey, date: new Date().toISOString() },
+      });
+      if (res.data) return res.data;
+    } catch (err) {
+      console.warn('[API Service] The Odds API historical failed:', err);
+    }
+  }
+
+  return { history: [] };
 }
 
 export async function fetchSignals(filters?: any): Promise<Signal[]> {
   try {
     const res = await valueEngineClient.get('/signals', { params: filters });
-    if (res.data?.length > 0) {
-      return res.data;
-    }
+    if (res.data?.length > 0) return res.data;
   } catch (err) {
-    console.warn('[API Service] fetchSignals failed, using fallback mock data:', err);
+    console.warn('[API Service] fetchSignals failed, using mock engine:', err);
   }
-  return generateMockSignals();
+  console.warn('[API Service] API key not configured — using mock data');
+  return generateMockSignals(10);
 }
 
 export async function fetchSignalDetails(signalId: string): Promise<Signal | null> {
@@ -324,34 +525,24 @@ export async function fetchSignalDetails(signalId: string): Promise<Signal | nul
     const res = await valueEngineClient.get(`/signals/${signalId}`);
     if (res.data) return res.data;
   } catch {}
-  const signals = generateMockSignals();
+  const signals = generateMockSignals(10);
   return signals.find((s) => s.id === signalId) || signals[0] || null;
 }
 
 export async function fetchMarketDepth(matchId: string, market: MarketType): Promise<MarketDepth> {
   try {
-    const res = await valueEngineClient.get('/market-depth', {
-      params: { matchId, market },
-    });
+    const res = await valueEngineClient.get('/market-depth', { params: { matchId, market } });
     if (res.data) return res.data;
   } catch {}
-  return {
-    matchId,
-    market,
-    selections: [
-      { name: 'Home Win', bestOdds: 2.05, bookmaker: 'Pinnacle', volumeWeightedOdds: 1.98, liquidityScore: 92 },
-      { name: 'Draw', bestOdds: 3.40, bookmaker: 'Bet365', volumeWeightedOdds: 3.35, liquidityScore: 84 },
-      { name: 'Away Win', bestOdds: 3.60, bookmaker: 'SBOBet', volumeWeightedOdds: 3.50, liquidityScore: 88 },
-    ],
-  };
+  console.warn('[API Service] API key not configured — using mock data');
+  return generateMockMarketDepth(matchId, market);
 }
 
 export async function fetchPerformanceReport(days: number = 30): Promise<PerformanceStats[]> {
   try {
-    const res = await valueEngineClient.get('/performance', {
-      params: { days },
-    });
+    const res = await valueEngineClient.get('/performance', { params: { days } });
     if (res.data?.length > 0) return res.data;
   } catch {}
+  console.warn('[API Service] API key not configured — using mock data');
   return generateMockPerformance(days);
 }

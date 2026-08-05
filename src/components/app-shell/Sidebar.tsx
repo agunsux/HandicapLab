@@ -7,18 +7,27 @@ import {
   LayoutDashboard,
   TrendingUp,
   Target,
+  Radio,
+  Database,
+  Trophy,
+  Users,
+  Calendar,
+  UserCheck,
+  LineChart,
+  GitCompare,
+  TrendingDown,
+  Award,
+  Search,
   BarChart3,
+  CheckCircle2,
+  BookOpen,
+  Cpu,
   CreditCard,
-  User,
   Settings,
   ChevronLeft,
   ChevronRight,
-  Globe,
   X,
-  Scale,
-  LineChart,
-  Trophy,
-  CircleDot,
+  Star,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -29,42 +38,61 @@ interface SidebarProps {
   setMobileOpen: (open: boolean) => void;
 }
 
-const MAIN_NAV = [
-  { label: 'Dashboard', href: '/app/dashboard', icon: LayoutDashboard },
-  { label: 'Markets', href: '/app/markets/asian-handicap', icon: TrendingUp },
-  { label: 'Value Bets', href: '/app/value-bets', icon: Target },
-  { label: 'Analytics', href: '/app/analysis', icon: BarChart3 },
-  { label: 'Pricing', href: '/pricing', icon: CreditCard },
+const OVERVIEW_NAV = [
+  { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { label: 'Markets', href: '/markets', icon: TrendingUp },
+  { label: 'Value Bets', href: '/value-bets', icon: Target },
+  { label: 'Live Now', href: '/live', icon: Radio, badge: 'LIVE' },
 ];
 
-const MARKETS_SUBNAV = [
-  { label: 'Asian Handicap', href: '/app/markets/asian-handicap', icon: Scale },
-  { label: 'Over / Under', href: '/app/markets/over-under', icon: LineChart },
-  { label: 'Moneyline', href: '/app/markets/moneyline', icon: Trophy },
-  { label: 'BTTS', href: '/app/markets/btts', icon: CircleDot },
+const INTELLIGENCE_NAV = [
+  { label: 'Historical Hub', href: '/historical', icon: Database, isStar: true },
+  { label: 'Competitions', href: '/historical/competitions', icon: Trophy },
+  { label: 'Teams', href: '/historical/teams', icon: Users },
+  { label: 'Matches', href: '/historical/matches', icon: Calendar },
+  { label: 'Players', href: '/historical/players', icon: UserCheck },
+  { label: 'Odds Explorer', href: '/historical/odds-explorer', icon: LineChart },
+  { label: 'Head-to-Head', href: '/historical/h2h', icon: GitCompare },
+  { label: 'Trends', href: '/historical/trends', icon: TrendingDown },
+  { label: 'Records', href: '/historical/records', icon: Award },
+  { label: 'Search', href: '/historical/search', icon: Search },
+  { label: 'Analytics', href: '/analytics', icon: BarChart3 },
+  { label: 'Track Record', href: '/track-record', icon: CheckCircle2 },
+];
+
+const RESEARCH_NAV = [
+  { label: 'Methodology', href: '/methodology', icon: BookOpen },
+  { label: 'Models', href: '/models', icon: Cpu },
 ];
 
 const ACCOUNT_NAV = [
-  { label: 'Profile', href: '/app/profile', icon: User },
-  { label: 'Settings', href: '/app/settings', icon: Settings },
+  { label: 'Pricing', href: '/pricing', icon: CreditCard },
+  { label: 'Settings', href: '/settings', icon: Settings },
 ];
 
 export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }: SidebarProps) {
   const pathname = usePathname();
 
+  const isLinkActive = (href: string) => {
+    if (href === '/dashboard' || href === '/') {
+      return pathname === '/dashboard' || pathname === '/app/dashboard' || pathname === '/';
+    }
+    return pathname === href || pathname.startsWith(href + '/');
+  };
+
   const renderNavGroup = (
     title: string,
-    items: { label: string; href: string; icon: React.ElementType }[]
+    items: { label: string; href: string; icon: React.ElementType; badge?: string; isStar?: boolean }[]
   ) => (
     <div className="py-2">
       {!collapsed && (
-        <h4 className="px-4 mb-2 text-[10px] font-semibold uppercase tracking-wider text-[#9CA3AF]/60">
+        <h4 className="px-4 mb-2 text-[10px] font-semibold uppercase tracking-widest text-[#9CA3AF]">
           {title}
         </h4>
       )}
       <div className="space-y-1">
         {items.map((item) => {
-          const isActive = pathname === item.href;
+          const active = isLinkActive(item.href);
           const Icon = item.icon;
 
           return (
@@ -74,21 +102,37 @@ export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }: 
               onClick={() => setMobileOpen(false)}
               className={cn(
                 'group flex items-center gap-3 px-3 py-2 text-xs font-medium rounded-lg transition-all relative mx-2',
-                isActive
-                  ? 'bg-[#10B981]/10 text-[#10B981] font-semibold border border-[#10B981]/30'
+                active
+                  ? 'bg-[#10B981]/15 text-[#10B981] font-semibold border border-[#10B981]/40'
                   : 'text-[#9CA3AF] hover:bg-[#111827] hover:text-[#F0FDF4]'
               )}
             >
-              {isActive && (
-                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-[#10B981] rounded-r-sm" />
+              {active && (
+                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-[#10B981] rounded-r-sm shadow-[0_0_8px_#10B981]" />
               )}
-              <Icon
-                className={cn(
-                  'h-4 w-4 shrink-0',
-                  isActive ? 'text-[#10B981]' : 'text-[#9CA3AF] group-hover:text-[#F0FDF4]'
+
+              <div className="relative shrink-0 flex items-center justify-center">
+                <Icon
+                  className={cn(
+                    'h-4 w-4',
+                    active ? 'text-[#10B981]' : 'text-[#9CA3AF] group-hover:text-[#F0FDF4]'
+                  )}
+                />
+                {item.isStar && (
+                  <Star className="h-2 w-2 text-[#F59E0B] fill-[#F59E0B] absolute -top-1 -right-1" />
                 )}
-              />
-              {!collapsed && <span className="truncate">{item.label}</span>}
+              </div>
+
+              {!collapsed && (
+                <span className="truncate flex-1 flex items-center justify-between">
+                  <span>{item.label}</span>
+                  {item.badge && (
+                    <span className="ml-2 px-1.5 py-0.5 text-[9px] font-mono font-bold bg-[#EF4444]/20 text-[#EF4444] border border-[#EF4444]/30 rounded-md animate-pulse">
+                      {item.badge}
+                    </span>
+                  )}
+                </span>
+              )}
             </Link>
           );
         })}
@@ -101,7 +145,7 @@ export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }: 
       {/* Mobile Drawer Backdrop */}
       {mobileOpen && (
         <div
-          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 lg:hidden"
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-40 lg:hidden"
           onClick={() => setMobileOpen(false)}
         />
       )}
@@ -116,7 +160,7 @@ export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }: 
       >
         {/* Mobile Header / Close Button */}
         <div className="lg:hidden flex items-center justify-between p-4 border-b border-[#1F2937]">
-          <span className="font-bold text-xs uppercase tracking-wider text-[#9CA3AF]">Menu</span>
+          <span className="font-mono text-xs uppercase tracking-widest text-[#9CA3AF]">Navigation</span>
           <button
             onClick={() => setMobileOpen(false)}
             className="p-1 rounded-lg text-[#9CA3AF] hover:text-[#F0FDF4] hover:bg-[#111827]"
@@ -126,10 +170,12 @@ export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }: 
         </div>
 
         {/* Scrollable Nav Area */}
-        <div className="flex-1 overflow-y-auto py-3 space-y-2">
-          {renderNavGroup('Main Menu', MAIN_NAV)}
+        <div className="flex-1 overflow-y-auto py-3 space-y-1">
+          {renderNavGroup('Overview', OVERVIEW_NAV)}
           {!collapsed && <div className="mx-4 border-t border-[#1F2937]/50 my-1" />}
-          {renderNavGroup('Core Markets', MARKETS_SUBNAV)}
+          {renderNavGroup('Intelligence ⭐', INTELLIGENCE_NAV)}
+          {!collapsed && <div className="mx-4 border-t border-[#1F2937]/50 my-1" />}
+          {renderNavGroup('Research', RESEARCH_NAV)}
           {!collapsed && <div className="mx-4 border-t border-[#1F2937]/50 my-1" />}
           {renderNavGroup('Account', ACCOUNT_NAV)}
         </div>
@@ -138,7 +184,7 @@ export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }: 
         <div className="p-3 border-t border-[#1F2937] hidden lg:flex items-center justify-end">
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="h-7 w-7 rounded-lg bg-[#111827] border border-[#1F2937] flex items-center justify-center text-[#9CA3AF] hover:text-[#F0FDF4] hover:bg-[#111827]/80 transition-colors"
+            className="h-7 w-7 rounded-lg bg-[#111827] border border-[#1F2937] flex items-center justify-center text-[#9CA3AF] hover:text-[#F0FDF4] hover:bg-[#1A1F2E] transition-colors"
             title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
             {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}

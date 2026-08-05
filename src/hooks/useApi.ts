@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
   fetchMatches,
@@ -9,11 +10,16 @@ import {
   fetchSignalDetails,
   fetchMarketDepth,
   fetchPerformanceReport,
+  fetchMatchStats,
+  fetchPredictions,
+  fetchOddsHistory,
+} from '@/services/api';
+import {
   generateMockMatches,
   generateMockOdds,
   generateMockSignals,
   generateMockPerformance,
-} from '@/services/api';
+} from '@/services/mockEngine';
 import { MarketType, PerformanceStats } from '@/types';
 import { useAppStore } from '@/store/appStore';
 
@@ -25,7 +31,7 @@ export function useMatches(dateFrom?: string, dateTo?: string) {
     queryFn: () => fetchMatches(dateFrom, dateTo),
     staleTime: 30000,
     refetchInterval: autoRefresh ? 60000 : false,
-    placeholderData: generateMockMatches(),
+    placeholderData: generateMockMatches(12, dateFrom || 'today'),
   });
 }
 
@@ -37,19 +43,28 @@ export function useLiveMatches() {
     queryFn: fetchLiveMatches,
     staleTime: 15000,
     refetchInterval: autoRefresh ? 15000 : false,
-    placeholderData: generateMockMatches().filter((m) => m.status === 'LIVE'),
+    placeholderData: generateMockMatches(12).filter((m) => m.status === 'LIVE'),
   });
 }
 
 export function useOdds(matchId?: string) {
   const { autoRefresh } = useAppStore();
+  const [tick, setTick] = useState(0);
+
+  useEffect(() => {
+    if (!autoRefresh) return;
+    const interval = setInterval(() => {
+      setTick((prev) => prev + 1);
+    }, 15000);
+    return () => clearInterval(interval);
+  }, [autoRefresh]);
 
   return useQuery({
-    queryKey: ['odds', matchId],
-    queryFn: () => fetchOdds('soccer_epl', 'eu'),
+    queryKey: ['odds', matchId, tick],
+    queryFn: () => fetchOdds('soccer_epl', 'eu', tick),
     staleTime: 10000,
-    refetchInterval: autoRefresh ? 30000 : false,
-    placeholderData: generateMockOdds(matchId || 'm-101'),
+    refetchInterval: autoRefresh ? 15000 : false,
+    placeholderData: generateMockOdds(matchId || 'm-101', tick),
   });
 }
 
@@ -61,7 +76,7 @@ export function useSignals(filters?: any) {
     queryFn: () => fetchSignals(filters),
     staleTime: 5000,
     refetchInterval: autoRefresh ? 10000 : false,
-    placeholderData: generateMockSignals(),
+    placeholderData: generateMockSignals(10),
   });
 }
 
@@ -119,5 +134,32 @@ export function usePerformance(days: number = 30) {
         cumulative: Number(r.cumulative || 0),
       })),
     },
+  });
+}
+
+export function useMatchStats(fixtureId: number | string) {
+  return useQuery({
+    queryKey: ['matchStats', fixtureId],
+    queryFn: () => fetchMatchStats(fixtureId),
+    staleTime: 30000,
+    enabled: Boolean(fixtureId),
+  });
+}
+
+export function usePredictions(fixtureId: number | string) {
+  return useQuery({
+    queryKey: ['predictions', fixtureId],
+    queryFn: () => fetchPredictions(fixtureId),
+    staleTime: 60000,
+    enabled: Boolean(fixtureId),
+  });
+}
+
+export function useOddsHistory(eventId: string) {
+  return useQuery({
+    queryKey: ['oddsHistory', eventId],
+    queryFn: () => fetchOddsHistory(eventId),
+    staleTime: 30000,
+    enabled: Boolean(eventId),
   });
 }
