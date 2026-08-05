@@ -30,26 +30,19 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
 
-  /* Semantic accent palette */
-  --color-terracotta: var(--accent-terracotta);
-  --color-terracotta-muted: var(--accent-terracotta-muted);
-  
-  /* Signal colors */
-  --color-signal-high: var(--signal-high);
-  --color-signal-high-strong: var(--signal-high-strong);
-  --color-signal-high-bg: var(--signal-high-bg);
+  /* Semantic EV signal colors */
+  --color-ev-positive: var(--ev-positive);
+  --color-ev-negative: var(--ev-negative);
+  --color-ev-neutral: var(--ev-neutral);
 
-  --color-signal-medium: var(--signal-medium);
-  --color-signal-medium-strong: var(--signal-medium-strong);
-  --color-signal-medium-bg: var(--signal-medium-bg);
-  
-  --color-status-warning: var(--status-warning);
-  --color-status-stale: var(--status-stale);
+  /* Brand accent */
+  --color-brand-accent: var(--accent-brand);
+  --color-brand-hover: var(--accent-brand-hover);
 
   /* Elevation */
-  --shadow-elevation-1: 0 1px 2px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.2);
-  --shadow-elevation-2: 0 2px 4px rgba(0, 0, 0, 0.3), 0 4px 12px rgba(0, 0, 0, 0.25);
-  --shadow-elevation-3: 0 4px 8px rgba(0, 0, 0, 0.35), 0 12px 32px rgba(0, 0, 0, 0.3);
+  --shadow-elevation-1: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-elevation-2: 0 4px 12px rgba(0, 0, 0, 0.5);
+  --shadow-elevation-3: 0 8px 24px rgba(0, 0, 0, 0.6);
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -58,72 +51,73 @@
 }
 
 :root {
-  /* Surfaces */
-  --surface-void: #15171B;
-  --surface-panel: #1C1F24;
-  --surface-raised: #262A31;
-  --surface-border: #33383F;
+  /* Midnight Quant Surfaces */
+  --bg-primary: #0A0B0F;
+  --bg-secondary: #111318;
+  --bg-tertiary: #1A1D24;
+  --bg-elevated: #1E2129;
 
-  /* Typography */
-  --text-primary: #E8EBEF;
-  --text-muted: #8C96A6;
-  --text-faint: #5B6472;
+  /* Midnight Quant Borders */
+  --border-subtle: #1F232C;
+  --border-default: #2A2F3A;
+
+  /* Midnight Quant Text Scale */
+  --text-primary: #F0F1F5;
+  --text-secondary: #8B92A8;
+  --text-tertiary: #5A6070;
   --font-display: var(--font-sans);
 
-  /* Action */
-  --action-blue: #3E8EF7;
-  --action-blue-hover: #5B9FF9;
+  /* Midnight Quant Signals */
+  --ev-positive: #10B981;
+  --ev-negative: #EF4444;
+  --ev-neutral: #F59E0B;
 
-  /* HIGH signal */
-  --signal-high: #4CAF7A;
-  --signal-high-strong: #63C794;
-  --signal-high-bg: #16261F;
+  /* Brand Accent */
+  --accent-brand: #6366F1;
+  --accent-brand-hover: #818CF8;
 
-  /* MEDIUM signal */
-  --signal-medium: #C99A4A;
-  --signal-medium-strong: #E0B461;
-  --signal-medium-bg: #262019;
+  /* Legacy compatibility aliases */
+  --signal-high: #10B981;
+  --signal-high-strong: #34D399;
+  --signal-high-bg: rgba(16, 185, 129, 0.12);
 
-  /* Brand */
-  --accent-terracotta: #C97B5B;
-  --accent-terracotta-soft: #8B5A42;
-  --accent-terracotta-text: #E3A788;
+  --signal-medium: #F59E0B;
+  --signal-medium-strong: #FBBF24;
+  --signal-medium-bg: rgba(245, 158, 11, 0.12);
 
-  /* Data-quality / stale states */
-  --status-warning: #C9A15A;
-  --status-stale: #5B6472;
+  --status-warning: #F59E0B;
+  --status-stale: #5A6070;
 
-  /* Shadcn Mapping (using our palette) */
-  --background: var(--surface-void);        
+  /* Shadcn Mapping (Midnight Quant) */
+  --background: var(--bg-primary);        
   --foreground: var(--text-primary);        
 
-  --card: var(--surface-panel);
+  --card: var(--bg-secondary);
   --card-foreground: var(--text-primary);
 
-  --popover: var(--surface-panel);
+  --popover: var(--bg-elevated);
   --popover-foreground: var(--text-primary);
 
-  --border: var(--surface-border);            
-  --input: var(--surface-panel);
-  --ring: var(--action-blue);
+  --border: var(--border-subtle);            
+  --input: var(--bg-tertiary);
+  --ring: var(--accent-brand);
 
-  --primary: var(--action-blue);
+  --primary: var(--accent-brand);
   --primary-foreground: #FFFFFF;
 
-  --secondary: var(--surface-raised);
+  --secondary: var(--bg-tertiary);
   --secondary-foreground: var(--text-primary);
 
-  --muted: var(--surface-raised);
-  --muted-foreground: var(--text-muted);
+  --muted: var(--bg-tertiary);
+  --muted-foreground: var(--text-secondary);
 
-  --accent: var(--surface-raised);
+  --accent: var(--bg-tertiary);
   --accent-foreground: var(--text-primary);
 
-  --destructive: #C97B5B; /* Fallback for shadcn */
+  --destructive: #EF4444;
   --destructive-foreground: #FFFFFF;
 
-  /* Premium rounded corners */
-  --radius: 0.5rem;
+  --radius: 0.75rem; /* 12px radius per design spec */
 }
 
 @layer base {
@@ -132,7 +126,7 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1, "cv11" 1, "tnum" 1; /* Tabular nums for data */
+    font-feature-settings: "rlig" 1, "calt" 1, "cv11" 1, "tnum" 1; /* Tabular nums for quantitative data */
   }
   
   /* Scrollbar styles for dense tables */
@@ -144,42 +138,10 @@
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    @apply bg-border rounded-full;
+    background: var(--border-default);
+    border-radius: 9999px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-muted-foreground;
+    background: var(--text-secondary);
   }
-}
-
-@keyframes signal-pulse-green {
-  0%, 100% {
-    border-color: var(--signal-high);
-    box-shadow: 0 0 0 0 transparent;
-  }
-
-  50% {
-    border-color: var(--signal-high-strong);
-    box-shadow:
-      0 0 8px 2px
-      color-mix(
-        in srgb,
-        var(--signal-high-strong) 40%,
-        transparent
-      );
-  }
-}
-
-.signal-high {
-  background-color: var(--signal-high-bg);
-  border: 1px solid var(--signal-high);
-}
-@media (prefers-reduced-motion: no-preference) {
-  .signal-high:not(.static) {
-    animation: signal-pulse-green 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  }
-}
-
-.signal-medium {
-  background-color: var(--signal-medium-bg);
-  border: 1px solid var(--signal-medium);
 }

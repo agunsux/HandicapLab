@@ -42,7 +42,6 @@ export default function DashboardPage() {
     }
     loadDashboard();
 
-    // Auto-refresh every 5 minutes per §3
     const interval = setInterval(loadDashboard, 300000);
     return () => clearInterval(interval);
   }, []);
@@ -82,8 +81,8 @@ export default function DashboardPage() {
     <div className="flex flex-col space-y-6 pb-8">
       {/* Page header */}
       <div>
-        <h1 className="text-xl font-display font-semibold tracking-tight text-foreground">Dashboard</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <h1 className="text-xl font-display font-semibold tracking-tight text-[#F0F1F5]">Dashboard</h1>
+        <p className="mt-1 text-sm text-[#8B92A8]">
           Market intelligence summary — calibrated probabilities, expected value and closing line value.
         </p>
       </div>
@@ -94,17 +93,17 @@ export default function DashboardPage() {
       {/* Hero metrics */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {metrics.map((m) => (
-          <div key={m.label} className="rounded-lg border border-border bg-card p-4">
+          <div key={m.label} className="rounded-xl border border-[#1F232C] bg-[#111318] p-4">
             <div className="flex items-center gap-2">
-              <m.icon className="h-4 w-4 text-muted-foreground" />
-              <span className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground">
+              <m.icon className="h-4 w-4 text-[#8B92A8]" />
+              <span className="text-[10px] font-medium uppercase tracking-widest text-[#8B92A8]">
                 {m.label}
               </span>
             </div>
-            <div className={`mt-3 font-semibold tracking-tight ${isBuilding ? 'text-sm text-amber-500/90' : 'text-2xl tabular-nums text-foreground'}`}>
+            <div className={`mt-3 font-semibold tracking-tight ${isBuilding ? 'text-xs text-amber-400' : 'text-2xl tabular-nums text-[#F0F1F5]'}`}>
               {m.value}
             </div>
-            <div className="mt-1 text-xs text-muted-foreground">{m.sub}</div>
+            <div className="mt-1 text-xs text-[#5A6070]">{m.sub}</div>
           </div>
         ))}
       </div>
@@ -122,13 +121,13 @@ export default function DashboardPage() {
             <Link
               key={mk.key}
               href={mk.href}
-              className="group flex items-center justify-between rounded-lg border border-border/70 bg-card px-4 py-3 transition-colors hover:border-border hover:bg-muted/30"
+              className="group flex items-center justify-between rounded-xl border border-[#1F232C] bg-[#111318] px-4 py-3 transition-colors hover:border-[#2A2F3A] hover:bg-[#1A1D24]/50"
             >
               <div>
-                <div className="text-sm font-medium text-foreground">{mk.label}</div>
-                <div className="mt-0.5 text-xs text-muted-foreground">{count} active signals</div>
+                <div className="text-sm font-medium text-[#F0F1F5]">{mk.label}</div>
+                <div className="mt-0.5 text-xs text-[#8B92A8]">{count} active signals</div>
               </div>
-              <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+              <ArrowRight className="h-4 w-4 text-[#8B92A8] transition-transform group-hover:translate-x-0.5" />
             </Link>
           );
         })}
@@ -137,20 +136,20 @@ export default function DashboardPage() {
       {/* Top EV today */}
       <div>
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+          <h2 className="text-[10px] font-semibold uppercase tracking-widest text-[#8B92A8]">
             Highest EV Today
           </h2>
           <Link
             href="/app/value-bets"
-            className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:text-primary/80 transition-colors"
+            className="inline-flex items-center gap-1 text-xs font-medium text-[#818CF8] hover:text-[#6366F1] transition-colors"
           >
             All opportunities <ArrowRight className="h-3 w-3" />
           </Link>
         </div>
 
         {topBets.length === 0 ? (
-          <div className="rounded-lg border border-border/70 bg-card/40 p-8 text-center">
-            <p className="text-sm text-muted-foreground">
+          <div className="rounded-xl border border-[#1F232C] bg-[#111318]/40 p-8 text-center">
+            <p className="text-sm text-[#8B92A8]">
               Engine is scanning. No validated opportunities for this window yet.
             </p>
           </div>
@@ -160,9 +159,9 @@ export default function DashboardPage() {
       </div>
 
       {/* Research note */}
-      <div className="flex items-start gap-3 rounded-lg border border-border/70 bg-card p-4">
-        <Shield className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
-        <p className="text-xs leading-relaxed text-muted-foreground">
+      <div className="flex items-start gap-3 rounded-xl border border-[#1F232C] bg-[#111318] p-4">
+        <Shield className="mt-0.5 h-4 w-4 shrink-0 text-amber-400" />
+        <p className="text-xs leading-relaxed text-[#8B92A8]">
           HandicapLab quantitative models operate under strict data governance. Pinnacle remains the ground truth for Closing Line Value (CLV) evaluation.
         </p>
       </div>

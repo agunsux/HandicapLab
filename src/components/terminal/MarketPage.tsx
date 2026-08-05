@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { EngineStatusWidget } from '@/components/engine/EngineStatusWidget';
+import { EVBadge } from '@/components/ui/EVBadge';
 
 type MarketCategory = 'asian-handicap' | 'over-under' | 'moneyline' | 'btts';
 
@@ -53,7 +54,6 @@ export function MarketPage({ market, description }: MarketPageProps) {
     }
     loadMarketData();
 
-    // Auto-refresh every 5 minutes per §3 contract
     const interval = setInterval(loadMarketData, 300000);
     return () => clearInterval(interval);
   }, [market]);
@@ -65,29 +65,29 @@ export function MarketPage({ market, description }: MarketPageProps) {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
         <div>
-          <h1 className="text-xl font-display font-semibold tracking-tight text-foreground">
+          <h1 className="text-xl font-display font-semibold tracking-tight text-[#F0F1F5]">
             {MARKET_TITLE_MAP[market]}
           </h1>
-          <p className="mt-1 text-sm text-muted-foreground">{description}</p>
+          <p className="mt-1 text-sm text-[#8B92A8]">{description}</p>
         </div>
         <EngineStatusWidget compact />
       </div>
 
       {/* Table / Empty State */}
       {loading ? (
-        <div className="rounded-lg border border-border/70 bg-card p-12 text-center text-sm text-muted-foreground animate-pulse">
+        <div className="rounded-xl border border-[#1F232C] bg-[#111318] p-12 text-center text-sm text-[#8B92A8] animate-pulse">
           Loading {MARKET_TITLE_MAP[market]} market data...
         </div>
       ) : rows.length === 0 ? (
-        <div className="rounded-lg border border-border/70 bg-card/60 p-12 text-center">
-          <p className="text-sm text-muted-foreground">
+        <div className="rounded-xl border border-[#1F232C] bg-[#111318]/60 p-12 text-center">
+          <p className="text-sm text-[#8B92A8]">
             Engine is scanning. No validated opportunities for this window yet.
           </p>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-border bg-card shadow-sm">
+        <div className="overflow-x-auto rounded-xl border border-[#1F232C] bg-[#111318] shadow-sm">
           <table className="w-full text-left text-xs">
-            <thead className="border-b border-border bg-muted/40 text-[11px] uppercase tracking-wider text-muted-foreground">
+            <thead className="border-b border-[#1F232C] bg-[#1A1D24] text-[11px] uppercase tracking-wider text-[#8B92A8]">
               <tr>
                 <th className="px-4 py-3">Match</th>
                 <th className="px-4 py-3">Selection</th>
@@ -98,30 +98,30 @@ export function MarketPage({ market, description }: MarketPageProps) {
                 <th className="px-4 py-3 text-right">Expected Value</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border/60">
+            <tbody className="divide-y divide-[#1F232C]">
               {rows.map((r) => (
-                <tr key={r.id} className="hover:bg-muted/20 transition-colors">
-                  <td className="px-4 py-3 font-medium text-foreground">
+                <tr key={r.id} className="hover:bg-[#1A1D24]/50 transition-colors">
+                  <td className="px-4 py-3 font-medium text-[#F0F1F5]">
                     <div>{r.home} vs {r.away}</div>
-                    <div className="text-[10px] text-muted-foreground">{r.league} · {new Date(r.kickoff).toLocaleString()}</div>
+                    <div className="text-[10px] text-[#5A6070]">{r.league} · {new Date(r.kickoff).toLocaleString()}</div>
                   </td>
-                  <td className="px-4 py-3 font-medium text-foreground capitalize">{r.selection}</td>
+                  <td className="px-4 py-3 font-medium text-[#F0F1F5] capitalize">{r.selection}</td>
                   {hasLineColumn && (
-                    <td className="px-4 py-3 tabular-nums text-muted-foreground">
+                    <td className="px-4 py-3 tabular-nums text-[#8B92A8]">
                       {r.line !== undefined ? (r.line > 0 ? `+${r.line}` : r.line) : '—'}
                     </td>
                   )}
                   <td className="px-4 py-3 text-right tabular-nums">
-                    {r.locked ? <span className="text-amber-500 font-mono">🔒 Locked</span> : `${((r.modelProb || 0) * 100).toFixed(1)}%`}
+                    {r.locked ? <span className="text-amber-400 font-mono">🔒 Locked</span> : `${((r.modelProb || 0) * 100).toFixed(1)}%`}
                   </td>
                   <td className="px-4 py-3 text-right tabular-nums">
-                    {r.locked ? <span className="text-amber-500 font-mono">🔒 Locked</span> : r.marketOdds?.toFixed(2)}
+                    {r.locked ? <span className="text-amber-400 font-mono">🔒 Locked</span> : r.marketOdds?.toFixed(2)}
                   </td>
                   <td className="px-4 py-3 text-right tabular-nums">
-                    {r.locked ? <span className="text-amber-500 font-mono">🔒 Locked</span> : r.fairOdds?.toFixed(2)}
+                    {r.locked ? <span className="text-amber-400 font-mono">🔒 Locked</span> : r.fairOdds?.toFixed(2)}
                   </td>
-                  <td className="px-4 py-3 text-right tabular-nums font-semibold text-emerald-500">
-                    {r.locked ? <span className="text-amber-500 font-mono">🔒 Locked</span> : `+${((r.ev || 0) * 100).toFixed(1)}%`}
+                  <td className="px-4 py-3 text-right">
+                    <EVBadge ev={r.ev} locked={r.locked} />
                   </td>
                 </tr>
               ))}
