@@ -1,5 +1,3 @@
-import { createClient } from '@supabase/supabase-js';
-import { NavigationChrome } from '@/components/layout/NavigationChrome';
 import { supabase } from '@/lib/supabase.server';
 
 export const revalidate = 60; // Cache for 60 seconds
@@ -57,8 +55,7 @@ export default async function PublicLedgerPage() {
     .limit(50);
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col">
-      <NavigationChrome />
+    <div className="min-h-screen bg-background text-foreground flex flex-col pt-16">
       
       <main className="flex-1 container mx-auto px-4 py-12">
         <div className="max-w-5xl mx-auto space-y-12">

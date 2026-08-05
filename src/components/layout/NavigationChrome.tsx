@@ -5,22 +5,31 @@ import { Header } from './Header';
 import { Footer } from './Footer';
 
 /**
- * Conditionally renders the marketing header/footer chrome.
- * The terminal UI under /app has its own chrome and must not be
- * polluted by the marketing navigation.
+ * Renders the marketing Header conditionally for non-/app routes.
+ */
+export function MarketingHeader() {
+  const pathname = usePathname();
+  if (pathname.startsWith('/app')) return null;
+  return <Header />;
+}
+
+/**
+ * Renders the marketing Footer conditionally for non-/app routes.
+ */
+export function MarketingFooter() {
+  const pathname = usePathname();
+  if (pathname.startsWith('/app')) return null;
+  return <Footer />;
+}
+
+/**
+ * Legacy NavigationChrome wrapper kept for backwards compatibility.
  */
 export function NavigationChrome() {
-  const pathname = usePathname();
-  const isTerminal = pathname.startsWith('/app');
-
-  if (isTerminal) {
-    return null;
-  }
-
   return (
     <>
-      <Header />
-      <Footer />
+      <MarketingHeader />
+      <MarketingFooter />
     </>
   );
 }
