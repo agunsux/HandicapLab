@@ -378,7 +378,7 @@ export class ApiFootballClient {
   return undefined as unknown as T;
 }
 
-/**
+  /**
    * Fetch fixtures for a given league and season
    */
   public async getFixtures(
@@ -389,6 +389,21 @@ export class ApiFootballClient {
     return this.request(
       'fixtures',
       { league: String(league), season: String(season) },
+      ApiFootballFixturesResponseSchema,
+      options
+    );
+  }
+
+  /**
+   * Fetch fixtures for a specific date (YYYY-MM-DD)
+   */
+  public async getFixturesByDate(
+    date: string,
+    options?: FetchOptions
+  ): Promise<z.infer<typeof ApiFootballFixturesResponseSchema>> {
+    return this.request(
+      'fixtures',
+      { date },
       ApiFootballFixturesResponseSchema,
       options
     );

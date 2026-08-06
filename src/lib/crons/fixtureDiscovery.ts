@@ -83,33 +83,33 @@ export async function discoverFixtures(): Promise<{
     return { fixtures: [], skipped: 0, quotaOk: canFetch };
   }
 
-  for (const league of leagues) {
-    // Use cached quota check — no N+1 Supabase queries
+  // Query today and tomorrow by date
+  const todayStr = now.toISOString().split('T')[0];
+  const tmr = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+  const tmrStr = tmr.toISOString().split('T')[0];
 
+  for (const dateStr of [todayStr, tmrStr]) {
     try {
       const startTime = Date.now();
-      // Season calculation: use current calendar year for active season fixtures
-      const season = new Date().getFullYear();
-      const response = await apiFootballClient.getFixtures(league.league_id, season);
+      const response = await apiFootballClient.getFixturesByDate(dateStr);
       await logCall('apifootball', 'fixtures', Date.now() - startTime, 200, {
-        leagueId: league.league_id,
+        date: dateStr,
         results: response.results,
       });
 
-      // Filter to upcoming/live fixtures
       for (const item of response.response) {
         const kickoff = new Date(item.fixture.date);
         const status = item.fixture.status.short;
 
-        // Skip already finished (FT, AET, PEN, CANC, ABD, POSTP)
+        // Skip finished matches
         if (['FT', 'AET', 'PEN', 'CANC', 'ABD', 'POSTP'].includes(status)) continue;
 
-        const score = computePriorityScore(league.league_priority || 6, kickoff, now);
+        const score = computePriorityScore(3, kickoff, now);
         allFixtures.push({
           fixtureId: item.fixture.id,
-          leagueId: league.league_id,
-          leagueName: league.league_name,
-          leagueTier: league.league_priority || 6,
+          leagueId: item.league.id,
+          leagueName: item.league.name,
+          leagueTier: 3,
           homeTeam: item.teams.home.name,
           homeTeamId: item.teams.home.id,
           awayTeam: item.teams.away.name,
@@ -120,7 +120,7 @@ export async function discoverFixtures(): Promise<{
         });
       }
     } catch (err) {
-      console.error(`[FixtureDiscovery] Failed for league ${league.league_name} (${league.league_id}):`, err);
+      console.error(`[FixtureDiscovery] Failed for date ${dateStr}:`, err);
       skipped += 1;
     }
   }

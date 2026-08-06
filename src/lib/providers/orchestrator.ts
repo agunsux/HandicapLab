@@ -21,15 +21,12 @@ export class ProviderOrchestrator {
    * Saves to database.
    */
   async runStage1Discovery() {
-    console.log('[Orchestrator] Starting Stage 1: Discovery (TheStatsAPI)');
+    console.log('[Orchestrator] Starting Stage 1: Discovery (API-Football)');
     try {
-      const fixtures = await this.statsProvider.getFixtures();
-      
-      // Assume mapping and insertion into supabase 'fixtures' table
-      // e.g. await supabase.from('fixtures').upsert(mappedFixtures);
-      
-      console.log(`[Orchestrator] Discovered ${fixtures.length} fixtures.`);
-      return { success: true, count: fixtures.length };
+      const { discoverFixtures } = await import('@/lib/crons/fixtureDiscovery');
+      const result = await discoverFixtures();
+      console.log(`[Orchestrator] Discovered ${result.fixtures.length} fixtures.`);
+      return { success: true, count: result.fixtures.length, skipped: result.skipped };
     } catch (error) {
       console.error('[Orchestrator] Stage 1 failed:', error);
       throw error;
