@@ -1,0 +1,418 @@
+{
+  "model": {
+    "version": "poisson-historical-v1-cal",
+    "algo": "feature-driven poisson + per-fold temperature scaling, chronological walk-forward",
+    "elo_scale": 400,
+    "elo_adjustment": "home: 2^(eloDelta/eloScale); away: reciprocal 2^(-eloDelta/eloScale) (symmetric multiplicative, not tuned against test results)",
+    "calibration_method": "temperature scaling, T fitted per fold on train seasons only (grid search NLL, T in [0.05,20.0]); never fitted or tuned on test data",
+    "max_goals": 10
+  },
+  "calibration_note": "grid boundary reached for one or more temperatures: single-temperature scaling is inadequate for this model; raw probabilities carry weak ordering information, calibrated probabilities collapse toward uniform/0.5, and calibrated EV must NOT be interpreted as validated",
+  "folds": [
+    {
+      "test_season": "2022-2023",
+      "train_seasons": [
+        "2020-2021",
+        "2021-2022"
+      ],
+      "train_n": 760,
+      "test_n": 380,
+      "league_constants": {
+        "leagueHomeAvg": 1.4329,
+        "leagueAwayAvg": 1.3237,
+        "homeAdv": 1.0825
+      }
+    },
+    {
+      "test_season": "2023-2024",
+      "train_seasons": [
+        "2020-2021",
+        "2021-2022",
+        "2022-2023"
+      ],
+      "train_n": 1140,
+      "test_n": 380,
+      "league_constants": {
+        "leagueHomeAvg": 1.5,
+        "leagueAwayAvg": 1.2886,
+        "homeAdv": 1.1641
+      }
+    },
+    {
+      "test_season": "2024-2025",
+      "train_seasons": [
+        "2020-2021",
+        "2021-2022",
+        "2022-2023",
+        "2023-2024"
+      ],
+      "train_n": 1520,
+      "test_n": 380,
+      "league_constants": {
+        "leagueHomeAvg": 1.575,
+        "leagueAwayAvg": 1.3362,
+        "homeAdv": 1.1787
+      }
+    },
+    {
+      "test_season": "2025-2026",
+      "train_seasons": [
+        "2020-2021",
+        "2021-2022",
+        "2022-2023",
+        "2023-2024",
+        "2024-2025"
+      ],
+      "train_n": 1900,
+      "test_n": 380,
+      "league_constants": {
+        "leagueHomeAvg": 1.5626,
+        "leagueAwayAvg": 1.3532,
+        "homeAdv": 1.1548
+      }
+    }
+  ],
+  "calibration_folds": [
+    {
+      "test_season": "2022-2023",
+      "n_train_predicted": 742,
+      "T_ml": 10.5,
+      "T_ou25": 0.05,
+      "T_btts": 0.05,
+      "T_ah": 0.5,
+      "T_ml_at_boundary": false,
+      "T_ou25_at_boundary": true,
+      "T_btts_at_boundary": true,
+      "T_ah_at_boundary": false,
+      "train_logloss_ml": 1.09693
+    },
+    {
+      "test_season": "2023-2024",
+      "n_train_predicted": 1120,
+      "T_ml": 7.35,
+      "T_ou25": 0.05,
+      "T_btts": 0.05,
+      "T_ah": 0.45,
+      "T_ml_at_boundary": false,
+      "T_ou25_at_boundary": true,
+      "T_btts_at_boundary": true,
+      "T_ah_at_boundary": false,
+      "train_logloss_ml": 1.09533
+    },
+    {
+      "test_season": "2024-2025",
+      "n_train_predicted": 1499,
+      "T_ml": 4.4,
+      "T_ou25": 0.05,
+      "T_btts": 0.05,
+      "T_ah": 0.5,
+      "T_ml_at_boundary": false,
+      "T_ou25_at_boundary": true,
+      "T_btts_at_boundary": true,
+      "T_ah_at_boundary": false,
+      "train_logloss_ml": 1.08973
+    },
+    {
+      "test_season": "2025-2026",
+      "n_train_predicted": 1878,
+      "T_ml": 4.45,
+      "T_ou25": 0.05,
+      "T_btts": 0.05,
+      "T_ah": 0.5,
+      "T_ml_at_boundary": false,
+      "T_ou25_at_boundary": true,
+      "T_btts_at_boundary": true,
+      "T_ah_at_boundary": false,
+      "train_logloss_ml": 1.09003
+    }
+  ],
+  "markets": {
+    "ML": {
+      "market": "ML",
+      "total_picks": 4545,
+      "settled_picks": 4545,
+      "wins": 1515,
+      "pushes": 0,
+      "losses": 3030,
+      "win_rate": {
+        "value": 0.3333,
+        "ci95": [
+          0.3196,
+          0.347
+        ]
+      },
+      "roi": {
+        "value": -0.064,
+        "ci95": [
+          -0.1099,
+          -0.018
+        ]
+      },
+      "avg_ev_calibrated": 0.2326,
+      "realized_roi": -0.064
+    },
+    "OU25": {
+      "market": "OU25",
+      "total_picks": 3030,
+      "settled_picks": 3030,
+      "wins": 1515,
+      "pushes": 0,
+      "losses": 1515,
+      "win_rate": {
+        "value": 0.5,
+        "ci95": [
+          0.4822,
+          0.5178
+        ]
+      },
+      "roi": {
+        "value": -0.0504,
+        "ci95": [
+          -0.0857,
+          -0.0151
+        ]
+      },
+      "avg_ev_calibrated": 0.0045,
+      "realized_roi": -0.0504
+    },
+    "BTTS": {
+      "market": "BTTS",
+      "total_picks": 1515,
+      "settled_picks": 1515,
+      "wins": 860,
+      "pushes": 0,
+      "losses": 655,
+      "win_rate": {
+        "value": 0.5677,
+        "ci95": [
+          0.5427,
+          0.5926
+        ]
+      },
+      "roi": null,
+      "avg_ev_calibrated": null,
+      "realized_roi": null
+    },
+    "AH": {
+      "market": "AH",
+      "total_picks": 1515,
+      "settled_picks": 1515,
+      "wins": 672,
+      "pushes": 0,
+      "losses": 843,
+      "win_rate": {
+        "value": 0.4436,
+        "ci95": [
+          0.4185,
+          0.4686
+        ]
+      },
+      "roi": null,
+      "avg_ev_calibrated": null,
+      "realized_roi": null
+    }
+  },
+  "calibration": {
+    "before": {
+      "ML": {
+        "ece": 0.2586,
+        "brier": {
+          "brier": 0.72646,
+          "logloss": 1.17092,
+          "n": 1515
+        },
+        "unique_n": 1515
+      },
+      "OU25": {
+        "ece": 0.52754,
+        "brier": null,
+        "unique_n": null
+      },
+      "BTTS": {
+        "ece": 0,
+        "brier": null,
+        "unique_n": null
+      },
+      "AH": {
+        "ece": 0.28222,
+        "brier": null,
+        "unique_n": null
+      }
+    },
+    "after": {
+      "ML": {
+        "ece": 0,
+        "brier": {
+          "brier": 0.66135,
+          "logloss": 1.08943,
+          "n": 1515
+        },
+        "unique_n": 1515
+      },
+      "OU25": {
+        "ece": 0.11187,
+        "brier": null,
+        "unique_n": null
+      },
+      "BTTS": {
+        "ece": 0,
+        "brier": null,
+        "unique_n": null
+      },
+      "AH": {
+        "ece": 0.29044,
+        "brier": null,
+        "unique_n": null
+      }
+    }
+  },
+  "ev_analysis": {
+    "ML": {
+      "buckets": [
+        {
+          "bucket": "<0%",
+          "n": 1923,
+          "win_rate": 0.4935,
+          "avg_ev": -0.324,
+          "realized_roi": -0.0548,
+          "roi_ci95": [
+            -0.101,
+            -0.0085
+          ]
+        },
+        {
+          "bucket": "0-5%",
+          "n": 87,
+          "win_rate": 0.3103,
+          "avg_ev": 0.0234,
+          "realized_roi": 0.0362,
+          "roi_ci95": [
+            -0.2912,
+            0.3636
+          ]
+        },
+        {
+          "bucket": "5-10%",
+          "n": 93,
+          "win_rate": 0.3226,
+          "avg_ev": 0.0739,
+          "realized_roi": 0.1538,
+          "roi_ci95": [
+            -0.1889,
+            0.4964
+          ]
+        },
+        {
+          "bucket": "10-20%",
+          "n": 215,
+          "win_rate": 0.2605,
+          "avg_ev": 0.1549,
+          "realized_roi": -0.0644,
+          "roi_ci95": [
+            -0.2767,
+            0.1479
+          ]
+        },
+        {
+          "bucket": "20-30%",
+          "n": 415,
+          "win_rate": 0.2578,
+          "avg_ev": 0.2521,
+          "realized_roi": -0.0787,
+          "roi_ci95": [
+            -0.2303,
+            0.0728
+          ]
+        },
+        {
+          "bucket": "30%+",
+          "n": 1812,
+          "win_rate": 0.1909,
+          "avg_ev": 0.8463,
+          "realized_roi": -0.0862,
+          "roi_ci95": [
+            -0.1784,
+            0.0059
+          ]
+        }
+      ],
+      "statement": "preliminary: compare realized ROI vs average EV across buckets"
+    },
+    "OU25": {
+      "buckets": [
+        {
+          "bucket": "<0%",
+          "n": 1671,
+          "win_rate": 0.5733,
+          "avg_ev": -0.195,
+          "realized_roi": -0.0334,
+          "roi_ci95": [
+            -0.0741,
+            0.0074
+          ]
+        },
+        {
+          "bucket": "0-5%",
+          "n": 146,
+          "win_rate": 0.5274,
+          "avg_ev": 0.0226,
+          "realized_roi": 0.0249,
+          "roi_ci95": [
+            -0.1337,
+            0.1835
+          ]
+        },
+        {
+          "bucket": "5-10%",
+          "n": 222,
+          "win_rate": 0.4775,
+          "avg_ev": 0.0758,
+          "realized_roi": -0.0453,
+          "roi_ci95": [
+            -0.177,
+            0.0865
+          ]
+        },
+        {
+          "bucket": "10-20%",
+          "n": 393,
+          "win_rate": 0.4148,
+          "avg_ev": 0.1453,
+          "realized_roi": -0.1177,
+          "roi_ci95": [
+            -0.2216,
+            -0.0139
+          ]
+        },
+        {
+          "bucket": "20-30%",
+          "n": 207,
+          "win_rate": 0.3961,
+          "avg_ev": 0.2572,
+          "realized_roi": -0.0728,
+          "roi_ci95": [
+            -0.2292,
+            0.0836
+          ]
+        },
+        {
+          "bucket": "30%+",
+          "n": 391,
+          "win_rate": 0.3299,
+          "avg_ev": 0.5343,
+          "realized_roi": -0.0747,
+          "roi_ci95": [
+            -0.2072,
+            0.0579
+          ]
+        }
+      ],
+      "statement": "preliminary: compare realized ROI vs average EV across buckets"
+    }
+  },
+  "clv": {
+    "available": false,
+    "reason": "no opening/closing odds split in source data; CLV=NULL"
+  },
+  "note": "All metrics out-of-sample. Eligible = core features present + market odds present (ML/OU25). Brier/log-loss on unique matches only. AH is home -0.5 (no push outcome). EV analysis uses calibrated probabilities."
+}

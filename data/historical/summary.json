@@ -1,0 +1,25 @@
+{
+  "raw_rows_read": 2282,
+  "normalized_matches": 2280,
+  "excluded": [
+    {
+      "reason": "missing_goals",
+      "count": 2
+    }
+  ],
+  "duplicates_found": 0,
+  "result_mismatches": 0,
+  "matches_with_odds_1x2": 2280,
+  "matches_with_odds_ou25": 2279,
+  "features_generated": 2280,
+  "leak_free": true,
+  "leakage_violations": 0,
+  "season_breakdown": {
+    "2020-2021": 380,
+    "2021-2022": 380,
+    "2022-2023": 380,
+    "2023-2024": 380,
+    "2024-2025": 380,
+    "2025-2026": 380
+  }
+}

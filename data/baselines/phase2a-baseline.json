@@ -1,0 +1,58 @@
+{
+  "model_version": "phase2a-baseline",
+  "immutable": true,
+  "created_at": "2026-08-10T00:00:00Z",
+  "dataset": {
+    "normalized_matches": "data/historical/normalized_matches.jsonl",
+    "feature_snapshots": "data/historical/feature_snapshots.jsonl",
+    "historical_odds": "data/historical/historical_odds.jsonl",
+    "sha256_matches": "10f8573f4a2aadc6bf6a086f5199196dd0aefa2fbd6f1c660f014779b1a37d1c",
+    "sha256_features": "6d82b053e9b2a13cc34307e966998ca5fe127b552f2e41ed01fce3046a0978d5",
+    "sha256_odds": "3b15748875321fe9d3f5f65df84e737dacf3c075c46d224fa07c9c2192253b43"
+  },
+  "feature_pipeline": "historical-v1",
+  "model": {
+    "algo": "feature-driven poisson + per-fold temperature scaling",
+    "elo_scale": 400,
+    "max_goals": 10,
+    "fold_definitions": [
+      { "train": ["2020-2021", "2021-2022"], "test": "2022-2023" },
+      { "train": ["2020-2021", "2021-2022", "2022-2023"], "test": "2023-2024" },
+      { "train": ["2020-2021", "2021-2022", "2022-2023", "2023-2024"], "test": "2024-2025" },
+      { "train": ["2020-2021", "2021-2022", "2022-2023", "2023-2024", "2024-2025"], "test": "2025-2026" }
+    ]
+  },
+  "metrics": {
+    "ML": {
+      "prediction_count": 4545,
+      "selection_rows": 4545,
+      "unique_match_count": 1515,
+      "win_rate": 0.3333,
+      "roi": -0.064,
+      "roi_ci95": [-0.1099, -0.018],
+      "brier": 0.72646,
+      "logloss": 1.17092,
+      "ece": 0.2586,
+      "avg_ev": 0.159
+    },
+    "OU25": {
+      "selection_rows": 3030,
+      "win_rate": 0.5,
+      "roi": -0.0504,
+      "ece": 0.52754
+    },
+    "AH": {
+      "wins": 672,
+      "pushes": 0,
+      "losses": 843,
+      "win_rate": 0.4436
+    },
+    "clv": null
+  },
+  "ev_buckets": {
+    "EV_lt_0": { "n": 2830, "realized_roi": -0.066 },
+    "EV_30_plus": { "n": 1565, "avg_ev": 1.177, "realized_roi": -0.041 }
+  },
+  "conclusion": "Model is materially overconfident. High predicted EV does not translate into positive realized ROI.",
+  "never_overwrite": true
+}

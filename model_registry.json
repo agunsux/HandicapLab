@@ -44,6 +44,72 @@
       "hyperparameters": { "kFactor": 32, "decayFactor": 0.97 },
       "calibration": "dynamic-isotonic",
       "validationDate": "2026-07-05"
+    },
+    {
+      "modelId": "phase2a-baseline",
+      "version": "1.0.0",
+      "trainingDataset": "historical-v1",
+      "featureSet": ["rollingGoalsFor", "rollingGoalsAgainst", "eloDelta", "leagueAvgGoals"],
+      "hyperparameters": { "eloScale": 400, "maxGoals": 10 },
+      "calibration": "temperature-scaling-per-fold",
+      "validationDate": "2026-08-10",
+      "metrics": {
+        "brier": 0.72646,
+        "logloss": 1.17092,
+        "ece": 0.2586,
+        "roi": -0.064
+      },
+      "status": "CURRENT_PRODUCTION",
+      "immutable": true
+    },
+    {
+      "modelId": "phase2b-temperature",
+      "version": "1.0.0",
+      "trainingDataset": "historical-v1",
+      "featureSet": ["rollingGoalsFor", "rollingGoalsAgainst", "eloDelta", "leagueAvgGoals"],
+      "hyperparameters": { "T": "10.5/7.35/4.4/4.45 per fold", "tMin": 0.05, "tMax": 20.0 },
+      "calibration": "temperature-scaling-walkforward",
+      "validationDate": "2026-08-10",
+      "metrics": {
+        "brier": 0.66135,
+        "logloss": 1.08944,
+        "ece": 0.0,
+        "roi": -0.064
+      },
+      "status": "RESEARCH_ONLY"
+    },
+    {
+      "modelId": "phase2b-shrinkage",
+      "version": "1.0.0",
+      "trainingDataset": "historical-v1",
+      "featureSet": ["rollingGoalsFor", "rollingGoalsAgainst", "eloDelta", "leagueAvgGoals"],
+      "hyperparameters": { "alpha": "0.95-0.97 per fold ML", "baseRate": "learned" },
+      "calibration": "shrinkage-empirical-base-rate",
+      "validationDate": "2026-08-10",
+      "metrics": {
+        "brier": 0.63921,
+        "logloss": 1.05893,
+        "ece": 0.496,
+        "roi": -0.064
+      },
+      "status": "RESEARCH_ONLY"
+    },
+    {
+      "modelId": "phase2b-isotonic",
+      "version": "1.0.0",
+      "trainingDataset": "historical-v1",
+      "featureSet": ["rollingGoalsFor", "rollingGoalsAgainst", "eloDelta", "leagueAvgGoals"],
+      "hyperparameters": { "method": "PAV-one-vs-rest", "minSample": 500 },
+      "calibration": "isotonic",
+      "validationDate": "2026-08-10",
+      "metrics": {
+        "brier": 0.60209,
+        "logloss": 1.02273,
+        "ece": 0.03215,
+        "roi": -0.064
+      },
+      "status": "RESEARCH_ONLY_NOT_PROMOTED",
+      "note": "Best ML calibration (slope 0.92, intercept -0.05) but EV NOT predictive (30%+ ROI -21%). NOT promoted."
     }
   ]
 }

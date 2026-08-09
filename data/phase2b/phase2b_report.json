@@ -1,0 +1,1237 @@
+{
+  "version": "phase2b-v1",
+  "baseline_ref": "phase2a-baseline",
+  "generated_at": "2026-08-09T21:35:19.103Z",
+  "protocol": {
+    "walk_forward": true,
+    "calibrator_fit": "prior seasons only; no test-fold outcome enters any fit",
+    "leakage_protection": "raw model fitted on train seasons; calibrators fitted on train-season raw predictions; evaluation strictly on test seasons",
+    "methods": [
+      "raw",
+      "temperature",
+      "shrinkage",
+      "isotonic"
+    ]
+  },
+  "folds": [
+    {
+      "test_season": "2022-2023",
+      "ML": {
+        "raw": {
+          "method": "raw",
+          "n": 378,
+          "brier": 0.75923,
+          "logloss": 1.22583,
+          "ece": 0.30218,
+          "slope": 0.0409,
+          "intercept": -0.66,
+          "roi": -0.0576,
+          "win_rate": 0.3333,
+          "calibration_status": "OVERCENT"
+        },
+        "temperature": {
+          "method": "temperature",
+          "n": 378,
+          "brier": 0.66595,
+          "logloss": 1.09719,
+          "ece": 0,
+          "slope": 0.8956,
+          "intercept": -0.0723,
+          "roi": -0.0576,
+          "win_rate": 0.3333,
+          "calibration_status": "CALIBRATED"
+        },
+        "shrinkage": {
+          "method": "shrinkage",
+          "n": 378,
+          "brier": 0.6406,
+          "logloss": 1.06035,
+          "ece": 0,
+          "slope": 2.7902,
+          "intercept": 1.2048,
+          "roi": -0.0576,
+          "win_rate": 0.3333,
+          "calibration_status": "UNDERCENT"
+        },
+        "isotonic": {
+          "method": "isotonic",
+          "n": 378,
+          "brier": 0.61989,
+          "logloss": 1.09258,
+          "ece": 0.11099,
+          "slope": 0.6119,
+          "intercept": -0.2544,
+          "roi": -0.0576,
+          "win_rate": 0.3333,
+          "calibration_status": "OVERCENT"
+        }
+      },
+      "OU25": {
+        "raw": {
+          "method": "raw",
+          "n": 756,
+          "brier": 0.48642,
+          "logloss": 1.74177,
+          "ece": 0.48864,
+          "slope": -0.0285,
+          "intercept": 0,
+          "roi": -0.0564,
+          "win_rate": 0.5,
+          "calibration_status": "OVERCENT"
+        },
+        "temperature": {
+          "method": "temperature",
+          "n": 756,
+          "brier": 0.25358,
+          "logloss": 0.70032,
+          "ece": 0.0696,
+          "slope": -0.57,
+          "intercept": 0,
+          "roi": -0.0564,
+          "win_rate": 0.5,
+          "calibration_status": "OVERCENT"
+        },
+        "shrinkage": {
+          "method": "shrinkage",
+          "n": 756,
+          "brier": 0.25,
+          "logloss": 0.69315,
+          "ece": 0,
+          "slope": 0,
+          "intercept": 0,
+          "roi": -0.0564,
+          "win_rate": 0.5,
+          "calibration_status": "OVERCENT"
+        },
+        "isotonic": {
+          "method": "isotonic",
+          "n": 756,
+          "brier": 0.25097,
+          "logloss": 0.6951,
+          "ece": 0.00441,
+          "slope": -0.2683,
+          "intercept": 0,
+          "roi": -0.0564,
+          "win_rate": 0.5,
+          "calibration_status": "OVERCENT"
+        }
+      }
+    },
+    {
+      "test_season": "2023-2024",
+      "ML": {
+        "raw": {
+          "method": "raw",
+          "n": 379,
+          "brier": 0.71426,
+          "logloss": 1.13903,
+          "ece": 0.25398,
+          "slope": 0.2995,
+          "intercept": -0.4564,
+          "roi": -0.1036,
+          "win_rate": 0.3333,
+          "calibration_status": "OVERCENT"
+        },
+        "temperature": {
+          "method": "temperature",
+          "n": 379,
+          "brier": 0.65769,
+          "logloss": 1.084,
+          "ece": 0,
+          "slope": 2.5011,
+          "intercept": 1.0295,
+          "roi": -0.1036,
+          "win_rate": 0.3333,
+          "calibration_status": "UNDERCENT"
+        },
+        "shrinkage": {
+          "method": "shrinkage",
+          "n": 379,
+          "brier": 0.62877,
+          "logloss": 1.04386,
+          "ece": 0,
+          "slope": 2.6312,
+          "intercept": 1.0937,
+          "roi": -0.1036,
+          "win_rate": 0.3333,
+          "calibration_status": "UNDERCENT"
+        },
+        "isotonic": {
+          "method": "isotonic",
+          "n": 379,
+          "brier": 0.56053,
+          "logloss": 0.94802,
+          "ece": 0.08954,
+          "slope": 1.337,
+          "intercept": 0.2143,
+          "roi": -0.1036,
+          "win_rate": 0.3333,
+          "calibration_status": "UNCLEAR"
+        }
+      },
+      "OU25": {
+        "raw": {
+          "method": "raw",
+          "n": 758,
+          "brier": 0.59017,
+          "logloss": 2.07628,
+          "ece": 0.60227,
+          "slope": -0.1823,
+          "intercept": 0,
+          "roi": -0.0648,
+          "win_rate": 0.5,
+          "calibration_status": "OVERCENT"
+        },
+        "temperature": {
+          "method": "temperature",
+          "n": 758,
+          "brier": 0.26281,
+          "logloss": 0.71883,
+          "ece": 0.18587,
+          "slope": -3.6457,
+          "intercept": 0,
+          "roi": -0.0648,
+          "win_rate": 0.5,
+          "calibration_status": "OVERCENT"
+        },
+        "shrinkage": {
+          "method": "shrinkage",
+          "n": 758,
+          "brier": 0.25,
+          "logloss": 0.69315,
+          "ece": 0,
+          "slope": 0,
+          "intercept": 0,
+          "roi": -0.0648,
+          "win_rate": 0.5,
+          "calibration_status": "OVERCENT"
+        },
+        "isotonic": {
+          "method": "isotonic",
+          "n": 758,
+          "brier": 0.25358,
+          "logloss": 0.70032,
+          "ece": 0.04728,
+          "slope": -3.1056,
+          "intercept": 0.0012,
+          "roi": -0.0648,
+          "win_rate": 0.5,
+          "calibration_status": "OVERCENT"
+        }
+      }
+    },
+    {
+      "test_season": "2024-2025",
+      "ML": {
+        "raw": {
+          "method": "raw",
+          "n": 379,
+          "brier": 0.71446,
+          "logloss": 1.15835,
+          "ece": 0.23463,
+          "slope": 0.2335,
+          "intercept": -0.5106,
+          "roi": -0.057,
+          "win_rate": 0.3333,
+          "calibration_status": "OVERCENT"
+        },
+        "temperature": {
+          "method": "temperature",
+          "n": 379,
+          "brier": 0.66041,
+          "logloss": 1.08752,
+          "ece": 0,
+          "slope": 1.1372,
+          "intercept": 0.0941,
+          "roi": -0.057,
+          "win_rate": 0.3333,
+          "calibration_status": "CALIBRATED"
+        },
+        "shrinkage": {
+          "method": "shrinkage",
+          "n": 379,
+          "brier": 0.64266,
+          "logloss": 1.06408,
+          "ece": 0.496,
+          "slope": 1.8459,
+          "intercept": 0.5739,
+          "roi": -0.057,
+          "win_rate": 0.3333,
+          "calibration_status": "UNDERCENT"
+        },
+        "isotonic": {
+          "method": "isotonic",
+          "n": 379,
+          "brier": 0.60842,
+          "logloss": 1.01675,
+          "ece": 0.0486,
+          "slope": 0.858,
+          "intercept": -0.0921,
+          "roi": -0.057,
+          "win_rate": 0.3333,
+          "calibration_status": "CALIBRATED"
+        }
+      },
+      "OU25": {
+        "raw": {
+          "method": "raw",
+          "n": 758,
+          "brier": 0.50999,
+          "logloss": 1.72306,
+          "ece": 0.51565,
+          "slope": -0.0831,
+          "intercept": 0,
+          "roi": -0.0395,
+          "win_rate": 0.5,
+          "calibration_status": "OVERCENT"
+        },
+        "temperature": {
+          "method": "temperature",
+          "n": 758,
+          "brier": 0.256,
+          "logloss": 0.70517,
+          "ece": 0.10434,
+          "slope": -1.6608,
+          "intercept": 0,
+          "roi": -0.0395,
+          "win_rate": 0.5,
+          "calibration_status": "OVERCENT"
+        },
+        "shrinkage": {
+          "method": "shrinkage",
+          "n": 758,
+          "brier": 0.25,
+          "logloss": 0.69315,
+          "ece": 0,
+          "slope": 0,
+          "intercept": 0,
+          "roi": -0.0395,
+          "win_rate": 0.5,
+          "calibration_status": "OVERCENT"
+        },
+        "isotonic": {
+          "method": "isotonic",
+          "n": 758,
+          "brier": 0.25,
+          "logloss": 0.69315,
+          "ece": 0,
+          "slope": 0,
+          "intercept": 0,
+          "roi": -0.0395,
+          "win_rate": 0.5,
+          "calibration_status": "OVERCENT"
+        }
+      }
+    },
+    {
+      "test_season": "2025-2026",
+      "ML": {
+        "raw": {
+          "method": "raw",
+          "n": 379,
+          "brier": 0.71796,
+          "logloss": 1.16062,
+          "ece": 0.24387,
+          "slope": 0.2153,
+          "intercept": -0.5259,
+          "roi": -0.0376,
+          "win_rate": 0.3333,
+          "calibration_status": "OVERCENT"
+        },
+        "temperature": {
+          "method": "temperature",
+          "n": 379,
+          "brier": 0.66135,
+          "logloss": 1.08905,
+          "ece": 0,
+          "slope": 1.0965,
+          "intercept": 0.0663,
+          "roi": -0.0376,
+          "win_rate": 0.3333,
+          "calibration_status": "CALIBRATED"
+        },
+        "shrinkage": {
+          "method": "shrinkage",
+          "n": 379,
+          "brier": 0.6448,
+          "logloss": 1.06741,
+          "ece": 0,
+          "slope": 2.0696,
+          "intercept": 0.7275,
+          "roi": -0.0376,
+          "win_rate": 0.3333,
+          "calibration_status": "UNDERCENT"
+        },
+        "isotonic": {
+          "method": "isotonic",
+          "n": 379,
+          "brier": 0.61957,
+          "logloss": 1.03376,
+          "ece": 0.03509,
+          "slope": 0.9227,
+          "intercept": -0.0507,
+          "roi": -0.0376,
+          "win_rate": 0.3333,
+          "calibration_status": "CALIBRATED"
+        }
+      },
+      "OU25": {
+        "raw": {
+          "method": "raw",
+          "n": 758,
+          "brier": 0.49926,
+          "logloss": 1.72638,
+          "ece": 0.50348,
+          "slope": -0.0515,
+          "intercept": 0,
+          "roi": -0.0409,
+          "win_rate": 0.5,
+          "calibration_status": "OVERCENT"
+        },
+        "temperature": {
+          "method": "temperature",
+          "n": 758,
+          "brier": 0.25467,
+          "logloss": 0.70251,
+          "ece": 0.08772,
+          "slope": -1.0308,
+          "intercept": 0,
+          "roi": -0.0409,
+          "win_rate": 0.5,
+          "calibration_status": "OVERCENT"
+        },
+        "shrinkage": {
+          "method": "shrinkage",
+          "n": 758,
+          "brier": 0.25,
+          "logloss": 0.69315,
+          "ece": 0,
+          "slope": 0,
+          "intercept": 0,
+          "roi": -0.0409,
+          "win_rate": 0.5,
+          "calibration_status": "OVERCENT"
+        },
+        "isotonic": {
+          "method": "isotonic",
+          "n": 758,
+          "brier": 0.2499,
+          "logloss": 0.69294,
+          "ece": 0.00546,
+          "slope": 2.3415,
+          "intercept": -0.0007,
+          "roi": -0.0409,
+          "win_rate": 0.5,
+          "calibration_status": "UNCLEAR"
+        }
+      }
+    }
+  ],
+  "calibration_fits": [
+    {
+      "test_season": "2022-2023",
+      "ml": {
+        "temperature": {
+          "T": 10.5,
+          "n_train": 2226,
+          "train_logloss": 1.09693,
+          "at_boundary": false
+        },
+        "shrinkage": {
+          "alpha": 0.15,
+          "base_rates": [
+            0.402,
+            0.23,
+            0.368
+          ],
+          "n_train": 2226,
+          "train_logloss": 1.067
+        },
+        "isotonic": {
+          "n_train": 2226,
+          "train_logloss": 0.993,
+          "status": "FIT"
+        }
+      },
+      "binary": {
+        "OU25": {
+          "temperature": {
+            "T": 0.05,
+            "n_train": 1484,
+            "at_boundary": true
+          },
+          "shrinkage": {
+            "alpha": 0,
+            "base_rate": 0.5,
+            "n_train": 1484
+          },
+          "isotonic": {
+            "n_train": 1484,
+            "status": "FIT"
+          }
+        },
+        "BTTS": {
+          "temperature": {
+            "T": 0.05,
+            "n_train": 742,
+            "at_boundary": true
+          },
+          "shrinkage": {
+            "alpha": 0.01,
+            "base_rate": 0.495,
+            "n_train": 742
+          },
+          "isotonic": {
+            "n_train": 742,
+            "status": "FIT"
+          }
+        },
+        "AH": {
+          "temperature": {
+            "T": 0.5,
+            "n_train": 742,
+            "at_boundary": false
+          },
+          "shrinkage": {
+            "alpha": 0.47,
+            "base_rate": 0.402,
+            "n_train": 742
+          },
+          "isotonic": {
+            "n_train": 742,
+            "status": "FIT"
+          }
+        }
+      }
+    },
+    {
+      "test_season": "2023-2024",
+      "ml": {
+        "temperature": {
+          "T": 7.35,
+          "n_train": 3360,
+          "train_logloss": 1.09533,
+          "at_boundary": false
+        },
+        "shrinkage": {
+          "alpha": 0.16,
+          "base_rates": [
+            0.429,
+            0.23,
+            0.341
+          ],
+          "n_train": 3360,
+          "train_logloss": 1.062
+        },
+        "isotonic": {
+          "n_train": 3360,
+          "train_logloss": 1,
+          "status": "FIT"
+        }
+      },
+      "binary": {
+        "OU25": {
+          "temperature": {
+            "T": 0.05,
+            "n_train": 2240,
+            "at_boundary": true
+          },
+          "shrinkage": {
+            "alpha": 0,
+            "base_rate": 0.5,
+            "n_train": 2240
+          },
+          "isotonic": {
+            "n_train": 2240,
+            "status": "FIT"
+          }
+        },
+        "BTTS": {
+          "temperature": {
+            "T": 0.05,
+            "n_train": 1120,
+            "at_boundary": true
+          },
+          "shrinkage": {
+            "alpha": 0,
+            "base_rate": 0.503,
+            "n_train": 1120
+          },
+          "isotonic": {
+            "n_train": 1120,
+            "status": "FIT"
+          }
+        },
+        "AH": {
+          "temperature": {
+            "T": 0.45,
+            "n_train": 1120,
+            "at_boundary": false
+          },
+          "shrinkage": {
+            "alpha": 0.47,
+            "base_rate": 0.429,
+            "n_train": 1120
+          },
+          "isotonic": {
+            "n_train": 1120,
+            "status": "FIT"
+          }
+        }
+      }
+    },
+    {
+      "test_season": "2024-2025",
+      "ml": {
+        "temperature": {
+          "T": 4.4,
+          "n_train": 4497,
+          "train_logloss": 1.08973,
+          "at_boundary": false
+        },
+        "shrinkage": {
+          "alpha": 0.22,
+          "base_rates": [
+            0.436,
+            0.227,
+            0.337
+          ],
+          "n_train": 4497,
+          "train_logloss": 1.055
+        },
+        "isotonic": {
+          "n_train": 4497,
+          "train_logloss": 0.985,
+          "status": "FIT"
+        }
+      },
+      "binary": {
+        "OU25": {
+          "temperature": {
+            "T": 0.05,
+            "n_train": 2998,
+            "at_boundary": true
+          },
+          "shrinkage": {
+            "alpha": 0,
+            "base_rate": 0.5,
+            "n_train": 2998
+          },
+          "isotonic": {
+            "n_train": 2998,
+            "status": "FIT"
+          }
+        },
+        "BTTS": {
+          "temperature": {
+            "T": 0.05,
+            "n_train": 1499,
+            "at_boundary": true
+          },
+          "shrinkage": {
+            "alpha": 0,
+            "base_rate": 0.531,
+            "n_train": 1499
+          },
+          "isotonic": {
+            "n_train": 1499,
+            "status": "FIT"
+          }
+        },
+        "AH": {
+          "temperature": {
+            "T": 0.5,
+            "n_train": 1499,
+            "at_boundary": false
+          },
+          "shrinkage": {
+            "alpha": 0.55,
+            "base_rate": 0.436,
+            "n_train": 1499
+          },
+          "isotonic": {
+            "n_train": 1499,
+            "status": "FIT"
+          }
+        }
+      }
+    },
+    {
+      "test_season": "2025-2026",
+      "ml": {
+        "temperature": {
+          "T": 4.45,
+          "n_train": 5634,
+          "train_logloss": 1.09003,
+          "at_boundary": false
+        },
+        "shrinkage": {
+          "alpha": 0.22,
+          "base_rates": [
+            0.431,
+            0.231,
+            0.339
+          ],
+          "n_train": 5634,
+          "train_logloss": 1.058
+        },
+        "isotonic": {
+          "n_train": 5634,
+          "train_logloss": 0.989,
+          "status": "FIT"
+        }
+      },
+      "binary": {
+        "OU25": {
+          "temperature": {
+            "T": 0.05,
+            "n_train": 3756,
+            "at_boundary": true
+          },
+          "shrinkage": {
+            "alpha": 0,
+            "base_rate": 0.5,
+            "n_train": 3756
+          },
+          "isotonic": {
+            "n_train": 3756,
+            "status": "FIT"
+          }
+        },
+        "BTTS": {
+          "temperature": {
+            "T": 0.05,
+            "n_train": 1878,
+            "at_boundary": true
+          },
+          "shrinkage": {
+            "alpha": 0,
+            "base_rate": 0.54,
+            "n_train": 1878
+          },
+          "isotonic": {
+            "n_train": 1878,
+            "status": "FIT"
+          }
+        },
+        "AH": {
+          "temperature": {
+            "T": 0.5,
+            "n_train": 1878,
+            "at_boundary": false
+          },
+          "shrinkage": {
+            "alpha": 0.54,
+            "base_rate": 0.431,
+            "n_train": 1878
+          },
+          "isotonic": {
+            "n_train": 1878,
+            "status": "FIT"
+          }
+        }
+      }
+    }
+  ],
+  "aggregate": {
+    "ML": {
+      "raw": {
+        "n": 1515,
+        "brier": 0.72646,
+        "logloss": 1.17092,
+        "ece": 0.2586,
+        "slope": 0.197,
+        "intercept": -0.5374,
+        "calibration_status": "OVERCENT",
+        "roi": -0.064,
+        "win_rate": 0.3333,
+        "avg_ev": 0.1592
+      },
+      "temperature": {
+        "n": 1515,
+        "brier": 0.66135,
+        "logloss": 1.08944,
+        "ece": 0,
+        "slope": 1.3381,
+        "intercept": 0.2325,
+        "calibration_status": "UNCLEAR",
+        "roi": -0.064,
+        "win_rate": 0.3333,
+        "avg_ev": 0.2326
+      },
+      "shrinkage": {
+        "n": 1515,
+        "brier": 0.63921,
+        "logloss": 1.05893,
+        "ece": 0.496,
+        "slope": 2.2965,
+        "intercept": 0.8765,
+        "calibration_status": "UNDERCENT",
+        "roi": -0.064,
+        "win_rate": 0.3333,
+        "avg_ev": 0.2053
+      },
+      "isotonic": {
+        "n": 1515,
+        "brier": 0.60209,
+        "logloss": 1.02273,
+        "ece": 0.03215,
+        "slope": 0.9202,
+        "intercept": -0.0517,
+        "calibration_status": "CALIBRATED",
+        "roi": -0.064,
+        "win_rate": 0.3333,
+        "avg_ev": 0.0324
+      }
+    },
+    "OU25": {
+      "raw": {
+        "n": 3030,
+        "brier": 0.52148,
+        "logloss": 1.81692,
+        "ece": 0.52754,
+        "slope": -0.085,
+        "intercept": 0,
+        "calibration_status": "OVERCENT",
+        "roi": -0.0504,
+        "win_rate": 0.5,
+        "avg_ev": 0.1125
+      },
+      "temperature": {
+        "n": 3030,
+        "brier": 0.25677,
+        "logloss": 0.70671,
+        "ece": 0.11187,
+        "slope": -1.7008,
+        "intercept": 0,
+        "calibration_status": "OVERCENT",
+        "roi": -0.0504,
+        "win_rate": 0.5,
+        "avg_ev": 0.0045
+      },
+      "shrinkage": {
+        "n": 3030,
+        "brier": 0.25,
+        "logloss": 0.69315,
+        "ece": 0,
+        "slope": 0,
+        "intercept": 0,
+        "calibration_status": "OVERCENT",
+        "roi": -0.0504,
+        "win_rate": 0.5,
+        "avg_ev": -0.0049
+      },
+      "isotonic": {
+        "n": 3030,
+        "brier": 0.25111,
+        "logloss": 0.69538,
+        "ece": 0.01012,
+        "slope": -1.4158,
+        "intercept": 0.0002,
+        "calibration_status": "OVERCENT",
+        "roi": -0.0504,
+        "win_rate": 0.5,
+        "avg_ev": -0.0045
+      }
+    }
+  },
+  "ev_buckets": {
+    "ML_raw": [
+      {
+        "bucket": "<0%",
+        "n": 2831,
+        "avg_ev": -0.401,
+        "realized_roi": -0.0622,
+        "roi_ci95": [
+          -0.1139,
+          -0.0105
+        ],
+        "win_rate": 0.3992
+      },
+      {
+        "bucket": "0-5%",
+        "n": 47,
+        "avg_ev": 0.0238,
+        "realized_roi": -0.1611,
+        "roi_ci95": [
+          -0.7916,
+          0.4695
+        ],
+        "win_rate": 0.1489
+      },
+      {
+        "bucket": "5-10%",
+        "n": 28,
+        "avg_ev": 0.0732,
+        "realized_roi": -0.2936,
+        "roi_ci95": [
+          -0.9191,
+          0.3319
+        ],
+        "win_rate": 0.1786
+      },
+      {
+        "bucket": "10-20%",
+        "n": 47,
+        "avg_ev": 0.1475,
+        "realized_roi": -0.3564,
+        "roi_ci95": [
+          -0.9982,
+          0.2855
+        ],
+        "win_rate": 0.0851
+      },
+      {
+        "bucket": "20-30%",
+        "n": 27,
+        "avg_ev": 0.2392,
+        "realized_roi": -0.6852,
+        "roi_ci95": [
+          -1.3022,
+          -0.0681
+        ],
+        "win_rate": 0.037
+      },
+      {
+        "bucket": "30%+",
+        "n": 1565,
+        "avg_ev": 1.1773,
+        "realized_roi": -0.0406,
+        "roi_ci95": [
+          -0.1305,
+          0.0494
+        ],
+        "win_rate": 0.2351
+      }
+    ],
+    "ML_calibrated_temperature": [
+      {
+        "bucket": "<0%",
+        "n": 1923,
+        "avg_ev": -0.324,
+        "realized_roi": -0.0548,
+        "roi_ci95": [
+          -0.101,
+          -0.0085
+        ],
+        "win_rate": 0.4935
+      },
+      {
+        "bucket": "0-5%",
+        "n": 87,
+        "avg_ev": 0.0234,
+        "realized_roi": 0.0362,
+        "roi_ci95": [
+          -0.2912,
+          0.3636
+        ],
+        "win_rate": 0.3103
+      },
+      {
+        "bucket": "5-10%",
+        "n": 93,
+        "avg_ev": 0.0739,
+        "realized_roi": 0.1538,
+        "roi_ci95": [
+          -0.1889,
+          0.4964
+        ],
+        "win_rate": 0.3226
+      },
+      {
+        "bucket": "10-20%",
+        "n": 215,
+        "avg_ev": 0.1549,
+        "realized_roi": -0.0644,
+        "roi_ci95": [
+          -0.2767,
+          0.1479
+        ],
+        "win_rate": 0.2605
+      },
+      {
+        "bucket": "20-30%",
+        "n": 415,
+        "avg_ev": 0.2521,
+        "realized_roi": -0.0787,
+        "roi_ci95": [
+          -0.2303,
+          0.0728
+        ],
+        "win_rate": 0.2578
+      },
+      {
+        "bucket": "30%+",
+        "n": 1812,
+        "avg_ev": 0.8463,
+        "realized_roi": -0.0862,
+        "roi_ci95": [
+          -0.1784,
+          0.0059
+        ],
+        "win_rate": 0.1909
+      }
+    ],
+    "ML_calibrated_shrinkage": [
+      {
+        "bucket": "<0%",
+        "n": 1974,
+        "avg_ev": -0.2474,
+        "realized_roi": -0.0428,
+        "roi_ci95": [
+          -0.0906,
+          0.005
+        ],
+        "win_rate": 0.4858
+      },
+      {
+        "bucket": "0-5%",
+        "n": 356,
+        "avg_ev": 0.0245,
+        "realized_roi": -0.1174,
+        "roi_ci95": [
+          -0.2703,
+          0.0354
+        ],
+        "win_rate": 0.2697
+      },
+      {
+        "bucket": "5-10%",
+        "n": 301,
+        "avg_ev": 0.0726,
+        "realized_roi": -0.0885,
+        "roi_ci95": [
+          -0.2628,
+          0.0858
+        ],
+        "win_rate": 0.2625
+      },
+      {
+        "bucket": "10-20%",
+        "n": 434,
+        "avg_ev": 0.145,
+        "realized_roi": -0.0242,
+        "roi_ci95": [
+          -0.1787,
+          0.1302
+        ],
+        "win_rate": 0.265
+      },
+      {
+        "bucket": "20-30%",
+        "n": 317,
+        "avg_ev": 0.2464,
+        "realized_roi": -0.0228,
+        "roi_ci95": [
+          -0.215,
+          0.1693
+        ],
+        "win_rate": 0.2429
+      },
+      {
+        "bucket": "30%+",
+        "n": 1163,
+        "avg_ev": 1.0745,
+        "realized_roi": -0.1032,
+        "roi_ci95": [
+          -0.2273,
+          0.0209
+        ],
+        "win_rate": 0.1625
+      }
+    ],
+    "ML_calibrated_isotonic": [
+      {
+        "bucket": "<0%",
+        "n": 2709,
+        "avg_ev": -0.173,
+        "realized_roi": -0.0444,
+        "roi_ci95": [
+          -0.0965,
+          0.0077
+        ],
+        "win_rate": 0.3931
+      },
+      {
+        "bucket": "0-5%",
+        "n": 313,
+        "avg_ev": 0.0248,
+        "realized_roi": -0.0663,
+        "roi_ci95": [
+          -0.2398,
+          0.1073
+        ],
+        "win_rate": 0.3003
+      },
+      {
+        "bucket": "5-10%",
+        "n": 253,
+        "avg_ev": 0.076,
+        "realized_roi": -0.0004,
+        "roi_ci95": [
+          -0.2046,
+          0.2037
+        ],
+        "win_rate": 0.3281
+      },
+      {
+        "bucket": "10-20%",
+        "n": 371,
+        "avg_ev": 0.1457,
+        "realized_roi": -0.0684,
+        "roi_ci95": [
+          -0.2337,
+          0.0969
+        ],
+        "win_rate": 0.2803
+      },
+      {
+        "bucket": "20-30%",
+        "n": 230,
+        "avg_ev": 0.2463,
+        "realized_roi": 0.0708,
+        "roi_ci95": [
+          -0.1851,
+          0.3267
+        ],
+        "win_rate": 0.2696
+      },
+      {
+        "bucket": "30%+",
+        "n": 669,
+        "avg_ev": 0.7145,
+        "realized_roi": -0.21,
+        "roi_ci95": [
+          -0.3656,
+          -0.0543
+        ],
+        "win_rate": 0.1599
+      }
+    ],
+    "OU25_raw": [
+      {
+        "bucket": "<0%",
+        "n": 1515,
+        "avg_ev": -0.9243,
+        "realized_roi": -0.0305,
+        "roi_ci95": [
+          -0.0736,
+          0.0126
+        ],
+        "win_rate": 0.5729
+      },
+      {
+        "bucket": "0-5%",
+        "n": 0,
+        "avg_ev": null,
+        "realized_roi": null,
+        "roi_ci95": null,
+        "win_rate": null
+      },
+      {
+        "bucket": "5-10%",
+        "n": 0,
+        "avg_ev": null,
+        "realized_roi": null,
+        "roi_ci95": null,
+        "win_rate": null
+      },
+      {
+        "bucket": "10-20%",
+        "n": 0,
+        "avg_ev": null,
+        "realized_roi": null,
+        "roi_ci95": null,
+        "win_rate": null
+      },
+      {
+        "bucket": "20-30%",
+        "n": 0,
+        "avg_ev": null,
+        "realized_roi": null,
+        "roi_ci95": null,
+        "win_rate": null
+      },
+      {
+        "bucket": "30%+",
+        "n": 1515,
+        "avg_ev": 1.1493,
+        "realized_roi": -0.0703,
+        "roi_ci95": [
+          -0.1261,
+          -0.0145
+        ],
+        "win_rate": 0.4271
+      }
+    ],
+    "OU25_calibrated_shrinkage": [
+      {
+        "bucket": "<0%",
+        "n": 1650,
+        "avg_ev": -0.1562,
+        "realized_roi": -0.0332,
+        "roi_ci95": [
+          -0.0736,
+          0.0071
+        ],
+        "win_rate": 0.5794
+      },
+      {
+        "bucket": "0-5%",
+        "n": 322,
+        "avg_ev": 0.0128,
+        "realized_roi": -0.0821,
+        "roi_ci95": [
+          -0.1923,
+          0.0282
+        ],
+        "win_rate": 0.4534
+      },
+      {
+        "bucket": "5-10%",
+        "n": 270,
+        "avg_ev": 0.0507,
+        "realized_roi": -0.0035,
+        "roi_ci95": [
+          -0.1289,
+          0.1219
+        ],
+        "win_rate": 0.4741
+      },
+      {
+        "bucket": "10-20%",
+        "n": 382,
+        "avg_ev": 0.1368,
+        "realized_roi": -0.1134,
+        "roi_ci95": [
+          -0.2248,
+          -0.002
+        ],
+        "win_rate": 0.3901
+      },
+      {
+        "bucket": "20-30%",
+        "n": 102,
+        "avg_ev": 0.2429,
+        "realized_roi": 0.1466,
+        "roi_ci95": [
+          -0.0954,
+          0.3885
+        ],
+        "win_rate": 0.4608
+      },
+      {
+        "bucket": "30%+",
+        "n": 304,
+        "avg_ev": 0.4872,
+        "realized_roi": -0.1387,
+        "roi_ci95": [
+          -0.291,
+          0.0137
+        ],
+        "win_rate": 0.2928
+      }
+    ]
+  },
+  "note": "Phase 2b research artifacts. Nothing here is used in production. Production continues with phase2a-baseline."
+}
