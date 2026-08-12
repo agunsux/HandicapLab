@@ -48,6 +48,7 @@ export class FootyStatsAPI {
   }
 
   private async fetchWithRetry(url: string, retries = 0): Promise<any> {
+    throw new Error('FootyStats API is disabled/dead.');
     if (this.apiKey === 'mock') {
       return this.getMockMatches();
     }
@@ -76,8 +77,8 @@ export class FootyStatsAPI {
       const validationResult = FootyStatsMatchesResponseSchema.safeParse(rawJson);
       
       if (!validationResult.success) {
-        console.error('[FootyStatsAPI] Schema validation failed:', validationResult.error.format());
-        throw new Error(`FootyStats API response schema validation failed: ${validationResult.error.message}`);
+        console.error('[FootyStatsAPI] Schema validation failed:', validationResult.error?.format());
+        throw new Error(`FootyStats API response schema validation failed: ${validationResult.error?.message}`);
       }
       
       return validationResult.data;

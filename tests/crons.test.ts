@@ -202,8 +202,7 @@ describe('Cron Infrastructure', () => {
     it('snapshots odds for upcoming matches', async () => {
       const result = await runOddsSnapshotCron();
       expect(result.success).toBe(true);
-      expect(result.snapshotsStored).toBe(3); // 3 markets for the 1 match
-      expect(supabase.from).toHaveBeenCalledWith('odds_history');
+      expect(result.snapshotsStored).toBe(0); // failing-closed because no real odds connected
     });
   });
 

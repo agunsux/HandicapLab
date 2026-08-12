@@ -33,62 +33,86 @@ export {
 // 1. API CLIENT DEFINITIONS (5 EXTERNAL PROVIDERS)
 // ==========================================
 
-// API 1: football-data.org (Matches & Schedules)
-export const footballDataClient = axios.create({
-  baseURL: 'https://api.football-data.org/v4',
-  headers: {
-    'X-Auth-Token':
-      process.env.VITE_FOOTBALL_DATA_API_KEY ||
-      process.env.NEXT_PUBLIC_FOOTBALL_DATA_API_KEY ||
-      '',
-  },
-  timeout: 10000,
-});
+import { globalGateway } from '@/lib/providers/providerGateway';
+import { filterOddsPapiBookmakers } from '@/lib/providers/oddspapiFilter';
 
-// API 2: API-Football (API-Sports DIRECT — not RapidAPI)
-export const apiFootball = axios.create({
-  baseURL: 'https://v3.football.api-sports.io',
-  headers: {
-    'x-apisports-key':
-      process.env.VITE_APIFOOTBALL_KEY ||
-      process.env.NEXT_PUBLIC_APIFOOTBALL_KEY ||
-      process.env.API_FOOTBALL_KEY ||
-      '',
-  },
-  timeout: 10000,
-});
+// API 1: football-data.org (Matches & Schedules) - DEPRECATED
+export const footballDataClient = {
+  async get(url: string, config?: any): Promise<any> {
+    throw new Error('footballDataClient is disabled/dead.');
+  }
+};
 
-// API 3: TheStatsAPI (xG, Advanced Analytics, Form)
-export const theStatsApi = axios.create({
-  baseURL: 'https://api.thestatsapi.com/api',
-  headers: {
-    'Authorization': `Bearer ${
-      process.env.VITE_THESTATS_API_KEY ||
-      process.env.NEXT_PUBLIC_THESTATS_API_KEY ||
-      ''
-    }`,
-  },
-  timeout: 10000,
-});
+// API 2: API-Football (API-Sports DIRECT)
+export const apiFootball = {
+  async get(url: string, config?: any) {
+    const baseURL = 'https://v3.football.api-sports.io';
+    const params = new URLSearchParams(config?.params || {});
+    const fullUrl = `${baseURL}${url}${params.toString() ? '?' + params.toString() : ''}`;
+    const headers = {
+      'x-apisports-key':
+        process.env.VITE_APIFOOTBALL_KEY ||
+        process.env.NEXT_PUBLIC_APIFOOTBALL_KEY ||
+        process.env.API_FOOTBALL_KEY ||
+        '',
+    };
 
-// API 4: The Odds API (Bookmaker Odds)
-export const oddsApiClient = axios.create({
-  baseURL: 'https://api.the-odds-api.com/v4',
-  timeout: 15000,
-});
+    const response = await globalGateway.fetch('apifootball', url, fullUrl, {
+      method: 'GET',
+      headers,
+      cacheTtlMs: config?.params?.live ? 60000 : 3600000, // 1 min for live, 1 hr otherwise
+    });
+    
+    return {
+      data: await response.json(),
+      status: response.status,
+      headers: response.headers
+    };
+  }
+};
+
+// API 3: TheStatsAPI (xG, Advanced Analytics, Form) - DEPRECATED
+export const theStatsApi = {
+  async get(url: string, config?: any): Promise<any> {
+    throw new Error('theStatsApi is disabled/dead.');
+  }
+};
+
+// API 4: The Odds API (Bookmaker Odds) - DEPRECATED
+export const oddsApiClient = {
+  async get(url: string, config?: any): Promise<any> {
+    throw new Error('oddsApiClient is disabled/dead.');
+  }
+};
 
 // API 5: OddsPAPI (Odds Comparison, Line Movements)
-export const oddsPapi = axios.create({
-  baseURL: 'https://api.oddspapi.com/v1',
-  headers: {
-    'x-api-key':
-      process.env.VITE_ODDS_PAPI_KEY ||
-      process.env.NEXT_PUBLIC_ODDS_PAPI_KEY ||
-      process.env.ODDSPAPI_KEY ||
-      '',
-  },
-  timeout: 10000,
-});
+export const oddsPapi = {
+  async get(url: string, config?: any) {
+    const baseURL = 'https://api.oddspapi.com/v1';
+    const params = new URLSearchParams(config?.params || {});
+    const fullUrl = `${baseURL}${url}${params.toString() ? '?' + params.toString() : ''}`;
+    const headers = {
+      'x-api-key':
+        process.env.VITE_ODDS_PAPI_KEY ||
+        process.env.NEXT_PUBLIC_ODDS_PAPI_KEY ||
+        process.env.ODDSPAPI_KEY ||
+        '',
+    };
+
+    const response = await globalGateway.fetch('oddspapi', url, fullUrl, {
+      method: 'GET',
+      headers,
+      cacheTtlMs: 300000, // 5 min
+    });
+
+    const data = await response.json();
+    return {
+      data: filterOddsPapiBookmakers(data),
+      status: response.status,
+      headers: response.headers
+    };
+  }
+};
 
 // Internal Value Engine Client
 export const valueEngineClient = axios.create({

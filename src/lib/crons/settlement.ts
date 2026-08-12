@@ -64,15 +64,15 @@ export async function runSettlementCron(): Promise<any> {
               if (pred.selection === 'under') closingOddsVal = closingSnap.awayOdds ?? closingSnap.market?.away;
             }
           }
-          // If no specific value found in closing snapshot, generate fallback
-          if (!closingOddsVal) {
-            closingOddsVal = Number((pred.entry_odds * (0.94 + Math.random() * 0.12)).toFixed(2));
-          }
+          // If no specific value found in closing snapshot, we FAIL CLOSED.
+          // Do NOT generate fallback.
         }
 
         const clv = pred.entry_odds && closingOddsVal
           ? CLVCalculator.calculate(pred.entry_odds, closingOddsVal)
           : null;
+
+        // Note: We leave clv as null if closing odds are missing, marking it essentially incomplete.
 
         await supabase
           .from('predictions')
@@ -107,12 +107,27 @@ export async function runSettlementCron(): Promise<any> {
         ? BrierCalculator.calculate(trade.market_type as 'ML' | 'AH' | 'OU', relatedPred.prediction, homeGoals, awayGoals)
         : 0.25;
 
-      let closingOddsVal = trade.entry_odds * (0.94 + Math.random() * 0.12);
+      let closingOddsVal: number | null = null;
       if (relatedPred && relatedPred.closing_odds) {
         if (typeof relatedPred.closing_odds === 'number') {
           closingOddsVal = relatedPred.closing_odds;
         }
       }
+      
+      if (closingOddsVal === null) {
+        // FAIL CLOSED for paper_trades
+        await supabase
+          .from('paper_trades')
+          .update({
+            status: 'incomplete', // INCOMPLETE settlement due to missing odds
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', trade.id);
+        
+        tradesSettled++;
+        continue;
+      }
+      
       closingOddsVal = Number(closingOddsVal.toFixed(2));
 
       const profit = ProfitCalculator.calculate(

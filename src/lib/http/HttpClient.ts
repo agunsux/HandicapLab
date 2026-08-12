@@ -16,6 +16,7 @@ export interface HttpClientConfig {
   defaultHeaders?: Record<string, string>;
   defaultTimeoutMs?: number;
   defaultRetries?: number;
+  defaultQueryParams?: Record<string, string>;
   provider: string;
 }
 
@@ -39,6 +40,7 @@ export class HttpClient {
       defaultHeaders: config.defaultHeaders ?? {},
       defaultTimeoutMs: config.defaultTimeoutMs ?? 30_000,
       defaultRetries: config.defaultRetries ?? 2,
+      defaultQueryParams: config.defaultQueryParams ?? {},
       provider: config.provider,
     };
     this.rateLimiter = rateLimiter;
@@ -116,6 +118,14 @@ export class HttpClient {
     if (options?.queryParams) {
       for (const [k, v] of Object.entries(options.queryParams)) {
         if (v !== undefined) url.searchParams.set(k, String(v));
+      }
+    }
+
+    if (this.config.defaultQueryParams) {
+      for (const [k, v] of Object.entries(this.config.defaultQueryParams)) {
+        if (!url.searchParams.has(k)) {
+          url.searchParams.append(k, v);
+        }
       }
     }
 

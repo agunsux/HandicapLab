@@ -129,85 +129,9 @@ export class OddsApiClient {
 
     const startTime = Date.now();
     console.log(`[OddsApiClient] Initiating request to endpoint: ${endpoint}`);
-
-    try {
-      const response = await fetch(url.toString(), {
-        signal: controller.signal,
-        headers: {
-          'Accept': 'application/json',
-        },
-      });
-
-      clearTimeout(timeoutId);
-
-      const duration = Date.now() - startTime;
-      console.log(`[OddsApiClient] Request completed in ${duration}ms with status ${response.status}`);
-
-      let responseText: string;
-      try {
-        responseText = await response.text();
-      } catch (err: any) {
-        throw new ApiError(
-          `Failed to read response body: ${err.message}`,
-          endpoint,
-          response.status
-        );
-      }
-
-      // Safe JSON parsing
-      let responseData: any;
-      try {
-        responseData = JSON.parse(responseText);
-      } catch (err: any) {
-        console.error(`[OddsApiClient] Safe JSON parse failed for ${endpoint}. Raw: ${responseText.substring(0, 200)}`);
-        throw new ApiError(
-          `Invalid JSON response: ${err.message}`,
-          endpoint,
-          response.status
-        );
-      }
-
-      if (!response.ok) {
-        console.error(`[OddsApiClient] API returned error status: ${response.status}`, responseData);
-        throw new ApiError(
-          responseData?.message || `API error with status ${response.status}`,
-          endpoint,
-          response.status,
-          responseData
-        );
-      }
-
-      // Schema validation with Zod
-      const validationResult = schema.safeParse(responseData);
-      if (!validationResult.success) {
-        console.error(
-          `[OddsApiClient] Zod validation failed for endpoint ${endpoint}:`,
-          validationResult.error.format()
-        );
-        throw new ApiError(
-          `Response validation failed: ${validationResult.error.message}`,
-          endpoint,
-          response.status,
-          validationResult.error.format()
-        );
-      }
-
-      return validationResult.data;
-    } catch (error: any) {
-      clearTimeout(timeoutId);
-
-      if (error.name === 'AbortError') {
-        console.error(`[OddsApiClient] Request to ${endpoint} timed out after ${timeoutMs}ms.`);
-        throw new ApiError(`Request timed out after ${timeoutMs}ms`, endpoint, 408);
-      }
-
-      if (error instanceof ApiError) {
-        throw error;
-      }
-
-      console.error(`[OddsApiClient] Request to ${endpoint} failed with error:`, error);
-      throw new ApiError(error.message || 'Unknown network error', endpoint, 500, error);
-    }
+    throw new ApiError('This provider (The Odds API) is disabled/dead.', endpoint, 403);
+    // Method deprecated
+    return undefined as unknown as T;
   }
 
   /**

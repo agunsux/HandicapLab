@@ -31,7 +31,7 @@ describe('ProviderConfig', () => {
   it('has default config with env keys', () => {
     const config = getProviderConfig();
     expect(config.apiFootball.baseUrl).toBe('https://v3.football.api-sports.io');
-    expect(config.oddsPapi.baseUrl).toBe('https://api.oddspapi.com/v1');
+    expect(config.oddsPapi.baseUrl).toBe('https://api.oddspapi.io/v4');
   });
 
   it('setProviderConfig merges overrides', () => {

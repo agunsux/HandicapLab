@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { globalGateway } from '@/lib/providers/providerGateway';
 
 // Ensure this module is only imported/run on the server side
 if (typeof window !== 'undefined') {
@@ -274,12 +275,14 @@ export class ApiFootballClient {
     console.log(`[ApiFootballClient] Initiating request to endpoint: ${endpoint}`);
 
     try {
-      const response = await fetch(url.toString(), {
+      const response = await globalGateway.fetch('apifootball', endpoint, url.toString(), {
+        method: 'GET',
         signal: controller.signal,
         headers: {
           'x-apisports-key': this.apiKey,
           'Accept': 'application/json',
         },
+        cacheTtlMs: 3600000, // 1 hour default cache
       });
 
       clearTimeout(timeoutId);

@@ -1,0 +1,33 @@
+{
+  "timestamp": "2026-08-12T11:52:22.062Z",
+  "gitSHA": "8dbd1c8b3d0b3b5dfdb7664b1bb7dc8cb2caba0d",
+  "migrationVerification": "PASS",
+  "tableVerification": "PASS",
+  "rpcVerification": "PASS",
+  "quotaReserveResult": "FAIL",
+  "quotaRollbackResult": "FAIL",
+  "providerIdentityVerification": "PENDING",
+  "apiFootballConnectivity": "PENDING",
+  "apiFootballFixtureAvailability": "PENDING",
+  "oddsPapiConnectivity": "PENDING",
+  "oddsPapiFootballAvailability": "PENDING",
+  "pinnaclePresence": "PENDING",
+  "sboPresence": "PENDING",
+  "moneylinePresence": "PENDING",
+  "asianHandicapPresence": "PENDING",
+  "overUnderPresence": "PENDING",
+  "filteredBookmakerResult": "PENDING",
+  "externalHttpCalls": 0,
+  "gatewayCalls": 0,
+  "cacheHits": 0,
+  "gates": {
+    "A_ProductionQuotaSchemaAndRPC": "PASS",
+    "B_ReserveAndRollback": "FAIL",
+    "C_ApiFootballConnectivity": "FAIL",
+    "D_OddsPapiConnectivity": "FAIL",
+    "E_OddsPapiFiltering": "FAIL",
+    "F_ExternalCallsLimit": "PASS"
+  },
+  "overallVerdict": "NO-GO",
+  "blocker": "Quota Sanity Test Failed: reserve_quota failed: Could not find the function public.reserve_quota(p_amount, p_default_limit, p_endpoint, p_period_end, p_period_start, p_provider, p_quota_type, p_request_id, p_safety_reserve_pct) in the schema cache"
+}

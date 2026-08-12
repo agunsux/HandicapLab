@@ -19,32 +19,11 @@ export async function runOddsSnapshotCron(): Promise<any> {
   const timestamp = new Date().toISOString();
 
   for (const match of matches) {
-    // Generate realistic market odds for snapshotting
-    // For ML (Home win), AH (Home cover at -0.5), OU (Over at 2.5)
-    const markets = [
-      { market: 'ML', line: null, odds: 1.7 + Math.random() * 2.5 },
-      { market: 'AH', line: -0.5, odds: 1.80 + Math.random() * 0.3 },
-      { market: 'OU', line: 2.5, odds: 1.80 + Math.random() * 0.3 }
-    ];
-
-    for (const item of markets) {
-      const { error: insertErr } = await supabase
-        .from('odds_history')
-        .insert({
-          match_id: String(match.id),
-          market: item.market,
-          line: item.line,
-          odds: Number(item.odds.toFixed(2)),
-          bookmaker: 'Pinnacle',
-          timestamp: timestamp
-        });
-
-      if (!insertErr) {
-        count++;
-      } else {
-        console.error(`Error inserting odds snapshot for match ${match.id}:`, insertErr);
-      }
-    }
+    // NO REAL ODDS implementation yet in this cron -> FAIL CLOSED
+    // Do not create synthetic odds.
+    // In a full implementation, we would query fetchSharpOdds(sportKey) here.
+    console.warn(`[OddsSnapshot] No real odds provider connected for match ${match.id}. Failing closed.`);
+    // We do NOT insert Math.random() into odds_history.
   }
 
   return { success: true, snapshotsStored: count };
