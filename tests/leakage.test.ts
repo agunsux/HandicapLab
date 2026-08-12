@@ -39,17 +39,17 @@ describe('LeakageGuard', () => {
     vi.mocked(supabase.from).mockImplementation((table: string) => {
       if (table === 'matches') {
         return {
-          select: () => ({
-            eq: () => ({
-              maybeSingle: mockMatchSelect
-            })
-          })
+          select: () => {
+    const chain = { eq: () => chain, in: () => chain, maybeSingle: mockMatchSelect };
+    return chain;
+  }
         } as any;
       }
       return {
-        select: () => ({
-          eq: mockPredSelect
-        })
+        select: () => {
+    const chain: any = { eq: () => chain, in: () => chain, then: (...args: any[]) => mockPredSelect().then(...args) };
+    return chain;
+  }
       } as any;
     });
 
@@ -84,17 +84,17 @@ describe('LeakageGuard', () => {
     vi.mocked(supabase.from).mockImplementation((table: string) => {
       if (table === 'matches') {
         return {
-          select: () => ({
-            eq: () => ({
-              maybeSingle: mockMatchSelect
-            })
-          })
+          select: () => {
+    const chain = { eq: () => chain, in: () => chain, maybeSingle: mockMatchSelect };
+    return chain;
+  }
         } as any;
       }
       return {
-        select: () => ({
-          eq: mockPredSelect
-        })
+        select: () => {
+    const chain: any = { eq: () => chain, in: () => chain, then: (...args: any[]) => mockPredSelect().then(...args) };
+    return chain;
+  }
       } as any;
     });
 
@@ -131,17 +131,17 @@ describe('LeakageGuard', () => {
     vi.mocked(supabase.from).mockImplementation((table: string) => {
       if (table === 'matches') {
         return {
-          select: () => ({
-            eq: () => ({
-              maybeSingle: mockMatchSelect
-            })
-          })
+          select: () => {
+    const chain = { eq: () => chain, in: () => chain, maybeSingle: mockMatchSelect };
+    return chain;
+  }
         } as any;
       }
       return {
-        select: () => ({
-          eq: mockPredSelect
-        })
+        select: () => {
+    const chain: any = { eq: () => chain, in: () => chain, then: (...args: any[]) => mockPredSelect().then(...args) };
+    return chain;
+  }
       } as any;
     });
 
@@ -178,17 +178,17 @@ describe('LeakageGuard', () => {
     vi.mocked(supabase.from).mockImplementation((table: string) => {
       if (table === 'matches') {
         return {
-          select: () => ({
-            eq: () => ({
-              maybeSingle: mockMatchSelect
-            })
-          })
+          select: () => {
+    const chain = { eq: () => chain, in: () => chain, maybeSingle: mockMatchSelect };
+    return chain;
+  }
         } as any;
       }
       return {
-        select: () => ({
-          eq: mockPredSelect
-        })
+        select: () => {
+    const chain: any = { eq: () => chain, in: () => chain, then: (...args: any[]) => mockPredSelect().then(...args) };
+    return chain;
+  }
       } as any;
     });
 

@@ -34,6 +34,9 @@ export interface GatewayOptions extends RequestInit {
   cacheTtlMs?: number; // 0 disables cache
 }
 
+// In-flight request deduplication registry
+export const inFlightRequests = new Map<string, Promise<Response>>();
+
 export class ProviderGateway {
   private cache: CacheStore;
 
@@ -45,15 +48,15 @@ export class ProviderGateway {
     return `gwcache:${provider}:${endpoint}:${method}:${url}:${body || ''}`;
   }
 
-  async fetch(
+  async _fetchInternal(
     provider: Provider,
     endpoint: string,
     url: string,
-    options: GatewayOptions = {}
+    options: GatewayOptions,
+    cacheKey: string
   ): Promise<Response> {
     const { quotaPriority = 50, cacheTtlMs = 0, ...fetchOptions } = options;
     const method = fetchOptions.method || 'GET';
-    const cacheKey = this.buildCacheKey(provider, endpoint, method, url, fetchOptions.body as string);
 
     // 1. CACHE CHECK
     if (cacheTtlMs > 0 && method === 'GET') {
@@ -126,6 +129,38 @@ export class ProviderGateway {
     }
 
     return response;
+  }
+
+  async fetch(
+    provider: Provider,
+    endpoint: string,
+    url: string,
+    options: GatewayOptions = {}
+  ): Promise<Response> {
+    const { quotaPriority = 50, cacheTtlMs = 0, ...fetchOptions } = options;
+    const method = fetchOptions.method || 'GET';
+    const cacheKey = this.buildCacheKey(provider, endpoint, method, url, fetchOptions.body as string);
+
+    if (method === 'GET') {
+      // Defer to the shared promise or create a new one
+      const inFlight = inFlightRequests.get(cacheKey);
+      if (inFlight) {
+        // Fallback catch if somehow it reached here instead of the check inside _fetchInternal,
+        // though normally it is handled above.
+        return (await inFlight).clone();
+      }
+
+      const promise = this._fetchInternal(provider, endpoint, url, options, cacheKey);
+      inFlightRequests.set(cacheKey, promise);
+      try {
+        const res = await promise;
+        return res.clone();
+      } finally {
+        inFlightRequests.delete(cacheKey);
+      }
+    } else {
+      return this._fetchInternal(provider, endpoint, url, options, cacheKey);
+    }
   }
 }
 
