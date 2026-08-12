@@ -42,8 +42,10 @@ async function checkOddsApi() {
     const key = process.env.ODDS_API_KEY || process.env.ODDSPAPI_KEY;
     if (!key) throw new Error('Missing Odds API key');
 
-    const baseUrl = process.env.ODDSPAPI_URL || 'https://api.the-odds-api.com/v4';
-    const res = await fetch(`${baseUrl}/sports?apiKey=${key}`);
+    const baseUrl = process.env.ODDSPAPI_URL || 'https://api.oddspapi.com/v1';
+    const res = await fetch(`${baseUrl}/status`, {
+      headers: { 'x-api-key': key }
+    });
     if (!res.ok) {
       throw new Error(`HTTP ${res.status}`);
     }

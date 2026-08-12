@@ -1,5 +1,6 @@
-// OddsApi Provider — IOddsProvider Implementation
+// OddsPAPI Provider — IOddsProvider Implementation
 // Location: src/lib/data/providers/odds/provider.ts
+// Provider: OddsPAPI (oddspapi.com)
 // Responsibilities: fetch odds, validate response, normalize
 // Does NOT: save to DB, make predictions, calculate EV/Kelly
 
@@ -11,9 +12,9 @@ import type { IOddsProvider, OddsSnapshot, ProviderOddsQuery, HealthStatus, Norm
 
 
 export class OddsApiProvider implements IOddsProvider {
-  readonly name = 'the-odds-api';
+  readonly name = 'oddspapi';
   private client: HttpClient;
-  private log = logger.child('provider:the-odds-api');
+  private log = logger.child('provider:oddspapi');
 
   constructor(client?: HttpClient) {
     this.client = client ?? createOddsApiClient();
@@ -25,7 +26,6 @@ export class OddsApiProvider implements IOddsProvider {
       marketTypes: query.marketTypes,
     });
 
-    const apiKey = this.getApiKey();
     const regions = 'us,uk,eu'; // Default regions
     const markets = this.buildMarketsParam(query.marketTypes);
     const oddsFormat = 'decimal';
@@ -33,8 +33,8 @@ export class OddsApiProvider implements IOddsProvider {
     // Determine sport key — default to soccer
     const sport = 'soccer_epl'; // Will be configurable in production
 
+    // OddsPAPI uses x-api-key header (configured in client.ts), not query param
     const queryParams: Record<string, string | number | undefined> = {
-      apiKey,
       regions,
       markets,
       oddsFormat,
@@ -74,12 +74,11 @@ export class OddsApiProvider implements IOddsProvider {
 
   async healthCheck(): Promise<boolean> {
     try {
-      const apiKey = this.getApiKey();
+      // OddsPAPI: /sports endpoint for health check
       const response = await this.client.get<any>('/sports', {
-        queryParams: { apiKey },
         cacheTtlMs: 300_000,
       });
-      return Array.isArray(response.data);
+      return response.data !== undefined;
     } catch {
       return false;
     }
@@ -141,10 +140,8 @@ export class OddsApiProvider implements IOddsProvider {
     };
   }
 
-  private getApiKey(): string {
-
-    return process.env.ODDSPAPI_KEY ?? '';
-  }
+  // API key is injected via defaultQueryParams in client.ts
+  // No explicit query-param key passing needed here.
 
   private buildMarketsParam(marketTypes?: string[]): string {
     if (!marketTypes || marketTypes.length === 0) return 'h2h,spreads,totals';

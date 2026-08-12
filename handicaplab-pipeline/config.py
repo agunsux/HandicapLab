@@ -52,14 +52,14 @@ DC_XI = 0.0018          # Time-decay factor
 DC_HOME_ADV = 0.25      # Initial home advantage guess (refined by MLE)
 
 # ─── API KEYS (from .env) ────────────────────────────────────────────────────
-API_FOOTBALL_KEY = os.getenv("API_FOOTBALL_KEY", "")
-ODDSPAPI_KEY = os.getenv("ODDSPAPI_KEY", "")
+API_FOOTBALL_KEY = os.getenv("APIFOOTBALL_KEY", os.getenv("API_FOOTBALL_KEY", ""))
+ODDSPAPI_KEY = os.getenv("ODDS_PAPI_KEY", os.getenv("ODDSPAPI_KEY", ""))
 SUPABASE_URL = os.getenv("SUPABASE_URL", "")
 SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_KEY", "")
 
 # ─── API BASE URLS ───────────────────────────────────────────────────────────
 API_FOOTBALL_BASE = "https://v3.football.api-sports.io"
-ODDSPAPI_BASE = "https://api.the-odds-api.com/v4"
+ODDSPAPI_BASE = "https://api.oddspapi.io/v4"
 
 # ─── CACHE DIRECTORY ─────────────────────────────────────────────────────────
 CACHE_DIR = os.path.join(os.path.dirname(__file__), "cache")

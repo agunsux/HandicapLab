@@ -44,14 +44,14 @@ const DEFAULT_CONFIG: ProviderApiConfig = {
     rateLimitWindowMs: 60_000,
   },
   oddsPapi: {
-    baseUrl: 'https://api.the-odds-api.com/v4',
-    apiKey: process.env.ODDSPAPI_KEY || process.env.ODDS_PAPI_KEY || '',
+    baseUrl: 'https://api.oddspapi.io/v4',
+    apiKey: process.env.ODDS_PAPI_KEY || process.env.ODDSPAPI_KEY || '',
     rateLimitRequests: 30,
     rateLimitWindowMs: 60_000,
   },
   apiFootball: {
     baseUrl: 'https://v3.football.api-sports.io',
-    apiKey: process.env.API_FOOTBALL_KEY || process.env.APIFOOTBALL_KEY || '',
+    apiKey: process.env.APIFOOTBALL_KEY || process.env.API_FOOTBALL_KEY || '',
     rateLimitRequests: 10,
     rateLimitWindowMs: 60_000,
   },
@@ -74,7 +74,7 @@ export function setProviderConfig(overrides: Partial<ProviderApiConfig>): void {
 export function validateProviderConfig(): string[] {
   const missing: string[] = [];
   if (!providerConfig.theStatsApi.apiKey) missing.push('THESTATS_API_KEY');
-  if (!providerConfig.oddsPapi.apiKey) missing.push('ODDSPAPI_KEY');
-  if (!providerConfig.apiFootball.apiKey) missing.push('API_FOOTBALL_KEY');
+  if (!providerConfig.oddsPapi.apiKey) missing.push('ODDS_PAPI_KEY');
+  if (!providerConfig.apiFootball.apiKey) missing.push('APIFOOTBALL_KEY');
   return missing;
 }

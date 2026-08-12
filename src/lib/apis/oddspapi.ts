@@ -1,5 +1,13 @@
 import { z } from 'zod';
 
+// ============================================================================
+// LEGACY CLIENT: "The Odds API" (the-odds-api.com)
+// DO NOT USE FOR NEW INTEGRATIONS.
+// The canonical odds provider is OddsPAPI (api.oddspapi.com/v1).
+// This client is preserved for backward compatibility but must NOT use the
+// canonical ODDS_PAPI_KEY. It uses LEGACY_THE_ODDS_API_KEY.
+// ============================================================================
+
 // Ensure this module is only imported/run on the server side
 if (typeof window !== 'undefined') {
   throw new Error('Odds API client can only be used on the server side.');
@@ -75,7 +83,8 @@ export class OddsApiClient {
   private apiKey: string;
 
   constructor() {
-    const key = process.env.ODDSPAPI_KEY || process.env.ODDS_PAPI_KEY || process.env.THESTATS_API_KEY;
+    // DO NOT read ODDS_PAPI_KEY or ODDSPAPI_KEY here to avoid leaking the canonical key to the wrong provider.
+    const key = process.env.LEGACY_THE_ODDS_API_KEY || process.env.THESTATS_API_KEY;
     if (!key) {
       // In production/runtime, lack of key is fatal for live operations.
       // We do not fallback to hardcoded keys.
@@ -90,7 +99,7 @@ export class OddsApiClient {
 
   private ensureApiKey(): void {
     if (!this.apiKey) {
-      console.error('[OddsApiClient] Error: ODDSPAPI_KEY / ODDS_PAPI_KEY / THESTATS_API_KEY environment variable is not defined.');
+      console.error('[OddsApiClient] Error: LEGACY_THE_ODDS_API_KEY environment variable is not defined.');
       throw new ApiError('API key is missing in environment variables.', 'auth', 401);
     }
   }

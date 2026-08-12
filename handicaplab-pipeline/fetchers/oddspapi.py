@@ -1,11 +1,7 @@
 """
-OddsPapi (The Odds API) Fetcher — FREE TIER Edition
+OddsPAPI (oddspapi.com) Fetcher — FREE TIER Edition
 ====================================================
-Key insight: /v4/sports/{league}/odds returns ALL upcoming matches
-in that league in ONE call. No need to call per-match.
-
-We make 1 call per active league per snapshot (opening/closing).
-6 leagues × 2 snapshots = 12 calls/day = 360/month (within 500 limit).
+Key insight: Fetches odds directly from the canonical OddsPAPI.
 """
 
 import logging
@@ -32,8 +28,7 @@ logger = logging.getLogger(__name__)
 
 class OddsPapiFetcher:
     """
-    Fetcher for The Odds API (odds-api.com).
-    One call per league returns ALL matches with odds from requested bookmakers.
+    Fetcher for OddsPAPI (oddspapi.com).
     """
 
     def __init__(self, cache: LocalCache, quota_guard: QuotaGuard):

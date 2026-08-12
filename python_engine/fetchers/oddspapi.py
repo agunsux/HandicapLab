@@ -7,8 +7,8 @@ from cache import local_cache
 from config import LEAGUES, CACHE_TTL_ODDS
 
 load_dotenv()
-API_KEY = os.getenv("ODDSPAPI_KEY")
-BASE_URL = "https://api.the-odds-api.com/v4/sports"
+API_KEY = os.getenv("ODDS_PAPI_KEY", os.getenv("ODDSPAPI_KEY"))
+BASE_URL = "https://api.oddspapi.io/v4/sports"
 
 def _make_request(endpoint: str, params: dict):
     if not API_KEY or API_KEY == "mock":

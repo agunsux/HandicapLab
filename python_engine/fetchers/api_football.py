@@ -7,7 +7,7 @@ from cache import local_cache
 from config import LEAGUES, CACHE_TTL_FIXTURES, CACHE_TTL_TEAM_STATS
 
 load_dotenv()
-API_KEY = os.getenv("API_FOOTBALL_KEY")
+API_KEY = os.getenv("APIFOOTBALL_KEY", os.getenv("API_FOOTBALL_KEY"))
 BASE_URL = "https://v3.football.api-sports.io"
 
 headers = {

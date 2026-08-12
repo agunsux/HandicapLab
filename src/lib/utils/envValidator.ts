@@ -1,22 +1,22 @@
 export function validateEnvironment() {
   const requiredVars = [
-    'NEXT_PUBLIC_SUPABASE_URL',
-    'SUPABASE_SERVICE_ROLE_KEY',
-    'NEXT_PUBLIC_SUPABASE_ANON_KEY',
-    'API_FOOTBALL_KEY',
-    'ODDSPAPI_KEY',
-    'CRON_SECRET'
+    { canonical: 'NEXT_PUBLIC_SUPABASE_URL', fallbacks: [] },
+    { canonical: 'SUPABASE_SERVICE_ROLE_KEY', fallbacks: [] },
+    { canonical: 'NEXT_PUBLIC_SUPABASE_ANON_KEY', fallbacks: [] },
+    { canonical: 'APIFOOTBALL_KEY', fallbacks: ['API_FOOTBALL_KEY'] },
+    { canonical: 'ODDS_PAPI_KEY', fallbacks: ['ODDSPAPI_KEY'] },
+    { canonical: 'CRON_SECRET', fallbacks: [] }
   ];
 
   const missing: string[] = [];
   const malformed: string[] = [];
 
-  for (const v of requiredVars) {
-    const val = process.env[v];
+  for (const item of requiredVars) {
+    const val = process.env[item.canonical] || item.fallbacks.map(f => process.env[f]).find(Boolean);
     if (!val) {
-      missing.push(v);
+      missing.push(item.canonical);
     } else if (val === 'mock' || val === 'mock_server_key' || val.includes('.mock')) {
-      malformed.push(v);
+      malformed.push(item.canonical);
     }
   }
 
@@ -35,26 +35,26 @@ export function validateEnvironment() {
 
 export function checkEnvironmentStatus() {
   const vars = [
-    'NEXT_PUBLIC_SUPABASE_URL',
-    'SUPABASE_SERVICE_ROLE_KEY',
-    'NEXT_PUBLIC_SUPABASE_ANON_KEY',
-    'API_FOOTBALL_KEY',
-    'ODDSPAPI_KEY',
-    'CRON_SECRET',
-    'MIDTRANS_SERVER_KEY',
-    'TELEGRAM_BOT_TOKEN',
-    'TELEGRAM_CHAT_ID'
+    { canonical: 'NEXT_PUBLIC_SUPABASE_URL', fallbacks: [] },
+    { canonical: 'SUPABASE_SERVICE_ROLE_KEY', fallbacks: [] },
+    { canonical: 'NEXT_PUBLIC_SUPABASE_ANON_KEY', fallbacks: [] },
+    { canonical: 'APIFOOTBALL_KEY', fallbacks: ['API_FOOTBALL_KEY'] },
+    { canonical: 'ODDS_PAPI_KEY', fallbacks: ['ODDSPAPI_KEY'] },
+    { canonical: 'CRON_SECRET', fallbacks: [] },
+    { canonical: 'MIDTRANS_SERVER_KEY', fallbacks: [] },
+    { canonical: 'TELEGRAM_BOT_TOKEN', fallbacks: [] },
+    { canonical: 'TELEGRAM_CHAT_ID', fallbacks: [] }
   ];
 
   const missing: string[] = [];
   const malformed: string[] = [];
 
-  for (const v of vars) {
-    const val = process.env[v];
+  for (const item of vars) {
+    const val = process.env[item.canonical] || item.fallbacks.map(f => process.env[f]).find(Boolean);
     if (!val) {
-      missing.push(v);
+      missing.push(item.canonical);
     } else if (val === 'mock' || val === 'mock_server_key' || val.includes('.mock')) {
-      malformed.push(v);
+      malformed.push(item.canonical);
     }
   }
 

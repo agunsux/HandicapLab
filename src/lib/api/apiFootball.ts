@@ -16,7 +16,7 @@ export class ApiFootballClient {
   private apiKey: string;
 
   constructor() {
-    this.apiKey = process.env.API_FOOTBALL_KEY || process.env.APIFOOTBALL_KEY || 'mock';
+    this.apiKey = process.env.APIFOOTBALL_KEY || process.env.API_FOOTBALL_KEY || 'mock';
   }
 
   private isMockMode(): boolean {

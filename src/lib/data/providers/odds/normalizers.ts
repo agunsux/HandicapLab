@@ -99,7 +99,7 @@ export function normalizeOddsSnapshot(
     priceAway,
     priceDraw,
     capturedAt: new Date(),
-    providerName: 'the-odds-api',
+    providerName: 'oddspapi',
     rawResponseHash: '',
   };
 }
