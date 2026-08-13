@@ -92,11 +92,7 @@ export const oddsPapi = {
     const params = new URLSearchParams(config?.params || {});
     const fullUrl = `${baseURL}${url}${params.toString() ? '?' + params.toString() : ''}`;
     const headers = {
-      'x-api-key':
-        process.env.VITE_ODDS_PAPI_KEY ||
-        process.env.NEXT_PUBLIC_ODDS_PAPI_KEY ||
-        process.env.ODDSPAPI_KEY ||
-        '',
+      'x-api-key': process.env.ODDS_PAPI_KEY || process.env.ODDSPAPI_KEY || '',
     };
 
     const response = await globalGateway.fetch('oddspapi', url, fullUrl, {
@@ -347,7 +343,7 @@ export async function fetchLiveMatches(): Promise<Match[]> {
   }
 
   // Try 3: OddsPAPI live
-  const opKey = process.env.VITE_ODDS_PAPI_KEY || process.env.NEXT_PUBLIC_ODDS_PAPI_KEY || process.env.ODDSPAPI_KEY;
+  const opKey = process.env.ODDS_PAPI_KEY || process.env.ODDSPAPI_KEY;
   if (isKeyValid(opKey)) {
     try {
       const res = await oddsPapi.get('/matches/live');
@@ -479,7 +475,7 @@ export async function fetchOdds(
   }
 
   // Try 2: OddsPAPI
-  const opKey = process.env.VITE_ODDS_PAPI_KEY || process.env.NEXT_PUBLIC_ODDS_PAPI_KEY || process.env.ODDSPAPI_KEY;
+  const opKey = process.env.ODDS_PAPI_KEY || process.env.ODDSPAPI_KEY;
   if (isKeyValid(opKey)) {
     try {
       const res = await oddsPapi.get('/odds');
@@ -508,7 +504,7 @@ export async function fetchOdds(
 }
 
 export async function fetchOddsHistory(eventId: string): Promise<any> {
-  const opKey = process.env.VITE_ODDS_PAPI_KEY || process.env.NEXT_PUBLIC_ODDS_PAPI_KEY || process.env.ODDSPAPI_KEY;
+  const opKey = process.env.ODDS_PAPI_KEY || process.env.ODDSPAPI_KEY;
   if (isKeyValid(opKey)) {
     try {
       const res = await oddsPapi.get('/odds/movement', { params: { match_id: eventId } });
