@@ -177,6 +177,20 @@ export class NativeOddsClient {
       const httpStatus: number | undefined = err?.status;
       const code: string | undefined = err?.code;
 
+      // Extract the provider error_code from the response body (e.g. 404 ->
+      // { error: { code: 'FIXTURE_NOT_FOUND' } }) so callers can distinguish
+      // data-availability 404s from genuine contract errors.
+      let providerErrorCode: string | undefined;
+      const body = typeof err?.body === 'string' ? err.body : undefined;
+      if (body) {
+        try {
+          const parsed = JSON.parse(body);
+          providerErrorCode = parsed?.error?.code ?? undefined;
+        } catch {
+          // non-JSON body; ignore
+        }
+      }
+
       // HTTP errors are thrown by HttpClient as { status, code: 'HTTP_<status>', body }
       if (httpStatus === 401 || code === 'HTTP_401') {
         await rollbackQuota(reservationId);
@@ -188,7 +202,7 @@ export class NativeOddsClient {
       }
       if (httpStatus !== undefined && httpStatus >= 400 && httpStatus < 500) {
         await rollbackQuota(reservationId);
-        throw new OddsPapiError('CONTRACT_ERROR', endpoint, `OddsPAPI HTTP ${httpStatus}: ${err?.message ?? ''}`, httpStatus, code);
+        throw new OddsPapiError('CONTRACT_ERROR', endpoint, `OddsPAPI HTTP ${httpStatus}: ${err?.message ?? ''}`, httpStatus, providerErrorCode ?? code);
       }
       if (code === 'VALIDATION_FAILED') {
         await rollbackQuota(reservationId);

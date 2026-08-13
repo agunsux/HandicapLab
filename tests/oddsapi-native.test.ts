@@ -478,7 +478,7 @@ describe('Provider status taxonomy', () => {
     vi.clearAllMocks();
   });
 
-  function makeProvider(client: NativeOddsClient, markets: NativeMarket[] = MARKETS, tournaments = [{ tournamentId: 17, tournamentSlug: 'premier-league', tournamentName: 'Premier League', categoryName: 'England' }]) {
+  function makeProvider(client: NativeOddsClient, markets: NativeMarket[] = MARKETS, tournaments = [{ tournamentId: 17, tournamentSlug: 'premier-league', tournamentName: 'Premier League', categoryName: 'England', futureFixtures: 10, upcomingFixtures: 2, liveFixtures: 0 }]) {
     const discovery = new OddsPapiDiscovery(client);
     vi.spyOn(discovery, 'getSoccerMarkets').mockResolvedValue(markets.map((m) => ({ marketId: m.marketId, marketName: m.marketName, marketType: m.marketType, handicap: m.handicap, outcomes: m.outcomes })));
     vi.spyOn(discovery, 'getSoccerTournaments').mockResolvedValue(tournaments);
@@ -726,7 +726,7 @@ describe('Provider odds-by-tournaments request shape', () => {
     const discovery = new OddsPapiDiscovery(fakeClient);
     vi.spyOn(discovery, 'getSoccerMarkets').mockResolvedValue([]);
     vi.spyOn(discovery, 'getSoccerTournaments').mockResolvedValue([
-      { tournamentId: 17, tournamentSlug: 'premier-league', tournamentName: 'Premier League', categoryName: 'England' },
+      { tournamentId: 17, tournamentSlug: 'premier-league', tournamentName: 'Premier League', categoryName: 'England', futureFixtures: 10, upcomingFixtures: 2, liveFixtures: 0 },
     ]);
     vi.spyOn(discovery, 'getVerifiedSharpBookmakers').mockResolvedValue({
       verified: [
@@ -786,7 +786,7 @@ describe('Provider odds-by-tournaments request shape', () => {
     const discovery = new OddsPapiDiscovery(fakeClient);
     vi.spyOn(discovery, 'getSoccerMarkets').mockResolvedValue(MARKETS.map((m) => ({ marketId: m.marketId, marketName: m.marketName, marketType: m.marketType, handicap: m.handicap, outcomes: m.outcomes })));
     vi.spyOn(discovery, 'getSoccerTournaments').mockResolvedValue([
-      { tournamentId: 17, tournamentSlug: 'premier-league', tournamentName: 'Premier League', categoryName: 'England' },
+      { tournamentId: 17, tournamentSlug: 'premier-league', tournamentName: 'Premier League', categoryName: 'England', futureFixtures: 10, upcomingFixtures: 2, liveFixtures: 0 },
     ]);
     vi.spyOn(discovery, 'getVerifiedSharpBookmakers').mockResolvedValue({
       verified: [
@@ -811,7 +811,7 @@ describe('Provider odds-by-tournaments request shape', () => {
     const discovery = new OddsPapiDiscovery(fakeClient);
     vi.spyOn(discovery, 'getSoccerMarkets').mockResolvedValue([]);
     vi.spyOn(discovery, 'getSoccerTournaments').mockResolvedValue([
-      { tournamentId: 17, tournamentSlug: 'premier-league', tournamentName: 'Premier League', categoryName: 'England' },
+      { tournamentId: 17, tournamentSlug: 'premier-league', tournamentName: 'Premier League', categoryName: 'England', futureFixtures: 10, upcomingFixtures: 2, liveFixtures: 0 },
     ]);
     vi.spyOn(discovery, 'getVerifiedSharpBookmakers').mockResolvedValue({
       verified: [],
@@ -820,5 +820,85 @@ describe('Provider odds-by-tournaments request shape', () => {
     vi.spyOn(discovery, 'getSoccerSportId').mockResolvedValue(10);
     (provider as any).discovery = discovery;
     await expect(provider.fetchNormalizedOdds()).rejects.toThrow('No verified sharp bookmakers');
+  });
+
+  it('skips tournaments with no upcoming/future fixtures', async () => {
+    const getSpy = vi.fn().mockResolvedValue({ data: [], status: 200, fromCache: false });
+    const fakeClient: any = { get: getSpy };
+    const provider = new OddsPapiV4Provider(fakeClient);
+    const discovery = new OddsPapiDiscovery(fakeClient);
+    vi.spyOn(discovery, 'getSoccerMarkets').mockResolvedValue([]);
+    vi.spyOn(discovery, 'getSoccerTournaments').mockResolvedValue([
+      { tournamentId: 17, tournamentSlug: 'premier-league', tournamentName: 'Premier League', categoryName: 'England', futureFixtures: 0, upcomingFixtures: 0, liveFixtures: 0 },
+      { tournamentId: 8, tournamentSlug: 'laliga', tournamentName: 'LaLiga', categoryName: 'Spain', futureFixtures: 12, upcomingFixtures: 0, liveFixtures: 0 },
+    ]);
+    vi.spyOn(discovery, 'getVerifiedSharpBookmakers').mockResolvedValue({
+      verified: [{ slug: 'pinnacle', name: 'Pinnacle' }],
+      unavailable: [],
+    });
+    vi.spyOn(discovery, 'getSoccerSportId').mockResolvedValue(10);
+    (provider as any).discovery = discovery;
+    await provider.fetchNormalizedOdds();
+    const oddsCall = getSpy.mock.calls.find((c: any) => String(c[0]).includes('odds-by-tournaments'));
+    expect(oddsCall).toBeDefined();
+    expect(oddsCall![1].tournamentIds).toBe('8');
+  });
+
+  it('skips a bookmaker with FIXTURE_NOT_FOUND instead of failing the cycle', async () => {
+    const fixture = {
+      fixtureId: 'id1000001761301153',
+      participant1Id: 1,
+      participant2Id: 2,
+      sportId: 10,
+      tournamentId: 17,
+      statusId: 0,
+      hasOdds: true,
+      startTime: '2026-04-13T19:00:00.000Z',
+      participant1Name: 'Liverpool FC',
+      participant2Name: 'Manchester United',
+      bookmakerOdds: {
+        pinnacle: {
+          bookmakerIsActive: true,
+          suspended: false,
+          markets: {
+            '101': {
+              marketActive: true,
+              outcomes: {
+                '101': { players: { '0': { active: true, price: 2.1, bookmakerOutcomeId: 'home' } } },
+                '102': { players: { '0': { active: true, price: 3.4, bookmakerOutcomeId: 'draw' } } },
+                '103': { players: { '0': { active: true, price: 3.2, bookmakerOutcomeId: 'away' } } },
+              },
+            },
+          },
+        },
+      },
+    };
+    const getSpy = vi.fn().mockImplementation(async (_path: any, params: any) => {
+      if (params.bookmaker === 'pinnacle') {
+        return { data: [fixture], status: 200, fromCache: false };
+      }
+      throw new OddsPapiError('CONTRACT_ERROR', 'odds-by-tournaments', 'HTTP 404: No fixtures found', 404, 'FIXTURE_NOT_FOUND');
+    });
+    const fakeClient: any = { get: getSpy };
+    const provider = new OddsPapiV4Provider(fakeClient);
+    const discovery = new OddsPapiDiscovery(fakeClient);
+    vi.spyOn(discovery, 'getSoccerMarkets').mockResolvedValue(MARKETS.map((m) => ({ marketId: m.marketId, marketName: m.marketName, marketType: m.marketType, handicap: m.handicap, outcomes: m.outcomes })));
+    vi.spyOn(discovery, 'getSoccerTournaments').mockResolvedValue([
+      { tournamentId: 17, tournamentSlug: 'premier-league', tournamentName: 'Premier League', categoryName: 'England', futureFixtures: 10, upcomingFixtures: 2, liveFixtures: 0 },
+    ]);
+    vi.spyOn(discovery, 'getVerifiedSharpBookmakers').mockResolvedValue({
+      verified: [
+        { slug: 'pinnacle', name: 'Pinnacle' },
+        { slug: 'sbobet', name: 'SBO' },
+      ],
+      unavailable: [],
+    });
+    vi.spyOn(discovery, 'getSoccerSportId').mockResolvedValue(10);
+    (provider as any).discovery = discovery;
+    const { sharp, snapshots } = await provider.fetchNormalizedOdds();
+    expect(sharp).toHaveLength(1);
+    expect(sharp[0].bookmakers.map((b) => b.key)).toEqual(['pinnacle']);
+    expect(snapshots.length).toBeGreaterThan(0);
+    expect(getSpy).toHaveBeenCalledTimes(2); // pinnacle + sbobet
   });
 });

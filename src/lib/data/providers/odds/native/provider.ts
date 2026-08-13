@@ -78,12 +78,21 @@ export class OddsPapiV4Provider implements IOddsProvider {
   }
 
   /**
-   * Select tournaments to fetch odds for. Prefers whitelist leagues with
-   * upcoming fixtures; falls back to any tournament with upcoming fixtures.
+   * Select tournaments to fetch odds for. Prefers whitelist leagues WITH
+   * upcoming/future fixtures (the /v4/tournaments response exposes fixture
+   * counts; a league between seasons has none and must be skipped, otherwise
+   * the odds endpoint returns FIXTURE_NOT_FOUND).
    */
   private async selectTournaments(limit = 5): Promise<Array<{ tournamentId: number; name: string }>> {
     const tournaments = await this.discovery.getSoccerTournaments();
-    const withFixtures = tournaments.filter((t) => t.tournamentId > 0);
+    const withFixtures = tournaments.filter(
+      (t) => t.futureFixtures > 0 || t.upcomingFixtures > 0
+    );
+
+    if (withFixtures.length === 0) {
+      log.warn('no_tournaments_with_fixtures', { total: tournaments.length });
+      return [];
+    }
 
     const ranked = withFixtures
       .map((t) => {
@@ -133,19 +142,34 @@ export class OddsPapiV4Provider implements IOddsProvider {
     }> = [];
 
     for (const bookmaker of bookmakerResult.verified) {
-      const res = await this.client.get(
-        '/odds-by-tournaments',
-        {
-          tournamentIds,
-          bookmaker: bookmaker.slug,
-          oddsFormat: 'decimal',
-          language: 'en',
-        },
-        NativeOddsResponseSchema,
-        'odds-by-tournaments'
-      );
-      const fixtures = Array.isArray(res.data) ? res.data : [res.data];
-      fixturesByBookmaker.push({ slug: bookmaker.slug, fixtures: fixtures as any });
+      try {
+        const res = await this.client.get(
+          '/odds-by-tournaments',
+          {
+            tournamentIds,
+            bookmaker: bookmaker.slug,
+            oddsFormat: 'decimal',
+            language: 'en',
+          },
+          NativeOddsResponseSchema,
+          'odds-by-tournaments'
+        );
+        const fixtures = Array.isArray(res.data) ? res.data : [res.data];
+        fixturesByBookmaker.push({ slug: bookmaker.slug, fixtures: fixtures as any });
+      } catch (err) {
+        // A per-bookmaker FIXTURE_NOT_FOUND (404) means this bookmaker simply
+        // has no odds for the selected tournaments — skip it, do not fail the
+        // whole cycle. Other errors propagate.
+        if (err instanceof OddsPapiError && err.errorCode === 'FIXTURE_NOT_FOUND') {
+          log.warn('bookmaker_no_fixtures', { slug: bookmaker.slug });
+          continue;
+        }
+        throw err;
+      }
+    }
+
+    if (fixturesByBookmaker.length === 0) {
+      return { sharp: [], snapshots: [], stats: emptyStats(), tournaments };
     }
 
     // Merge per-bookmaker responses by fixtureId, combining bookmakerOdds so a

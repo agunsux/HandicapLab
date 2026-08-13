@@ -38,6 +38,9 @@ export interface DiscoveryResult {
     tournamentSlug: string;
     tournamentName: string;
     categoryName: string;
+    futureFixtures: number;
+    upcomingFixtures: number;
+    liveFixtures: number;
   }>;
   bookmakers: Array<{ slug: string; name: string }>;
   markets: DiscoveredMarket[];
@@ -113,6 +116,9 @@ export class OddsPapiDiscovery {
         tournamentSlug: t.tournamentSlug,
         tournamentName: t.tournamentName,
         categoryName: t.categoryName,
+        futureFixtures: t.futureFixtures,
+        upcomingFixtures: t.upcomingFixtures,
+        liveFixtures: t.liveFixtures,
       }));
     });
   }
