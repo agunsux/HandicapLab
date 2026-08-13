@@ -90,9 +90,15 @@ export class OddsPapiError extends Error {
 export class NativeOddsClient {
   private client: HttpClient;
   private cooldownMap = new Map<OddsPapiEndpoint, number>();
+  private readonly baseUrl: string;
 
   constructor(client?: HttpClient) {
     const config = getProviderConfig().oddsPapi;
+    // The HttpClient resolves `new URL(path, baseUrl)`; without a trailing
+    // slash, `https://api.oddspapi.io/v4` is treated as a file path and a
+    // relative path like `sports` would drop the `/v4` segment. We therefore
+    // build the absolute URL ourselves.
+    this.baseUrl = config.baseUrl.replace(/\/+$/, '');
     this.client =
       client ??
       new HttpClient(
@@ -107,6 +113,15 @@ export class NativeOddsClient {
         new CircuitBreaker({ failureThreshold: 5, cooldownMs: 60_000, halfOpenSuccessThreshold: 2, provider: 'oddspapi' }),
         new Cache({ defaultTtlMs: 30_000, maxEntries: 200, provider: 'oddspapi' })
       );
+  }
+
+  /**
+   * Build the absolute OddsPAPI URL so the /v4 base path is always preserved.
+   * `new URL('sports', 'https://api.oddspapi.io/v4')` would yield
+   * `https://api.oddspapi.io/sports` (404) — this must never happen.
+   */
+  private resolveUrl(path: string): string {
+    return `${this.baseUrl}/${path.replace(/^\/+/, '')}`;
   }
 
   /**
@@ -148,10 +163,8 @@ export class NativeOddsClient {
     }
 
     try {
-      // The HttpClient joins `new URL(path, baseUrl)`; a leading slash would
-      // discard the /v4 base path (api.oddspapi.io/v4). Strip it.
-      const cleanPath = path.replace(/^\/+/, '');
-      const res = await this.client.get<z.infer<T>>(cleanPath, {
+      // Pass the absolute URL (baseUrl + path) so the /v4 segment is preserved.
+      const res = await this.client.get<z.infer<T>>(this.resolveUrl(path), {
         queryParams: params,
         schema,
         cacheTtlMs: ENDPOINT_CACHE_TTL_MS[endpoint] ?? 0,
@@ -192,7 +205,7 @@ export class NativeOddsClient {
    */
   async getAccountInfo(): Promise<{ requestLimit: number; requestCount: number } | null> {
     try {
-      const res = await this.client.get<any>('/account', { skipCache: true } as any);
+      const res = await this.client.get<any>(this.resolveUrl('/account'), { skipCache: true } as any);
       const data = res.data;
       if (!data || typeof data !== 'object') return null;
       return {

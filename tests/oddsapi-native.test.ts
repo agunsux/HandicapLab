@@ -599,19 +599,40 @@ describe('Native client error classification', () => {
 });
 
 describe('Native client path joining', () => {
-  it('strips the leading slash so the /v4 base path is preserved', async () => {
+  it('preserves the /v4 base path in the absolute URL', async () => {
     const { createNativeOddsClient } = await import('../src/lib/data/providers/odds/native/client');
-    const { HttpClient } = await import('../src/lib/http/HttpClient');
     const getSpy = vi.fn().mockResolvedValue({ data: [], status: 200, headers: new Headers(), durationMs: 1, fromCache: false });
     const fakeHttp: any = { get: getSpy };
     const native = (createNativeOddsClient as any)();
     (native as any).client = fakeHttp;
     (native as any).cooldownMap.clear();
     await native.get('/sports', { language: 'en' }, NativeSportsResponseSchema, 'sports');
-    expect(getSpy).toHaveBeenCalledWith(
-      'sports',
-      expect.objectContaining({ queryParams: { language: 'en' } })
-    );
-    expect(getSpy.mock.calls[0][0]).not.toMatch(/^\//);
+    expect(getSpy).toHaveBeenCalledTimes(1);
+    const calledPath: string = getSpy.mock.calls[0][0];
+    // The absolute URL must keep the /v4 segment:
+    expect(calledPath).toBe('https://api.oddspapi.io/v4/sports');
+    expect(calledPath).not.toBe('https://api.oddspapi.io/sports');
+  });
+
+  it('preserves the /v4 base path for odds-by-tournaments', async () => {
+    const { createNativeOddsClient } = await import('../src/lib/data/providers/odds/native/client');
+    const getSpy = vi.fn().mockResolvedValue({ data: [], status: 200, headers: new Headers(), durationMs: 1, fromCache: false });
+    const fakeHttp: any = { get: getSpy };
+    const native = (createNativeOddsClient as any)();
+    (native as any).client = fakeHttp;
+    (native as any).cooldownMap.clear();
+    await native.get('/odds-by-tournaments', { tournamentIds: '17' }, NativeOddsResponseSchema, 'odds-by-tournaments');
+    expect(getSpy.mock.calls[0][0]).toBe('https://api.oddspapi.io/v4/odds-by-tournaments');
+  });
+
+  it('resolves correctly even when the path has no leading slash', async () => {
+    const { createNativeOddsClient } = await import('../src/lib/data/providers/odds/native/client');
+    const getSpy = vi.fn().mockResolvedValue({ data: [], status: 200, headers: new Headers(), durationMs: 1, fromCache: false });
+    const fakeHttp: any = { get: getSpy };
+    const native = (createNativeOddsClient as any)();
+    (native as any).client = fakeHttp;
+    (native as any).cooldownMap.clear();
+    await native.get('markets', {}, NativeMarketsResponseSchema, 'markets');
+    expect(getSpy.mock.calls[0][0]).toBe('https://api.oddspapi.io/v4/markets');
   });
 });
