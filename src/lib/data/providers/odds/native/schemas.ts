@@ -44,7 +44,8 @@ export const NativeMarketSchema = z.object({
   playerProp: z.boolean(),
   sportId: z.number(),
   handicap: z.number(),
-  period: z.string(),
+  // The live API returns null for some markets (e.g. non-line markets).
+  period: z.string().nullable(),
   marketType: z.string(),
   outcomes: z.array(NativeMarketOutcomeSchema),
 });

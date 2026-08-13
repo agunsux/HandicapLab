@@ -28,7 +28,7 @@ vi.mock('../src/lib/supabase.server', () => {
 import { OddsPapiV4Provider } from '../src/lib/data/providers/odds/native/provider';
 import { OddsPapiDiscovery } from '../src/lib/data/providers/odds/native/discovery';
 import { normalizeNativeFixture, normalizeNativeOddsResponse } from '../src/lib/data/providers/odds/native/normalize';
-import { NativeOddsResponseSchema, NativeMarketsResponseSchema, NativeSportsResponseSchema } from '../src/lib/data/providers/odds/native/schemas';
+import { NativeOddsResponseSchema, NativeMarketsResponseSchema, NativeSportsResponseSchema, NativeBookmakersResponseSchema } from '../src/lib/data/providers/odds/native/schemas';
 import { OddsPapiError } from '../src/lib/data/providers/odds/native/client';
 import type { NativeOddsClient } from '../src/lib/data/providers/odds/native/client';
 import type { NativeOddsFixture, NativeMarket } from '../src/lib/data/providers/odds/native/schemas';
@@ -205,6 +205,19 @@ describe('Native OddsPAPI schemas', () => {
     const { fixtureId: _omit, ...rest } = makeFixture() as any;
     const parsed = NativeOddsResponseSchema.safeParse([rest]);
     expect(parsed.success).toBe(false);
+  });
+
+  it('accepts markets with period: null (live API behavior)', () => {
+    const parsed = NativeMarketsResponseSchema.safeParse([
+      makeMarket({ marketId: 999, period: null as any, marketType: 'totals' }),
+    ]);
+    expect(parsed.success).toBe(true);
+  });
+
+  it('parses the markets catalog including null periods', () => {
+    const withNullPeriod = MARKETS.map((m, i) => (i === 1 ? { ...m, period: null as any } : m));
+    const parsed = NativeMarketsResponseSchema.safeParse(withNullPeriod);
+    expect(parsed.success).toBe(true);
   });
 });
 
@@ -595,6 +608,49 @@ describe('Native client error classification', () => {
     expect(new OddsPapiError('RATE_LIMITED', 'odds', 'x', 429).kind).toBe('RATE_LIMITED');
     expect(new OddsPapiError('CONTRACT_ERROR', 'odds', 'x', 404).kind).toBe('CONTRACT_ERROR');
     expect(makeErr(401).status).toBe(401);
+  });
+});
+
+describe('Native discovery — bookmaker resolution', () => {
+  beforeEach(() => {
+    new OddsPapiDiscovery({} as any).clearCache();
+  });
+
+  it('resolves approved names with provider-side naming variants', async () => {
+    const getSpy = vi.fn().mockResolvedValue({
+      data: [
+        { bookmakerName: 'Pinnacle Sports', slug: 'pinnacle', liveOdds: false, cloneOf: null },
+        { bookmakerName: 'SBOBET', slug: 'sbobet', liveOdds: false, cloneOf: null },
+        { bookmakerName: '188BET', slug: '188bet', liveOdds: false, cloneOf: null },
+      ],
+      status: 200,
+      fromCache: false,
+    });
+    const fakeClient: any = { get: getSpy };
+    const discovery = new OddsPapiDiscovery(fakeClient);
+    const result = await discovery.getVerifiedSharpBookmakers();
+    expect(result.verified.map((b) => b.slug).sort()).toEqual(['pinnacle', 'sbobet']);
+    expect(result.unavailable).toEqual(['Circa']);
+  });
+
+  it('marks approved bookmakers unavailable when absent from the response', async () => {
+    const getSpy = vi.fn().mockResolvedValue({
+      data: [{ bookmakerName: 'Bet365', slug: 'bet365', liveOdds: false, cloneOf: null }],
+      status: 200,
+      fromCache: false,
+    });
+    const fakeClient: any = { get: getSpy };
+    const discovery = new OddsPapiDiscovery(fakeClient);
+    const result = await discovery.getVerifiedSharpBookmakers();
+    expect(result.verified).toEqual([]);
+    expect(result.unavailable).toEqual(['Pinnacle', 'Circa', 'SBO']);
+  });
+
+  it('parses the live bookmakers catalog schema', () => {
+    const parsed = NativeBookmakersResponseSchema.safeParse([
+      { bookmakerName: 'Pinnacle', slug: 'pinnacle', liveOdds: false, cloneOf: null },
+    ]);
+    expect(parsed.success).toBe(true);
   });
 });
 

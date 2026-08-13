@@ -106,6 +106,9 @@ export class OddsPapiDiscovery {
   /**
    * Discover bookmakers from /v4/bookmakers and resolve the actual slugs for
    * the project-approved sharp bookmakers (by NAME, never by guess).
+   * Matching is tolerant of provider-side naming variants (e.g. "Pinnacle
+   * Sports", "SBOBET"): exact match first, then case-insensitive prefix,
+   * then case-insensitive substring.
    */
   async getVerifiedSharpBookmakers(): Promise<{
     verified: Array<{ slug: string; name: string }>;
@@ -119,9 +122,10 @@ export class OddsPapiDiscovery {
       const unavailable: string[] = [];
 
       for (const approved of APPROVED_SHARP_BOOKMAKER_NAMES) {
-        const match = all.find(
-          (b) => b.bookmakerName.toLowerCase() === approved.toLowerCase()
-        );
+        const lower = approved.toLowerCase();
+        const exact = all.find((b) => b.bookmakerName.toLowerCase() === lower);
+        const byPrefix = exact ?? all.find((b) => b.bookmakerName.toLowerCase().startsWith(lower));
+        const match = byPrefix ?? all.find((b) => b.bookmakerName.toLowerCase().includes(lower));
         if (match) {
           verified.push({ slug: match.slug, name: match.bookmakerName });
         } else {
