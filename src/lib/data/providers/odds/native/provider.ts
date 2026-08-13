@@ -14,6 +14,7 @@
 //   UNKNOWN        — network or unclassified failure
 
 import { logger } from '@/lib/logger';
+import { z } from 'zod';
 import type {
   IOddsProvider,
   OddsSnapshot,
@@ -120,24 +121,47 @@ export class OddsPapiV4Provider implements IOddsProvider {
 
     const tournamentIds = tournaments.map((t) => t.tournamentId).join(',');
 
-    // NOTE: the live API rejects a comma-separated `bookmakers` param
-    // ("Invalid number of bookmakers specified. Please provide exactly one
-    // bookmaker using the 'bookmaker' query parameter."). Omit it entirely so
-    // all bookmakers are returned, then filter client-side to the verified
-    // sharp slugs in the normalizer — this preserves the sharp-book policy
-    // while using a single request per cycle.
-    const res = await this.client.get(
-      '/odds-by-tournaments',
-      {
-        tournamentIds,
-        oddsFormat: 'decimal',
-        language: 'en',
-      },
-      NativeOddsResponseSchema,
-      'odds-by-tournaments'
-    );
+    // NOTE: the live API rejects both a comma-separated `bookmakers` param AND
+    // an omitted param ("Invalid number of bookmakers specified. Please provide
+    // exactly one bookmaker using the 'bookmaker' query parameter."). The
+    // contract is exactly ONE bookmaker per request, so we issue one request
+    // per verified sharp slug (quota: 1 request per verified bookmaker per
+    // cycle) and merge the results.
+    const fixturesByBookmaker: Array<{
+      slug: string;
+      fixtures: Array<z.infer<typeof NativeOddsResponseSchema> extends Array<infer F> ? F : never>;
+    }> = [];
 
-    const fixtures = Array.isArray(res.data) ? res.data : [res.data];
+    for (const bookmaker of bookmakerResult.verified) {
+      const res = await this.client.get(
+        '/odds-by-tournaments',
+        {
+          tournamentIds,
+          bookmaker: bookmaker.slug,
+          oddsFormat: 'decimal',
+          language: 'en',
+        },
+        NativeOddsResponseSchema,
+        'odds-by-tournaments'
+      );
+      const fixtures = Array.isArray(res.data) ? res.data : [res.data];
+      fixturesByBookmaker.push({ slug: bookmaker.slug, fixtures: fixtures as any });
+    }
+
+    // Merge per-bookmaker responses by fixtureId, combining bookmakerOdds so a
+    // fixture appears once with all its verified bookmakers' odds.
+    const merged = new Map<string, any>();
+    for (const group of fixturesByBookmaker) {
+      for (const fixture of group.fixtures as any[]) {
+        const existing = merged.get(fixture.fixtureId);
+        if (!existing) {
+          merged.set(fixture.fixtureId, { ...fixture, bookmakerOdds: { ...(fixture.bookmakerOdds ?? {}) } });
+        } else {
+          existing.bookmakerOdds = { ...existing.bookmakerOdds, ...(fixture.bookmakerOdds ?? {}) };
+        }
+      }
+    }
+    const fixtures = Array.from(merged.values());
 
     const ctx = {
       verifiedBookmakerSlugs: new Set(bookmakerResult.verified.map((b) => b.slug)),

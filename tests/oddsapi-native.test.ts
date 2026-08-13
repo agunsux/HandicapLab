@@ -719,7 +719,7 @@ describe('Native client path joining', () => {
 });
 
 describe('Provider odds-by-tournaments request shape', () => {
-  it('does not send a comma-separated bookmakers param (live API rejects it)', async () => {
+  it('sends exactly one bookmaker per request (live API constraint)', async () => {
     const getSpy = vi.fn().mockResolvedValue({ data: [], status: 200, fromCache: false });
     const fakeClient: any = { get: getSpy };
     const provider = new OddsPapiV4Provider(fakeClient);
@@ -729,19 +729,79 @@ describe('Provider odds-by-tournaments request shape', () => {
       { tournamentId: 17, tournamentSlug: 'premier-league', tournamentName: 'Premier League', categoryName: 'England' },
     ]);
     vi.spyOn(discovery, 'getVerifiedSharpBookmakers').mockResolvedValue({
-      verified: [{ slug: 'pinnacle', name: 'Pinnacle' }],
-      unavailable: [],
+      verified: [
+        { slug: 'pinnacle', name: 'Pinnacle' },
+        { slug: 'sbobet', name: 'SBO' },
+      ],
+      unavailable: ['Circa'],
     });
     vi.spyOn(discovery, 'getSoccerSportId').mockResolvedValue(10);
     (provider as any).discovery = discovery;
     await provider.fetchNormalizedOdds();
-    const oddsCall = getSpy.mock.calls.find((c: any) => String(c[0]).includes('odds-by-tournaments'));
-    expect(oddsCall).toBeDefined();
-    const params = oddsCall![1];
-    expect(params).not.toHaveProperty('bookmakers');
-    expect(params).not.toHaveProperty('bookmaker');
-    expect(params.tournamentIds).toBe('17');
-    expect(params.oddsFormat).toBe('decimal');
+    const oddsCalls = getSpy.mock.calls.filter((c: any) => String(c[0]).includes('odds-by-tournaments'));
+    expect(oddsCalls).toHaveLength(2);
+    expect(oddsCalls[0][1].bookmaker).toBe('pinnacle');
+    expect(oddsCalls[1][1].bookmaker).toBe('sbobet');
+    expect(oddsCalls[0][1]).not.toHaveProperty('bookmakers');
+    expect(oddsCalls[0][1].tournamentIds).toBe('17');
+    expect(oddsCalls[0][1].oddsFormat).toBe('decimal');
+  });
+
+  it('merges per-bookmaker responses by fixtureId', async () => {
+    const mkFixture = (bookmaker: string, price: number) => ({
+      fixtureId: 'id1000001761301153',
+      participant1Id: 1,
+      participant2Id: 2,
+      sportId: 10,
+      tournamentId: 17,
+      statusId: 0,
+      hasOdds: true,
+      startTime: '2026-04-13T19:00:00.000Z',
+      participant1Name: 'Liverpool FC',
+      participant2Name: 'Manchester United',
+      bookmakerOdds: {
+        [bookmaker]: {
+          bookmakerIsActive: true,
+          suspended: false,
+          markets: {
+            '101': {
+              marketActive: true,
+              outcomes: {
+                '101': { players: { '0': { active: true, price, bookmakerOutcomeId: 'home' } } },
+                '102': { players: { '0': { active: true, price: 3.4, bookmakerOutcomeId: 'draw' } } },
+                '103': { players: { '0': { active: true, price: 3.2, bookmakerOutcomeId: 'away' } } },
+              },
+            },
+          },
+        },
+      },
+    });
+    const getSpy = vi.fn().mockImplementation(async (_path: any, params: any) => ({
+      data: [mkFixture(params.bookmaker, params.bookmaker === 'pinnacle' ? 2.1 : 2.05)],
+      status: 200,
+      fromCache: false,
+    }));
+    const fakeClient: any = { get: getSpy };
+    const provider = new OddsPapiV4Provider(fakeClient);
+    const discovery = new OddsPapiDiscovery(fakeClient);
+    vi.spyOn(discovery, 'getSoccerMarkets').mockResolvedValue(MARKETS.map((m) => ({ marketId: m.marketId, marketName: m.marketName, marketType: m.marketType, handicap: m.handicap, outcomes: m.outcomes })));
+    vi.spyOn(discovery, 'getSoccerTournaments').mockResolvedValue([
+      { tournamentId: 17, tournamentSlug: 'premier-league', tournamentName: 'Premier League', categoryName: 'England' },
+    ]);
+    vi.spyOn(discovery, 'getVerifiedSharpBookmakers').mockResolvedValue({
+      verified: [
+        { slug: 'pinnacle', name: 'Pinnacle' },
+        { slug: 'sbobet', name: 'SBO' },
+      ],
+      unavailable: [],
+    });
+    vi.spyOn(discovery, 'getSoccerSportId').mockResolvedValue(10);
+    (provider as any).discovery = discovery;
+    const { sharp } = await provider.fetchNormalizedOdds();
+    expect(sharp).toHaveLength(1);
+    expect(sharp[0].bookmakers.map((b) => b.key).sort()).toEqual(['pinnacle', 'sbobet']);
+    const pinnacleMl = sharp[0].bookmakers.find((b) => b.key === 'pinnacle')!.markets.find((m) => m.key === 'h2h')!;
+    expect(pinnacleMl.outcomes[0].price).toBe(2.1);
   });
 
   it('throws no verified bookmakers error when none resolve', async () => {
