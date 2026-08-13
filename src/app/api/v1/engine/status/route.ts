@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase.server';
-import { oddsApiClient } from '@/lib/apis/oddspapi';
+import { oddsPapiV4Provider } from '@/lib/data/providers/odds/native';
 
 export async function GET() {
   try {
@@ -32,27 +32,36 @@ export async function GET() {
 
     const actualSettledCount = settledCount || 0;
 
-    // 4. Live Odds Provider Health
-    let oddsProviderStatus: 'LIVE' | 'DEGRADED' | 'INVALID_KEY' | 'NO_DATA' = 'LIVE';
-    try {
-      const odds = await oddsApiClient.getOdds('soccer_epl', 'uk');
-      if (!odds || odds.length === 0) {
-        oddsProviderStatus = 'NO_DATA';
-      }
-    } catch (err: any) {
-      if (err.status === 401 || err.message?.includes('API key') || err.details?.error_code === 'INVALID_KEY') {
-        oddsProviderStatus = 'INVALID_KEY';
-      } else {
-        oddsProviderStatus = 'DEGRADED';
-      }
-    }
+    // 4. Live Odds Provider Health — native OddsPAPI v4 adapter
+    const oddsStatus = await oddsPapiV4Provider.getProviderStatus();
+
+    const oddsProviderStatusMap: Record<string, string> = {
+      HEALTHY: 'LIVE',
+      INVALID_KEY: 'INVALID_KEY',
+      RATE_LIMITED: 'RATE_LIMITED',
+      NO_ODDS: 'NO_DATA',
+      DEGRADED: 'DEGRADED',
+      PARSING_ERROR: 'PARSING_ERROR',
+      QUOTA: 'DEGRADED',
+      UNKNOWN: 'DEGRADED',
+    };
 
     return NextResponse.json({
       success: true,
       data: {
         fixtures_last_ingestion: fixturesLastIngestion,
         predictions_last_run: predictionsLastRun,
-        odds_provider: oddsProviderStatus,
+        odds_provider: oddsProviderStatusMap[oddsStatus.status] ?? 'DEGRADED',
+        odds_provider_detail: {
+          status: oddsStatus.status,
+          fixture_count: oddsStatus.fixtureCount,
+          snapshot_count: oddsStatus.snapshotCount,
+          verified_bookmakers: oddsStatus.verifiedBookmakers,
+          unavailable_bookmakers: oddsStatus.unavailableBookmakers,
+          market_ids: oddsStatus.marketIds,
+          http_status: oddsStatus.httpStatus ?? null,
+          error_code: oddsStatus.errorCode ?? null,
+        },
         settled_count: actualSettledCount,
         leagues_modeled: 5,
       },
