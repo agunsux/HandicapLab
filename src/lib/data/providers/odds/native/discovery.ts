@@ -50,16 +50,30 @@ interface CacheEntry<T> {
 
 const TTL_MS = 24 * 60 * 60 * 1000; // 24h — static metadata
 const cache: Record<string, CacheEntry<unknown>> = {};
+// In-flight loads keyed by cache key: prevents duplicate concurrent calls to
+// the same endpoint (e.g. two discovery methods both resolving the soccer
+// sport id), which would trip the provider's per-endpoint rate limiter.
+const inFlight = new Map<string, Promise<unknown>>();
 
 function cached<T>(key: string, ttlMs: number, loader: () => Promise<T>): Promise<T> {
   const entry = cache[key];
   if (entry && entry.expiresAt > Date.now()) {
     return Promise.resolve(entry.value as T);
   }
-  return loader().then((value) => {
-    cache[key] = { value, expiresAt: Date.now() + ttlMs };
-    return value;
-  });
+  const pending = inFlight.get(key);
+  if (pending) {
+    return pending as Promise<T>;
+  }
+  const promise = loader()
+    .then((value) => {
+      cache[key] = { value, expiresAt: Date.now() + ttlMs };
+      return value;
+    })
+    .finally(() => {
+      inFlight.delete(key);
+    });
+  inFlight.set(key, promise);
+  return promise;
 }
 
 export class OddsPapiDiscovery {
@@ -178,9 +192,10 @@ export class OddsPapiDiscovery {
     };
   }
 
-  /** Test hook: clears the metadata cache. */
+  /** Test hook: clears the metadata cache and in-flight loads. */
   clearCache(): void {
     for (const key of Object.keys(cache)) delete cache[key];
+    inFlight.clear();
   }
 }
 

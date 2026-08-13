@@ -652,6 +652,31 @@ describe('Native discovery — bookmaker resolution', () => {
     ]);
     expect(parsed.success).toBe(true);
   });
+
+  it('deduplicates concurrent discovery loads (single-flight)', async () => {
+    new OddsPapiDiscovery({} as any).clearCache();
+    let calls = 0;
+    const getSpy = vi.fn().mockImplementation(async () => {
+      calls += 1;
+      await new Promise((r) => setTimeout(r, 10));
+      return {
+        data: [{ sportId: 10, slug: 'soccer', sportName: 'Soccer' }],
+        status: 200,
+        fromCache: false,
+      };
+    });
+    const fakeClient: any = { get: getSpy };
+    const discovery = new OddsPapiDiscovery(fakeClient);
+    const [a, b, c] = await Promise.all([
+      discovery.getSoccerSportId(),
+      discovery.getSoccerSportId(),
+      discovery.getSoccerSportId(),
+    ]);
+    expect(a).toBe(10);
+    expect(b).toBe(10);
+    expect(c).toBe(10);
+    expect(calls).toBe(1);
+  });
 });
 
 describe('Native client path joining', () => {
