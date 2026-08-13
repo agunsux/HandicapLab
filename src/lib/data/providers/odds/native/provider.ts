@@ -119,13 +119,17 @@ export class OddsPapiV4Provider implements IOddsProvider {
     }
 
     const tournamentIds = tournaments.map((t) => t.tournamentId).join(',');
-    const bookmakerSlugs = bookmakerResult.verified.map((b) => b.slug).join(',');
 
+    // NOTE: the live API rejects a comma-separated `bookmakers` param
+    // ("Invalid number of bookmakers specified. Please provide exactly one
+    // bookmaker using the 'bookmaker' query parameter."). Omit it entirely so
+    // all bookmakers are returned, then filter client-side to the verified
+    // sharp slugs in the normalizer — this preserves the sharp-book policy
+    // while using a single request per cycle.
     const res = await this.client.get(
       '/odds-by-tournaments',
       {
         tournamentIds,
-        bookmakers: bookmakerSlugs,
         oddsFormat: 'decimal',
         language: 'en',
       },

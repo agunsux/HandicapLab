@@ -717,3 +717,48 @@ describe('Native client path joining', () => {
     expect(getSpy.mock.calls[0][0]).toBe('https://api.oddspapi.io/v4/markets');
   });
 });
+
+describe('Provider odds-by-tournaments request shape', () => {
+  it('does not send a comma-separated bookmakers param (live API rejects it)', async () => {
+    const getSpy = vi.fn().mockResolvedValue({ data: [], status: 200, fromCache: false });
+    const fakeClient: any = { get: getSpy };
+    const provider = new OddsPapiV4Provider(fakeClient);
+    const discovery = new OddsPapiDiscovery(fakeClient);
+    vi.spyOn(discovery, 'getSoccerMarkets').mockResolvedValue([]);
+    vi.spyOn(discovery, 'getSoccerTournaments').mockResolvedValue([
+      { tournamentId: 17, tournamentSlug: 'premier-league', tournamentName: 'Premier League', categoryName: 'England' },
+    ]);
+    vi.spyOn(discovery, 'getVerifiedSharpBookmakers').mockResolvedValue({
+      verified: [{ slug: 'pinnacle', name: 'Pinnacle' }],
+      unavailable: [],
+    });
+    vi.spyOn(discovery, 'getSoccerSportId').mockResolvedValue(10);
+    (provider as any).discovery = discovery;
+    await provider.fetchNormalizedOdds();
+    const oddsCall = getSpy.mock.calls.find((c: any) => String(c[0]).includes('odds-by-tournaments'));
+    expect(oddsCall).toBeDefined();
+    const params = oddsCall![1];
+    expect(params).not.toHaveProperty('bookmakers');
+    expect(params).not.toHaveProperty('bookmaker');
+    expect(params.tournamentIds).toBe('17');
+    expect(params.oddsFormat).toBe('decimal');
+  });
+
+  it('throws no verified bookmakers error when none resolve', async () => {
+    const getSpy = vi.fn().mockResolvedValue({ data: [], status: 200, fromCache: false });
+    const fakeClient: any = { get: getSpy };
+    const provider = new OddsPapiV4Provider(fakeClient);
+    const discovery = new OddsPapiDiscovery(fakeClient);
+    vi.spyOn(discovery, 'getSoccerMarkets').mockResolvedValue([]);
+    vi.spyOn(discovery, 'getSoccerTournaments').mockResolvedValue([
+      { tournamentId: 17, tournamentSlug: 'premier-league', tournamentName: 'Premier League', categoryName: 'England' },
+    ]);
+    vi.spyOn(discovery, 'getVerifiedSharpBookmakers').mockResolvedValue({
+      verified: [],
+      unavailable: ['Pinnacle', 'Circa', 'SBO'],
+    });
+    vi.spyOn(discovery, 'getSoccerSportId').mockResolvedValue(10);
+    (provider as any).discovery = discovery;
+    await expect(provider.fetchNormalizedOdds()).rejects.toThrow('No verified sharp bookmakers');
+  });
+});
