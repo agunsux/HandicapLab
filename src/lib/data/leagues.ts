@@ -963,7 +963,7 @@ export async function getLeagueMatches(leagueApiId: number, slug: string): Promi
     // 2. Query matches directly, filtering for valid fields (not null)
     const { data: matches, error: matchError } = await supabase
       .from('matches')
-      .select('id, home_team, away_team, kickoff, status')
+      .select('id, home_team, away_team, kickoff, status').eq('data_status', 'ACTIVE').in('source_type', ['PROVIDER', 'HISTORICAL', 'MANUAL'])
       .eq('league', leagueName)
       .not('home_team', 'is', null)
       .not('away_team', 'is', null)
@@ -995,7 +995,7 @@ export async function getLeagueMatches(leagueApiId: number, slug: string): Promi
     const matchIds = validMatches.map((m: any) => m.id);
     const { data: preds, error: predError } = await supabase
       .from('predictions')
-      .select('*')
+      .select('*').eq('data_status', 'ACTIVE').in('source_type', ['PROVIDER', 'HISTORICAL', 'MANUAL'])
       .in('match_id', matchIds);
 
     if (predError) {

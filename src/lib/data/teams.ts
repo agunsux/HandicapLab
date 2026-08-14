@@ -157,7 +157,7 @@ export async function getTeamMatches(teamApiId: number, slug: string): Promise<M
     // 2. Query matches directly where home_team or away_team matches the team name
     const { data: matches, error: matchError } = await supabase
       .from('matches')
-      .select('id, home_team, away_team, kickoff, status')
+      .select('id, home_team, away_team, kickoff, status').eq('data_status', 'ACTIVE').in('source_type', ['PROVIDER', 'HISTORICAL', 'MANUAL'])
       .or(`home_team.eq."${teamName}",away_team.eq."${teamName}"`)
       .order('kickoff', { ascending: true });
 
@@ -174,7 +174,7 @@ export async function getTeamMatches(teamApiId: number, slug: string): Promise<M
     const matchIds = matches.map((m: { id: number }) => m.id);
     const { data: preds, error: predError } = await supabase
       .from('predictions')
-      .select('*')
+      .select('*').eq('data_status', 'ACTIVE').in('source_type', ['PROVIDER', 'HISTORICAL', 'MANUAL'])
       .in('match_id', matchIds);
 
     if (predError) {

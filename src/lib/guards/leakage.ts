@@ -46,7 +46,7 @@ export class LeakageGuard {
     // 1. Check match status and goals relative to cutoff
     const { data: match, error: matchErr } = await supabase
       .from('matches')
-      .select('id, status, kickoff, home_goals, away_goals')
+      .select('id, status, kickoff, home_goals, away_goals').eq('data_status', 'ACTIVE').in('source_type', ['PROVIDER', 'HISTORICAL', 'MANUAL'])
       .eq('id', matchId)
       .maybeSingle();
 
@@ -70,7 +70,7 @@ export class LeakageGuard {
     // 2. Check odds snapshots and features in predictions table
     const { data: predictions, error: predErr } = await supabase
       .from('predictions')
-      .select('id, generated_at, odds_snapshot')
+      .select('id, generated_at, odds_snapshot').eq('data_status', 'ACTIVE').in('source_type', ['PROVIDER', 'HISTORICAL', 'MANUAL'])
       .eq('match_id', matchId);
 
     if (predErr) {

@@ -167,7 +167,7 @@ async function phasePredictions(): Promise<number> {
       };
 
       // Fetch fixture from DB to pass to executeAndRecord
-      const { data: matchRow } = await supabase.from('matches').select('*').eq('id', f.fixtureId).single();
+      const { data: matchRow } = await supabase.from('matches').select('*').eq('data_status', 'ACTIVE').in('source_type', ['PROVIDER', 'HISTORICAL', 'MANUAL']).eq('id', f.fixtureId).single();
       
       const prediction = await audited(
         `prediction-${f.fixtureId}-${Date.now()}`,
@@ -256,7 +256,7 @@ async function phaseSettlement(): Promise<number> {
       // Fetch actual result from matches table
       const { data: matchRow } = await supabase
         .from('matches')
-        .select('home_score, away_score')
+        .select('home_score, away_score').eq('data_status', 'ACTIVE').in('source_type', ['PROVIDER', 'HISTORICAL', 'MANUAL'])
         .eq('fixture_id', f.fixtureId)
         .maybeSingle();
 

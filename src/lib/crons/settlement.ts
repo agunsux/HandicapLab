@@ -8,7 +8,7 @@ export async function runSettlementCron(): Promise<any> {
   const cutoff = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
   const { data: matches, error: matchesErr } = await supabase
     .from('matches')
-    .select('id, status, home_goals, away_goals, kickoff')
+    .select('id, status, home_goals, away_goals, kickoff').eq('data_status', 'ACTIVE').in('source_type', ['PROVIDER', 'HISTORICAL', 'MANUAL'])
     .eq('status', 'finished')
     .gt('kickoff', cutoff);
 
@@ -26,7 +26,7 @@ export async function runSettlementCron(): Promise<any> {
     // Fetch predictions for this match that have not been fully settled yet
     const { data: predictions, error: predErr } = await supabase
       .from('predictions')
-      .select('*')
+      .select('*').eq('data_status', 'ACTIVE').in('source_type', ['PROVIDER', 'HISTORICAL', 'MANUAL'])
       .eq('match_id', String(match.id));
 
     if (predErr || !predictions) {

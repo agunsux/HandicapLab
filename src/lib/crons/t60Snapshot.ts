@@ -35,7 +35,7 @@ async function getFixturesNeedingSnapshot(): Promise<any[]> {
 
   const { data, error } = await supabase
     .from('matches')
-    .select('id, home_team, away_team, league, kickoff, competition_type')
+    .select('id, home_team, away_team, league, kickoff, competition_type').eq('data_status', 'ACTIVE').in('source_type', ['PROVIDER', 'HISTORICAL', 'MANUAL'])
     .eq('status', 'upcoming')
     .gte('kickoff', windowStart)
     .lte('kickoff', windowEnd)

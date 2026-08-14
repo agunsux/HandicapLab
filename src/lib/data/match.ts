@@ -37,7 +37,7 @@ export async function getMatchById(id: string): Promise<DbMatch | null> {
   try {
     const { data, error } = await supabase
       .from('matches')
-      .select('id, home_team, away_team, kickoff, status, home_goals, away_goals, league, competition_type, tournament_stage, venue, weather_condition, attendance')
+      .select('id, home_team, away_team, kickoff, status, home_goals, away_goals, league, competition_type, tournament_stage, venue, weather_condition, attendance').eq('data_status', 'ACTIVE').in('source_type', ['PROVIDER', 'HISTORICAL', 'MANUAL'])
       .eq('id', id)
       .maybeSingle();
 
@@ -56,7 +56,7 @@ export async function getPredictionsByMatchId(matchId: string): Promise<DbPredic
   try {
     const { data, error } = await supabase
       .from('predictions')
-      .select('id, match_id, market_type, prediction, odds_snapshot, closing_odds, model_version, generated_at, confidence, edge_pct, fair_odds, entry_odds, market_confidence_score, prediction_timestamp')
+      .select('id, match_id, market_type, prediction, odds_snapshot, closing_odds, model_version, generated_at, confidence, edge_pct, fair_odds, entry_odds, market_confidence_score, prediction_timestamp').eq('data_status', 'ACTIVE').in('source_type', ['PROVIDER', 'HISTORICAL', 'MANUAL'])
       .eq('match_id', matchId);
 
     if (error) {

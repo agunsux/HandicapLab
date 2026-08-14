@@ -12,7 +12,7 @@ export async function runPredictionCron(): Promise<any> {
   // 1. Fetch upcoming matches from our database
   const { data: matches, error: fetchErr } = await supabase
     .from('matches')
-    .select('*')
+    .select('*').eq('data_status', 'ACTIVE').in('source_type', ['PROVIDER', 'HISTORICAL', 'MANUAL'])
     .eq('status', 'upcoming');
 
   if (fetchErr) {
@@ -36,7 +36,7 @@ export async function runPredictionCron(): Promise<any> {
   // Pre-fetch all predictions to resolve N+1 select queries
   const { data: existingPreds } = await supabase
     .from('predictions')
-    .select('id, match_id, market_type')
+    .select('id, match_id, market_type').eq('data_status', 'ACTIVE').in('source_type', ['PROVIDER', 'HISTORICAL', 'MANUAL'])
     .in('match_id', matchIds);
 
   const existingPredsMap = new Map<string, string>(
