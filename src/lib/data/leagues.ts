@@ -1,5 +1,4 @@
 import { supabase } from '@/lib/supabase.server';
-import { getMatches as getMockMatches, getPredictionsForMatch as getMockPredictions } from '@/lib/mock-data';
 
 export interface LeagueCache {
   api_id: number;

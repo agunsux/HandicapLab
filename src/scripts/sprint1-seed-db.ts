@@ -1,3 +1,6 @@
+import { assertNotProduction } from '../lib/security/environmentGuard';
+assertNotProduction();
+
 import * as fs from 'fs';
 import * as path from 'path';
 import { createClient } from '@supabase/supabase-js';
@@ -83,3 +86,4 @@ async function run() {
 }
 
 run();
+

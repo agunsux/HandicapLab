@@ -18,13 +18,13 @@ if odds_api_key:
         latency = int((time.time() - start_time) * 1000)
         if resp.status_code == 200:
             remaining = resp.headers.get('x-requests-remaining', 'Unknown')
-            print(f"- The Odds API: [✅] | Latency: {latency}ms | Remaining calls: {remaining}")
+            print(f"- The Odds API: [OK] | Latency: {latency}ms | Remaining calls: {remaining}")
         else:
-            print(f"- The Odds API: [❌] | HTTP {resp.status_code}")
+            print(f"- The Odds API: [FAIL] | HTTP {resp.status_code}")
     except Exception as e:
-        print(f"- The Odds API: [❌] | Error: {e}")
+        print(f"- The Odds API: [FAIL] | Error: {e}")
 else:
-    print("- The Odds API: [❌] | Key missing")
+    print("- The Odds API: [FAIL] | Key missing")
 
 # Check API-Football
 api_football_key = os.getenv('API_FOOTBALL_KEY')
@@ -38,17 +38,17 @@ if api_football_key:
             data = resp.json()
             requests_info = data.get('response', {}).get('requests', {})
             remaining = requests_info.get('limit_day', 0) - requests_info.get('current', 0)
-            print(f"- API-Football: [✅] | Latency: {latency}ms | Remaining calls: {remaining}")
+            print(f"- API-Football: [OK] | Latency: {latency}ms | Remaining calls: {remaining}")
         else:
-            print(f"- API-Football: [❌] | HTTP {resp.status_code}")
+            print(f"- API-Football: [FAIL] | HTTP {resp.status_code}")
     except Exception as e:
-        print(f"- API-Football: [❌] | Error: {e}")
+        print(f"- API-Football: [FAIL] | Error: {e}")
 else:
-    print("- API-Football: [❌] | Key missing")
+    print("- API-Football: [FAIL] | Key missing")
 
 # Check FootyStats
 footystats_key = os.getenv('FOOTYSTATS_API_KEY')
 if footystats_key:
-    print("- FootyStats: [✅] | Note: Need specific endpoint to test properly")
+    print("- FootyStats: [OK] | Note: Need specific endpoint to test properly")
 else:
-    print("- FootyStats: [❌] | Key missing")
+    print("- FootyStats: [FAIL] | Key missing")

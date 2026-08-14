@@ -1,3 +1,6 @@
+import { assertNotProduction } from '../lib/security/environmentGuard';
+assertNotProduction();
+
 import { runSimulation } from '../lib/simulation/batchRunner';
 
 async function main() {
@@ -24,3 +27,4 @@ async function main() {
 }
 
 main().catch(console.error);
+

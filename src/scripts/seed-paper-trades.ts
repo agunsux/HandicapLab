@@ -1,3 +1,6 @@
+import { assertNotProduction } from '../lib/security/environmentGuard';
+assertNotProduction();
+
 import { createClient } from '@supabase/supabase-js';
 import * as dotenv from 'dotenv';
 
@@ -56,3 +59,4 @@ async function seedPaperTrades() {
 }
 
 seedPaperTrades();
+

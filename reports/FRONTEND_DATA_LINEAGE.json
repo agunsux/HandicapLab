@@ -1,0 +1,265 @@
+{
+  "auditTitle": "HandicapLab Frontend Reality & Data Lineage Audit",
+  "timestamp": "2026-08-14T21:43:00.000Z",
+  "auditStandard": "ZERO_DUMMY_PRODUCTION_GRADE_INTEGRITY_V1",
+  "governanceRules": [
+    "No future leakage: all features strictly pre-kickoff timestamped",
+    "Single source of truth: API-Football (fixtures/stats) + OddsPAPI (odds)",
+    "Pinnacle is primary ground truth for Closing Line Value (CLV)",
+    "Top-leagues whitelist: Premier League, Championship, Serie A, Bundesliga, La Liga, Ligue 1, Eredivisie, J1 League, K League, Liga 1 Indonesia",
+    "Zero mock/fake fallbacks in production UI surfaces",
+    "Zero client-side secret exposure"
+  ],
+  "surfaces": [
+    {
+      "surfaceId": "HOMEPAGE_HERO_AND_TEASER",
+      "route": "/",
+      "componentFile": "src/app/page.tsx",
+      "isClientComponent": false,
+      "service": "src/services/opportunities.service.ts",
+      "dataMethod": "getSecureOpportunities(userId, 2)",
+      "primarySource": "Supabase PostgreSQL",
+      "tablesOrViews": [
+        "prediction_ledger_v3"
+      ],
+      "fields": [
+        "id",
+        "home_team",
+        "away_team",
+        "cohort_tag",
+        "market_type",
+        "selection",
+        "expected_value",
+        "model_probability",
+        "entry_odds",
+        "fair_odds"
+      ],
+      "accessTierGating": "Free users see masked selection/odds; Pro/Quant users see unlocked math",
+      "emptyStateBehavior": "Renders clean zero-state message in OpportunitiesTable ('No active value opportunities found')",
+      "zeroDummyCompliant": true
+    },
+    {
+      "surfaceId": "LIVE_VALUE_OPPORTUNITIES",
+      "route": "/app/value-bets",
+      "componentFile": "src/app/app/value-bets/page.tsx",
+      "isClientComponent": false,
+      "service": "src/services/opportunities.service.ts",
+      "dataMethod": "getSecureOpportunities(userId, 50)",
+      "primarySource": "Supabase PostgreSQL",
+      "tablesOrViews": [
+        "prediction_ledger_v3"
+      ],
+      "fields": [
+        "id",
+        "home_team",
+        "away_team",
+        "expected_value",
+        "model_probability",
+        "entry_odds",
+        "fair_odds",
+        "market_type"
+      ],
+      "accessTierGating": "Entitlement visibility service limits free accounts to daily quota and masks edge metrics",
+      "emptyStateBehavior": "Renders OpportunitiesTable empty state row without mock rows",
+      "zeroDummyCompliant": true
+    },
+    {
+      "surfaceId": "MATCHES_EXPLORER",
+      "route": "/app/matches",
+      "componentFile": "src/app/app/matches/page.tsx",
+      "isClientComponent": false,
+      "service": "Direct Server Client (supabase.server.ts)",
+      "dataMethod": "supabase.from('matches').select('..., predictions(...)').eq('status', 'upcoming')",
+      "primarySource": "Supabase PostgreSQL",
+      "tablesOrViews": [
+        "matches",
+        "predictions"
+      ],
+      "fields": [
+        "matches.id",
+        "matches.home_team",
+        "matches.away_team",
+        "matches.league",
+        "matches.kickoff",
+        "matches.status",
+        "predictions.market_type",
+        "predictions.prediction",
+        "predictions.odds_snapshot"
+      ],
+      "accessTierGating": "Public upcoming fixtures visible, detailed model distribution restricted by tier",
+      "emptyStateBehavior": "Renders 'No Upcoming Matches Found' card with sync status notice",
+      "zeroDummyCompliant": true
+    },
+    {
+      "surfaceId": "MATCH_DETAILS_TERMINAL",
+      "route": "/app/matches/[id]",
+      "componentFile": "src/app/app/matches/[id]/page.tsx",
+      "isClientComponent": true,
+      "service": "API Route /api/matches/[id]",
+      "dataMethod": "fetch(`/api/matches/${id}`)",
+      "primarySource": "Supabase PostgreSQL",
+      "tablesOrViews": [
+        "matches",
+        "predictions",
+        "team_statistics",
+        "odds_movements"
+      ],
+      "fields": [
+        "match detail payload",
+        "poisson xG expectation",
+        "elo ratings",
+        "Pinnacle opening vs current line movement"
+      ],
+      "accessTierGating": "Requires authenticated session for deep forensics; basic match overview accessible",
+      "emptyStateBehavior": "Calls notFound() or renders 404 Match Not Found view",
+      "zeroDummyCompliant": true
+    },
+    {
+      "surfaceId": "CLV_LEADERBOARD",
+      "route": "/clv",
+      "componentFile": "src/app/(app)/clv/page.tsx",
+      "isClientComponent": true,
+      "service": "API Route /api/performance/clv",
+      "dataMethod": "fetch('/api/performance/clv')",
+      "primarySource": "Supabase PostgreSQL",
+      "tablesOrViews": [
+        "signals"
+      ],
+      "fields": [
+        "signals.home_team",
+        "signals.away_team",
+        "signals.market",
+        "signals.selection",
+        "signals.odds",
+        "signals.closing_odds",
+        "signals.clv_percentage",
+        "signals.clv_category"
+      ],
+      "accessTierGating": "PRO / QUANT / LIFETIME tier unlocks live leaderboard; FREE / STARTER blurred with upgrade CTA",
+      "emptyStateBehavior": "Displays 'No settled CLV records currently available in live database' message",
+      "zeroDummyCompliant": true
+    },
+    {
+      "surfaceId": "USER_WATCHLIST",
+      "route": "/watchlist",
+      "componentFile": "src/app/(app)/watchlist/page.tsx",
+      "isClientComponent": true,
+      "service": "API Route /api/fixtures",
+      "dataMethod": "fetch('/api/fixtures?limit=100')",
+      "primarySource": "Supabase PostgreSQL + Client LocalStorage Watchlist IDs",
+      "tablesOrViews": [
+        "matches"
+      ],
+      "fields": [
+        "matches.id",
+        "matches.home_team",
+        "matches.away_team",
+        "matches.league",
+        "matches.kickoff"
+      ],
+      "accessTierGating": "PRO tier unlocks advanced edge tags; FREE tier displays delayed indicator",
+      "emptyStateBehavior": "Displays 'Your watchlist is currently empty' with direct action buttons",
+      "zeroDummyCompliant": true
+    },
+    {
+      "surfaceId": "PREDICTION_DOI_LEDGER_ENTRY",
+      "route": "/app/ledger/[id]",
+      "componentFile": "src/app/app/ledger/[id]/page.tsx",
+      "isClientComponent": false,
+      "service": "Direct Server Client (supabase.server.ts)",
+      "dataMethod": "supabase.from('prediction_ledger').select('*').eq('id', id).maybeSingle()",
+      "primarySource": "Supabase PostgreSQL",
+      "tablesOrViews": [
+        "prediction_ledger",
+        "matches"
+      ],
+      "fields": [
+        "prediction_ledger.id",
+        "prediction_ledger.published_at",
+        "prediction_ledger.market",
+        "prediction_ledger.selection",
+        "prediction_ledger.odds_at_prediction",
+        "prediction_ledger.confidence",
+        "prediction_ledger.result_status",
+        "prediction_ledger.settled_at",
+        "prediction_ledger.roi",
+        "prediction_ledger.model_version"
+      ],
+      "accessTierGating": "Public cryptographic verification ledger (Open Science access)",
+      "emptyStateBehavior": "Executes notFound() HTTP 404 if record ID is not found in database",
+      "zeroDummyCompliant": true
+    },
+    {
+      "surfaceId": "HISTORICAL_GOLD_LAYER_EXPLORER",
+      "route": "/historical/*",
+      "componentFile": "src/app/(app)/historical/competitions/page.tsx, matches/page.tsx, teams/page.tsx, odds-explorer/page.tsx",
+      "isClientComponent": true,
+      "service": "src/services/goldService.ts",
+      "dataMethod": "GoldService.getCompetitions(), getTeams(), getMatches(), getOddsExplorerRecords()",
+      "primarySource": "Supabase PostgreSQL Gold Views",
+      "tablesOrViews": [
+        "gold_competitions",
+        "gold_teams",
+        "gold_matches",
+        "gold_odds_explorer"
+      ],
+      "fields": [
+        "aggregated metrics",
+        "opening vs closing odds",
+        "clv percentage",
+        "settled outcomes"
+      ],
+      "accessTierGating": "Quant / Pro tier access",
+      "emptyStateBehavior": "Renders empty state table upon query error or zero rows",
+      "zeroDummyCompliant": true
+    },
+    {
+      "surfaceId": "PROSPECTIVE_SHADOW_VALIDATION",
+      "route": "/admin/shadow & /shadow-mode",
+      "componentFile": "src/app/shadow-mode/page.tsx",
+      "isClientComponent": true,
+      "service": "src/historical/shadow/shadowValidationEngine.ts",
+      "dataMethod": "ShadowValidationEngine.runProspectiveValidation()",
+      "primarySource": "Cryptographic Prediction Ledger (SHA-256) & Supabase shadow_predictions",
+      "tablesOrViews": [
+        "shadow_predictions",
+        "prediction_ledger"
+      ],
+      "fields": [
+        "prediction_fingerprint",
+        "temporal_gate",
+        "entry_odds",
+        "pinnacle_closing_odds",
+        "clv_pct",
+        "settlement_status"
+      ],
+      "accessTierGating": "Admin / Internal Research Console",
+      "emptyStateBehavior": "Shows 'Shadow Ledger Initializing' status",
+      "zeroDummyCompliant": true
+    },
+    {
+      "surfaceId": "PROBABILITY_RESEARCH_LAB",
+      "route": "/research/probability",
+      "componentFile": "src/app/research/probability/page.tsx",
+      "isClientComponent": false,
+      "service": "API Route /api/science/calibration + Supabase",
+      "dataMethod": "fetch('/api/science/calibration') + supabase.from('matches').select(...)",
+      "primarySource": "Out-of-Sample Empirical Prediction Data (data/historical/out_of_sample_predictions.jsonl) & Live Matches",
+      "tablesOrViews": [
+        "out_of_sample_predictions.jsonl",
+        "matches",
+        "predictions"
+      ],
+      "fields": [
+        "calibrated probability",
+        "reliability diagram bins (10 bins)",
+        "multi-class Brier score (0.6149)",
+        "out-of-sample log loss (1.0266)",
+        "ECE (1.44%)"
+      ],
+      "accessTierGating": "Quant Research Tier",
+      "emptyStateBehavior": "Displays calibrated statistical gate and empty message for upcoming matches",
+      "zeroDummyCompliant": true
+    }
+  ]
+}

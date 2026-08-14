@@ -20,7 +20,7 @@ export default async function PaperTradingPage() {
   if (matchIds.length > 0) {
     const { data: matchesData } = await supabase
       .from('matches')
-      .select('*')
+      .select('*').eq('data_status', 'ACTIVE').in('source_type', ['PROVIDER', 'HISTORICAL', 'MANUAL'])
       .in('id', matchIds);
     matches = matchesData || [];
   }

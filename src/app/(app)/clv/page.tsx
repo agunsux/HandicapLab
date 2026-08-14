@@ -11,23 +11,19 @@ interface ClvRow {
   match: string;
   market: string;
   selection: string;
-  entryOdds: number;
+  openingOdds: number;
   closingOdds: number;
-  beatMargin: number;
-  status: string;
+  clvPercentage: number;
+  category: string;
 }
-
-const MOCK_CLV_LEADERBOARD: ClvRow[] = [
-  { id: '1', match: 'Liverpool vs Chelsea', market: 'Asian Handicap -0.25', selection: 'Home (Liverpool)', entryOdds: 1.95, closingOdds: 1.80, beatMargin: 8.3, status: 'BEATEN' },
-  { id: '2', match: 'Manchester City vs Manchester United', market: 'Asian Handicap -1.25', selection: 'Home (Man City)', entryOdds: 1.85, closingOdds: 1.76, beatMargin: 5.1, status: 'BEATEN' },
-  { id: '3', match: 'Real Madrid vs Atletico Madrid', league: 'La Liga', market: 'Over/Under Goals 2.5', selection: 'Over', entryOdds: 2.10, closingOdds: 2.02, beatMargin: 3.9, status: 'BEATEN' } as any,
-  { id: '4', match: 'AC Milan vs Juventus', market: 'Moneyline 1X2', selection: 'Home (AC Milan)', entryOdds: 1.92, closingOdds: 1.86, beatMargin: 3.2, status: 'BEATEN' },
-  { id: '5', match: 'Bayern Munich vs RB Leipzig', market: 'Asian Handicap -0.75', selection: 'Home (Bayern)', entryOdds: 1.75, closingOdds: 1.70, beatMargin: 2.9, status: 'BEATEN' }
-];
 
 export default function ClvPage() {
   const [tier, setTier] = useState<'FREE' | 'STARTER' | 'PRO' | 'QUANT' | 'LIFETIME'>('FREE');
   const [mounted, setMounted] = useState(false);
+  const [clvRows, setClvRows] = useState<ClvRow[]>([]);
+  const [avgClv, setAvgClv] = useState<number>(0);
+  const [beatRate, setBeatRate] = useState<number>(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setMounted(true);
@@ -35,13 +31,32 @@ export default function ClvPage() {
     if (savedTier && ['FREE', 'STARTER', 'PRO', 'QUANT', 'LIFETIME'].includes(savedTier)) {
       setTier(savedTier);
     }
+
+    async function loadCLV() {
+      try {
+        setLoading(true);
+        const res = await fetch('/api/performance/clv');
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success) {
+            setClvRows(json.recentMovements || []);
+            setAvgClv(json.averageClv || 0);
+            const total = (json.distribution?.positive || 0) + (json.distribution?.elite || 0) + (json.distribution?.neutral || 0) + (json.distribution?.negative || 0);
+            const beaten = (json.distribution?.positive || 0) + (json.distribution?.elite || 0);
+            setBeatRate(total > 0 ? Number(((beaten / total) * 100).toFixed(1)) : 0);
+          }
+        }
+      } catch (err) {
+        console.error('Failed to load CLV metrics:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadCLV();
   }, []);
 
   const isLocked = tier === 'FREE' || tier === 'STARTER';
-
-  const avgClv = 3.2;
-  const bestStreak = 14;
-  const beatRate = 68;
 
   if (!mounted) {
     return (
@@ -73,21 +88,27 @@ export default function ClvPage() {
           <Card className="bg-slate-900 border-slate-800">
             <CardContent className="p-4 space-y-1">
               <span className="text-[10px] font-mono text-slate-500 uppercase">Average CLV Beat</span>
-              <div className="text-2xl font-bold text-emerald-400">+{avgClv}%</div>
+              <div className="text-2xl font-bold text-emerald-400">
+                {avgClv > 0 ? `+${avgClv.toFixed(2)}%` : `${avgClv.toFixed(2)}%`}
+              </div>
             </CardContent>
           </Card>
 
           <Card className="bg-slate-900 border-slate-800">
             <CardContent className="p-4 space-y-1">
-              <span className="text-[10px] font-mono text-slate-500 uppercase">Best CLV Streak</span>
-              <div className="text-2xl font-bold text-white">{bestStreak} <span className="text-xs text-slate-450 font-normal">consecutive picks</span></div>
+              <span className="text-[10px] font-mono text-slate-500 uppercase">Tracked CLV Records</span>
+              <div className="text-2xl font-bold text-white">
+                {clvRows.length} <span className="text-xs text-slate-400 font-normal">persisted entries</span>
+              </div>
             </CardContent>
           </Card>
 
           <Card className="bg-slate-900 border-slate-800">
             <CardContent className="p-4 space-y-1">
               <span className="text-[10px] font-mono text-slate-500 uppercase">Closing Line Beat Rate</span>
-              <div className="text-2xl font-bold text-emerald-450">{beatRate}% <span className="text-xs text-slate-450 font-normal">of last 100 picks</span></div>
+              <div className="text-2xl font-bold text-emerald-400">
+                {beatRate}% <span className="text-xs text-slate-400 font-normal">positive movements</span>
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -95,39 +116,48 @@ export default function ClvPage() {
         {/* CLV table */}
         <Card className="bg-slate-900 border-slate-800 overflow-hidden">
           <CardHeader className="border-b border-slate-800">
-            <CardTitle className="text-sm font-mono text-white">Recent Line Movements & Beat Margins</CardTitle>
+            <CardTitle className="text-sm font-mono text-white">Recent Line Movements &amp; Beat Margins</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
-            <Table>
-              <TableHeader className="border-b border-slate-800">
-                <TableRow className="hover:bg-transparent border-slate-800">
-                  <TableHead className="text-slate-450 font-mono text-xs pl-6">Match</TableHead>
-                  <TableHead className="text-slate-450 font-mono text-xs text-center">Market</TableHead>
-                  <TableHead className="text-slate-450 font-mono text-xs text-center">Selection</TableHead>
-                  <TableHead className="text-slate-450 font-mono text-xs text-center">Entry Odds</TableHead>
-                  <TableHead className="text-slate-450 font-mono text-xs text-center">Closing Odds</TableHead>
-                  <TableHead className="text-slate-450 font-mono text-xs text-center">Beat Margin</TableHead>
-                  <TableHead className="text-slate-450 font-mono text-xs text-right pr-6">Status</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {MOCK_CLV_LEADERBOARD.map((row) => (
-                  <TableRow key={row.id} className="hover:bg-slate-850/40 border-slate-800/60 font-mono text-xs">
-                    <TableCell className="py-4 pl-6 font-sans font-semibold text-white">{row.match}</TableCell>
-                    <TableCell className="text-center py-4 text-slate-400">{row.market}</TableCell>
-                    <TableCell className="text-center py-4 text-slate-300 font-semibold">{row.selection}</TableCell>
-                    <TableCell className="text-center py-4 text-slate-300">{row.entryOdds.toFixed(2)}</TableCell>
-                    <TableCell className="text-center py-4 text-slate-350">{row.closingOdds.toFixed(2)}</TableCell>
-                    <TableCell className="text-center py-4 font-bold text-emerald-450">+{row.beatMargin.toFixed(1)}%</TableCell>
-                    <TableCell className="text-right py-4 pr-6">
-                      <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 font-bold">
-                        {row.status}
-                      </Badge>
-                    </TableCell>
+            {clvRows.length === 0 ? (
+              <div className="py-12 text-center text-slate-500 font-mono text-xs space-y-2">
+                <p>No settled CLV records currently available in live database.</p>
+                <p className="text-[10px] text-slate-600">Records accumulate as pre-match predictions meet post-kickoff closing line captures.</p>
+              </div>
+            ) : (
+              <Table>
+                <TableHeader className="border-b border-slate-800">
+                  <TableRow className="hover:bg-transparent border-slate-800">
+                    <TableHead className="text-slate-400 font-mono text-xs pl-6">Match</TableHead>
+                    <TableHead className="text-slate-400 font-mono text-xs text-center">Market</TableHead>
+                    <TableHead className="text-slate-400 font-mono text-xs text-center">Selection</TableHead>
+                    <TableHead className="text-slate-400 font-mono text-xs text-center">Entry Odds</TableHead>
+                    <TableHead className="text-slate-400 font-mono text-xs text-center">Closing Odds</TableHead>
+                    <TableHead className="text-slate-400 font-mono text-xs text-center">Beat Margin</TableHead>
+                    <TableHead className="text-slate-400 font-mono text-xs text-right pr-6">Status</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {clvRows.map((row) => (
+                    <TableRow key={row.id} className="hover:bg-slate-800/40 border-slate-800/60 font-mono text-xs">
+                      <TableCell className="py-4 pl-6 font-sans font-semibold text-white">{row.match}</TableCell>
+                      <TableCell className="text-center py-4 text-slate-400">{row.market}</TableCell>
+                      <TableCell className="text-center py-4 text-slate-300 font-semibold">{row.selection}</TableCell>
+                      <TableCell className="text-center py-4 text-slate-300">{row.openingOdds ? row.openingOdds.toFixed(2) : '-'}</TableCell>
+                      <TableCell className="text-center py-4 text-slate-400">{row.closingOdds ? row.closingOdds.toFixed(2) : '-'}</TableCell>
+                      <TableCell className="text-center py-4 font-bold text-emerald-400">
+                        {row.clvPercentage > 0 ? `+${row.clvPercentage.toFixed(1)}%` : `${row.clvPercentage.toFixed(1)}%`}
+                      </TableCell>
+                      <TableCell className="text-right py-4 pr-6">
+                        <Badge className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 font-bold">
+                          {row.category}
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
           </CardContent>
         </Card>
       </div>

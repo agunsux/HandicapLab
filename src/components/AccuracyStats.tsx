@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { Target, TrendingUp, BarChart3, Percent, Loader2, ShieldCheck, HelpCircle, Lock } from 'lucide-react';
-import { mockAccuracyStats } from '@/lib/mockData';
 
 interface AccuracyData {
   status: string;
@@ -32,41 +31,33 @@ export function AccuracyStats() {
         }
         const json = await res.json();
         
-        // If empty database or reliability is false and sample is 0,
-        // we show sandbox mode so they can preview the UI dashboard
-        if (json.sample_size === 0) {
-          setData({
-            status: 'Based on tracked predictions',
-            reliability_flag: true,
-            sample_size: mockAccuracyStats.total,
-            hit_rate: (mockAccuracyStats.accuracy1x2 + mockAccuracyStats.accuracyAh + mockAccuracyStats.accuracyOu) / 3,
-            roi_placeholder: 4.82,
-            confidence_interval: '[58.5%, 66.2%]',
-            accuracy1x2: mockAccuracyStats.accuracy1x2,
-            accuracyAh: mockAccuracyStats.accuracyAh,
-            accuracyOu: mockAccuracyStats.accuracyOu,
-          });
-          setIsSandbox(true);
-        } else {
-          setData(json);
-          setIsSandbox(false);
-        }
+        setData({
+          status: json.status || 'Based on tracked predictions',
+          reliability_flag: Boolean(json.reliability_flag && (json.sample_size || 0) >= 100),
+          sample_size: json.sample_size || 0,
+          hit_rate: json.hit_rate || 0,
+          roi_placeholder: json.roi_placeholder || 0,
+          confidence_interval: json.confidence_interval || '[0.0%, 0.0%]',
+          accuracy1x2: json.accuracy1x2 || 0,
+          accuracyAh: json.accuracyAh || 0,
+          accuracyOu: json.accuracyOu || 0,
+        });
+        setIsSandbox(false);
       } catch (err: any) {
         console.error('Error fetching stats:', err);
         setError(err.message);
-        // Fallback to sandbox mock data
         setData({
-          status: 'Based on tracked predictions',
-          reliability_flag: true,
-          sample_size: mockAccuracyStats.total,
-          hit_rate: 62.37,
-          roi_placeholder: 4.82,
-          confidence_interval: '[58.5%, 66.2%]',
-          accuracy1x2: mockAccuracyStats.accuracy1x2,
-          accuracyAh: mockAccuracyStats.accuracyAh,
-          accuracyOu: mockAccuracyStats.accuracyOu,
+          status: 'Insufficient sample size',
+          reliability_flag: false,
+          sample_size: 0,
+          hit_rate: 0,
+          roi_placeholder: 0,
+          confidence_interval: '[0.0%, 0.0%]',
+          accuracy1x2: 0,
+          accuracyAh: 0,
+          accuracyOu: 0,
         });
-        setIsSandbox(true);
+        setIsSandbox(false);
       } finally {
         setLoading(false);
       }

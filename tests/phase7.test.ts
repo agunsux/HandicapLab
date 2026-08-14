@@ -10,7 +10,7 @@ vi.mock('../src/lib/supabase.server', () => {
   const mockFrom = vi.fn((table: string) => {
     return {
       select: vi.fn().mockReturnThis(),
-      eq: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(), in: vi.fn().mockReturnThis(),
       not: vi.fn().mockReturnThis(),
       order: vi.fn().mockReturnThis(),
       limit: vi.fn().mockReturnThis(),

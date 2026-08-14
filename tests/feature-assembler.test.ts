@@ -36,7 +36,7 @@ describe('FeatureAssembler Point-In-Time Safety & Bounds', () => {
       if (table === 'wh_fixtures') {
         return {
           select: vi.fn().mockReturnThis(),
-          eq: vi.fn().mockReturnThis(),
+          eq: vi.fn().mockReturnThis(), in: vi.fn().mockReturnThis(),
           single: vi.fn().mockResolvedValue({ data: mockFixture }),
           or: vi.fn().mockReturnThis(),
           lt: vi.fn().mockReturnThis(),

@@ -102,31 +102,21 @@ export async function unlockForensicAction(ledgerId: string) {
       .maybeSingle();
 
     if (!snapshot || !snapshot.prediction) {
-      // Fallback mocks if snapshot data isn't fully detailed
       return {
-        success: true,
-        forensics: {
-          eloHomeShift: 'Home +18.4',
-          eloAwayShift: 'Away -18.4',
-          poissonHomeXG: 'H: 1.48 Gs',
-          poissonAwayXG: 'A: 0.94 Gs',
-          dixonColesRho: 'Rho: -0.041',
-          dixonColesDecay: 'Decay: 0.998',
-          expectedValue: 0.035,
-          edgeScore: 3.5
-        } as ForensicsMath
+        success: false,
+        error: 'Prediction snapshot telemetry not available for this ledger entry',
+        forensics: null
       };
     }
 
     const predObj = typeof snapshot.prediction === 'string' ? JSON.parse(snapshot.prediction) : snapshot.prediction;
     
-    // Extract Dixon-Coles and Poisson params from parsed model output if available, else use mapped mocks
-    const eloHome = predObj.elo_home_shift !== undefined ? `Home ${predObj.elo_home_shift >= 0 ? '+' : ''}${predObj.elo_home_shift.toFixed(1)}` : 'Home +18.4';
-    const eloAway = predObj.elo_away_shift !== undefined ? `Away ${predObj.elo_away_shift >= 0 ? '+' : ''}${predObj.elo_away_shift.toFixed(1)}` : 'Away -18.4';
-    const poissonH = predObj.poisson_home_xg !== undefined ? `H: ${predObj.poisson_home_xg.toFixed(2)} Gs` : 'H: 1.48 Gs';
-    const poissonA = predObj.poisson_away_xg !== undefined ? `A: ${predObj.poisson_away_xg.toFixed(2)} Gs` : 'A: 0.94 Gs';
-    const dcRho = predObj.dixon_coles_rho !== undefined ? `Rho: ${predObj.dixon_coles_rho.toFixed(3)}` : 'Rho: -0.041';
-    const dcDecay = predObj.dixon_coles_decay !== undefined ? `Decay: ${predObj.dixon_coles_decay.toFixed(3)}` : 'Decay: 0.998';
+    const eloHome = predObj.elo_home_shift !== undefined ? `Home ${predObj.elo_home_shift >= 0 ? '+' : ''}${predObj.elo_home_shift.toFixed(1)}` : 'N/A';
+    const eloAway = predObj.elo_away_shift !== undefined ? `Away ${predObj.elo_away_shift >= 0 ? '+' : ''}${predObj.elo_away_shift.toFixed(1)}` : 'N/A';
+    const poissonH = predObj.poisson_home_xg !== undefined ? `H: ${predObj.poisson_home_xg.toFixed(2)} Gs` : 'N/A';
+    const poissonA = predObj.poisson_away_xg !== undefined ? `A: ${predObj.poisson_away_xg.toFixed(2)} Gs` : 'N/A';
+    const dcRho = predObj.dixon_coles_rho !== undefined ? `Rho: ${predObj.dixon_coles_rho.toFixed(3)}` : 'N/A';
+    const dcDecay = predObj.dixon_coles_decay !== undefined ? `Decay: ${predObj.dixon_coles_decay.toFixed(3)}` : 'N/A';
 
     const { data: decision } = await supabase
       .from('prediction_decisions')

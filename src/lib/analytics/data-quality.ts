@@ -86,7 +86,7 @@ export class DataQualityEngine {
       // Get all matches
       const { data: matches, error: matchErr } = await supabase
         .from('matches')
-        .select('id');
+        .select('id').eq('data_status', 'ACTIVE').in('source_type', ['PROVIDER', 'HISTORICAL', 'MANUAL']);
       if (matchErr) throw matchErr;
       const matchIds = new Set((matches || []).map(m => String(m.id)));
 

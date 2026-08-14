@@ -36,7 +36,7 @@ describe('EntityResolver Strategy Cascade', () => {
     vi.spyOn(supabase, 'from').mockReturnValue({
       insert: vi.fn().mockResolvedValue({ error: null }),
       select: vi.fn().mockReturnThis(),
-      eq: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(), in: vi.fn().mockReturnThis(),
       maybeSingle: vi.fn().mockResolvedValue({ data: null })
     } as any);
   });
@@ -59,7 +59,7 @@ describe('EntityResolver Strategy Cascade', () => {
     // Stub supabase team alias query to return empty
     vi.spyOn(supabase, 'from').mockReturnValue({
       select: vi.fn().mockReturnThis(),
-      eq: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(), in: vi.fn().mockReturnThis(),
       maybeSingle: vi.fn().mockResolvedValue({ data: null }),
       insert: vi.fn().mockResolvedValue({ error: null })
     } as any);

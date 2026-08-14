@@ -1,3 +1,6 @@
+import { assertNotProduction } from '../lib/security/environmentGuard';
+assertNotProduction();
+
 // Start Shadow Pipeline — CLI Worker for Live Data Acquisition
 // Run: npx tsx src/scripts/start-shadow-pipeline.ts
 
@@ -192,3 +195,4 @@ async function main() {
 }
 
 main().catch(e => { console.error('[FATAL]', e); process.exit(1); });
+

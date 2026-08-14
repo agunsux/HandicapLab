@@ -40,7 +40,7 @@ describe('HistoricalImporter Idempotency', () => {
     // Mock Supabase call: first run returns no existing fixture, second run returns the existing fixture
     vi.spyOn(supabase, 'from').mockReturnValue({
       select: vi.fn().mockReturnThis(),
-      eq: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(), in: vi.fn().mockReturnThis(),
       maybeSingle: vi.fn()
         .mockResolvedValueOnce({ data: null, error: null }) // First run
         .mockResolvedValueOnce({ data: { id: 301 }, error: null }), // Second run

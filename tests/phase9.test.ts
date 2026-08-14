@@ -8,7 +8,7 @@ vi.mock('../src/lib/supabase.server', () => {
     supabase: {
       from: vi.fn(() => ({
         select: vi.fn().mockReturnThis(),
-        eq: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(), in: vi.fn().mockReturnThis(),
         not: vi.fn().mockReturnThis(),
         order: vi.fn().mockReturnThis(),
         limit: vi.fn().mockReturnThis(),

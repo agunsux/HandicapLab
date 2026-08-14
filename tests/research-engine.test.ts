@@ -31,7 +31,7 @@ describe('ResearchEngineService Transitions', () => {
     // Mock supabase calls
     vi.spyOn(supabase, 'from').mockReturnValue({
       select: vi.fn().mockReturnThis(),
-      eq: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(), in: vi.fn().mockReturnThis(),
       single: vi.fn().mockResolvedValue({ data: { id: 1, status: 'draft' } }),
       update: vi.fn().mockReturnThis(),
       insert: vi.fn().mockResolvedValue({ error: null }),

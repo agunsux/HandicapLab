@@ -20,7 +20,7 @@ describe('Phase 5B-1 Monetization Foundation Tests', () => {
           })
         })),
         select: vi.fn().mockReturnThis(),
-        eq: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(), in: vi.fn().mockReturnThis(),
         gte: vi.fn().mockImplementation(() => Promise.resolve({
           count: 5,
           data: [{ signal_id: 'sig-1' }, { signal_id: 'sig-2' }],

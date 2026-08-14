@@ -1,3 +1,6 @@
+import { assertNotProduction } from '../lib/security/environmentGuard';
+assertNotProduction();
+
 import 'dotenv/config';
 import { createClient } from '@supabase/supabase-js';
 import { apiFootballClient } from '../lib/apis/apifootball';
@@ -223,3 +226,4 @@ main()
     process.exit(0);
   })
   .catch((e) => { console.error('FATAL', e); process.exit(1); });
+

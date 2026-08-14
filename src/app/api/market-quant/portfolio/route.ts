@@ -1,15 +1,48 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PortfolioRiskEngine } from '../../../../lib/quant-market/portfolio-risk-engine';
+import { supabase } from '../../../../lib/supabase.server';
 
 export async function GET(req: NextRequest) {
   try {
-    const mockBets = [
-      { fixtureId: 'f-1', league: 'Premier League', market: 'asian_handicap', modelProb: 0.58, bookmakerOdds: 2.05, ev: 0.189, fullKellyStakePct: 0.18 },
-      { fixtureId: 'f-2', league: 'La Liga', market: 'moneyline', modelProb: 0.53, bookmakerOdds: 2.15, ev: 0.139, fullKellyStakePct: 0.12 },
-      { fixtureId: 'f-3', league: 'Bundesliga', market: 'over_under', modelProb: 0.59, bookmakerOdds: 1.95, ev: 0.150, fullKellyStakePct: 0.15 },
-    ];
+    const { data: rows, error } = await supabase
+      .from('predictions')
+      .select(`
+        id,
+        match_id,
+        market_type,
+        fair_odds,
+        entry_odds,
+        edge_pct,
+        prediction,
+        matches (
+          league,
+          home_team,
+          away_team
+        )
+      `)
+      .gt('edge_pct', 0.02)
+      .limit(20);
 
-    const report = PortfolioRiskEngine.optimizePortfolio(mockBets, 1000, 0.05);
+    const candidateBets = (rows || []).map((r: any) => {
+      const match = Array.isArray(r.matches) ? r.matches[0] : r.matches;
+      const modelProb = r.fair_odds > 0 ? 1 / r.fair_odds : (r.prediction?.home_prob || 0.5);
+      const bOdds = r.entry_odds || 2.0;
+      const ev = (modelProb * bOdds) - 1;
+      const b = bOdds - 1;
+      const kelly = b > 0 ? Math.max(0, (b * modelProb - (1 - modelProb)) / b) : 0;
+
+      return {
+        fixtureId: r.match_id || r.id,
+        league: match?.league || 'Whitelisted League',
+        market: r.market_type || 'asian_handicap',
+        modelProb: Number(modelProb.toFixed(4)),
+        bookmakerOdds: Number(bOdds.toFixed(2)),
+        ev: Number(ev.toFixed(4)),
+        fullKellyStakePct: Number(kelly.toFixed(4)),
+      };
+    });
+
+    const report = PortfolioRiskEngine.optimizePortfolio(candidateBets, 1000, 0.05);
 
     return NextResponse.json({
       success: true,

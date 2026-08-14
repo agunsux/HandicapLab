@@ -1,3 +1,6 @@
+import { assertNotProduction } from '../lib/security/environmentGuard';
+assertNotProduction();
+
 import { createClient } from '@supabase/supabase-js';
 import { fetchUpcomingFixtures } from '../lib/api/apiFootball';
 import { generatePredictions } from '../lib/services/predictionService';
@@ -126,3 +129,4 @@ async function debugIngest() {
 }
 
 debugIngest();
+

@@ -2,11 +2,11 @@
   "datasetVersion": "unknown-",
   "featureVersion": "v1.0",
   "modelVersion": "dixonColes-v1",
-  "calibrationVersion": "repaired-v2",
-  "experimentVersion": "exp-1786713916706",
+  "calibrationVersion": "beta-v1",
+  "experimentVersion": "exp-1786739859086",
   "decisionVersion": "v1.0",
   "reportVersion": "v1.0",
-  "evidenceVersion": "6a783cf1",
+  "evidenceVersion": "e7930da1",
   "gitCommit": "a1b2c3d4e5f6",
   "randomSeed": 42
 }

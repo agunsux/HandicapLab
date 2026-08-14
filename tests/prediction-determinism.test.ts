@@ -125,7 +125,9 @@ describe('runPredictionCron determinism', () => {
 
       if (table === 'matches') {
         chain.select = vi.fn().mockReturnThis();
-        chain.eq = vi.fn().mockResolvedValue({ data: mockMatches, error: null } as any);
+        chain.eq = vi.fn().mockReturnThis();
+        chain.in = vi.fn().mockReturnThis();
+        (chain as any).then = vi.fn((resolve: any) => resolve({ data: mockMatches, error: null }));
       }
 
       return chain as any;
@@ -157,7 +159,9 @@ describe('runPredictionCron determinism', () => {
 
       if (table === 'matches') {
         chain.select = vi.fn().mockReturnThis();
-        chain.eq = vi.fn().mockResolvedValue({ data: mockMatches, error: null } as any);
+        chain.eq = vi.fn().mockReturnThis();
+        chain.in = vi.fn().mockReturnThis();
+        (chain as any).then = vi.fn((resolve: any) => resolve({ data: mockMatches, error: null }));
       }
 
       return chain as any;

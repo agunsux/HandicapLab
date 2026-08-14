@@ -21,70 +21,49 @@ export default async function PredictionDoiPage({ params }: PredictionPageProps)
     .from('prediction_ledger')
     .select('*')
     .eq('id', id)
-    .single();
+    .maybeSingle();
 
-  // Fallback / Mock data if entry not found directly by UUID or if running on sample ID
-  let item = entry;
-  if (!item) {
-    // Try querying by match_id or external_match_id or generate deterministic permanent view
-    const { data: firstEntry } = await supabase
-      .from('prediction_ledger')
-      .select('*')
-      .limit(1)
-      .single();
-    
-    item = firstEntry || null;
+  if (!entry) {
+    notFound();
   }
 
-  // If completely empty database, provide structured fallback record for demonstration
-  const predictionData = item ? {
-    id: item.id,
-    published_at: item.published_at || new Date().toISOString(),
-    market: item.market || 'asian_handicap',
-    selection: item.selection || 'Home -0.75',
-    odds: item.odds_at_prediction || 1.85,
-    confidence: item.confidence || 58.4,
-    result_status: item.result_status || 'WON',
-    settled_at: item.settled_at || new Date().toISOString(),
-    roi: item.roi || 8.5,
-    model_version: item.model_version || 'Poisson v1.2-cal',
-    match_id: item.match_id || 'm-2026-0421',
-  } : {
-    id: id,
-    published_at: new Date('2026-07-22T14:30:00Z').toISOString(),
-    market: 'asian_handicap',
-    selection: 'Home -0.75',
-    odds: 1.85,
-    confidence: 58.4,
-    result_status: 'WON',
-    settled_at: new Date('2026-07-22T17:00:00Z').toISOString(),
-    roi: 8.5,
-    model_version: 'Poisson v1.2-cal + Dixon-Coles-rho',
-    match_id: 'm-2026-0421',
+  const predictionData = {
+    id: entry.id,
+    published_at: entry.published_at || new Date().toISOString(),
+    market: entry.market || 'asian_handicap',
+    selection: entry.selection || '-',
+    odds: entry.odds_at_prediction || 0,
+    confidence: entry.confidence || 0,
+    result_status: entry.result_status || 'PENDING',
+    settled_at: entry.settled_at || null,
+    roi: entry.roi || 0,
+    model_version: entry.model_version || 'Poisson-Dixon-Coles v1.0',
+    match_id: entry.match_id || '',
   };
 
   // Fetch match details if available
   let matchInfo = {
-    home_team: 'Arsenal',
-    away_team: 'Chelsea',
-    kickoff: '2026-07-22T15:00:00Z',
-    competition: 'Premier League',
-    score: '2 - 0',
+    home_team: 'Unknown Home',
+    away_team: 'Unknown Away',
+    kickoff: entry.published_at || new Date().toISOString(),
+    competition: 'Football Market',
+    score: '-',
   };
 
-  if (item?.match_id) {
+  if (entry.match_id) {
     const { data: matchData } = await supabase
       .from('matches')
       .select('*')
-      .eq('id', item.match_id)
-      .single();
+      .eq('id', entry.match_id)
+      .maybeSingle();
+
     if (matchData) {
       matchInfo = {
         home_team: matchData.home_team || matchInfo.home_team,
         away_team: matchData.away_team || matchInfo.away_team,
         kickoff: matchData.kickoff || matchInfo.kickoff,
-        competition: matchData.competition || matchInfo.competition,
-        score: matchData.home_score !== null ? `${matchData.home_score} - ${matchData.away_score}` : matchInfo.score,
+        competition: matchData.league || matchData.competition || matchInfo.competition,
+        score: matchData.home_score !== null && matchData.away_score !== null ? `${matchData.home_score} - ${matchData.away_score}` : '-',
       };
     }
   }

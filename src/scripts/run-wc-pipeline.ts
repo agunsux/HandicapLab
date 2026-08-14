@@ -1,3 +1,6 @@
+import { assertNotProduction } from '../lib/security/environmentGuard';
+assertNotProduction();
+
 import { createClient } from '@supabase/supabase-js';
 import { fetchUpcomingFixtures } from '../lib/api/apiFootball';
 import { runPredictionCron } from '../lib/crons/prediction';
@@ -75,3 +78,4 @@ runPipeline().catch(err => {
   console.error('❌ Pipeline failed:', err);
   process.exit(1);
 });
+

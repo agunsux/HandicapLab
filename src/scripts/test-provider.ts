@@ -1,3 +1,6 @@
+import { assertNotProduction } from '../lib/security/environmentGuard';
+assertNotProduction();
+
 import { getFootballProvider } from '../lib/api/providers';
 import { LEAGUE_REGISTRY } from '../lib/crons/leagueRegistry';
 
@@ -34,3 +37,4 @@ async function testProvider() {
 }
 
 testProvider().catch(console.error);
+

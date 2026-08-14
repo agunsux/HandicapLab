@@ -38,7 +38,7 @@ describe('Silver Transformation Pipeline E2E', () => {
       upsert: vi.fn().mockReturnThis(),
       select: vi.fn().mockReturnThis(),
       single: vi.fn().mockResolvedValue({ data: { id: 'mock-uuid', dataset_id: 'silver_fixtures', version: '1.0.0', schema_definition: {}, checksum: 'abc', compression: 'gzip', partition_count: 0, row_count: 2, provider: 'api-football', coverage_pct: 100, generated_at: '2026-07-01' } }),
-      eq: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(), in: vi.fn().mockReturnThis(),
       maybeSingle: vi.fn().mockResolvedValue({ data: null })
     } as any);
   });

@@ -67,7 +67,7 @@ describe('FootballDataImporter Staging Database Logs', () => {
       insert: vi.fn().mockReturnThis(),
       select: vi.fn().mockReturnThis(),
       update: vi.fn().mockReturnThis(),
-      eq: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(), in: vi.fn().mockReturnThis(),
       single: vi.fn().mockResolvedValue({ data: { id: 1 } }),
       maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null })
     } as any);

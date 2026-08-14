@@ -18,7 +18,8 @@ const {
   rpc,
   gt,
   lte,
-  limit
+  limit,
+  inMock
 } = vi.hoisted(() => {
   const select = vi.fn();
   const eq = vi.fn();
@@ -35,6 +36,7 @@ const {
   const gt = vi.fn();
   const lte = vi.fn();
   const limit = vi.fn();
+  const inMock = vi.fn();
 
   const mockChainObj: any = {
     select,
@@ -50,7 +52,8 @@ const {
     then,
     gt,
     lte,
-    limit
+    limit,
+    in: inMock,
   };
 
   select.mockReturnValue(mockChainObj);
@@ -65,6 +68,7 @@ const {
   gt.mockReturnValue(mockChainObj);
   lte.mockReturnValue(mockChainObj);
   limit.mockReturnValue(mockChainObj);
+  inMock.mockReturnValue(mockChainObj);
 
   const mockSupabase = {
     from: vi.fn((table) => {
@@ -91,7 +95,8 @@ const {
     rpc,
     gt,
     lte,
-    limit
+    limit,
+    inMock
   };
 });
 
@@ -142,6 +147,7 @@ describe('Analytics Refinement Layer', () => {
     gt.mockReturnValue(mockChainObj);
     lte.mockReturnValue(mockChainObj);
     limit.mockReturnValue(mockChainObj);
+    inMock.mockReturnValue(mockChainObj);
 
     vi.mocked(mockSupabase.from).mockImplementation((table: string) => {
       mockChainObj._currentTable = table;

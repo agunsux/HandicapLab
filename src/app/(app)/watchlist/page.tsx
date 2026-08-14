@@ -3,14 +3,27 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { getMatches, getPredictionsForMatch } from '@/lib/mock-data';
 import { WatchlistButton } from '@/components/WatchlistButton';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 
+interface WatchlistMatchItem {
+  id: string;
+  home_team: string;
+  away_team: string;
+  league: string;
+  kickoff: string;
+  status: string;
+  homeTeam?: { name: string };
+  awayTeam?: { name: string };
+  kickoffTime?: string;
+}
+
 export default function WatchlistPage() {
   const [tier, setTier] = useState<'FREE' | 'STARTER' | 'PRO' | 'QUANT' | 'LIFETIME'>('FREE');
   const [watchlist, setWatchlist] = useState<string[]>([]);
+  const [allMatches, setAllMatches] = useState<WatchlistMatchItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -31,6 +44,34 @@ export default function WatchlistPage() {
 
     loadState();
 
+    async function fetchFixtures() {
+      try {
+        setLoading(true);
+        const res = await fetch('/api/fixtures?limit=100');
+        if (res.ok) {
+          const json = await res.json();
+          const list = (json.data?.fixtures || json.fixtures || []).map((m: any) => ({
+            id: m.id,
+            home_team: m.home_team,
+            away_team: m.away_team,
+            league: m.league,
+            kickoff: m.kickoff,
+            status: m.status,
+            homeTeam: { name: m.home_team },
+            awayTeam: { name: m.away_team },
+            kickoffTime: m.kickoff,
+          }));
+          setAllMatches(list);
+        }
+      } catch (err) {
+        console.error('Failed to load watchlist fixtures:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchFixtures();
+
     window.addEventListener('handicaplab_tier_changed', loadState);
     window.addEventListener('handicaplab_watchlist_changed', loadState);
     window.addEventListener('storage', loadState);
@@ -41,8 +82,6 @@ export default function WatchlistPage() {
       window.removeEventListener('storage', loadState);
     };
   }, []);
-
-  const allMatches = useMemo(() => getMatches(), []);
 
   // Filter matches that are in the user's watchlist
   const watchlistedMatches = useMemo(() => {
@@ -98,9 +137,8 @@ export default function WatchlistPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {watchlistedMatches.map((match) => {
-                  const pred = getPredictionsForMatch(match.id);
-                  if (!pred) return null;
+                {watchlistedMatches.map((match: any) => {
+                  const pred = match.prediction || {};
 
                   return (
                     <TableRow key={match.id} className="hover:bg-slate-850/40 border-slate-800/60">
@@ -110,45 +148,45 @@ export default function WatchlistPage() {
                       <TableCell className="py-4">
                         <div className="flex flex-col">
                           <span className="font-semibold text-white">
-                            {match.homeTeam?.name} vs {match.awayTeam?.name}
+                            {match.home_team} vs {match.away_team}
                           </span>
                           <span className="text-[10px] text-slate-500 font-mono mt-0.5" suppressHydrationWarning>
-                            {match.league} • {new Date(match.kickoffTime).toLocaleDateString([], { month: 'short', day: 'numeric' })} {new Date(match.kickoffTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            {match.league} • {match.kickoff ? new Date(match.kickoff).toLocaleDateString([], { month: 'short', day: 'numeric' }) : ''} {match.kickoff ? new Date(match.kickoff).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
                           </span>
                         </div>
                       </TableCell>
                       <TableCell className="text-center font-mono py-4">
                         <div className="flex flex-col items-center">
                           <span className="text-xs text-slate-300">
-                            {pred.handicapLine > 0 ? `+${pred.handicapLine}` : pred.handicapLine}
+                            {pred.handicapLine ? (pred.handicapLine > 0 ? `+${pred.handicapLine}` : pred.handicapLine) : '-'}
                           </span>
-                          {hasAdvancedAccess ? (
+                          {hasAdvancedAccess && pred.handicapEdgePercent !== undefined ? (
                             <span className={`text-xs font-bold mt-0.5 ${pred.handicapEdgePercent > 5 ? 'text-emerald-400' : 'text-slate-500'}`}>
                               {pred.handicapEdgePercent > 0 ? `+${pred.handicapEdgePercent}%` : `${pred.handicapEdgePercent}%`}
                             </span>
                           ) : (
                             <span className="text-[10px] text-slate-500 bg-slate-950 px-1 py-0.2 rounded border border-slate-850 mt-1 font-bold">
-                              🔒 Pro
+                              {hasAdvancedAccess ? '-' : '🔒 Pro'}
                             </span>
                           )}
                         </div>
                       </TableCell>
                       <TableCell className="text-center font-mono py-4">
                         <div className="flex flex-col items-center">
-                          <span className="text-xs text-slate-300">Over {pred.totalLine}</span>
-                          {hasAdvancedAccess ? (
+                          <span className="text-xs text-slate-300">{pred.totalLine ? `Over ${pred.totalLine}` : '-'}</span>
+                          {hasAdvancedAccess && pred.ouEdgePercent !== undefined ? (
                             <span className={`text-xs font-bold mt-0.5 ${pred.ouEdgePercent > 5 ? 'text-emerald-400' : 'text-slate-500'}`}>
                               {pred.ouEdgePercent > 0 ? `+${pred.ouEdgePercent}%` : `${pred.ouEdgePercent}%`}
                             </span>
                           ) : (
                             <span className="text-[10px] text-slate-500 bg-slate-950 px-1 py-0.2 rounded border border-slate-850 mt-1 font-bold">
-                              🔒 Pro
+                              {hasAdvancedAccess ? '-' : '🔒 Pro'}
                             </span>
                           )}
                         </div>
                       </TableCell>
                       <TableCell className="text-center font-mono text-xs py-4">
-                        {hasAdvancedAccess ? (
+                        {hasAdvancedAccess && pred.homeProbability !== undefined ? (
                           <div className="flex items-center justify-center gap-1.5">
                             <span className="bg-slate-950 px-1.5 py-0.5 rounded text-slate-300 border border-slate-850">
                               {Math.round(pred.homeProbability * 100)}%
@@ -164,14 +202,14 @@ export default function WatchlistPage() {
                           </div>
                         ) : (
                           <div className="flex items-center justify-center gap-1 opacity-50 blur-[2px] select-none font-mono">
-                            <span>33%</span>•<span>33%</span>•<span>33%</span>
+                            <span>-</span>•<span>-</span>•<span>-</span>
                           </div>
                         )}
                       </TableCell>
                       <TableCell className="text-right py-4 pr-6">
-                        <Link href="/scanner">
+                        <Link href={`/matches/${match.id}`}>
                           <button className="px-3 py-1.5 rounded bg-slate-800 hover:bg-slate-750 text-slate-200 text-xs font-mono transition-colors">
-                            Open Scanner
+                            Inspect
                           </button>
                         </Link>
                       </TableCell>

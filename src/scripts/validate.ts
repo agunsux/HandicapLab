@@ -1,3 +1,6 @@
+import { assertNotProduction } from '../lib/security/environmentGuard';
+assertNotProduction();
+
 import { runSimulation } from '../lib/simulation/batchRunner';
 import { generateCalibrationDiagnostic } from '../lib/validation/calibrationDiagnostic';
 import { generateDistributionReport } from '../lib/validation/distributionReport';
@@ -183,3 +186,4 @@ ${significantCount > 0
 }
 
 main().catch(console.error);
+

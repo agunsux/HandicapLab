@@ -43,7 +43,7 @@ describe('BulkImportService Chronological Sorting & Checkpoints', () => {
   it('should skip ingestion of completed seasons via checkpoints', async () => {
     vi.spyOn(supabase, 'from').mockReturnValue({
       select: vi.fn().mockReturnThis(),
-      eq: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(), in: vi.fn().mockReturnThis(),
       maybeSingle: vi.fn().mockResolvedValue({ data: { id: 10, status: 'completed' }, error: null })
     } as any);
 

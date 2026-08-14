@@ -21,7 +21,7 @@ export default async function AdminDashboardPage() {
 
   const { count: fixturesCount } = await supabase
     .from('matches')
-    .select('*', { count: 'exact', head: true })
+    .select('*', { count: 'exact', head: true }).eq('data_status', 'ACTIVE').in('source_type', ['PROVIDER', 'HISTORICAL', 'MANUAL'])
     .gte('created_at', oneDayAgo);
 
   const { count: oddsCount } = await supabase

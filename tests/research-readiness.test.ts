@@ -64,7 +64,7 @@ describe('Drift Detection & Registry Freezer', () => {
     // Mock get indicating dataset is frozen
     vi.spyOn(supabase, 'from').mockReturnValue({
       select: vi.fn().mockReturnThis(),
-      eq: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(), in: vi.fn().mockReturnThis(),
       maybeSingle: vi.fn().mockResolvedValue({ data: { id: 10, is_frozen: true } }),
       upsert: vi.fn().mockReturnThis()
     } as any);

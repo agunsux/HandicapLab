@@ -46,7 +46,7 @@ describe('requireAdmin helper', () => {
     const mockFrom = vi.fn().mockImplementation((table: string) => {
       const chain = {
         select: vi.fn().mockReturnThis(),
-        eq: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(), in: vi.fn().mockReturnThis(),
         maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
       };
       return chain;
@@ -69,7 +69,7 @@ describe('requireAdmin helper', () => {
     const mockFrom = vi.fn().mockImplementation((table: string) => {
       const chain = {
         select: vi.fn().mockReturnThis(),
-        eq: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(), in: vi.fn().mockReturnThis(),
         maybeSingle: vi.fn().mockImplementation(() => {
           if (table === 'roles') {
             return Promise.resolve({ data: { id: 'admin_role_id' }, error: null });
@@ -97,7 +97,7 @@ describe('requireAdmin helper', () => {
     const mockFrom = vi.fn().mockImplementation((table: string) => {
       const chain = {
         select: vi.fn().mockReturnThis(),
-        eq: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(), in: vi.fn().mockReturnThis(),
         maybeSingle: vi.fn().mockImplementation(() => {
           if (table === 'roles') {
             return Promise.resolve({ data: { id: 'admin_role_id' }, error: null });

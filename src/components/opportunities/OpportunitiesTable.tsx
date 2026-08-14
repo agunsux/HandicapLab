@@ -67,50 +67,57 @@ export function OpportunitiesTable({ data, previewMode = false }: OpportunitiesT
           </tr>
         </thead>
         <tbody className="divide-y divide-border font-mono text-[11px] sm:text-xs">
-          {data.map((opp) => {
-            if (opp.locked) {
-              return (
-                <tr 
-                  key={opp.id} 
-                  className={cn(
-                    "hover:bg-muted/50 transition-colors group cursor-not-allowed opacity-60",
-                    opp.isStale ? "opacity-30 grayscale" : ""
-                  )}
-                >
-                  <td className="px-3 py-2 sm:py-2.5">
-                    <div className="font-sans font-medium text-foreground tracking-tight">{opp.match}</div>
-                    <div className="font-sans text-[10px] text-muted-foreground mt-0.5 uppercase tracking-wide">{opp.league} &middot; {opp.time}</div>
-                  </td>
-                  <td className="px-3 py-2 sm:py-2.5">
-                    <div className="text-foreground font-medium blur-[4px] select-none">Mock Sel</div>
-                    <div className="font-sans text-[10px] text-muted-foreground mt-0.5 uppercase tracking-wide">{opp.market}</div>
-                  </td>
-                  <td className="px-3 py-2 sm:py-2.5 text-right text-foreground">
-                    <span className="text-muted-foreground blur-[4px] select-none">-1.5</span>
-                  </td>
-                  <td className="px-3 py-2 sm:py-2.5 text-right text-muted-foreground hidden sm:table-cell">
-                    <span className="blur-[4px] select-none">50.0%</span>
-                  </td>
-                  <td className="px-3 py-2 sm:py-2.5 text-right font-medium text-foreground">
-                    <span className="blur-[4px] select-none">1.95</span>
-                  </td>
-                  <td className="px-3 py-2 sm:py-2.5 text-right text-muted-foreground hidden sm:table-cell">
-                    <span className="blur-[4px] select-none">1.80</span>
-                  </td>
-                  <td className="px-3 py-2 sm:py-2.5 text-right hidden md:table-cell font-medium text-foreground">
-                    <span className="blur-[4px] select-none">+5.0%</span>
-                  </td>
-                  <td className="px-3 py-2 sm:py-2.5 text-right font-bold text-signal-high">
-                    <span className="blur-[4px] select-none">3.50%</span>
-                  </td>
-                  <td className="px-3 py-2 sm:py-2.5 text-center">
-                    <div className="inline-flex items-center justify-center px-1.5 py-0.5 rounded text-[10px] font-sans font-bold tracking-widest border uppercase bg-muted/30 border-border text-muted-foreground blur-[2px] select-none">
-                      LOCKED
-                    </div>
-                  </td>
-                </tr>
-              );
-            }
+          {data.length === 0 ? (
+            <tr>
+              <td colSpan={9} className="py-12 text-center text-muted-foreground font-mono text-xs">
+                No active value opportunities found. Market scanning active across whitelisted leagues.
+              </td>
+            </tr>
+          ) : (
+            data.map((opp) => {
+              if (opp.locked) {
+                return (
+                  <tr 
+                    key={opp.id} 
+                    className={cn(
+                      "hover:bg-muted/50 transition-colors group cursor-not-allowed opacity-60",
+                      opp.isStale ? "opacity-30 grayscale" : ""
+                    )}
+                  >
+                    <td className="px-3 py-2 sm:py-2.5">
+                      <div className="font-sans font-medium text-foreground tracking-tight">{opp.match}</div>
+                      <div className="font-sans text-[10px] text-muted-foreground mt-0.5 uppercase tracking-wide">{opp.league} &middot; {opp.time}</div>
+                    </td>
+                    <td className="px-3 py-2 sm:py-2.5">
+                      <div className="text-foreground font-medium blur-[4px] select-none">Locked Selection</div>
+                      <div className="font-sans text-[10px] text-muted-foreground mt-0.5 uppercase tracking-wide">{opp.market}</div>
+                    </td>
+                    <td className="px-3 py-2 sm:py-2.5 text-right text-foreground">
+                      <span className="text-muted-foreground blur-[4px] select-none">-1.5</span>
+                    </td>
+                    <td className="px-3 py-2 sm:py-2.5 text-right text-muted-foreground hidden sm:table-cell">
+                      <span className="blur-[4px] select-none">50.0%</span>
+                    </td>
+                    <td className="px-3 py-2 sm:py-2.5 text-right font-medium text-foreground">
+                      <span className="blur-[4px] select-none">1.95</span>
+                    </td>
+                    <td className="px-3 py-2 sm:py-2.5 text-right text-muted-foreground hidden sm:table-cell">
+                      <span className="blur-[4px] select-none">1.80</span>
+                    </td>
+                    <td className="px-3 py-2 sm:py-2.5 text-right hidden md:table-cell font-medium text-foreground">
+                      <span className="blur-[4px] select-none">+5.0%</span>
+                    </td>
+                    <td className="px-3 py-2 sm:py-2.5 text-right font-bold text-signal-high">
+                      <span className="blur-[4px] select-none">3.50%</span>
+                    </td>
+                    <td className="px-3 py-2 sm:py-2.5 text-center">
+                      <div className="inline-flex items-center justify-center px-1.5 py-0.5 rounded text-[10px] font-sans font-bold tracking-widest border uppercase bg-muted/30 border-border text-muted-foreground blur-[2px] select-none">
+                        LOCKED
+                      </div>
+                    </td>
+                  </tr>
+                );
+              }
 
             const signalConfig = getSignalConfig(opp.signal);
             return (
@@ -167,7 +174,7 @@ export function OpportunitiesTable({ data, previewMode = false }: OpportunitiesT
                 </td>
               </tr>
             );
-          })}
+          }))}
         </tbody>
       </table>
       
