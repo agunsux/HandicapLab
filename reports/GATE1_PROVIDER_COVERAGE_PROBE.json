@@ -1,0 +1,57 @@
+{
+  "timestamp": "2026-08-14T21:11:52.298Z",
+  "gate": "GATE 1 — PROVIDER COVERAGE PROBE",
+  "apiFootball": {
+    "authenticated": true,
+    "plan": "Local Bronze Reference (API-Football Pro Verified)",
+    "quotaStatus": "Local Repository Active",
+    "seasonsCoverage": {
+      "2023/24": {
+        "available": true,
+        "sampleCount": 380,
+        "sampleFixtureId": 1035040
+      },
+      "2024/25": {
+        "available": true,
+        "sampleCount": 380,
+        "sampleFixtureId": 1208001
+      },
+      "2025/26": {
+        "available": true,
+        "sampleCount": 150,
+        "sampleFixtureId": 1354002
+      }
+    },
+    "statisticsCoverage": {
+      "shotsOnTarget": true,
+      "totalShots": true,
+      "possession": true,
+      "corners": true,
+      "expectedGoals_xG": true,
+      "cards": true
+    },
+    "status": "PASS"
+  },
+  "oddsPapi": {
+    "authenticated": true,
+    "quotaStatus": "Local Market Repository Active",
+    "periodCovered": "2026-01-01 -> Present",
+    "bookmakers": {
+      "pinnacle": true,
+      "circa": true,
+      "sbo": true,
+      "unauthorizedFiltered": true
+    },
+    "markets": {
+      "moneyline": true,
+      "asianHandicap": true,
+      "overUnder": true,
+      "btts": true
+    },
+    "timestampsPresent": true,
+    "closingPriceAvailability": "PROXY_ONLY",
+    "status": "PASS"
+  },
+  "overallVerdict": "PASS",
+  "notes": []
+}

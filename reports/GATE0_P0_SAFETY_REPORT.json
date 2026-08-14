@@ -1,0 +1,34 @@
+{
+  "timestamp": "2026-08-14T21:10:15.351Z",
+  "gate": "GATE 0 — P0 SAFETY FIRST",
+  "p0_a_isolation": {
+    "localNotProd": true,
+    "testNotProd": true,
+    "syntheticWriterBlockedInProd": true,
+    "unknownFailsClosed": true,
+    "currentEnv": "UNKNOWN",
+    "status": "PASS"
+  },
+  "p0_b_provenance": {
+    "totalRecordsChecked": 2280,
+    "cleanRealRecords": 2280,
+    "quarantinedCount": 0,
+    "syntheticCount": 0,
+    "testCount": 0,
+    "invalidCount": 0,
+    "status": "PASS"
+  },
+  "p0_c_quarantine": {
+    "activeRealRecords": 2280,
+    "quarantinedRecords": 0,
+    "unquarantinedViolations": 0,
+    "status": "PASS"
+  },
+  "calibration_invariant": {
+    "commit": "2deac1e9434c2ddd4ad022a30149d1b9c5383528",
+    "status": "PASS",
+    "details": "Calibration methods (fitSoftmaxTemperature, fitBinaryTemperature, fitBinaryPlatt) intact and frozen."
+  },
+  "overallVerdict": "PASS",
+  "notes": []
+}

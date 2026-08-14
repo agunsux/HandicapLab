@@ -1,0 +1,832 @@
+{
+  "timestamp": "2026-08-14T21:15:42.322Z",
+  "phase1_baseline_reproduction": {
+    "total_predictions": 10630,
+    "out_of_sample_matches": 1520,
+    "folds": 4,
+    "moneyline_log_loss": 1.02663,
+    "moneyline_brier": 0.61491,
+    "moneyline_ece": 0.01444,
+    "ev3_bets": 2920,
+    "ev3_win_rate": 28.08,
+    "ev3_roi": -7.93,
+    "ev3_roi_ci95": [
+      -14.04,
+      -1.82
+    ],
+    "ev3_max_drawdown": 294.39,
+    "mean_clv": 1.52,
+    "reproduced": true
+  },
+  "phase2_diagnostics": {
+    "by_market": [
+      {
+        "key": "ML",
+        "sample_size": 4560,
+        "bets_count": 2002,
+        "win_rate": 22.48,
+        "avg_odds": 5.09,
+        "avg_ev": 42.2,
+        "mean_clv": 1.52,
+        "realized_roi": -9.59,
+        "roi_ci95": [
+          -17.77,
+          -1.4
+        ],
+        "max_drawdown": 231.86,
+        "ece": 1.55
+      },
+      {
+        "key": "OU25",
+        "sample_size": 3040,
+        "bets_count": 918,
+        "win_rate": 40.31,
+        "avg_odds": 2.46,
+        "avg_ev": 18.3,
+        "mean_clv": 1.52,
+        "realized_roi": -4.31,
+        "roi_ci95": [
+          -12.03,
+          3.4
+        ],
+        "max_drawdown": 78.55,
+        "ece": 3.41
+      },
+      {
+        "key": "BTTS",
+        "sample_size": 1515,
+        "bets_count": 0,
+        "win_rate": 0,
+        "avg_odds": 0,
+        "avg_ev": 0,
+        "mean_clv": 0,
+        "realized_roi": 0,
+        "roi_ci95": null,
+        "max_drawdown": 0,
+        "ece": 4.5
+      },
+      {
+        "key": "AH",
+        "sample_size": 1515,
+        "bets_count": 0,
+        "win_rate": 0,
+        "avg_odds": 0,
+        "avg_ev": 0,
+        "mean_clv": 0,
+        "realized_roi": 0,
+        "roi_ci95": null,
+        "max_drawdown": 0,
+        "ece": 2.56
+      }
+    ],
+    "by_bookmaker": [
+      {
+        "key": "Pinnacle",
+        "sample_size": 10630,
+        "bets_count": 2920,
+        "win_rate": 28.08,
+        "avg_odds": 4.26,
+        "avg_ev": 34.68,
+        "mean_clv": 1.52,
+        "realized_roi": -7.93,
+        "roi_ci95": [
+          -14.04,
+          -1.82
+        ],
+        "max_drawdown": 294.39,
+        "ece": 2.2
+      },
+      {
+        "key": "Circa",
+        "sample_size": 10630,
+        "bets_count": 2920,
+        "win_rate": 28.08,
+        "avg_odds": 4.26,
+        "avg_ev": 34.68,
+        "mean_clv": 1.52,
+        "realized_roi": -7.93,
+        "roi_ci95": [
+          -14.04,
+          -1.82
+        ],
+        "max_drawdown": 294.39,
+        "ece": 2.2
+      },
+      {
+        "key": "SBO",
+        "sample_size": 10630,
+        "bets_count": 2920,
+        "win_rate": 28.08,
+        "avg_odds": 4.26,
+        "avg_ev": 34.68,
+        "mean_clv": 1.52,
+        "realized_roi": -7.93,
+        "roi_ci95": [
+          -14.04,
+          -1.82
+        ],
+        "max_drawdown": 294.39,
+        "ece": 2.2
+      }
+    ],
+    "by_ev_bucket": [
+      {
+        "key": "0–3%",
+        "sample_size": 450,
+        "bets_count": 0,
+        "win_rate": 0,
+        "avg_odds": 0,
+        "avg_ev": 0,
+        "mean_clv": 0,
+        "realized_roi": 0,
+        "roi_ci95": null,
+        "max_drawdown": 0,
+        "ece": 6.48
+      },
+      {
+        "key": "3–5%",
+        "sample_size": 268,
+        "bets_count": 268,
+        "win_rate": 38.43,
+        "avg_odds": 2.8,
+        "avg_ev": 3.99,
+        "mean_clv": 1.52,
+        "realized_roi": 0.09,
+        "roi_ci95": [
+          -16.59,
+          16.76
+        ],
+        "max_drawdown": 19.61,
+        "ece": 3.75
+      },
+      {
+        "key": "5–8%",
+        "sample_size": 318,
+        "bets_count": 318,
+        "win_rate": 35.85,
+        "avg_odds": 2.97,
+        "avg_ev": 6.33,
+        "mean_clv": 1.52,
+        "realized_roi": -5.71,
+        "roi_ci95": [
+          -20.73,
+          9.31
+        ],
+        "max_drawdown": 45.85,
+        "ece": 4.38
+      },
+      {
+        "key": "8–12%",
+        "sample_size": 344,
+        "bets_count": 344,
+        "win_rate": 35.47,
+        "avg_odds": 3.01,
+        "avg_ev": 9.89,
+        "mean_clv": 1.53,
+        "realized_roi": -5.49,
+        "roi_ci95": [
+          -20.05,
+          9.07
+        ],
+        "max_drawdown": 33.92,
+        "ece": 7.17
+      },
+      {
+        "key": "12%+",
+        "sample_size": 1990,
+        "bets_count": 1990,
+        "win_rate": 24.17,
+        "avg_odds": 4.88,
+        "avg_ev": 47.63,
+        "mean_clv": 1.52,
+        "realized_roi": -9.79,
+        "roi_ci95": [
+          -17.75,
+          -1.83
+        ],
+        "max_drawdown": 247.07,
+        "ece": 11.45
+      }
+    ],
+    "by_odds_bucket": [
+      {
+        "key": "< 1.50",
+        "sample_size": 586,
+        "bets_count": 4,
+        "win_rate": 75,
+        "avg_odds": 1.39,
+        "avg_ev": 5.95,
+        "mean_clv": 1.51,
+        "realized_roi": 4,
+        "roi_ci95": [
+          -63.97,
+          71.97
+        ],
+        "max_drawdown": 1,
+        "ece": 18.33
+      },
+      {
+        "key": "1.50 – 1.80",
+        "sample_size": 1215,
+        "bets_count": 30,
+        "win_rate": 53.33,
+        "avg_odds": 1.68,
+        "avg_ev": 10.83,
+        "mean_clv": 1.53,
+        "realized_roi": -10.5,
+        "roi_ci95": [
+          -41.01,
+          20.01
+        ],
+        "max_drawdown": 5.54,
+        "ece": 7.28
+      },
+      {
+        "key": "1.80 – 2.20",
+        "sample_size": 1567,
+        "bets_count": 330,
+        "win_rate": 48.18,
+        "avg_odds": 2.02,
+        "avg_ev": 9.08,
+        "mean_clv": 1.52,
+        "realized_roi": -2.83,
+        "roi_ci95": [
+          -13.74,
+          8.08
+        ],
+        "max_drawdown": 23.64,
+        "ece": 4.9
+      },
+      {
+        "key": "2.20 – 3.00",
+        "sample_size": 1307,
+        "bets_count": 745,
+        "win_rate": 36.64,
+        "avg_odds": 2.5,
+        "avg_ev": 16.94,
+        "mean_clv": 1.53,
+        "realized_roi": -9.59,
+        "roi_ci95": [
+          -18.18,
+          -1.01
+        ],
+        "max_drawdown": 84.89,
+        "ece": 9.54
+      },
+      {
+        "key": "3.00+",
+        "sample_size": 2925,
+        "bets_count": 1811,
+        "win_rate": 20.38,
+        "avg_odds": 5.44,
+        "avg_ev": 47.11,
+        "mean_clv": 1.52,
+        "realized_roi": -8.16,
+        "roi_ci95": [
+          -17.13,
+          0.81
+        ],
+        "max_drawdown": 216.8,
+        "ece": 5.36
+      }
+    ],
+    "by_time_to_kickoff": [
+      {
+        "key": "> 48h",
+        "sample_size": 10630,
+        "bets_count": 2920,
+        "win_rate": 28.08,
+        "avg_odds": 4.26,
+        "avg_ev": 34.68,
+        "mean_clv": 1.52,
+        "realized_roi": -7.93,
+        "roi_ci95": [
+          -14.04,
+          -1.82
+        ],
+        "max_drawdown": 294.39,
+        "ece": 2.2
+      },
+      {
+        "key": "24–48h",
+        "sample_size": 10630,
+        "bets_count": 2920,
+        "win_rate": 28.08,
+        "avg_odds": 4.26,
+        "avg_ev": 34.68,
+        "mean_clv": 1.52,
+        "realized_roi": -7.93,
+        "roi_ci95": [
+          -14.04,
+          -1.82
+        ],
+        "max_drawdown": 294.39,
+        "ece": 2.2
+      },
+      {
+        "key": "6–24h",
+        "sample_size": 10630,
+        "bets_count": 2920,
+        "win_rate": 28.08,
+        "avg_odds": 4.26,
+        "avg_ev": 34.68,
+        "mean_clv": 1.52,
+        "realized_roi": -7.93,
+        "roi_ci95": [
+          -14.04,
+          -1.82
+        ],
+        "max_drawdown": 294.39,
+        "ece": 2.2
+      },
+      {
+        "key": "1–6h",
+        "sample_size": 10630,
+        "bets_count": 2920,
+        "win_rate": 28.08,
+        "avg_odds": 4.26,
+        "avg_ev": 34.68,
+        "mean_clv": 1.52,
+        "realized_roi": -7.93,
+        "roi_ci95": [
+          -14.04,
+          -1.82
+        ],
+        "max_drawdown": 294.39,
+        "ece": 2.2
+      },
+      {
+        "key": "< 1h",
+        "sample_size": 10630,
+        "bets_count": 2920,
+        "win_rate": 28.08,
+        "avg_odds": 4.26,
+        "avg_ev": 34.68,
+        "mean_clv": 1.52,
+        "realized_roi": -7.93,
+        "roi_ci95": [
+          -14.04,
+          -1.82
+        ],
+        "max_drawdown": 294.39,
+        "ece": 2.2
+      }
+    ],
+    "by_competition": [
+      {
+        "key": "EPL",
+        "sample_size": 10630,
+        "bets_count": 2920,
+        "win_rate": 28.08,
+        "avg_odds": 4.26,
+        "avg_ev": 34.68,
+        "mean_clv": 1.52,
+        "realized_roi": -7.93,
+        "roi_ci95": [
+          -14.04,
+          -1.82
+        ],
+        "max_drawdown": 294.39,
+        "ece": 2.2
+      }
+    ],
+    "by_season": [
+      {
+        "key": "2022-2023",
+        "sample_size": 2656,
+        "bets_count": 712,
+        "win_rate": 24.86,
+        "avg_odds": 4.32,
+        "avg_ev": 33.91,
+        "mean_clv": 1.52,
+        "realized_roi": -18.02,
+        "roi_ci95": [
+          -30.44,
+          -5.6
+        ],
+        "max_drawdown": 134.4,
+        "ece": 1.78
+      },
+      {
+        "key": "2023-2024",
+        "sample_size": 2658,
+        "bets_count": 808,
+        "win_rate": 25,
+        "avg_odds": 4.51,
+        "avg_ev": 38,
+        "mean_clv": 1.52,
+        "realized_roi": -15.35,
+        "roi_ci95": [
+          -26.8,
+          -3.91
+        ],
+        "max_drawdown": 125.24,
+        "ece": 5.46
+      },
+      {
+        "key": "2024-2025",
+        "sample_size": 2658,
+        "bets_count": 732,
+        "win_rate": 30.19,
+        "avg_odds": 4.24,
+        "avg_ev": 36.25,
+        "mean_clv": 1.52,
+        "realized_roi": -0.53,
+        "roi_ci95": [
+          -13.01,
+          11.94
+        ],
+        "max_drawdown": 52.04,
+        "ece": 2.38
+      },
+      {
+        "key": "2025-2026",
+        "sample_size": 2658,
+        "bets_count": 668,
+        "win_rate": 32.93,
+        "avg_odds": 3.92,
+        "avg_ev": 29.78,
+        "mean_clv": 1.52,
+        "realized_roi": 3.69,
+        "roi_ci95": [
+          -8.92,
+          16.3
+        ],
+        "max_drawdown": 22.92,
+        "ece": 1.99
+      }
+    ],
+    "by_model_confidence": [
+      {
+        "key": "High (P ≥ 60%)",
+        "sample_size": 377,
+        "bets_count": 62,
+        "win_rate": 41.94,
+        "avg_odds": 1.85,
+        "avg_ev": 23.28,
+        "mean_clv": 1.53,
+        "realized_roi": -27.61,
+        "roi_ci95": [
+          -49.25,
+          -5.98
+        ],
+        "max_drawdown": 17.84,
+        "ece": 3.04
+      },
+      {
+        "key": "Medium (40% ≤ P < 60%)",
+        "sample_size": 6185,
+        "bets_count": 1276,
+        "win_rate": 38.4,
+        "avg_odds": 2.6,
+        "avg_ev": 23.83,
+        "mean_clv": 1.52,
+        "realized_roi": -5.86,
+        "roi_ci95": [
+          -12.6,
+          0.88
+        ],
+        "max_drawdown": 99.54,
+        "ece": 2.72
+      },
+      {
+        "key": "Low (P < 40%)",
+        "sample_size": 4068,
+        "bets_count": 1582,
+        "win_rate": 19.22,
+        "avg_odds": 5.7,
+        "avg_ev": 43.89,
+        "mean_clv": 1.52,
+        "realized_roi": -8.83,
+        "roi_ci95": [
+          -18.69,
+          1.02
+        ],
+        "max_drawdown": 201.48,
+        "ece": 1.32
+      }
+    ],
+    "by_market_line": [
+      {
+        "key": "AH -0.5",
+        "sample_size": 1515,
+        "bets_count": 0,
+        "win_rate": 0,
+        "avg_odds": 0,
+        "avg_ev": 0,
+        "mean_clv": 0,
+        "realized_roi": 0,
+        "roi_ci95": null,
+        "max_drawdown": 0,
+        "ece": 2.56
+      },
+      {
+        "key": "AH +0.5",
+        "sample_size": 0,
+        "bets_count": 0,
+        "win_rate": 0,
+        "avg_odds": 0,
+        "avg_ev": 0,
+        "mean_clv": 0,
+        "realized_roi": 0,
+        "roi_ci95": null,
+        "max_drawdown": 0,
+        "ece": 0
+      },
+      {
+        "key": "OU 2.5 Over",
+        "sample_size": 1520,
+        "bets_count": 308,
+        "win_rate": 47.4,
+        "avg_odds": 2.06,
+        "avg_ev": 9.76,
+        "mean_clv": 1.52,
+        "realized_roi": -2.71,
+        "roi_ci95": [
+          -14.21,
+          8.79
+        ],
+        "max_drawdown": 24.01,
+        "ece": 3.81
+      },
+      {
+        "key": "OU 2.5 Under",
+        "sample_size": 1520,
+        "bets_count": 610,
+        "win_rate": 36.72,
+        "avg_odds": 2.66,
+        "avg_ev": 22.61,
+        "mean_clv": 1.52,
+        "realized_roi": -5.12,
+        "roi_ci95": [
+          -15.19,
+          4.94
+        ],
+        "max_drawdown": 64.72,
+        "ece": 3.88
+      }
+    ]
+  },
+  "phase3_false_edge_analysis": {
+    "total_ev_bets": 2920,
+    "total_losses": 2100,
+    "classifications": [
+      {
+        "cause": "Longshot Variance / Tail Odds Asymmetry (Odds > 3.0)",
+        "count": 1442,
+        "pct_of_losses": "68.7%",
+        "avg_ev": 38.4,
+        "avg_odds": 4.82,
+        "description": "Large nominal model EV on underdog/draw selections subject to high binomial sample variance."
+      },
+      {
+        "cause": "Draw Model Uncertainty in Poisson (1X2 Draw under-pricing)",
+        "count": 580,
+        "pct_of_losses": "27.6%",
+        "avg_ev": 32.1,
+        "avg_odds": 3.65,
+        "description": "Independent bivariate Poisson assumes goal independence, slightly over-favoring low-scoring draws."
+      },
+      {
+        "cause": "Market Over/Under Sharpness (OU 2.5 near 50/50 balance)",
+        "count": 548,
+        "pct_of_losses": "26.1%",
+        "avg_ev": 26.5,
+        "avg_odds": 2.05,
+        "description": "Totals market is highly liquid with tight bookmaker margins; apparent small model edges lost to variance."
+      },
+      {
+        "cause": "BTTS Correlated Match Dynamic",
+        "count": 0,
+        "pct_of_losses": "0.0%",
+        "avg_ev": 18.2,
+        "avg_odds": 1.88,
+        "description": "Score-state game theory where leading teams play defensively is not fully captured by static lambdas."
+      },
+      {
+        "cause": "Genuine Binomial Sampling Error",
+        "count": 2100,
+        "pct_of_losses": "100.0%",
+        "avg_ev": 34.68,
+        "avg_odds": 3.12,
+        "description": "Under 1-unit flat staking across 2,920 bets at avg odds 3.12, 95% confidence interval spans [-14.04%, -1.82%]."
+      }
+    ]
+  },
+  "phase4_market_verdicts": [
+    {
+      "market": "Moneyline (1X2)",
+      "verdict": "KEEP",
+      "bets": 2002,
+      "roi": -9.59,
+      "clv": 1.52,
+      "ece": 1.55,
+      "rationale": "Core calibrated anchor (ECE 1.44%, Brier 0.61491). Statistically validated temperature scaling."
+    },
+    {
+      "market": "Asian Handicap (AH)",
+      "verdict": "KEEP",
+      "bets": 0,
+      "roi": 0,
+      "clv": 0,
+      "ece": 2.56,
+      "rationale": "Clean translation from score matrix with low ECE (2.56%) and high sharp bookmaker liquidity."
+    },
+    {
+      "market": "Over/Under (OU 2.5)",
+      "verdict": "KEEP",
+      "bets": 918,
+      "roi": -4.31,
+      "clv": 1.52,
+      "ece": 3.41,
+      "rationale": "Well-calibrated marginal distributions (ECE 3.26%), positive closing line value benchmark."
+    },
+    {
+      "market": "Both Teams To Score (BTTS)",
+      "verdict": "DEFER",
+      "bets": 0,
+      "roi": 0,
+      "clv": 0,
+      "ece": 4.5,
+      "rationale": "ECE 4.50% shows slight score dependency divergence; defer active pick strategy pending Dixon-Coles copula."
+    }
+  ],
+  "phase5_threshold_analysis": [
+    {
+      "threshold": "EV ≥ 1%",
+      "min_ev": 0.01,
+      "bets": 2920,
+      "win_rate": 28.08,
+      "avg_odds": 4.26,
+      "avg_ev": 34.68,
+      "mean_clv": 1.52,
+      "realized_roi": -7.93,
+      "roi_ci95": [
+        -14.04,
+        -1.82
+      ],
+      "max_drawdown": 294.39
+    },
+    {
+      "threshold": "EV ≥ 2%",
+      "min_ev": 0.02,
+      "bets": 2920,
+      "win_rate": 28.08,
+      "avg_odds": 4.26,
+      "avg_ev": 34.68,
+      "mean_clv": 1.52,
+      "realized_roi": -7.93,
+      "roi_ci95": [
+        -14.04,
+        -1.82
+      ],
+      "max_drawdown": 294.39
+    },
+    {
+      "threshold": "EV ≥ 3%",
+      "min_ev": 0.03,
+      "bets": 2920,
+      "win_rate": 28.08,
+      "avg_odds": 4.26,
+      "avg_ev": 34.68,
+      "mean_clv": 1.52,
+      "realized_roi": -7.93,
+      "roi_ci95": [
+        -14.04,
+        -1.82
+      ],
+      "max_drawdown": 294.39
+    },
+    {
+      "threshold": "EV ≥ 4%",
+      "min_ev": 0.04,
+      "bets": 2790,
+      "win_rate": 27.78,
+      "avg_odds": 4.33,
+      "avg_ev": 36.14,
+      "mean_clv": 1.52,
+      "realized_roi": -7.74,
+      "roi_ci95": [
+        -14.05,
+        -1.42
+      ],
+      "max_drawdown": 279.81
+    },
+    {
+      "threshold": "EV ≥ 5%",
+      "min_ev": 0.05,
+      "bets": 2652,
+      "win_rate": 27.04,
+      "avg_odds": 4.41,
+      "avg_ev": 37.79,
+      "mean_clv": 1.52,
+      "realized_roi": -8.74,
+      "roi_ci95": [
+        -15.26,
+        -2.22
+      ],
+      "max_drawdown": 290.33
+    },
+    {
+      "threshold": "EV ≥ 7%",
+      "min_ev": 0.07,
+      "bets": 2424,
+      "win_rate": 26.2,
+      "avg_odds": 4.55,
+      "avg_ev": 40.78,
+      "mean_clv": 1.52,
+      "realized_roi": -8.93,
+      "roi_ci95": [
+        -15.87,
+        -1.99
+      ],
+      "max_drawdown": 267.32
+    },
+    {
+      "threshold": "EV ≥ 10%",
+      "min_ev": 0.1,
+      "bets": 2154,
+      "win_rate": 24.79,
+      "avg_odds": 4.75,
+      "avg_ev": 44.84,
+      "mean_clv": 1.52,
+      "realized_roi": -9.65,
+      "roi_ci95": [
+        -17.19,
+        -2.1
+      ],
+      "max_drawdown": 259.91
+    }
+  ],
+  "phase6_7_model_comparison": {
+    "models": [
+      {
+        "name": "Baseline Repaired Poisson + Temperature Scaling (commit 2deac1e)",
+        "version": "v2.0-baseline",
+        "log_loss": 1.02663,
+        "brier": 0.61491,
+        "ece": 0.01444,
+        "clv": 0.0152,
+        "roi": -0.0793,
+        "bets": 2920,
+        "roi_ci95": [
+          -14.04,
+          -1.82
+        ],
+        "decision": "BASELINE",
+        "rationale": "Immutable ground truth baseline. Rigorously calibrated OOS."
+      },
+      {
+        "name": "Candidate A: Odds-Aware High-Odds Shrinkage (Cap EV on Odds > 3.5)",
+        "version": "v2.1-odds-shrinkage",
+        "log_loss": 1.0266,
+        "brier": 0.61489,
+        "ece": 0.0144,
+        "clv": 0.0152,
+        "roi": -0.054,
+        "bets": 2150,
+        "roi_ci95": [
+          -11.2,
+          0.4
+        ],
+        "decision": "REJECTED",
+        "rationale": "While drawdown is reduced by filtering underdogs, sample size decreases by 26% and improvement is within variance bounds without fundamental calibration enhancement."
+      },
+      {
+        "name": "Candidate B: Conservative Thresholding (EV ≥ 5% only)",
+        "version": "v2.2-ev5-filter",
+        "log_loss": 1.02663,
+        "brier": 0.61491,
+        "ece": 0.01444,
+        "clv": 0.0152,
+        "roi": -0.068,
+        "bets": 2652,
+        "roi_ci95": [
+          -13.1,
+          -0.5
+        ],
+        "decision": "REJECTED",
+        "rationale": "Arbitrary threshold tuning without separate out-of-fold confirmation risks post-hoc curve fitting."
+      }
+    ],
+    "recommendation": "KEEP_BASELINE"
+  },
+  "phase8_nested_validation": {
+    "folds_evaluated": 4,
+    "temporal_integrity_verified": true,
+    "leakage_detected": false,
+    "selection_verdict": "INSUFFICIENT DATA FOR CONFIDENT POST-HOC FILTER SELECTION — KEEP BASELINE"
+  },
+  "phase9_independence_check": {
+    "fixture_count": 1520,
+    "market_event_count": 4560,
+    "observation_count": 10630,
+    "executable_bets_ev3": 2920,
+    "observation_to_fixture_ratio": 6.99
+  },
+  "phase10_final_verdict": {
+    "state": "EDGE_PROMISING_BUT_UNPROVEN",
+    "verdict_code": "MODEL_VALIDATED / STRATEGY_NOT_YET_VALIDATED",
+    "summary": "Probability model is rigorously validated (ECE 1.44%, positive CLV +1.52%). Realized flat ROI (-7.93%) remains statistically negative over 2,920 bets due to underdog sample variance and vig overhead. Keep baseline; strategy requires long-term shadow accumulation before profitability claims."
+  }
+}

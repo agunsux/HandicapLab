@@ -1,0 +1,323 @@
+{
+  "gate": "GATE 2 — SMALL REAL-DATA PILOT",
+  "status": "PASS",
+  "pilotSampleCount": 5,
+  "results": [
+    {
+      "match_id": "EPL-2020-2021-2020-12-13-arsenal-burnley",
+      "match_date": "2020-12-13",
+      "fixture": "Arsenal vs Burnley (0-1)",
+      "markets": [
+        {
+          "market": "ML",
+          "selection": "Home",
+          "model_probability": 0.5329,
+          "entry_odds": 1.53,
+          "closing_odds": 1.5,
+          "market_implied_prob": 0.6536,
+          "ev": -0.1846,
+          "clv": 0.02,
+          "close_quality": "PROXY_CLOSE",
+          "settlement_outcome": "LOSS",
+          "profit_1u": -1
+        },
+        {
+          "market": "OU25",
+          "selection": "Over 2.5",
+          "line": 2.5,
+          "model_probability": 0.2027,
+          "entry_odds": 1.9,
+          "closing_odds": 1.84,
+          "market_implied_prob": 0.5263,
+          "ev": -0.6149,
+          "clv": 0.0326,
+          "close_quality": "PROXY_CLOSE",
+          "settlement_outcome": "LOSS",
+          "profit_1u": -1
+        },
+        {
+          "market": "AH",
+          "selection": "Home -0.5",
+          "line": -0.5,
+          "model_probability": 0.5329,
+          "entry_odds": 1.53,
+          "closing_odds": 1.5,
+          "market_implied_prob": 0.6536,
+          "ev": -0.1846,
+          "clv": 0.02,
+          "close_quality": "PROXY_CLOSE",
+          "settlement_outcome": "LOSS",
+          "profit_1u": -1
+        },
+        {
+          "market": "BTTS",
+          "selection": "Yes",
+          "model_probability": 0.2332,
+          "entry_odds": 1.85,
+          "closing_odds": 1.85,
+          "market_implied_prob": 0.5405,
+          "ev": -0.5686,
+          "clv": 0,
+          "close_quality": "PROXY_CLOSE",
+          "settlement_outcome": "LOSS",
+          "profit_1u": -1
+        }
+      ],
+      "provenance_verified": true,
+      "leakage_free": true
+    },
+    {
+      "match_id": "EPL-2020-2021-2020-12-13-crystal-palace-tottenham",
+      "match_date": "2020-12-13",
+      "fixture": "Crystal Palace vs Tottenham (1-1)",
+      "markets": [
+        {
+          "market": "ML",
+          "selection": "Home",
+          "model_probability": 0.1645,
+          "entry_odds": 4.5,
+          "closing_odds": 4.41,
+          "market_implied_prob": 0.2222,
+          "ev": -0.2599,
+          "clv": 0.0204,
+          "close_quality": "PROXY_CLOSE",
+          "settlement_outcome": "LOSS",
+          "profit_1u": -1
+        },
+        {
+          "market": "OU25",
+          "selection": "Over 2.5",
+          "line": 2.5,
+          "model_probability": 0.5445,
+          "entry_odds": 1.9,
+          "closing_odds": 1.84,
+          "market_implied_prob": 0.5263,
+          "ev": 0.0345,
+          "clv": 0.0326,
+          "close_quality": "PROXY_CLOSE",
+          "settlement_outcome": "LOSS",
+          "profit_1u": -1
+        },
+        {
+          "market": "AH",
+          "selection": "Home -0.5",
+          "line": -0.5,
+          "model_probability": 0.1645,
+          "entry_odds": 4.5,
+          "closing_odds": 4.41,
+          "market_implied_prob": 0.2222,
+          "ev": -0.2599,
+          "clv": 0.0204,
+          "close_quality": "PROXY_CLOSE",
+          "settlement_outcome": "LOSS",
+          "profit_1u": -1
+        },
+        {
+          "market": "BTTS",
+          "selection": "Yes",
+          "model_probability": 0.5084,
+          "entry_odds": 1.85,
+          "closing_odds": 1.85,
+          "market_implied_prob": 0.5405,
+          "ev": -0.0595,
+          "clv": 0,
+          "close_quality": "PROXY_CLOSE",
+          "settlement_outcome": "WIN",
+          "profit_1u": 0.85
+        }
+      ],
+      "provenance_verified": true,
+      "leakage_free": true
+    },
+    {
+      "match_id": "EPL-2020-2021-2020-12-13-fulham-liverpool",
+      "match_date": "2020-12-13",
+      "fixture": "Fulham vs Liverpool (1-1)",
+      "markets": [
+        {
+          "market": "ML",
+          "selection": "Home",
+          "model_probability": 0.0877,
+          "entry_odds": 9,
+          "closing_odds": 8.82,
+          "market_implied_prob": 0.1111,
+          "ev": -0.2111,
+          "clv": 0.0204,
+          "close_quality": "PROXY_CLOSE",
+          "settlement_outcome": "LOSS",
+          "profit_1u": -1
+        },
+        {
+          "market": "OU25",
+          "selection": "Over 2.5",
+          "line": 2.5,
+          "model_probability": 0.7833,
+          "entry_odds": 1.4,
+          "closing_odds": 1.36,
+          "market_implied_prob": 0.7143,
+          "ev": 0.0966,
+          "clv": 0.0294,
+          "close_quality": "PROXY_CLOSE",
+          "settlement_outcome": "LOSS",
+          "profit_1u": -1
+        },
+        {
+          "market": "AH",
+          "selection": "Home -0.5",
+          "line": -0.5,
+          "model_probability": 0.0877,
+          "entry_odds": 9,
+          "closing_odds": 8.82,
+          "market_implied_prob": 0.1111,
+          "ev": -0.2111,
+          "clv": 0.0204,
+          "close_quality": "PROXY_CLOSE",
+          "settlement_outcome": "LOSS",
+          "profit_1u": -1
+        },
+        {
+          "market": "BTTS",
+          "selection": "Yes",
+          "model_probability": 0.6104,
+          "entry_odds": 1.85,
+          "closing_odds": 1.85,
+          "market_implied_prob": 0.5405,
+          "ev": 0.1292,
+          "clv": 0,
+          "close_quality": "PROXY_CLOSE",
+          "settlement_outcome": "WIN",
+          "profit_1u": 0.85
+        }
+      ],
+      "provenance_verified": true,
+      "leakage_free": true
+    },
+    {
+      "match_id": "EPL-2020-2021-2020-12-13-leicester-brighton",
+      "match_date": "2020-12-13",
+      "fixture": "Leicester vs Brighton (3-0)",
+      "markets": [
+        {
+          "market": "ML",
+          "selection": "Home",
+          "model_probability": 0.5829,
+          "entry_odds": 2,
+          "closing_odds": 1.96,
+          "market_implied_prob": 0.5,
+          "ev": 0.1659,
+          "clv": 0.0204,
+          "close_quality": "PROXY_CLOSE",
+          "settlement_outcome": "WIN",
+          "profit_1u": 1
+        },
+        {
+          "market": "OU25",
+          "selection": "Over 2.5",
+          "line": 2.5,
+          "model_probability": 0.6574,
+          "entry_odds": 1.9,
+          "closing_odds": 1.84,
+          "market_implied_prob": 0.5263,
+          "ev": 0.249,
+          "clv": 0.0326,
+          "close_quality": "PROXY_CLOSE",
+          "settlement_outcome": "WIN",
+          "profit_1u": 0.9
+        },
+        {
+          "market": "AH",
+          "selection": "Home -0.5",
+          "line": -0.5,
+          "model_probability": 0.5829,
+          "entry_odds": 2,
+          "closing_odds": 1.96,
+          "market_implied_prob": 0.5,
+          "ev": 0.1659,
+          "clv": 0.0204,
+          "close_quality": "PROXY_CLOSE",
+          "settlement_outcome": "WIN",
+          "profit_1u": 1
+        },
+        {
+          "market": "BTTS",
+          "selection": "Yes",
+          "model_probability": 0.6265,
+          "entry_odds": 1.85,
+          "closing_odds": 1.85,
+          "market_implied_prob": 0.5405,
+          "ev": 0.159,
+          "clv": 0,
+          "close_quality": "PROXY_CLOSE",
+          "settlement_outcome": "LOSS",
+          "profit_1u": -1
+        }
+      ],
+      "provenance_verified": true,
+      "leakage_free": true
+    },
+    {
+      "match_id": "EPL-2020-2021-2020-12-13-southampton-sheffield-united",
+      "match_date": "2020-12-13",
+      "fixture": "Southampton vs Sheffield United (3-0)",
+      "markets": [
+        {
+          "market": "ML",
+          "selection": "Home",
+          "model_probability": 0.7644,
+          "entry_odds": 1.7,
+          "closing_odds": 1.67,
+          "market_implied_prob": 0.5882,
+          "ev": 0.2995,
+          "clv": 0.018,
+          "close_quality": "PROXY_CLOSE",
+          "settlement_outcome": "WIN",
+          "profit_1u": 0.7
+        },
+        {
+          "market": "OU25",
+          "selection": "Over 2.5",
+          "line": 2.5,
+          "model_probability": 0.4842,
+          "entry_odds": 2.01,
+          "closing_odds": 1.95,
+          "market_implied_prob": 0.4975,
+          "ev": -0.0267,
+          "clv": 0.0308,
+          "close_quality": "PROXY_CLOSE",
+          "settlement_outcome": "WIN",
+          "profit_1u": 1.01
+        },
+        {
+          "market": "AH",
+          "selection": "Home -0.5",
+          "line": -0.5,
+          "model_probability": 0.7644,
+          "entry_odds": 1.7,
+          "closing_odds": 1.67,
+          "market_implied_prob": 0.5882,
+          "ev": 0.2995,
+          "clv": 0.018,
+          "close_quality": "PROXY_CLOSE",
+          "settlement_outcome": "WIN",
+          "profit_1u": 0.7
+        },
+        {
+          "market": "BTTS",
+          "selection": "Yes",
+          "model_probability": 0.33,
+          "entry_odds": 1.85,
+          "closing_odds": 1.85,
+          "market_implied_prob": 0.5405,
+          "ev": -0.3896,
+          "clv": 0,
+          "close_quality": "PROXY_CLOSE",
+          "settlement_outcome": "LOSS",
+          "profit_1u": -1
+        }
+      ],
+      "provenance_verified": true,
+      "leakage_free": true
+    }
+  ],
+  "errors": []
+}

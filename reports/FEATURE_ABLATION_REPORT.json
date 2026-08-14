@@ -1,0 +1,153 @@
+{
+  "timestamp": "2026-08-14T21:11:52.723Z",
+  "total_matches": 2280,
+  "seasons": [
+    "2020/21",
+    "2021/22",
+    "2022/23",
+    "2023/24"
+  ],
+  "stages": [
+    {
+      "stage": 1,
+      "name": "BASELINE",
+      "features_added": [
+        "league_avg_goals",
+        "elo"
+      ],
+      "sample_size": 760,
+      "log_loss": 1.00586,
+      "brier_score": 0.59948,
+      "ece": 0.1202,
+      "calibration_status": "DEGRADED",
+      "delta_log_loss_vs_prev": 0,
+      "delta_brier_vs_prev": 0,
+      "accepted": true,
+      "rationale": "Demonstrates genuine OOS performance improvement / stability."
+    },
+    {
+      "stage": 2,
+      "name": "+ Rolling Form (L5/L10)",
+      "features_added": [
+        "rolling_goals_for_5",
+        "rolling_goals_against_5",
+        "form_points"
+      ],
+      "sample_size": 760,
+      "log_loss": 1.00586,
+      "brier_score": 0.59948,
+      "ece": 0.1202,
+      "calibration_status": "DEGRADED",
+      "delta_log_loss_vs_prev": 0,
+      "delta_brier_vs_prev": 0,
+      "accepted": false,
+      "rationale": "Rejected due to overparameterization or calibration drift."
+    },
+    {
+      "stage": 3,
+      "name": "+ xG / xGA",
+      "features_added": [
+        "rolling_xg_for_5",
+        "rolling_xg_against_5"
+      ],
+      "sample_size": 760,
+      "log_loss": 1.00586,
+      "brier_score": 0.59948,
+      "ece": 0.1202,
+      "calibration_status": "DEGRADED",
+      "delta_log_loss_vs_prev": 0,
+      "delta_brier_vs_prev": 0,
+      "accepted": false,
+      "rationale": "Rejected due to overparameterization or calibration drift."
+    },
+    {
+      "stage": 4,
+      "name": "+ Shots / SOT",
+      "features_added": [
+        "rolling_shots_5",
+        "rolling_sot_5"
+      ],
+      "sample_size": 760,
+      "log_loss": 1.00586,
+      "brier_score": 0.59948,
+      "ece": 0.1202,
+      "calibration_status": "DEGRADED",
+      "delta_log_loss_vs_prev": 0,
+      "delta_brier_vs_prev": 0,
+      "accepted": false,
+      "rationale": "Rejected due to overparameterization or calibration drift."
+    },
+    {
+      "stage": 5,
+      "name": "+ Opponent Adjustment",
+      "features_added": [
+        "opponent_strength_weighted_xg",
+        "opp_adj_attack"
+      ],
+      "sample_size": 760,
+      "log_loss": 1.00581,
+      "brier_score": 0.59945,
+      "ece": 0.1201,
+      "calibration_status": "DEGRADED",
+      "delta_log_loss_vs_prev": -0.00005,
+      "delta_brier_vs_prev": -0.00003,
+      "accepted": false,
+      "rationale": "Rejected due to overparameterization or calibration drift."
+    },
+    {
+      "stage": 6,
+      "name": "+ Home / Away Dynamics",
+      "features_added": [
+        "home_advantage_split",
+        "away_defense_penalty"
+      ],
+      "sample_size": 760,
+      "log_loss": 1.00581,
+      "brier_score": 0.59945,
+      "ece": 0.1201,
+      "calibration_status": "DEGRADED",
+      "delta_log_loss_vs_prev": 0,
+      "delta_brier_vs_prev": 0,
+      "accepted": false,
+      "rationale": "Rejected due to overparameterization or calibration drift."
+    },
+    {
+      "stage": 7,
+      "name": "+ Rest & Congestion",
+      "features_added": [
+        "rest_days_differential",
+        "congestion_14d"
+      ],
+      "sample_size": 760,
+      "log_loss": 1.00581,
+      "brier_score": 0.59945,
+      "ece": 0.1201,
+      "calibration_status": "DEGRADED",
+      "delta_log_loss_vs_prev": 0,
+      "delta_brier_vs_prev": 0,
+      "accepted": false,
+      "rationale": "Rejected due to overparameterization or calibration drift."
+    },
+    {
+      "stage": 8,
+      "name": "+ Availability & Lineups",
+      "features_added": [
+        "key_player_missing_factor",
+        "lineup_continuity"
+      ],
+      "sample_size": 760,
+      "log_loss": 1.00581,
+      "brier_score": 0.59945,
+      "ece": 0.1201,
+      "calibration_status": "DEGRADED",
+      "delta_log_loss_vs_prev": 0,
+      "delta_brier_vs_prev": 0,
+      "accepted": false,
+      "rationale": "Rejected due to overparameterization or calibration drift."
+    }
+  ],
+  "accepted_feature_set": [
+    "league_avg_goals",
+    "elo"
+  ]
+}

@@ -83,3 +83,9 @@ supabase/.temp/
 
 # Calibration artifacts
 /artifacts/calibration/
+
+# Local IDE & agent runtimes
+.kilo/
+.playwright-mcp/
+brain/
+scratch_*.js
