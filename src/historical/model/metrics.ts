@@ -127,6 +127,11 @@ export function evBucketAnalysis(
 
 export function calibrationBuckets(preds: Array<{ p: number; outcome: boolean }>): { buckets: CalibrationBucket[]; ece: number } {
   const ranges = [
+    { label: '0-10', lo: 0.0, hi: 0.1 },
+    { label: '10-20', lo: 0.1, hi: 0.2 },
+    { label: '20-30', lo: 0.2, hi: 0.3 },
+    { label: '30-40', lo: 0.3, hi: 0.4 },
+    { label: '40-50', lo: 0.4, hi: 0.5 },
     { label: '50-55', lo: 0.5, hi: 0.55 },
     { label: '55-60', lo: 0.55, hi: 0.6 },
     { label: '60-65', lo: 0.6, hi: 0.65 },
@@ -139,7 +144,7 @@ export function calibrationBuckets(preds: Array<{ p: number; outcome: boolean }>
   let ece = 0;
   let totalN = 0;
   for (const r of ranges) {
-    const items = preds.filter((x) => x.p >= r.lo && x.p < r.hi);
+    const items = preds.filter((x) => x.p >= r.lo && (r.label === '80+' ? x.p <= r.hi : x.p < r.hi));
     const n = items.length;
     if (n === 0) {
       buckets.push({ bucket: r.label, n: 0, predicted: 0, actual: 0, error: 0 });

@@ -40,14 +40,15 @@ export interface LambdaInput {
 }
 
 export function computeLambdas(input: LambdaInput, p: PoissonParams): { home: number; away: number } {
-  const lg = Math.max(input.leagueAvgGoals, 1.0);
-  const homeAttack = input.homeAvgGoalsFor / lg;
-  const awayDefense = input.awayAvgGoalsAgainst / lg;
-  const awayAttack = input.awayAvgGoalsFor / lg;
-  const homeDefense = input.homeAvgGoalsAgainst / lg;
-  const eloAdjHome = Math.pow(2, input.eloDelta / p.eloScale);
+  const homeBase = Math.max(p.leagueHomeAvg, 0.5);
+  const awayBase = Math.max(p.leagueAwayAvg, 0.5);
+  const homeAttack = input.homeAvgGoalsFor / homeBase;
+  const awayDefense = input.awayAvgGoalsAgainst / homeBase;
+  const awayAttack = input.awayAvgGoalsFor / awayBase;
+  const homeDefense = input.homeAvgGoalsAgainst / awayBase;
+  const eloAdjHome = Math.pow(2, input.eloDelta / (p.eloScale * 2));
   const eloAdjAway = 1 / eloAdjHome;
-  const rawHome = p.leagueHomeAvg * homeAttack * awayDefense * p.homeAdv * eloAdjHome;
+  const rawHome = p.leagueHomeAvg * homeAttack * awayDefense * eloAdjHome;
   const rawAway = p.leagueAwayAvg * awayAttack * homeDefense * eloAdjAway;
   return { home: clamp(rawHome, 0.1, 5), away: clamp(rawAway, 0.1, 5) };
 }

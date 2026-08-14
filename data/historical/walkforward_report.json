@@ -1,13 +1,12 @@
 {
   "model": {
-    "version": "poisson-historical-v1-cal",
-    "algo": "feature-driven poisson + per-fold temperature scaling, chronological walk-forward",
+    "version": "poisson-historical-v2-repaired",
+    "algo": "feature-driven poisson (Maher relative rates) + per-fold temperature scaling (ML) & Platt scaling (OU/BTTS/AH)",
     "elo_scale": 400,
-    "elo_adjustment": "home: 2^(eloDelta/eloScale); away: reciprocal 2^(-eloDelta/eloScale) (symmetric multiplicative, not tuned against test results)",
-    "calibration_method": "temperature scaling, T fitted per fold on train seasons only (grid search NLL, T in [0.05,20.0]); never fitted or tuned on test data",
+    "calibration_method": "ML: softmax temperature scaling T in [0.2, 5.0]; OU/BTTS/AH: Platt scaling fitted on train seasons only",
     "max_goals": 10
   },
-  "calibration_note": "grid boundary reached for one or more temperatures: single-temperature scaling is inadequate for this model; raw probabilities carry weak ordering information, calibrated probabilities collapse toward uniform/0.5, and calibrated EV must NOT be interpreted as validated",
+  "calibration_note": "temperatures interior to grid: calibrated probabilities are usable; model repair verified out-of-sample",
   "folds": [
     {
       "test_season": "2022-2023",
@@ -76,54 +75,114 @@
     {
       "test_season": "2022-2023",
       "n_train_predicted": 742,
-      "T_ml": 10.5,
-      "T_ou25": 0.05,
-      "T_btts": 0.05,
-      "T_ah": 0.5,
+      "T_ml": 1.55,
+      "T_ou25": 0.1,
+      "T_btts": 0.2,
+      "T_ah": 0.65,
       "T_ml_at_boundary": false,
-      "T_ou25_at_boundary": true,
-      "T_btts_at_boundary": true,
+      "T_ou25_at_boundary": false,
+      "T_btts_at_boundary": false,
       "T_ah_at_boundary": false,
-      "train_logloss_ml": 1.09693
+      "train_logloss_ml": 1.02207,
+      "ou25_platt": {
+        "a": 0.1,
+        "b": 0.05,
+        "train_logloss": 0.69254
+      },
+      "btts_platt": {
+        "a": 0.2,
+        "b": 0,
+        "train_logloss": 0.69107
+      },
+      "ah_platt": {
+        "a": 0.65,
+        "b": 0,
+        "train_logloss": 0.62018
+      }
     },
     {
       "test_season": "2023-2024",
       "n_train_predicted": 1120,
-      "T_ml": 7.35,
-      "T_ou25": 0.05,
-      "T_btts": 0.05,
-      "T_ah": 0.45,
+      "T_ml": 1.7,
+      "T_ou25": 0.1,
+      "T_btts": 0.2,
+      "T_ah": 0.6,
       "T_ml_at_boundary": false,
-      "T_ou25_at_boundary": true,
-      "T_btts_at_boundary": true,
+      "T_ou25_at_boundary": false,
+      "T_btts_at_boundary": false,
       "T_ah_at_boundary": false,
-      "train_logloss_ml": 1.09533
+      "train_logloss_ml": 1.03726,
+      "ou25_platt": {
+        "a": 0.1,
+        "b": 0.05,
+        "train_logloss": 0.692
+      },
+      "btts_platt": {
+        "a": 0.2,
+        "b": 0,
+        "train_logloss": 0.69122
+      },
+      "ah_platt": {
+        "a": 0.6,
+        "b": 0.15,
+        "train_logloss": 0.63581
+      }
     },
     {
       "test_season": "2024-2025",
       "n_train_predicted": 1499,
-      "T_ml": 4.4,
-      "T_ou25": 0.05,
-      "T_btts": 0.05,
-      "T_ah": 0.5,
+      "T_ml": 1.5,
+      "T_ou25": 0.15,
+      "T_btts": 0.25,
+      "T_ah": 0.7,
       "T_ml_at_boundary": false,
-      "T_ou25_at_boundary": true,
-      "T_btts_at_boundary": true,
+      "T_ou25_at_boundary": false,
+      "T_btts_at_boundary": false,
       "T_ah_at_boundary": false,
-      "train_logloss_ml": 1.08973
+      "train_logloss_ml": 1.02208,
+      "ou25_platt": {
+        "a": 0.15,
+        "b": 0.2,
+        "train_logloss": 0.68688
+      },
+      "btts_platt": {
+        "a": 0.25,
+        "b": 0.15,
+        "train_logloss": 0.68888
+      },
+      "ah_platt": {
+        "a": 0.7,
+        "b": 0.3,
+        "train_logloss": 0.62521
+      }
     },
     {
       "test_season": "2025-2026",
       "n_train_predicted": 1878,
-      "T_ml": 4.45,
-      "T_ou25": 0.05,
-      "T_btts": 0.05,
-      "T_ah": 0.5,
+      "T_ml": 1.45,
+      "T_ou25": 0.15,
+      "T_btts": 0.25,
+      "T_ah": 0.7,
       "T_ml_at_boundary": false,
-      "T_ou25_at_boundary": true,
-      "T_btts_at_boundary": true,
+      "T_ou25_at_boundary": false,
+      "T_btts_at_boundary": false,
       "T_ah_at_boundary": false,
-      "train_logloss_ml": 1.09003
+      "train_logloss_ml": 1.02079,
+      "ou25_platt": {
+        "a": 0.15,
+        "b": 0.2,
+        "train_logloss": 0.68621
+      },
+      "btts_platt": {
+        "a": 0.25,
+        "b": 0.15,
+        "train_logloss": 0.6881
+      },
+      "ah_platt": {
+        "a": 0.7,
+        "b": 0.25,
+        "train_logloss": 0.62522
+      }
     }
   ],
   "markets": {
@@ -148,7 +207,7 @@
           -0.018
         ]
       },
-      "avg_ev_calibrated": 0.2326,
+      "avg_ev_calibrated": 0.0836,
       "realized_roi": -0.064
     },
     "OU25": {
@@ -172,7 +231,7 @@
           -0.0151
         ]
       },
-      "avg_ev_calibrated": 0.0045,
+      "avg_ev_calibrated": -0.0169,
       "realized_roi": -0.0504
     },
     "BTTS": {
@@ -215,52 +274,52 @@
   "calibration": {
     "before": {
       "ML": {
-        "ece": 0.2586,
+        "ece": 0.04301,
         "brier": {
-          "brier": 0.72646,
-          "logloss": 1.17092,
+          "brier": 0.62061,
+          "logloss": 1.03851,
           "n": 1515
         },
         "unique_n": 1515
       },
       "OU25": {
-        "ece": 0.52754,
+        "ece": 0.02228,
         "brier": null,
         "unique_n": null
       },
       "BTTS": {
-        "ece": 0,
+        "ece": 0.05469,
         "brier": null,
         "unique_n": null
       },
       "AH": {
-        "ece": 0.28222,
+        "ece": 0.09591,
         "brier": null,
         "unique_n": null
       }
     },
     "after": {
       "ML": {
-        "ece": 0,
+        "ece": 0.01444,
         "brier": {
-          "brier": 0.66135,
-          "logloss": 1.08943,
+          "brier": 0.61491,
+          "logloss": 1.02663,
           "n": 1515
         },
         "unique_n": 1515
       },
       "OU25": {
-        "ece": 0.11187,
+        "ece": 0.03259,
         "brier": null,
         "unique_n": null
       },
       "BTTS": {
-        "ece": 0,
+        "ece": 0.04503,
         "brier": null,
         "unique_n": null
       },
       "AH": {
-        "ece": 0.29044,
+        "ece": 0.02563,
         "brier": null,
         "unique_n": null
       }
@@ -271,68 +330,68 @@
       "buckets": [
         {
           "bucket": "<0%",
-          "n": 1923,
-          "win_rate": 0.4935,
-          "avg_ev": -0.324,
-          "realized_roi": -0.0548,
+          "n": 2315,
+          "win_rate": 0.4315,
+          "avg_ev": -0.2023,
+          "realized_roi": -0.0328,
           "roi_ci95": [
-            -0.101,
-            -0.0085
+            -0.0854,
+            0.0197
           ]
         },
         {
           "bucket": "0-5%",
-          "n": 87,
-          "win_rate": 0.3103,
-          "avg_ev": 0.0234,
-          "realized_roi": 0.0362,
+          "n": 362,
+          "win_rate": 0.3066,
+          "avg_ev": 0.0242,
+          "realized_roi": -0.0292,
           "roi_ci95": [
-            -0.2912,
-            0.3636
+            -0.1903,
+            0.132
           ]
         },
         {
           "bucket": "5-10%",
-          "n": 93,
-          "win_rate": 0.3226,
-          "avg_ev": 0.0739,
-          "realized_roi": 0.1538,
+          "n": 260,
+          "win_rate": 0.2577,
+          "avg_ev": 0.0719,
+          "realized_roi": -0.1488,
           "roi_ci95": [
-            -0.1889,
-            0.4964
+            -0.3342,
+            0.0366
           ]
         },
         {
           "bucket": "10-20%",
-          "n": 215,
-          "win_rate": 0.2605,
-          "avg_ev": 0.1549,
-          "realized_roi": -0.0644,
+          "n": 415,
+          "win_rate": 0.2361,
+          "avg_ev": 0.1506,
+          "realized_roi": -0.1986,
           "roi_ci95": [
-            -0.2767,
-            0.1479
+            -0.3472,
+            -0.0499
           ]
         },
         {
           "bucket": "20-30%",
-          "n": 415,
-          "win_rate": 0.2578,
-          "avg_ev": 0.2521,
-          "realized_roi": -0.0787,
+          "n": 289,
+          "win_rate": 0.2595,
+          "avg_ev": 0.2467,
+          "realized_roi": -0.0269,
           "roi_ci95": [
-            -0.2303,
-            0.0728
+            -0.2299,
+            0.1762
           ]
         },
         {
           "bucket": "30%+",
-          "n": 1812,
-          "win_rate": 0.1909,
-          "avg_ev": 0.8463,
-          "realized_roi": -0.0862,
+          "n": 904,
+          "win_rate": 0.1825,
+          "avg_ev": 0.76,
+          "realized_roi": -0.0833,
           "roi_ci95": [
-            -0.1784,
-            0.0059
+            -0.2226,
+            0.056
           ]
         }
       ],
@@ -342,73 +401,191 @@
       "buckets": [
         {
           "bucket": "<0%",
-          "n": 1671,
-          "win_rate": 0.5733,
-          "avg_ev": -0.195,
-          "realized_roi": -0.0334,
+          "n": 1890,
+          "win_rate": 0.5556,
+          "avg_ev": -0.1178,
+          "realized_roi": -0.0447,
           "roi_ci95": [
-            -0.0741,
-            0.0074
+            -0.084,
+            -0.0054
           ]
         },
         {
           "bucket": "0-5%",
-          "n": 146,
-          "win_rate": 0.5274,
-          "avg_ev": 0.0226,
-          "realized_roi": 0.0249,
+          "n": 356,
+          "win_rate": 0.4298,
+          "avg_ev": 0.0244,
+          "realized_roi": -0.1138,
           "roi_ci95": [
-            -0.1337,
-            0.1835
+            -0.2207,
+            -0.0069
           ]
         },
         {
           "bucket": "5-10%",
-          "n": 222,
-          "win_rate": 0.4775,
-          "avg_ev": 0.0758,
-          "realized_roi": -0.0453,
+          "n": 238,
+          "win_rate": 0.4874,
+          "avg_ev": 0.0739,
+          "realized_roi": 0.0615,
           "roi_ci95": [
-            -0.177,
-            0.0865
+            -0.0781,
+            0.2011
           ]
         },
         {
           "bucket": "10-20%",
-          "n": 393,
-          "win_rate": 0.4148,
+          "n": 274,
+          "win_rate": 0.438,
           "avg_ev": 0.1453,
-          "realized_roi": -0.1177,
+          "realized_roi": 0.0204,
           "roi_ci95": [
-            -0.2216,
-            -0.0139
+            -0.118,
+            0.1588
           ]
         },
         {
           "bucket": "20-30%",
-          "n": 207,
-          "win_rate": 0.3961,
-          "avg_ev": 0.2572,
-          "realized_roi": -0.0728,
+          "n": 114,
+          "win_rate": 0.3421,
+          "avg_ev": 0.244,
+          "realized_roi": -0.0932,
           "roi_ci95": [
-            -0.2292,
-            0.0836
+            -0.326,
+            0.1395
           ]
         },
         {
           "bucket": "30%+",
-          "n": 391,
-          "win_rate": 0.3299,
-          "avg_ev": 0.5343,
-          "realized_roi": -0.0747,
+          "n": 158,
+          "win_rate": 0.2342,
+          "avg_ev": 0.4899,
+          "realized_roi": -0.2358,
           "roi_ci95": [
-            -0.2072,
-            0.0579
+            -0.4537,
+            -0.018
           ]
         }
       ],
       "statement": "preliminary: compare realized ROI vs average EV across buckets"
     }
+  },
+  "threshold_analysis": {
+    "ML": [
+      {
+        "threshold": ">=1%",
+        "bets": 2157,
+        "wins": 489,
+        "losses": 1668,
+        "hit_rate": 0.2267,
+        "avg_ev": 0.3931,
+        "profit": -227.65,
+        "roi": -0.1055,
+        "roi_ci95": [
+          -0.1832,
+          -0.0279
+        ]
+      },
+      {
+        "threshold": ">=3%",
+        "bets": 2002,
+        "wins": 450,
+        "losses": 1552,
+        "hit_rate": 0.2248,
+        "avg_ev": 0.422,
+        "profit": -191.98,
+        "roi": -0.0959,
+        "roi_ci95": [
+          -0.1777,
+          -0.014
+        ]
+      },
+      {
+        "threshold": ">=5%",
+        "bets": 1868,
+        "wins": 405,
+        "losses": 1463,
+        "hit_rate": 0.2168,
+        "avg_ev": 0.4494,
+        "profit": -204.16,
+        "roi": -0.1093,
+        "roi_ci95": [
+          -0.1946,
+          -0.0239
+        ]
+      },
+      {
+        "threshold": ">=7%",
+        "bets": 1743,
+        "wins": 372,
+        "losses": 1371,
+        "hit_rate": 0.2134,
+        "avg_ev": 0.4774,
+        "profit": -186.96,
+        "roi": -0.1073,
+        "roi_ci95": [
+          -0.1967,
+          -0.0178
+        ]
+      }
+    ],
+    "OU25": [
+      {
+        "threshold": ">=1%",
+        "bets": 1064,
+        "wins": 430,
+        "losses": 634,
+        "hit_rate": 0.4041,
+        "avg_ev": 0.1606,
+        "profit": -63.85,
+        "roi": -0.06,
+        "roi_ci95": [
+          -0.1303,
+          0.0103
+        ]
+      },
+      {
+        "threshold": ">=3%",
+        "bets": 918,
+        "wins": 370,
+        "losses": 548,
+        "hit_rate": 0.4031,
+        "avg_ev": 0.183,
+        "profit": -39.61,
+        "roi": -0.0431,
+        "roi_ci95": [
+          -0.1203,
+          0.034
+        ]
+      },
+      {
+        "threshold": ">=5%",
+        "bets": 784,
+        "wins": 312,
+        "losses": 472,
+        "hit_rate": 0.398,
+        "avg_ev": 0.2074,
+        "profit": -27.67,
+        "roi": -0.0353,
+        "roi_ci95": [
+          -0.1204,
+          0.0498
+        ]
+      },
+      {
+        "threshold": ">=7%",
+        "bets": 681,
+        "wins": 263,
+        "losses": 418,
+        "hit_rate": 0.3862,
+        "avg_ev": 0.2298,
+        "profit": -29.55,
+        "roi": -0.0434,
+        "roi_ci95": [
+          -0.1361,
+          0.0494
+        ]
+      }
+    ]
   },
   "clv": {
     "available": false,

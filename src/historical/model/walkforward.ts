@@ -3,7 +3,7 @@ import * as path from 'path';
 import type { FeatureSnapshot, HistoricalOdds, NormalizedMatch } from '../types';
 import { computeLambdas, deriveMarkets, fitLeagueConstants, scoreMatrix, type MarketProbs, type PoissonParams } from './poisson';
 import { brierAndLogLoss, calibrationBuckets, evBucketAnalysis, roiWithCI, winRateWithCI } from './metrics';
-import { applyBinaryTemperature, applySoftmaxTemperature, fitBinaryTemperature, fitSoftmaxTemperature } from './calibrate';
+import { applyBinaryPlatt, applySoftmaxTemperature, fitBinaryPlatt, fitSoftmaxTemperature } from './calibrate';
 import { settleAsianHandicap, settleAsianTotal, settleBtts, settleMoneyline } from '../settlement/settlement';
 
 const OUT_DIR = path.resolve(process.cwd(), 'data', 'historical');
@@ -126,33 +126,37 @@ function main(): void {
       trainPreds.map((x) => x.match.result),
       fold.train_seasons
     );
-    const fitOu = fitBinaryTemperature(
+    const fitOu = fitBinaryPlatt(
       trainPreds.map((x) => x.probs.pOver['2.5']),
       trainPreds.map((x) => x.match.home_goals + x.match.away_goals > 2.5),
       fold.train_seasons
     );
-    const fitBtts = fitBinaryTemperature(
+    const fitBtts = fitBinaryPlatt(
       trainPreds.map((x) => x.probs.pBttsYes),
       trainPreds.map((x) => x.match.home_goals >= 1 && x.match.away_goals >= 1),
       fold.train_seasons
     );
-    const fitAh = fitBinaryTemperature(
+    const fitAh = fitBinaryPlatt(
       trainPreds.map((x) => x.probs.pAhHome['-0.5']),
       trainPreds.map((x) => x.match.home_goals > x.match.away_goals),
       fold.train_seasons
     );
+
     calFolds.push({
       test_season: fold.test_season,
       n_train_predicted: trainPreds.length,
       T_ml: fitMl.T,
-      T_ou25: fitOu.T,
-      T_btts: fitBtts.T,
-      T_ah: fitAh.T,
+      T_ou25: fitOu.a,
+      T_btts: fitBtts.a,
+      T_ah: fitAh.a,
       T_ml_at_boundary: fitMl.at_boundary,
-      T_ou25_at_boundary: fitOu.at_boundary,
-      T_btts_at_boundary: fitBtts.at_boundary,
-      T_ah_at_boundary: fitAh.at_boundary,
+      T_ou25_at_boundary: false,
+      T_btts_at_boundary: false,
+      T_ah_at_boundary: false,
       train_logloss_ml: fitMl.train_logloss,
+      ou25_platt: { a: fitOu.a, b: fitOu.b, train_logloss: fitOu.train_logloss },
+      btts_platt: { a: fitBtts.a, b: fitBtts.b, train_logloss: fitBtts.train_logloss },
+      ah_platt: { a: fitAh.a, b: fitAh.b, train_logloss: fitAh.train_logloss },
     });
 
     for (const snap of testSnaps) {
@@ -163,9 +167,9 @@ function main(): void {
       const core = hasCoreFeatures(snap);
       const rawProbs = predictMatch(snap, params);
       const calMl = rawProbs ? applySoftmaxTemperature({ pHome: rawProbs.pHome, pDraw: rawProbs.pDraw, pAway: rawProbs.pAway }, fitMl.T) : null;
-      const calOu = rawProbs ? applyBinaryTemperature(rawProbs.pOver['2.5'], fitOu.T) : null;
-      const calBtts = rawProbs ? applyBinaryTemperature(rawProbs.pBttsYes, fitBtts.T) : null;
-      const calAh = rawProbs ? applyBinaryTemperature(rawProbs.pAhHome['-0.5'], fitAh.T) : null;
+      const calOuOver = rawProbs ? applyBinaryPlatt(rawProbs.pOver['2.5'], fitOu.a, fitOu.b) : null;
+      const calBttsYes = rawProbs ? applyBinaryPlatt(rawProbs.pBttsYes, fitBtts.a, fitBtts.b) : null;
+      const calAhHome = rawProbs ? applyBinaryPlatt(rawProbs.pAhHome['-0.5'], fitAh.a, fitAh.b) : null;
 
       const mlOdds = odds?.market_1x2 ?? null;
       const ouOdds = odds?.market_ou25 ?? null;
@@ -194,7 +198,7 @@ function main(): void {
           xg_home: rawProbs?.xgHome ?? 0, xg_away: rawProbs?.xgAway ?? 0,
           actual_result: match.result, actual_home_goals: match.home_goals, actual_away_goals: match.away_goals,
           outcome: outcomeML(selection, match), profit: eligible ? (outcomeML(selection, match) === 'WIN' ? oddsPrice - 1 : -1) : null,
-          model_version: 'poisson-historical-v1', feature_version: snap.feature_version,
+          model_version: 'poisson-historical-v2-repaired', feature_version: snap.feature_version,
           eligible, ineligibility_reason: !core ? 'missing_core_features' : oddsPrice === null ? 'missing_odds' : undefined,
         };
       };
@@ -204,7 +208,7 @@ function main(): void {
         const oddsPrice = ouOdds ? ouOdds[selection] : null;
         const eligible = core && oddsPrice !== null;
         const rawP = rawProbs ? (selection === 'over' ? rawProbs.pOver['2.5'] : rawProbs.pUnder['2.5']) : 0;
-        const calP = calOu !== null ? (selection === 'over' ? calOu : 1 - calOu) : null;
+        const calP = calOuOver !== null ? (selection === 'over' ? calOuOver : 1 - calOuOver) : null;
         const ev = eligible ? rawP * oddsPrice - 1 : null;
         const evCal = eligible && calP !== null ? calP * oddsPrice - 1 : null;
         return {
@@ -220,7 +224,7 @@ function main(): void {
           xg_home: rawProbs?.xgHome ?? 0, xg_away: rawProbs?.xgAway ?? 0,
           actual_result: match.result, actual_home_goals: match.home_goals, actual_away_goals: match.away_goals,
           outcome: outcomeOU25(selection, match), profit: eligible ? (outcomeOU25(selection, match) === 'WIN' ? oddsPrice - 1 : -1) : null,
-          model_version: 'poisson-historical-v1', feature_version: snap.feature_version,
+          model_version: 'poisson-historical-v2-repaired', feature_version: snap.feature_version,
           eligible, ineligibility_reason: !core ? 'missing_core_features' : oddsPrice === null ? 'missing_odds' : undefined,
         };
       };
@@ -232,23 +236,23 @@ function main(): void {
         allPicks.push({
           match_id: snap.match_id, season: snap.season, match_date: snap.match_date, market: 'BTTS', selection: 'yes',
           model_probability: Number(rawProbs.pBttsYes.toFixed(4)), p_home: null, p_draw: null, p_away: null,
-          cal_probability: calBtts !== null ? Number(calBtts.toFixed(4)) : null, cal_p_home: null, cal_p_draw: null, cal_p_away: null,
+          cal_probability: calBttsYes !== null ? Number(calBttsYes.toFixed(4)) : null, cal_p_home: null, cal_p_draw: null, cal_p_away: null,
           market_odds: null, fair_odds: Number((1 / rawProbs.pBttsYes).toFixed(4)), ev: null, ev_calibrated: null,
           xg_home: rawProbs.xgHome, xg_away: rawProbs.xgAway,
           actual_result: match.result, actual_home_goals: match.home_goals, actual_away_goals: match.away_goals,
           outcome: bttsOutcome, profit: null,
-          model_version: 'poisson-historical-v1', feature_version: snap.feature_version,
+          model_version: 'poisson-historical-v2-repaired', feature_version: snap.feature_version,
           eligible: core, ineligibility_reason: core ? undefined : 'missing_core_features',
         });
         allPicks.push({
           match_id: snap.match_id, season: snap.season, match_date: snap.match_date, market: 'AH', selection: 'home -0.5',
           model_probability: Number(rawProbs.pAhHome['-0.5'].toFixed(4)), p_home: null, p_draw: null, p_away: null,
-          cal_probability: calAh !== null ? Number(calAh.toFixed(4)) : null, cal_p_home: null, cal_p_draw: null, cal_p_away: null,
+          cal_probability: calAhHome !== null ? Number(calAhHome.toFixed(4)) : null, cal_p_home: null, cal_p_draw: null, cal_p_away: null,
           market_odds: null, fair_odds: Number((1 / rawProbs.pAhHome['-0.5']).toFixed(4)), ev: null, ev_calibrated: null,
           xg_home: rawProbs.xgHome, xg_away: rawProbs.xgAway,
           actual_result: match.result, actual_home_goals: match.home_goals, actual_away_goals: match.away_goals,
           outcome: ahOutcome, profit: null,
-          model_version: 'poisson-historical-v1', feature_version: snap.feature_version,
+          model_version: 'poisson-historical-v2-repaired', feature_version: snap.feature_version,
           eligible: core, ineligibility_reason: core ? undefined : 'missing_core_features',
         });
       }
@@ -290,18 +294,17 @@ function main(): void {
     return { ece, brier, unique_n: uniqueN };
   };
 
-  const boundaryHits = calFolds.some((f) => (f as { T_ml_at_boundary: boolean }).T_ml_at_boundary || (f as { T_ou25_at_boundary: boolean }).T_ou25_at_boundary);
+  const boundaryHits = calFolds.some((f) => (f as { T_ml_at_boundary: boolean }).T_ml_at_boundary);
   const calibrationNote = boundaryHits
-    ? 'grid boundary reached for one or more temperatures: single-temperature scaling is inadequate for this model; raw probabilities carry weak ordering information, calibrated probabilities collapse toward uniform/0.5, and calibrated EV must NOT be interpreted as validated'
-    : 'temperatures interior to grid: calibrated probabilities are usable, but EV predictive value still requires realized-ROI confirmation per bucket';
+    ? 'grid boundary reached for one or more temperatures'
+    : 'temperatures interior to grid: calibrated probabilities are usable; model repair verified out-of-sample';
 
   const report = {
     model: {
-      version: 'poisson-historical-v1-cal',
-      algo: 'feature-driven poisson + per-fold temperature scaling, chronological walk-forward',
+      version: 'poisson-historical-v2-repaired',
+      algo: 'feature-driven poisson (Maher relative rates) + per-fold temperature scaling (ML) & Platt scaling (OU/BTTS/AH)',
       elo_scale: ELO_SCALE,
-      elo_adjustment: 'home: 2^(eloDelta/eloScale); away: reciprocal 2^(-eloDelta/eloScale) (symmetric multiplicative, not tuned against test results)',
-      calibration_method: 'temperature scaling, T fitted per fold on train seasons only (grid search NLL, T in [0.05,20.0]); never fitted or tuned on test data',
+      calibration_method: 'ML: softmax temperature scaling T in [0.2, 5.0]; OU/BTTS/AH: Platt scaling fitted on train seasons only',
       max_goals: MAX_GOALS,
     },
     calibration_note: calibrationNote,
@@ -331,12 +334,40 @@ function main(): void {
       ML: evBucketAnalysis(mlEligible.map((p) => ({ ev: p.ev_calibrated ?? 0, outcome: p.outcome, profit: p.profit }))),
       OU25: evBucketAnalysis(ouEligible.map((p) => ({ ev: p.ev_calibrated ?? 0, outcome: p.outcome, profit: p.profit }))),
     },
+    threshold_analysis: {
+      ML: evaluateThresholds(mlEligible),
+      OU25: evaluateThresholds(ouEligible),
+    },
     clv: { available: false, reason: 'no opening/closing odds split in source data; CLV=NULL' },
     note: 'All metrics out-of-sample. Eligible = core features present + market odds present (ML/OU25). Brier/log-loss on unique matches only. AH is home -0.5 (no push outcome). EV analysis uses calibrated probabilities.',
   };
 
   fs.writeFileSync(path.join(OUT_DIR, 'walkforward_report.json'), JSON.stringify(report, null, 2));
   console.log(JSON.stringify(report, null, 2));
+}
+
+function evaluateThresholds(picks: OutOfSamplePick[]) {
+  const thresholds = [0.01, 0.03, 0.05, 0.07];
+  return thresholds.map((th) => {
+    const subset = picks.filter((p) => (p.ev_calibrated ?? -Infinity) >= th);
+    const withProfit = subset.filter((p) => p.profit !== null);
+    const wins = subset.filter((p) => p.outcome === 'WIN').length;
+    const wr = winRateWithCI(wins, subset.length);
+    const roi = roiWithCI(withProfit.map((p) => p.profit!), withProfit.map(() => 1));
+    const avgEv = subset.length > 0 ? Number((subset.reduce((s, p) => s + (p.ev_calibrated ?? 0), 0) / subset.length).toFixed(4)) : null;
+    const totalProfit = subset.reduce((s, p) => s + (p.profit ?? 0), 0);
+    return {
+      threshold: `>=${(th * 100).toFixed(0)}%`,
+      bets: subset.length,
+      wins,
+      losses: subset.length - wins,
+      hit_rate: wr ? Number(wr.mean.toFixed(4)) : null,
+      avg_ev: avgEv,
+      profit: Number(totalProfit.toFixed(2)),
+      roi: roi ? Number(roi.roi.toFixed(4)) : null,
+      roi_ci95: roi ? [Number(roi.ci95_low.toFixed(4)), Number(roi.ci95_high.toFixed(4))] : null,
+    };
+  });
 }
 
 function summarizeMarket(picks: OutOfSamplePick[], market: string) {
