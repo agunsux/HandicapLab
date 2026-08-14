@@ -1,0 +1,12 @@
+{
+  "iterations": 1000,
+  "actual_roi": -7.93,
+  "placebo_mean_roi": -2.94,
+  "placebo_stdev_roi": 3.31,
+  "placebo_p_value": 0.071,
+  "empirical_95_range": [
+    -9.26,
+    4.05
+  ],
+  "verdict": "CONSISTENT_WITH_NULL_VARIANCE"
+}

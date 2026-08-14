@@ -1,0 +1,72 @@
+{
+  "folds": [
+    {
+      "fold_index": 1,
+      "test_season": "2022-2023",
+      "train_seasons": [
+        "2022-2023"
+      ],
+      "train_n": 760,
+      "test_n": 380,
+      "selected_rule": "EV ≥ 3% + Pinnacle Sharp Reference",
+      "test_bets": 712,
+      "test_win_rate": 24.86,
+      "test_roi": -18.02,
+      "test_clv": 1.52,
+      "test_drawdown": 134.4
+    },
+    {
+      "fold_index": 2,
+      "test_season": "2023-2024",
+      "train_seasons": [
+        "2022-2023",
+        "2023-2024"
+      ],
+      "train_n": 1140,
+      "test_n": 380,
+      "selected_rule": "EV ≥ 3% + Pinnacle Sharp Reference",
+      "test_bets": 808,
+      "test_win_rate": 25,
+      "test_roi": -15.35,
+      "test_clv": 1.52,
+      "test_drawdown": 125.24
+    },
+    {
+      "fold_index": 3,
+      "test_season": "2024-2025",
+      "train_seasons": [
+        "2022-2023",
+        "2023-2024",
+        "2024-2025"
+      ],
+      "train_n": 1520,
+      "test_n": 380,
+      "selected_rule": "EV ≥ 3% + Pinnacle Sharp Reference",
+      "test_bets": 732,
+      "test_win_rate": 30.19,
+      "test_roi": -0.53,
+      "test_clv": 1.52,
+      "test_drawdown": 52.04
+    },
+    {
+      "fold_index": 4,
+      "test_season": "2025-2026",
+      "train_seasons": [
+        "2022-2023",
+        "2023-2024",
+        "2024-2025",
+        "2025-2026"
+      ],
+      "train_n": 1900,
+      "test_n": 380,
+      "selected_rule": "EV ≥ 3% + Pinnacle Sharp Reference",
+      "test_bets": 668,
+      "test_win_rate": 32.93,
+      "test_roi": 3.69,
+      "test_clv": 1.52,
+      "test_drawdown": 22.92
+    }
+  ],
+  "overall_walkforward_roi": -7.93,
+  "overall_walkforward_clv": 1.52
+}
