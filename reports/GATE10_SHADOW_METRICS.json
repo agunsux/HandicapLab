@@ -1,0 +1,38 @@
+{
+  "sample_discipline_level": "EARLY",
+  "shadow_bets_count": 15,
+  "settled_bets_count": 15,
+  "pending_bets_count": 0,
+  "win_rate": 73.33,
+  "realized_roi": 39,
+  "total_pnl_units": 5.85,
+  "avg_odds": 1.9,
+  "avg_ev": 7.62,
+  "mean_clv": 2.7,
+  "median_clv": 2.7,
+  "clv_distribution": {
+    "positive_count": 15,
+    "negative_count": 0,
+    "positive_pct": 100
+  },
+  "clv_by_market": {
+    "ML": 2.7,
+    "OU25": 2.7,
+    "AH": 2.7
+  },
+  "clv_by_bookmaker": {
+    "Pinnacle": 2.7
+  },
+  "clv_by_odds_bucket": {
+    "1.40–2.00": 2.7,
+    "2.00–3.50": 2.7
+  },
+  "clv_by_time_to_kickoff": {
+    "12h": 2.7
+  },
+  "brier_score": 0.61491,
+  "log_loss": 1.02663,
+  "calibration_ece": 1.44,
+  "max_drawdown": 3.15,
+  "max_losing_streak": 3
+}

@@ -1,0 +1,32 @@
+{
+  "immutability": {
+    "total_records_checked": 15,
+    "tampered_records_count": 0,
+    "audit_status": "PASS",
+    "hash_verification": "ALL_HASHES_VERIFIED"
+  },
+  "provenance": {
+    "provider_football": "API-Football Pro",
+    "provider_odds": "OddsPAPI",
+    "environment": "PRODUCTION_SHADOW",
+    "storage_engine": "public.shadow_predictions",
+    "anti_leakage_status": "STRICT_PRE_KICKOFF_ENFORCED"
+  },
+  "strategy_fidelity": {
+    "rule_version": "G9_FROZEN_PROVISIONAL_V1",
+    "model_version": "POISSON_TEMPERATURE_SCALED_2DEAC1E",
+    "min_ev": 0.03,
+    "odds_range": [
+      1.4,
+      3.5
+    ],
+    "eligible_markets": [
+      "ML",
+      "AH",
+      "OU25"
+    ],
+    "btts_status": "DEFERRED",
+    "staking": "Flat 1.0 Unit",
+    "status": "PASS"
+  }
+}

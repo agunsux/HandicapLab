@@ -1,0 +1,20 @@
+{
+  "fixtures_discovered": 5,
+  "fixtures_valid_kickoff": 5,
+  "fixtures_with_odds": 5,
+  "market_events_total": 20,
+  "eligible_market_events": 30,
+  "shadow_bets_locked": 15,
+  "settled_shadow_bets": 15,
+  "rejections_by_reason": {
+    "KICKOFF_IN_PAST": 0,
+    "STALE_ODDS": 5,
+    "UNSUPPORTED_MARKET": 5,
+    "EV_BELOW_THRESHOLD": 0,
+    "ODDS_OUT_OF_BOUNDS": 5,
+    "DUPLICATE_POSITION": 0,
+    "MISSING_PROBABILITY": 0,
+    "INVALID_KICKOFF_TIMESTAMP": 0
+  },
+  "reconciliation_status": "PASS"
+}
