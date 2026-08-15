@@ -103,9 +103,14 @@ async function resolveRecord(row: any, supabase: any): Promise<ResolvedRecord> {
 
   if ((!home || !away || !kickoff || !providerFixtureId) && matchId) {
     try {
+      // NOTE: only columns that exist on the live production `matches` table
+      // may be selected here. `external_match_id` and `source` are defined in
+      // an early migration but are absent from the deployed schema (verified in
+      // production: `column matches.external_match_id does not exist`), and a
+      // PostgREST 400 on the join silently left every record SCHEMA_INVALID.
       const { data: match, error: matchError } = await supabase
         .from('matches')
-        .select('id, external_match_id, home_team, away_team, kickoff, league, source')
+        .select('id, home_team, away_team, kickoff, league')
         .eq('id', matchId)
         .maybeSingle();
       if (matchError) {
