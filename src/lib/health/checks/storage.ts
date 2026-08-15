@@ -9,7 +9,7 @@ export class StorageCheck implements HealthCheck {
   public async run(): Promise<Omit<HealthCheckResult, 'latency_ms' | 'timestamp'>> {
     try {
       const apiFootballKey = process.env.APIFOOTBALL_KEY || process.env.API_FOOTBALL_KEY;
-      const oddsApiKey = process.env.ODDS_PAPI_KEY || process.env.ODDSPAPI_KEY || process.env.THE_ODDS_API_KEY;
+      const oddsApiKey = process.env.ODDS_PAPI_KEY;
 
       const missingVars: string[] = [];
       if (!process.env.NEXT_PUBLIC_SUPABASE_URL && !process.env.SUPABASE_URL) missingVars.push('SUPABASE_URL');

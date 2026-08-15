@@ -122,7 +122,7 @@ describe('Phase 8.5: System Hardening & Public Trust Layer', () => {
     process.env.SUPABASE_SERVICE_ROLE_KEY = 'sb_secret_dummy';
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = 'sb_publishable_dummy';
     process.env.API_FOOTBALL_KEY = 'dummy_key';
-    process.env.ODDSPAPI_KEY = 'dummy_key';
+    process.env.ODDS_PAPI_KEY = 'dummy_key';
   });
 
   describe('Kelly Criterion Engine (kelly.ts)', () => {

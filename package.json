@@ -19,6 +19,10 @@
     "historical:gold": "tsx src/historical/gold/run.ts",
     "historical:walkforward": "tsx src/historical/model/walkforward.ts",
     "historical:engine": "tsx src/historical/engine/run.ts",
+    "historical:real-odds-ingest": "tsx src/historical/realOdds/ingest.ts",
+    "historical:real-odds-validation": "tsx src/historical/realOdds/validate.ts",
+    "historical:three-regime": "tsx src/historical/regime/analyze.ts",
+    "historical:odds-250-299": "tsx src/historical/odds250/validate.ts",
     "phase2b:research": "tsx src/historical/research/phase2b/runner.ts",
     "test": "vitest run",
     "backtest:level2": "tsx src/scripts/backtest-level2-production.ts",
@@ -48,7 +52,9 @@
     "epic32:phase8": "tsx -e \"const{runBaselines}=require('./src/pipelines/baselines/research-baselines');runBaselines().then(r=>console.log(JSON.stringify(r,null,2)))\"",
     "epic32:phases1-5": "tsx -e \"const{runPipeline}=require('./src/pipelines/orchestrator');runPipeline({phases:[1,2,3,4,5]}).then(r=>console.log(JSON.stringify(r,null,2)))\"",
     "epic32:phases6-10": "tsx -e \"const{runPipeline}=require('./src/pipelines/orchestrator');runPipeline({phases:[6,7,8,9,10]}).then(r=>console.log(JSON.stringify(r,null,2)))\"",
-    "pipeline": "tsx src/pipeline/cli/run-pipeline.ts"
+    "pipeline": "tsx src/pipeline/cli/run-pipeline.ts",
+    "verify:oddspapi-production": "node scripts/verify-oddspapi-production.mjs",
+    "verify:providers": "node scripts/canonical_provider_probe.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",

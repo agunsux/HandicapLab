@@ -44,7 +44,7 @@ export const PROVIDER_CATALOG: ProviderConfig[] = [
     id: 'oddspapi',
     name: 'OddsPAPI',
     providerType: 'odds',
-    baseUrl: 'https://api.oddspapi.com/v1',
+    baseUrl: 'https://api.oddspapi.io/v4',
     rateLimitPerMin: 120,
     isActive: true,
   },

@@ -1,0 +1,15 @@
+{
+  "oddspapi_records_received": 0,
+  "valid_records": 0,
+  "duplicate_records": 0,
+  "unmatched_fixtures": 0,
+  "matched_fixtures": 0,
+  "unmatched_markets": 0,
+  "matched_markets": 0,
+  "matched_predictions": 0,
+  "matched_250_299_opportunities": 0,
+  "oddspapi_data_present": false,
+  "credential_status": "BLOCKED — ODDS_PAPI_KEY resolves to empty string locally (phase_e2); prior key rejected HTTP 401 INVALID_API_KEY",
+  "blocked_reason": "No OddsPAPI data has been ingested anywhere in the repository; the only 2026+ odds are football-data.co.uk Pinnacle (not OddsPAPI). Per EPIC section 3/4, OddsPAPI is the sole acceptable C3 source and substitution is forbidden.",
+  "decision": "C3_VALIDATION_BLOCKED"
+}

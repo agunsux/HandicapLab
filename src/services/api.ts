@@ -85,19 +85,23 @@ export const oddsApiClient = {
   }
 };
 
-// API 5: OddsPAPI (Odds Comparison, Line Movements)
+// API 5: OddsPAPI.io (Canonical Bookmaker Odds)
 export const oddsPapi = {
   async get(url: string, config?: any) {
-    const baseURL = 'https://api.oddspapi.com/v1';
+    const baseURL = 'https://api.oddspapi.io/v4';
     const params = new URLSearchParams(config?.params || {});
-    const fullUrl = `${baseURL}${url}${params.toString() ? '?' + params.toString() : ''}`;
-    const headers = {
-      'x-api-key': process.env.ODDS_PAPI_KEY || process.env.ODDSPAPI_KEY || '',
-    };
+    const apiKey = process.env.ODDS_PAPI_KEY || '';
+    if (apiKey) {
+      params.set('apiKey', apiKey);
+    }
+    const queryString = params.toString();
+    const fullUrl = `${baseURL}${url}${queryString ? '?' + queryString : ''}`;
 
     const response = await globalGateway.fetch('oddspapi', url, fullUrl, {
       method: 'GET',
-      headers,
+      headers: {
+        'Accept': 'application/json',
+      },
       cacheTtlMs: 300000, // 5 min
     });
 
@@ -343,7 +347,7 @@ export async function fetchLiveMatches(): Promise<Match[]> {
   }
 
   // Try 3: OddsPAPI live
-  const opKey = process.env.ODDS_PAPI_KEY || process.env.ODDSPAPI_KEY;
+  const opKey = process.env.ODDS_PAPI_KEY;
   if (isKeyValid(opKey)) {
     try {
       const res = await oddsPapi.get('/matches/live');
@@ -457,44 +461,15 @@ export async function fetchOdds(
   regions: string = 'eu',
   tick: number = 0
 ): Promise<MatchOdds[]> {
-  // Try 1: The Odds API
-  const oddsKey =
-    process.env.VITE_THE_ODDS_API_KEY ||
-    process.env.VITE_ODDS_API_KEY ||
-    process.env.NEXT_PUBLIC_ODDS_API_KEY;
-  if (isKeyValid(oddsKey)) {
-    try {
-      const res = await oddsApiClient.get(`/sports/${sport}/odds`, {
-        params: { apiKey: oddsKey, regions, markets: 'h2h,totals,spreads,btts', oddsFormat: 'decimal' },
-      });
-      const odds = transformOddsApi(res.data);
-      if (odds.length > 0) return odds;
-    } catch (err) {
-      console.warn('[API Service] The Odds API failed, trying OddsPAPI:', err);
-    }
-  }
-
-  // Try 2: OddsPAPI
-  const opKey = process.env.ODDS_PAPI_KEY || process.env.ODDSPAPI_KEY;
+  // Canonical Provider: OddsPAPI.io
+  const opKey = process.env.ODDS_PAPI_KEY;
   if (isKeyValid(opKey)) {
     try {
-      const res = await oddsPapi.get('/odds');
+      const res = await oddsPapi.get('/odds', { params: { sport, regions, markets: 'h2h,spreads,totals,btts' } });
       const odds = transformOddsPapi(res.data);
       if (odds.length > 0) return odds;
     } catch (err) {
-      console.warn('[API Service] OddsPAPI failed, trying API-Football odds:', err);
-    }
-  }
-
-  // Try 3: API-Football (odds)
-  const afKey = process.env.VITE_APIFOOTBALL_KEY || process.env.NEXT_PUBLIC_APIFOOTBALL_KEY || process.env.API_FOOTBALL_KEY;
-  if (isKeyValid(afKey)) {
-    try {
-      const res = await apiFootball.get('/odds', { params: { date: new Date().toISOString().split('T')[0] } });
-      const odds = transformApiFootballOdds(res.data?.response);
-      if (odds.length > 0) return odds;
-    } catch (err) {
-      console.warn('[API Service] API-Football odds failed:', err);
+      console.warn('[API Service] OddsPAPI odds fetch failed:', err);
     }
   }
 
@@ -504,25 +479,13 @@ export async function fetchOdds(
 }
 
 export async function fetchOddsHistory(eventId: string): Promise<any> {
-  const opKey = process.env.ODDS_PAPI_KEY || process.env.ODDSPAPI_KEY;
+  const opKey = process.env.ODDS_PAPI_KEY;
   if (isKeyValid(opKey)) {
     try {
       const res = await oddsPapi.get('/odds/movement', { params: { match_id: eventId } });
       if (res.data) return res.data;
     } catch (err) {
       console.warn('[API Service] OddsPAPI movement failed:', err);
-    }
-  }
-
-  const oddsKey = process.env.VITE_THE_ODDS_API_KEY || process.env.VITE_ODDS_API_KEY || process.env.NEXT_PUBLIC_ODDS_API_KEY;
-  if (isKeyValid(oddsKey)) {
-    try {
-      const res = await oddsApiClient.get(`/historical/sports/soccer_epl/odds`, {
-        params: { apiKey: oddsKey, date: new Date().toISOString() },
-      });
-      if (res.data) return res.data;
-    } catch (err) {
-      console.warn('[API Service] The Odds API historical failed:', err);
     }
   }
 

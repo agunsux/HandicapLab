@@ -13,7 +13,7 @@ export class ProviderCredentialCheck implements HealthCheck {
   }> {
     const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production';
     const apiFootballKey = process.env.APIFOOTBALL_KEY || process.env.API_FOOTBALL_KEY;
-    const oddsApiKey = process.env.ODDS_PAPI_KEY || process.env.ODDSPAPI_KEY || process.env.THE_ODDS_API_KEY;
+    const oddsApiKey = process.env.ODDS_PAPI_KEY;
 
     const hasApiFootball = !!(apiFootballKey && apiFootballKey.trim().length > 0);
     const hasOddsApi = !!(oddsApiKey && oddsApiKey.trim().length > 0);

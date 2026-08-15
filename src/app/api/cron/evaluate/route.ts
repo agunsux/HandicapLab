@@ -1,20 +1,5 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase.server';
-import { footyStatsApi, FootyStatsMatch } from '@/services/footystats.api';
-
-// Utility to mock or fetch real result
-async function fetchMatchResult(footystats_id: number): Promise<{ home_goals: number, away_goals: number }> {
-  // In a real scenario, call FootyStats API for specific match result
-  // If we are using mock, return random result
-  if (!process.env.FOOTYSTATS_API_KEY || process.env.FOOTYSTATS_API_KEY === 'mock') {
-    return {
-      home_goals: Math.floor(Math.random() * 4),
-      away_goals: Math.floor(Math.random() * 4)
-    };
-  }
-  // TODO: implement actual FootyStats endpoint for single match result
-  return { home_goals: 0, away_goals: 0 };
-}
 
 // TODO: Sprint 6 Refactor - Settle cron evaluate route should be consolidated with Sprint 5 closed-loop settlement engine and edge stats tracking
 

@@ -1,55 +1,53 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ChevronDown, ChevronRight, CheckCircle2, XCircle, MinusCircle } from 'lucide-react';
+import { ChevronDown, ChevronRight, CheckCircle2, XCircle, MinusCircle, ShieldCheck } from 'lucide-react';
 import ExpandableMatchDetail from './ExpandableMatchDetail';
 
-// Mock data for initial UI
-const mockPredictions = [
-  {
-    id: 'pred-001',
-    kickoff: '2026-07-28T14:00:00Z',
-    league: 'Premier League',
-    home: 'Arsenal',
-    away: 'Brighton',
-    market: 'Moneyline',
-    prediction: 'Arsenal',
-    probability: 63,
-    fairOdds: 1.59,
-    bookmakerOdds: 1.92,
-    ev: 17,
-    closingOdds: 1.83,
-    clv: 0.09,
-    result: 'WIN',
-    profit: 0.92,
-    confidence: 81
-  },
-  {
-    id: 'pred-002',
-    kickoff: '2026-07-28T16:30:00Z',
-    league: 'Serie A',
-    home: 'Juventus',
-    away: 'Napoli',
-    market: 'Over 2.5',
-    prediction: 'Over 2.5',
-    probability: 52,
-    fairOdds: 1.92,
-    bookmakerOdds: 2.10,
-    ev: 9.2,
-    closingOdds: 2.05,
-    clv: 0.05,
-    result: 'LOSS',
-    profit: -1.0,
-    confidence: 65
-  }
-];
+export interface AuditPredictionRow {
+  id: string;
+  kickoff: string;
+  league: string;
+  home: string;
+  away: string;
+  market: string;
+  prediction: string;
+  probability: number;
+  fairOdds: number;
+  bookmakerOdds: number;
+  ev: number;
+  closingOdds?: number;
+  clv?: number;
+  result?: 'WIN' | 'LOSS' | 'PUSH' | 'PENDING';
+  profit?: number;
+  confidence?: number;
+}
 
-export default function PredictionTable({ searchParams }: { searchParams: any }) {
+export default function PredictionTable({
+  predictions = [],
+}: {
+  predictions?: AuditPredictionRow[];
+  searchParams?: any;
+}) {
   const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>({});
 
   const toggleRow = (id: string) => {
-    setExpandedRows(prev => ({ ...prev, [id]: !prev[id] }));
+    setExpandedRows((prev) => ({ ...prev, [id]: !prev[id] }));
   };
+
+  if (!predictions || predictions.length === 0) {
+    return (
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-12 text-center shadow-sm">
+        <ShieldCheck className="w-10 h-10 text-emerald-500 mx-auto mb-3 opacity-80" />
+        <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-1">
+          NO VERIFIED PREDICTIONS AVAILABLE
+        </h3>
+        <p className="text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto">
+          Prediction ledger is currently tracking verified upcoming matches. Predictions will populate upon model pipeline execution.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-sm overflow-hidden">
@@ -70,9 +68,9 @@ export default function PredictionTable({ searchParams }: { searchParams: any })
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-            {mockPredictions.map((pred) => (
+            {predictions.map((pred) => (
               <React.Fragment key={pred.id}>
-                <tr 
+                <tr
                   className="hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition-colors"
                   onClick={() => toggleRow(pred.id)}
                 >
@@ -83,45 +81,74 @@ export default function PredictionTable({ searchParams }: { searchParams: any })
                       <ChevronRight className="w-4 h-4 text-slate-400" />
                     )}
                   </td>
-                  <td className="px-4 py-4 whitespace-nowrap text-slate-600 dark:text-slate-300">
-                    {new Date(pred.kickoff).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    <div className="text-xs text-slate-400">{new Date(pred.kickoff).toLocaleDateString()}</div>
+                  <td className="px-4 py-4 text-slate-600 dark:text-slate-300 whitespace-nowrap">
+                    {new Date(pred.kickoff).toLocaleDateString(undefined, {
+                      month: 'short',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
                   </td>
-                  <td className="px-4 py-4">
-                    <div className="font-semibold text-slate-900 dark:text-white">{pred.home} vs {pred.away}</div>
-                    <div className="text-xs text-slate-500">{pred.league}</div>
+                  <td className="px-4 py-4 font-medium text-slate-900 dark:text-white">
+                    <div>
+                      {pred.home} vs {pred.away}
+                    </div>
+                    <span className="text-xs text-slate-400">{pred.league}</span>
                   </td>
-                  <td className="px-4 py-4">
-                    <div className="font-medium text-slate-900 dark:text-white">{pred.prediction}</div>
-                    <div className="text-xs text-slate-500">{pred.market}</div>
+                  <td className="px-4 py-4 text-slate-700 dark:text-slate-200">
+                    <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+                      {pred.prediction}
+                    </span>
+                    <span className="text-xs text-slate-400 block">{pred.market}</span>
                   </td>
-                  <td className="px-4 py-4 text-right font-medium text-slate-900 dark:text-white">
-                    {pred.probability}%
+                  <td className="px-4 py-4 text-right font-mono text-slate-700 dark:text-slate-300">
+                    {pred.probability.toFixed(1)}%
                   </td>
-                  <td className="px-4 py-4 text-right">
-                    <div className="text-slate-900 dark:text-white">{pred.bookmakerOdds.toFixed(2)}</div>
-                    <div className="text-xs text-slate-500">Fair: {pred.fairOdds.toFixed(2)}</div>
+                  <td className="px-4 py-4 text-right font-mono text-slate-700 dark:text-slate-300">
+                    {pred.bookmakerOdds.toFixed(2)}
                   </td>
-                  <td className="px-4 py-4 text-right font-medium text-emerald-600 dark:text-emerald-400">
-                    +{pred.ev}%
+                  <td className="px-4 py-4 text-right font-mono font-medium text-emerald-600 dark:text-emerald-400">
+                    {pred.ev > 0 ? `+${pred.ev.toFixed(1)}%` : `${pred.ev.toFixed(1)}%`}
                   </td>
-                  <td className="px-4 py-4 text-right font-medium text-blue-600 dark:text-blue-400">
-                    +{pred.clv.toFixed(2)}
+                  <td className="px-4 py-4 text-right font-mono text-slate-500">
+                    {pred.clv !== undefined ? `${(pred.clv * 100).toFixed(1)}%` : '-'}
                   </td>
                   <td className="px-4 py-4 text-center">
-                    {pred.result === 'WIN' && <CheckCircle2 className="w-5 h-5 text-emerald-500 mx-auto" />}
-                    {pred.result === 'LOSS' && <XCircle className="w-5 h-5 text-rose-500 mx-auto" />}
-                    {pred.result === 'PUSH' && <MinusCircle className="w-5 h-5 text-slate-400 mx-auto" />}
+                    {pred.result === 'WIN' && (
+                      <span className="inline-flex items-center text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
+                        <CheckCircle2 className="w-3.5 h-3.5 mr-1" /> WIN
+                      </span>
+                    )}
+                    {pred.result === 'LOSS' && (
+                      <span className="inline-flex items-center text-xs font-semibold px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300">
+                        <XCircle className="w-3.5 h-3.5 mr-1" /> LOSS
+                      </span>
+                    )}
+                    {(!pred.result || pred.result === 'PENDING') && (
+                      <span className="inline-flex items-center text-xs font-medium text-slate-500">
+                        <MinusCircle className="w-3.5 h-3.5 mr-1" /> PENDING
+                      </span>
+                    )}
                   </td>
-                  <td className={`px-4 py-4 text-right font-bold ${
-                    pred.profit > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
-                  }`}>
-                    {pred.profit > 0 ? '+' : ''}{pred.profit.toFixed(2)}
+                  <td
+                    className={`px-4 py-4 text-right font-mono font-semibold ${
+                      (pred.profit ?? 0) > 0
+                        ? 'text-emerald-600 dark:text-emerald-400'
+                        : (pred.profit ?? 0) < 0
+                        ? 'text-rose-600 dark:text-rose-400'
+                        : 'text-slate-400'
+                    }`}
+                  >
+                    {pred.profit !== undefined
+                      ? pred.profit > 0
+                        ? `+${pred.profit.toFixed(2)}`
+                        : pred.profit.toFixed(2)
+                      : '-'}
                   </td>
                 </tr>
                 {expandedRows[pred.id] && (
                   <tr>
-                    <td colSpan={10} className="px-0 py-0 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
+                    <td colSpan={10} className="p-0 border-b border-slate-200 dark:border-slate-800">
                       <ExpandableMatchDetail predictionId={pred.id} />
                     </td>
                   </tr>

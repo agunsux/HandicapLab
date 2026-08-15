@@ -1,4 +1,4 @@
-// OddsPAPI HTTP Client — Preconfigured HttpClient for OddsPAPI (oddspapi.com)
+// OddsPAPI HTTP Client — Preconfigured HttpClient for OddsPAPI (oddspapi.io)
 // Location: src/lib/data/providers/odds/client.ts
 // Base: https://api.oddspapi.io/v4
 // Rate limit: 30 requests/minute on basic plan

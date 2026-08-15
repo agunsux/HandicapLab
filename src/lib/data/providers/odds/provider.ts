@@ -1,6 +1,6 @@
 // OddsPAPI Provider — IOddsProvider Implementation
 // Location: src/lib/data/providers/odds/provider.ts
-// Provider: OddsPAPI (oddspapi.com)
+// Provider: OddsPAPI (oddspapi.io)
 // Responsibilities: fetch odds, validate response, normalize
 // Does NOT: save to DB, make predictions, calculate EV/Kelly
 
@@ -33,7 +33,7 @@ export class OddsApiProvider implements IOddsProvider {
     // Determine sport key — default to soccer
     const sport = 'soccer_epl'; // Will be configurable in production
 
-    // OddsPAPI uses x-api-key header (configured in client.ts), not query param
+    // OddsPAPI uses apiKey query param (configured in client.ts)
     const queryParams: Record<string, string | number | undefined> = {
       regions,
       markets,

@@ -45,7 +45,7 @@ const DEFAULT_CONFIG: ProviderApiConfig = {
   },
   oddsPapi: {
     baseUrl: 'https://api.oddspapi.io/v4',
-    apiKey: process.env.ODDS_PAPI_KEY || process.env.ODDSPAPI_KEY || '',
+    apiKey: process.env.ODDS_PAPI_KEY || '',
     rateLimitRequests: 30,
     rateLimitWindowMs: 60_000,
   },
