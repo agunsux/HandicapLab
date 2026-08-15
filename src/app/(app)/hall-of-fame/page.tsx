@@ -32,6 +32,9 @@ export default function HallOfFamePage() {
     }
   };
 
+  const hallOfFame = data?.hallOfFame || [];
+  const hallOfShame = data?.hallOfShame || [];
+
   return (
     <div className="min-h-screen bg-[#0A0D14] text-slate-100 font-mono p-6 space-y-6">
       {/* Header */}
@@ -47,7 +50,7 @@ export default function HallOfFamePage() {
             </span>
           </div>
           <p className="text-xs text-slate-400 font-sans">
-            Celebrating our top value wins while opening mandatory public postmortems for our worst model failures. Zero deletion allowed.
+            Celebrating verified top value wins while publishing transparent public postmortems for model failure cases. Zero deletion allowed.
           </p>
         </div>
       </div>
@@ -60,18 +63,26 @@ export default function HallOfFamePage() {
             HALL OF FAME (TOP VALUE WINS)
           </h3>
 
-          <div className="space-y-3">
-            {(data?.hallOfFame || []).map((item: any, idx: number) => (
-              <div key={idx} className="bg-[#141A26] border border-slate-800 p-4 rounded space-y-2 text-xs">
-                <div className="flex justify-between items-center font-bold">
-                  <span className="text-slate-100">{item.fixtureName}</span>
-                  <span className="bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded text-[10px]">{item.recordType}</span>
+          {loading ? (
+            <div className="p-8 text-center text-xs text-slate-500 animate-pulse">Loading Hall of Fame records...</div>
+          ) : hallOfFame.length > 0 ? (
+            <div className="space-y-3">
+              {hallOfFame.map((item: any, idx: number) => (
+                <div key={idx} className="bg-[#141A26] border border-slate-800 p-4 rounded space-y-2 text-xs">
+                  <div className="flex justify-between items-center font-bold">
+                    <span className="text-slate-100">{item.fixtureName}</span>
+                    <span className="bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded text-[10px]">{item.recordType}</span>
+                  </div>
+                  <div className="text-slate-400">{item.league} | Bookmaker Odds: {item.bookmakerOdds.toFixed(2)} | EV: +{(item.expectedValue * 100).toFixed(1)}%</div>
+                  <p className="text-slate-300 text-[11px] leading-relaxed pt-1 border-t border-slate-800">{item.postmortemNotes}</p>
                 </div>
-                <div className="text-slate-400">{item.league} | Bookmaker Odds: {item.bookmakerOdds.toFixed(2)} | EV: +{(item.expectedValue * 100).toFixed(1)}%</div>
-                <p className="text-slate-300 text-[11px] leading-relaxed pt-1 border-t border-slate-800">{item.postmortemNotes}</p>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="p-8 text-center text-xs text-slate-500 bg-[#141A26] rounded border border-slate-800/60">
+              No top value win records archived in public ledger yet.
+            </div>
+          )}
         </div>
 
         {/* Hall of Shame */}
@@ -81,18 +92,26 @@ export default function HallOfFamePage() {
             HALL OF SHAME (MODEL FAILURE POSTMORTEMS)
           </h3>
 
-          <div className="space-y-3">
-            {(data?.hallOfShame || []).map((item: any, idx: number) => (
-              <div key={idx} className="bg-[#141A26] border border-slate-800 p-4 rounded space-y-2 text-xs">
-                <div className="flex justify-between items-center font-bold">
-                  <span className="text-slate-100">{item.fixtureName}</span>
-                  <span className="bg-rose-500/20 text-rose-400 px-2 py-0.5 rounded text-[10px]">{item.recordType}</span>
+          {loading ? (
+            <div className="p-8 text-center text-xs text-slate-500 animate-pulse">Loading postmortem logs...</div>
+          ) : hallOfShame.length > 0 ? (
+            <div className="space-y-3">
+              {hallOfShame.map((item: any, idx: number) => (
+                <div key={idx} className="bg-[#141A26] border border-slate-800 p-4 rounded space-y-2 text-xs">
+                  <div className="flex justify-between items-center font-bold">
+                    <span className="text-slate-100">{item.fixtureName}</span>
+                    <span className="bg-rose-500/20 text-rose-400 px-2 py-0.5 rounded text-[10px]">{item.recordType}</span>
+                  </div>
+                  <div className="text-slate-400">{item.league} | Model Prob: {(item.predictedProb * 100).toFixed(1)}% | Outcome: {item.result}</div>
+                  <p className="text-slate-300 text-[11px] leading-relaxed pt-1 border-t border-slate-800">{item.postmortemNotes}</p>
                 </div>
-                <div className="text-slate-400">{item.league} | Model Prob: {(item.predictedProb * 100).toFixed(1)}% | Outcome: {item.result}</div>
-                <p className="text-slate-300 text-[11px] leading-relaxed pt-1 border-t border-slate-800">{item.postmortemNotes}</p>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="p-8 text-center text-xs text-slate-500 bg-[#141A26] rounded border border-slate-800/60">
+              No model failure postmortems logged in public ledger yet.
+            </div>
+          )}
         </div>
       </div>
     </div>

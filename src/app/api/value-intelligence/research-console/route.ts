@@ -1,26 +1,55 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { supabase } from '@/lib/supabase.server';
 import { ConfidenceMovementEngine } from '../../../../lib/value-intelligence/confidence-movement';
 
 export async function GET(req: NextRequest) {
   try {
-    const confidenceBuckets = ConfidenceMovementEngine.getConfidenceBuckets();
+    const { data: audits, error } = await supabase
+      .from('prediction_audits')
+      .select('*')
+      .not('settled_at', 'is', null);
 
-    const evMatrix = [
-      { evBucket: '0% - 2%', bets: 340, roi: 0.012, clv: 0.008, hitRate: 0.512 },
-      { evBucket: '2% - 5%', bets: 580, roi: 0.048, clv: 0.031, hitRate: 0.554 },
-      { evBucket: '5% - 8%', bets: 420, roi: 0.082, clv: 0.049, hitRate: 0.612 },
-      { evBucket: '8% - 12%', bets: 210, roi: 0.114, clv: 0.068, hitRate: 0.665 },
-      { evBucket: '12%+', bets: 95, roi: 0.142, clv: 0.084, hitRate: 0.710 },
+    if (error) {
+      console.warn('[Research Console API] Error fetching audits:', error.message);
+    }
+
+    const records = audits || [];
+    const confidenceBuckets = ConfidenceMovementEngine.getConfidenceBuckets(records);
+
+    // EV Buckets computation
+    const evRanges = [
+      { evBucket: '0% - 2%', min: 0.0, max: 0.02 },
+      { evBucket: '2% - 5%', min: 0.02, max: 0.05 },
+      { evBucket: '5% - 8%', min: 0.05, max: 0.08 },
+      { evBucket: '8% - 12%', min: 0.08, max: 0.12 },
+      { evBucket: '12%+', min: 0.12, max: Infinity },
     ];
 
-    const stakingComparison = [
-      { month: 'Jan', flatRoi: 0.052, kellyRoi: 0.078, bankrollUnits: 107.8 },
-      { month: 'Feb', flatRoi: 0.061, kellyRoi: 0.092, bankrollUnits: 117.0 },
-      { month: 'Mar', flatRoi: 0.058, kellyRoi: 0.088, bankrollUnits: 125.8 },
-      { month: 'Apr', flatRoi: 0.064, kellyRoi: 0.099, bankrollUnits: 135.7 },
-      { month: 'May', flatRoi: 0.071, kellyRoi: 0.112, bankrollUnits: 146.9 },
-      { month: 'Jun', flatRoi: 0.068, kellyRoi: 0.108, bankrollUnits: 157.7 },
-    ];
+    const evMatrix = evRanges.map(r => {
+      const matching = records.filter(a => {
+        const ev = Number(a.expected_value || a.ev || 0);
+        return ev >= r.min && ev < r.max;
+      });
+
+      const count = matching.length;
+      if (count === 0) {
+        return { evBucket: r.evBucket, bets: 0, roi: 0, clv: 0, hitRate: 0 };
+      }
+
+      const wins = matching.filter(a => a.settlement === 'WIN' || a.settlement === 'WON').length;
+      const profit = matching.reduce((acc, a) => acc + (Number(a.profit) || 0), 0);
+      const clvSum = matching.reduce((acc, a) => acc + (Number(a.clv) || 0), 0);
+
+      return {
+        evBucket: r.evBucket,
+        bets: count,
+        roi: Number(((profit / count) * 100).toFixed(2)),
+        clv: Number((clvSum / count).toFixed(2)),
+        hitRate: Number(((wins / count) * 100).toFixed(2)),
+      };
+    });
+
+    const stakingComparison: any[] = [];
 
     return NextResponse.json({
       success: true,

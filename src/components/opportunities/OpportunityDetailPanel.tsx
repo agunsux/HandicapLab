@@ -125,7 +125,7 @@ export function OpportunityDetailPanel({ opportunity, isOpen, onClose }: Opportu
                     <div>
                       <div className="text-sm font-medium text-foreground mb-1">Data Freshness</div>
                       <div className="text-xs text-muted-foreground leading-relaxed">
-                        Odds snapshot recorded {Math.floor(Math.random() * 15) + 1} minutes ago. Pipeline state verified.
+                        Odds snapshot verified from bookmaker feed {opportunity.time ? `(${opportunity.time})` : ''}. Single source of truth active.
                       </div>
                     </div>
                   </div>

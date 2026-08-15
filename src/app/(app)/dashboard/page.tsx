@@ -1,41 +1,53 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
-  LayoutDashboard,
   Trophy,
-  TrendingUp,
   Target,
-  Radio,
   ArrowRight,
   Sparkles,
   ShieldCheck,
   Calendar,
+  Layers,
+  Activity,
+  AlertCircle
 } from 'lucide-react';
-import { StatCard } from '@/components/ui/StatCard';
+import { GoldService, GoldCompetition } from '@/services/goldService';
 
 export default function DashboardPage() {
-  const topValueBets = [
-    { match: 'Liverpool vs Brighton', pick: 'Liverpool -1.25', odds: 1.95, ev: '+8.4%', edge: 'A+', league: 'Premier League' },
-    { match: 'Arsenal vs Everton', pick: 'Over 2.75 Goals', odds: 1.88, ev: '+6.2%', edge: 'A', league: 'Premier League' },
-    { match: 'Real Madrid vs Barcelona', pick: 'Real Madrid ML', odds: 2.10, ev: '+5.1%', edge: 'B+', league: 'La Liga' },
-    { match: 'Inter vs AC Milan', pick: 'BTTS Yes', odds: 1.75, ev: '+4.8%', edge: 'B', league: 'Serie A' },
-    { match: 'Bayern vs Dortmund', pick: 'Over 3.5 Goals', odds: 2.05, ev: '+7.1%', edge: 'A', league: 'Bundesliga' },
-  ];
+  const [topValueBets, setTopValueBets] = useState<any[]>([]);
+  const [competitions, setCompetitions] = useState<GoldCompetition[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const popularCompetitions = [
-    { id: 'EPL', name: 'Premier League', country: 'England', flag: '🏴', matches: 2660 },
-    { id: 'LALIGA', name: 'La Liga', country: 'Spain', flag: '🇪🇸', matches: 2660 },
-    { id: 'SERIEA', name: 'Serie A', country: 'Italy', flag: '🇮🇹', matches: 2660 },
-    { id: 'BUNDESLIGA', name: 'Bundesliga', country: 'Germany', flag: '🇩🇪', matches: 2142 },
-    { id: 'LIGUE1', name: 'Ligue 1', country: 'France', flag: '🇫🇷', matches: 2420 },
-    { id: 'EREDIVISIE', name: 'Eredivisie', country: 'Netherlands', flag: '🇳🇱', matches: 2142 },
-  ];
+  useEffect(() => {
+    async function loadDashboardData() {
+      setLoading(true);
+      try {
+        const [betsRes, comps] = await Promise.all([
+          fetch('/api/value-intelligence/bets').then(r => r.json()).catch(() => ({ success: false, data: [] })),
+          GoldService.getCompetitions().catch(() => [])
+        ]);
+
+        if (betsRes.success && Array.isArray(betsRes.data)) {
+          setTopValueBets(betsRes.data.slice(0, 5));
+        } else {
+          setTopValueBets([]);
+        }
+
+        setCompetitions(Array.isArray(comps) ? comps : []);
+      } catch (err) {
+        console.error('Failed to load dashboard data:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadDashboardData();
+  }, []);
 
   return (
     <div className="space-y-6">
-      {/* Today's Top 5 Value Bets Horizontal Cards */}
+      {/* Today's Top Value Bets Horizontal Cards */}
       <div>
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
@@ -49,28 +61,47 @@ export default function DashboardPage() {
           </Link>
         </div>
 
-        <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">
-          {topValueBets.map((b, i) => (
-            <div
-              key={i}
-              className="min-w-[240px] p-4 bg-[#111827] border border-[#1F2937] hover:border-[#10B981]/50 rounded-xl transition-all flex flex-col justify-between shrink-0 font-mono text-xs"
-            >
-              <div>
-                <div className="flex items-center justify-between text-[10px] text-[#9CA3AF] mb-2">
-                  <span>{b.league}</span>
-                  <span className="px-1.5 py-0.5 rounded bg-[#10B981]/10 text-[#10B981] font-bold">{b.edge}</span>
+        {loading ? (
+          <div className="p-8 text-center bg-[#111827] border border-[#1F2937] rounded-xl text-xs font-mono text-[#9CA3AF] animate-pulse">
+            Loading live market edge opportunities...
+          </div>
+        ) : topValueBets.length > 0 ? (
+          <div className="flex gap-4 overflow-x-auto no-scrollbar pb-2">
+            {topValueBets.map((b) => (
+              <div
+                key={b.id}
+                className="min-w-[240px] p-4 bg-[#111827] border border-[#1F2937] hover:border-[#10B981]/50 rounded-xl transition-all flex flex-col justify-between shrink-0 font-mono text-xs"
+              >
+                <div>
+                  <div className="flex items-center justify-between text-[10px] text-[#9CA3AF] mb-2">
+                    <span>{b.league}</span>
+                    <span className="px-1.5 py-0.5 rounded bg-[#10B981]/10 text-[#10B981] font-bold">
+                      {b.confidenceBucket || 'ACTIVE'}
+                    </span>
+                  </div>
+                  <div className="font-sans font-bold text-[#F0FDF4] mb-1">
+                    {b.homeTeam} vs {b.awayTeam}
+                  </div>
+                  <div className="text-[#10B981] font-bold">
+                    {b.selection} ({b.market})
+                  </div>
                 </div>
-                <div className="font-sans font-bold text-[#F0FDF4] mb-1">{b.match}</div>
-                <div className="text-[#10B981] font-bold">{b.pick}</div>
-              </div>
 
-              <div className="mt-3 pt-2 border-t border-[#1F2937] flex items-center justify-between text-xs">
-                <span className="text-[#9CA3AF]">Odds: <strong className="text-[#F0FDF4]">{b.odds}</strong></span>
-                <span className="font-bold text-[#10B981]">{b.ev} EV</span>
+                <div className="mt-3 pt-2 border-t border-[#1F2937] flex items-center justify-between text-xs">
+                  <span className="text-[#9CA3AF]">Odds: <strong className="text-[#F0FDF4]">{b.bookmakerOdds?.toFixed(2) || '—'}</strong></span>
+                  <span className="font-bold text-[#10B981]">+{(b.expectedValue * 100).toFixed(1)}% EV</span>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="p-6 bg-[#111827] border border-[#1F2937] rounded-xl text-center font-mono space-y-1">
+            <div className="text-xs text-[#F0FDF4] font-bold">No Qualifying Value Opportunities Active</div>
+            <p className="text-[11px] text-[#9CA3AF]">
+              All upcoming fixtures are currently efficiently priced within model variance margins (&lt; +4% EV).
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Main Grid: Historical Insights & Popular Competitions */}
@@ -87,33 +118,28 @@ export default function DashboardPage() {
             </Link>
           </div>
 
-          <div className="space-y-3">
-            <div className="p-3 bg-[#0B0F0E] border border-[#1F2937] rounded-lg space-y-1">
-              <div className="flex justify-between font-sans font-bold text-[#F0FDF4]">
-                <span>Premier League</span>
-                <span className="text-[#10B981]">2,660 Matches</span>
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 text-[11px] text-[#9CA3AF]">
-                <div>Avg Goals: <strong className="text-[#F0FDF4]">2.81</strong></div>
-                <div>Home Win: <strong className="text-[#F0FDF4]">46.2%</strong></div>
-                <div>Over 2.5: <strong className="text-[#F0FDF4]">55.4%</strong></div>
-                <div>AH Fav Win: <strong className="text-[#10B981]">52.3%</strong></div>
-              </div>
+          {competitions.length > 0 ? (
+            <div className="space-y-3">
+              {competitions.slice(0, 2).map((comp) => (
+                <div key={comp.id} className="p-3 bg-[#0B0F0E] border border-[#1F2937] rounded-lg space-y-1">
+                  <div className="flex justify-between font-sans font-bold text-[#F0FDF4]">
+                    <span>{comp.name}</span>
+                    <span className="text-[#10B981]">{comp.totalMatches.toLocaleString()} Matches</span>
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 text-[11px] text-[#9CA3AF]">
+                    <div>Avg Goals: <strong className="text-[#F0FDF4]">{comp.avgGoals.toFixed(2)}</strong></div>
+                    <div>Home Win: <strong className="text-[#F0FDF4]">{(comp.homeWinPct * 100).toFixed(1)}%</strong></div>
+                    <div>Over 2.5: <strong className="text-[#F0FDF4]">{(comp.over25Pct * 100).toFixed(1)}%</strong></div>
+                    <div>AH Fav Win: <strong className="text-[#10B981]">{(comp.ahFavWinPct * 100).toFixed(1)}%</strong></div>
+                  </div>
+                </div>
+              ))}
             </div>
-
-            <div className="p-3 bg-[#0B0F0E] border border-[#1F2937] rounded-lg space-y-1">
-              <div className="flex justify-between font-sans font-bold text-[#F0FDF4]">
-                <span>La Liga</span>
-                <span className="text-[#10B981]">2,660 Matches</span>
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 text-[11px] text-[#9CA3AF]">
-                <div>Avg Goals: <strong className="text-[#F0FDF4]">2.65</strong></div>
-                <div>Home Win: <strong className="text-[#F0FDF4]">44.8%</strong></div>
-                <div>Over 2.5: <strong className="text-[#F0FDF4]">49.2%</strong></div>
-                <div>AH Fav Win: <strong className="text-[#10B981]">51.1%</strong></div>
-              </div>
+          ) : (
+            <div className="p-6 bg-[#0B0F0E] border border-[#1F2937] rounded-lg text-center space-y-1">
+              <div className="text-xs text-[#9CA3AF]">No historical league aggregates available in Gold Layer.</div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Popular Competitions Grid */}
@@ -121,26 +147,32 @@ export default function DashboardPage() {
           <div className="flex items-center justify-between border-b border-[#1F2937] pb-3">
             <div className="flex items-center gap-2">
               <Trophy className="h-4 w-4 text-[#F59E0B]" />
-              <h3 className="font-sans font-bold text-[#F0FDF4]">Popular Historical Competitions</h3>
+              <h3 className="font-sans font-bold text-[#F0FDF4]">Tracked Competitions</h3>
             </div>
             <Link href="/historical/competitions" className="text-[11px] text-[#10B981] hover:underline">
-              View All 120+ →
+              View All →
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {popularCompetitions.map((c) => (
-              <Link
-                key={c.id}
-                href={`/historical/competitions/${c.id}`}
-                className="p-3 bg-[#0B0F0E] border border-[#1F2937] hover:border-[#10B981]/50 rounded-lg transition-all text-center space-y-1 group"
-              >
-                <div className="text-xl">{c.flag}</div>
-                <div className="font-sans font-bold text-[#F0FDF4] group-hover:text-[#10B981] transition-colors">{c.name}</div>
-                <div className="text-[10px] text-[#9CA3AF]">{c.matches} Matches</div>
-              </Link>
-            ))}
-          </div>
+          {competitions.length > 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {competitions.map((c) => (
+                <Link
+                  key={c.id}
+                  href={`/historical/competitions/${c.id}`}
+                  className="p-3 bg-[#0B0F0E] border border-[#1F2937] hover:border-[#10B981]/50 rounded-lg transition-all text-center space-y-1 group"
+                >
+                  <div className="text-xl">{c.flag || '⚽'}</div>
+                  <div className="font-sans font-bold text-[#F0FDF4] group-hover:text-[#10B981] transition-colors truncate">{c.name}</div>
+                  <div className="text-[10px] text-[#9CA3AF]">{c.totalMatches.toLocaleString()} Matches</div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="p-6 bg-[#0B0F0E] border border-[#1F2937] rounded-lg text-center space-y-1">
+              <div className="text-xs text-[#9CA3AF]">No tracked competitions available in Gold Layer view.</div>
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -26,16 +26,65 @@ export interface OddsMovementProfile {
 }
 
 export class ConfidenceMovementEngine {
-  /** Get metrics across confidence probability buckets */
-  static getConfidenceBuckets(): ConfidenceBucketMetrics[] {
-    return [
-      { bucketRange: '50% - 55%', minConfidence: 0.50, maxConfidence: 0.55, sampleSize: 480, roi: 0.032, hitRate: 0.521, avgClv: 0.018, calibrationEce: 0.021 },
-      { bucketRange: '55% - 60%', minConfidence: 0.55, maxConfidence: 0.60, sampleSize: 620, roi: 0.054, hitRate: 0.568, avgClv: 0.031, calibrationEce: 0.017 },
-      { bucketRange: '60% - 65%', minConfidence: 0.60, maxConfidence: 0.65, sampleSize: 510, roi: 0.078, hitRate: 0.624, avgClv: 0.045, calibrationEce: 0.015 },
-      { bucketRange: '65% - 70%', minConfidence: 0.65, maxConfidence: 0.70, sampleSize: 340, roi: 0.089, hitRate: 0.672, avgClv: 0.052, calibrationEce: 0.014 },
-      { bucketRange: '70% - 75%', minConfidence: 0.70, maxConfidence: 0.75, sampleSize: 190, roi: 0.094, hitRate: 0.718, avgClv: 0.058, calibrationEce: 0.012 },
-      { bucketRange: '75% - 80%', minConfidence: 0.75, maxConfidence: 0.80, sampleSize: 85, roi: 0.102, hitRate: 0.771, avgClv: 0.064, calibrationEce: 0.011 },
+  /** Compute metrics across confidence probability buckets */
+  static getConfidenceBuckets(audits?: any[]): ConfidenceBucketMetrics[] {
+    const ranges = [
+      { bucketRange: '50% - 55%', min: 0.50, max: 0.55 },
+      { bucketRange: '55% - 60%', min: 0.55, max: 0.60 },
+      { bucketRange: '60% - 65%', min: 0.60, max: 0.65 },
+      { bucketRange: '65% - 70%', min: 0.65, max: 0.70 },
+      { bucketRange: '70% - 75%', min: 0.70, max: 0.75 },
+      { bucketRange: '75% - 80%', min: 0.75, max: 0.80 },
     ];
+
+    if (!audits || audits.length === 0) {
+      return ranges.map(r => ({
+        bucketRange: r.bucketRange,
+        minConfidence: r.min,
+        maxConfidence: r.max,
+        sampleSize: 0,
+        roi: 0,
+        hitRate: 0,
+        avgClv: 0,
+        calibrationEce: 0
+      }));
+    }
+
+    return ranges.map(r => {
+      const matching = audits.filter(a => {
+        const prob = Number(a.model_prob || a.calibrated_probability || 0);
+        return prob >= r.min && prob < r.max;
+      });
+
+      const count = matching.length;
+      if (count === 0) {
+        return {
+          bucketRange: r.bucketRange,
+          minConfidence: r.min,
+          maxConfidence: r.max,
+          sampleSize: 0,
+          roi: 0,
+          hitRate: 0,
+          avgClv: 0,
+          calibrationEce: 0
+        };
+      }
+
+      const wins = matching.filter(a => a.settlement === 'WIN' || a.settlement === 'WON').length;
+      const profit = matching.reduce((acc, a) => acc + (Number(a.profit) || 0), 0);
+      const clvSum = matching.reduce((acc, a) => acc + (Number(a.clv) || 0), 0);
+
+      return {
+        bucketRange: r.bucketRange,
+        minConfidence: r.min,
+        maxConfidence: r.max,
+        sampleSize: count,
+        roi: Number(((profit / count) * 100).toFixed(2)),
+        hitRate: Number(((wins / count) * 100).toFixed(2)),
+        avgClv: Number((clvSum / count).toFixed(2)),
+        calibrationEce: 0
+      };
+    });
   }
 
   /** Analyze odds trajectory from opening to current/closing */
@@ -48,7 +97,7 @@ export class ConfidenceMovementEngine {
     closingOdds?: number | null
   ): OddsMovementProfile {
     const activeOdds = closingOdds ?? currentOdds;
-    const oddsChangePct = Number(((activeOdds - openingOdds) / openingOdds).toFixed(4));
+    const oddsChangePct = openingOdds > 0 ? Number(((activeOdds - openingOdds) / openingOdds).toFixed(4)) : 0;
 
     let movementType: 'steam' | 'reverse_line' | 'neutral' = 'neutral';
     let historicalRoiForMovement = 0.045;

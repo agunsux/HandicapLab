@@ -36,6 +36,10 @@ export default function ResearchConsolePage() {
     }
   };
 
+  const evMatrix = data?.evMatrix || [];
+  const confidenceBuckets = data?.confidenceBuckets || [];
+  const stakingComparison = data?.stakingComparison || [];
+
   return (
     <div className="min-h-screen bg-[#0A0D14] text-slate-100 font-mono p-6 space-y-6">
       {/* Console Header */}
@@ -77,15 +81,23 @@ export default function ResearchConsolePage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/50">
-                {(data?.evMatrix || []).map((row: any, i: number) => (
-                  <tr key={i} className="hover:bg-slate-800/30">
-                    <td className="p-2.5 font-bold text-slate-300">{row.evBucket}</td>
-                    <td className="p-2.5 text-right text-slate-400">{row.bets}</td>
-                    <td className="p-2.5 text-right text-slate-300">{(row.hitRate * 100).toFixed(1)}%</td>
-                    <td className="p-2.5 text-right text-sky-400">+{(row.clv * 100).toFixed(1)}%</td>
-                    <td className="p-2.5 text-right font-bold text-emerald-400">+{(row.roi * 100).toFixed(1)}%</td>
+                {evMatrix.length > 0 ? (
+                  evMatrix.map((row: any, i: number) => (
+                    <tr key={i} className="hover:bg-slate-800/30">
+                      <td className="p-2.5 font-bold text-slate-300">{row.evBucket}</td>
+                      <td className="p-2.5 text-right text-slate-400">{row.bets}</td>
+                      <td className="p-2.5 text-right text-slate-300">{row.bets > 0 ? `${(row.hitRate * 100).toFixed(1)}%` : '—'}</td>
+                      <td className="p-2.5 text-right text-sky-400">{row.bets > 0 ? `+${(row.clv * 100).toFixed(1)}%` : '—'}</td>
+                      <td className={`p-2.5 text-right font-bold ${row.bets > 0 ? (row.roi >= 0 ? 'text-emerald-400' : 'text-rose-400') : 'text-slate-500'}`}>
+                        {row.bets > 0 ? `${row.roi >= 0 ? '+' : ''}${(row.roi * 100).toFixed(1)}%` : '—'}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={5} className="p-4 text-center text-slate-500">No settled predictions for EV bucket evaluation.</td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </div>
@@ -110,15 +122,21 @@ export default function ResearchConsolePage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/50">
-                {(data?.confidenceBuckets || []).map((row: any, i: number) => (
-                  <tr key={i} className="hover:bg-slate-800/30">
-                    <td className="p-2.5 font-bold text-slate-300">{row.bucketRange}</td>
-                    <td className="p-2.5 text-right text-slate-400">{row.sampleSize}</td>
-                    <td className="p-2.5 text-right text-slate-300">{(row.hitRate * 100).toFixed(1)}%</td>
-                    <td className="p-2.5 text-right text-sky-400">+{(row.avgClv * 100).toFixed(1)}%</td>
-                    <td className="p-2.5 text-right font-bold text-emerald-400">{(row.calibrationEce * 100).toFixed(2)}%</td>
+                {confidenceBuckets.length > 0 ? (
+                  confidenceBuckets.map((row: any, i: number) => (
+                    <tr key={i} className="hover:bg-slate-800/30">
+                      <td className="p-2.5 font-bold text-slate-300">{row.bucketRange}</td>
+                      <td className="p-2.5 text-right text-slate-400">{row.sampleSize}</td>
+                      <td className="p-2.5 text-right text-slate-300">{row.sampleSize > 0 ? `${(row.hitRate * 100).toFixed(1)}%` : '—'}</td>
+                      <td className="p-2.5 text-right text-sky-400">{row.sampleSize > 0 ? `+${(row.avgClv * 100).toFixed(1)}%` : '—'}</td>
+                      <td className="p-2.5 text-right font-bold text-emerald-400">{row.sampleSize > 0 ? `${(row.calibrationEce * 100).toFixed(2)}%` : '—'}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={5} className="p-4 text-center text-slate-500">No confidence bucket records available.</td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </div>
@@ -132,26 +150,32 @@ export default function ResearchConsolePage() {
           </h3>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-[#141A26] text-slate-400 uppercase">
-                <tr>
-                  <th className="p-2.5">MONTH</th>
-                  <th className="p-2.5 text-right">FLAT STAKE ROI</th>
-                  <th className="p-2.5 text-right">QUARTER KELLY ROI</th>
-                  <th className="p-2.5 text-right">COMPOUNDED BANKROLL</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800/50">
-                {(data?.stakingComparison || []).map((row: any, i: number) => (
-                  <tr key={i} className="hover:bg-slate-800/30">
-                    <td className="p-2.5 font-bold text-slate-300">{row.month} 2026</td>
-                    <td className="p-2.5 text-right text-slate-300">+{(row.flatRoi * 100).toFixed(1)}%</td>
-                    <td className="p-2.5 text-right text-emerald-400 font-bold">+{(row.kellyRoi * 100).toFixed(1)}%</td>
-                    <td className="p-2.5 text-right text-purple-400 font-bold">{row.bankrollUnits} units</td>
+            {stakingComparison.length > 0 ? (
+              <table className="w-full text-left text-xs">
+                <thead className="bg-[#141A26] text-slate-400 uppercase">
+                  <tr>
+                    <th className="p-2.5">MONTH</th>
+                    <th className="p-2.5 text-right">FLAT STAKE ROI</th>
+                    <th className="p-2.5 text-right">QUARTER KELLY ROI</th>
+                    <th className="p-2.5 text-right">COMPOUNDED BANKROLL</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-slate-800/50">
+                  {stakingComparison.map((row: any, i: number) => (
+                    <tr key={i} className="hover:bg-slate-800/30">
+                      <td className="p-2.5 font-bold text-slate-300">{row.month}</td>
+                      <td className="p-2.5 text-right text-slate-300">+{(row.flatRoi * 100).toFixed(1)}%</td>
+                      <td className="p-2.5 text-right text-emerald-400 font-bold">+{(row.kellyRoi * 100).toFixed(1)}%</td>
+                      <td className="p-2.5 text-right text-purple-400 font-bold">{row.bankrollUnits} units</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <div className="p-6 text-center text-xs text-slate-500">
+                Staking growth comparison will be tracked longitudinally as monthly paper trading cohorts settle.
+              </div>
+            )}
           </div>
         </div>
       </div>

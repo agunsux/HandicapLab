@@ -36,59 +36,23 @@ export async function GET(request: Request) {
   try {
     const url = new URL(request.url);
     const selectedCohort = url.searchParams.get('cohort') || 'all';
-    const mode = url.searchParams.get('mode') || 'production';
 
-    let allSignals: any[] = [];
+    const { data: signals, error } = await supabase
+      .from('signals')
+      .select('*')
+      .not('settled_at', 'is', null);
 
-    if (mode === 'production') {
-      const { data: signals, error } = await supabase
-        .from('signals')
-        .select('*')
-        .not('settled_at', 'is', null);
-
-      if (error) {
-        return NextResponse.json({ success: false, error: error.message }, { status: 500 });
-      }
-      allSignals = signals || [];
-    } else {
-      // High-fidelity simulation dataset for backtest curves visualization
-      const markets = ['asian_handicap', 'over_under', 'moneyline'];
-      const leagues = ['English Premier League', 'La Liga', 'Serie A'];
-      const cohorts = ['elite_europe', 'europe_qualification', 'latin_america'];
-      
-      for (let i = 0; i < 500; i++) {
-        const isWin = i % 100 < 60; // 60% win rate
-        const status = isWin ? 'won' : 'lost';
-        const odds = 1.95;
-        const prob = 0.55;
-
-        allSignals.push({
-          id: `sim-sig-${i}`,
-          match_id: `sim-match-${i}`,
-          league: leagues[i % 3],
-          league_cohort: cohorts[i % 3],
-          market: markets[i % 3],
-          odds: odds,
-          probability: prob,
-          clv_percentage: 2.45,
-          market_truth_score: 90,
-          hours_before_kickoff: 12,
-          status: status,
-          settled_at: new Date(Date.now() - i * 3600000).toISOString(),
-          updated_at: new Date().toISOString()
-        });
-      }
+    if (error) {
+      console.warn('[Performance Summary] Query error:', error.message);
     }
+    const allSignals: any[] = signals || [];
 
     // Filter to validation_priority A leagues
     const priorityALeagues = new Set(
       LEAGUE_REGISTRY.filter(l => l.validation_priority === 'A').map(l => l.name)
     );
     
-    // In simulation mode, we bypass the registry priority filter to ensure sample is populated
-    let filteredSignals = mode === 'production' 
-      ? allSignals.filter(sig => sig.league && priorityALeagues.has(sig.league))
-      : allSignals;
+    let filteredSignals = allSignals.filter(sig => sig.league && priorityALeagues.has(sig.league));
 
     // Grouping by Cohort
     const cohortMap: Record<string, CohortStats> = {
@@ -214,7 +178,7 @@ export async function GET(request: Request) {
       if (isLoss) calib.losses++;
       calib.brierSum += Math.pow(prob - outcomeValue, 2);
 
-      // Edge Decay Buckets logic (based on hours_before_kickoff)
+      // Edge Decay Buckets logic
       const hours = sig.hours_before_kickoff !== null && sig.hours_before_kickoff !== undefined
         ? Number(sig.hours_before_kickoff)
         : null;
@@ -271,7 +235,6 @@ export async function GET(request: Request) {
       d.avgClv = d.clvCount > 0 ? Number((d.clvSum / d.clvCount).toFixed(2)) : 0;
     });
 
-    // If cohort filter is active, slice filteredSignals for the drawdown/curves calculation
     if (selectedCohort !== 'all') {
       filteredSignals = filteredSignals.filter(sig => sig.league_cohort === selectedCohort);
     }
@@ -345,7 +308,6 @@ export async function GET(request: Request) {
     const beatClosingRate = periodClvCount > 0 ? (periodBeatClosingCount / periodClvCount) * 100 : 0.0;
     const avgTruthScore = truthScoreCount > 0 ? truthScoreSum / truthScoreCount : 90.0;
 
-    // Statistical Confidence Score calculation
     const sampleSizeWeight = Math.min(1.0, totalBets / 500) * 40;
     const clvConsistencyWeight = Math.min(1.0, beatClosingRate / 60) * 30;
     const drawdownPercent = maxDrawdown * 100;

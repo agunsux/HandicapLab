@@ -80,6 +80,34 @@ describe('EPIC 40 — Public Ledger, Transparency & Scientific Reproducibility T
 
   describe('4. Hall of Fame & Hall of Shame Engine', () => {
     it('should return Hall of Fame entries and Hall of Shame postmortems', () => {
+      HallEngine.registerRecord({
+        id: 'hof-test-1',
+        category: 'HALL_OF_FAME',
+        recordType: 'BEST_LONG_ODDS',
+        fixtureName: 'Test Match 1',
+        league: 'Test League',
+        predictedProb: 0.35,
+        bookmakerOdds: 4.20,
+        expectedValue: 0.47,
+        result: 'WIN',
+        postmortemNotes: 'Audited value edge on home underdog.',
+        loggedAt: new Date().toISOString()
+      });
+
+      HallEngine.registerRecord({
+        id: 'hos-test-1',
+        category: 'HALL_OF_SHAME',
+        recordType: 'WORST_PREDICTION',
+        fixtureName: 'Test Match 2',
+        league: 'Test League',
+        predictedProb: 0.82,
+        bookmakerOdds: 1.25,
+        expectedValue: 0.02,
+        result: 'LOSS',
+        postmortemNotes: 'Model Failure Postmortem: Verified test postmortem.',
+        loggedAt: new Date().toISOString()
+      });
+
       const hof = HallEngine.getHallOfFame();
       const hos = HallEngine.getHallOfShame();
 

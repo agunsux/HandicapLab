@@ -1,37 +1,76 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { HistoricalSubNav } from '@/components/layout/HistoricalSubNav';
 import { StatCard } from '@/components/ui/StatCard';
 import { DataTable, Column } from '@/components/ui/DataTable';
-import { Trophy, Calendar, LineChart, TrendingUp, Filter } from 'lucide-react';
+import { Trophy, Calendar, LineChart, TrendingUp } from 'lucide-react';
+import { GoldService, GoldCompetition, GoldTeam } from '@/services/goldService';
+
+interface StandingsRow {
+  pos: number;
+  team: string;
+  p: number;
+  w: number;
+  d: number;
+  l: number;
+  gf: number;
+  ga: number;
+  gd: string;
+  pts: number;
+  form: string;
+}
 
 export default function CompetitionDetailPage() {
   const params = useParams();
-  const compId = (params?.id as string) || 'EPL';
+  const compId = (params?.id as string) || '';
   const [activeTab, setActiveTab] = useState('overview');
   const [season, setSeason] = useState('2023-2024');
+  const [competition, setCompetition] = useState<GoldCompetition | null>(null);
+  const [teams, setTeams] = useState<GoldTeam[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const tabs = [
-    { id: 'overview', label: 'Overview' },
-    { id: 'standings', label: 'Standings', count: 20 },
-    { id: 'fixtures', label: 'Fixtures', count: 380 },
-    { id: 'results', label: 'Results', count: 380 },
-    { id: 'statistics', label: 'Statistics' },
-    { id: 'odds', label: 'Odds Analytics' },
-    { id: 'trends', label: 'Trends' },
-  ];
+  useEffect(() => {
+    async function loadData() {
+      setLoading(true);
+      try {
+        const [comps, allTeams] = await Promise.all([
+          GoldService.getCompetitions().catch(() => []),
+          GoldService.getTeams().catch(() => [])
+        ]);
 
-  const standingsData = [
-    { pos: 1, team: 'Manchester City', p: 38, w: 28, d: 7, l: 3, gf: 94, ga: 33, gd: '+61', pts: 91, form: 'WWWWD' },
-    { pos: 2, team: 'Arsenal', p: 38, w: 26, d: 6, l: 6, gf: 88, ga: 42, gd: '+46', pts: 84, form: 'WLWDW' },
-    { pos: 3, team: 'Liverpool', p: 38, w: 24, d: 8, l: 6, gf: 86, ga: 41, gd: '+45', pts: 80, form: 'WWWLW' },
-    { pos: 4, team: 'Aston Villa', p: 38, w: 20, d: 8, l: 10, gf: 76, ga: 61, gd: '+15', pts: 68, form: 'LWDWW' },
-    { pos: 5, team: 'Tottenham Hotspur', p: 38, w: 20, d: 6, l: 12, gf: 74, ga: 61, gd: '+13', pts: 66, form: 'WLLWL' },
-  ];
+        const currentComp = comps.find(c => c.id?.toLowerCase() === compId?.toLowerCase() || c.name?.toLowerCase().includes(compId?.toLowerCase()));
+        setCompetition(currentComp || null);
+        setTeams(allTeams);
+      } catch (err) {
+        console.error('Failed to load competition details:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, [compId]);
 
-  const standingsColumns: Column<typeof standingsData[0]>[] = [
+  const standingsData: StandingsRow[] = teams.map((t, idx) => {
+    const s = t.seasonStats;
+    const diff = s.gf - s.ga;
+    return {
+      pos: idx + 1,
+      team: t.name,
+      p: s.played,
+      w: s.wins,
+      d: s.draws,
+      l: s.losses,
+      gf: s.gf,
+      ga: s.ga,
+      gd: diff >= 0 ? `+${diff}` : `${diff}`,
+      pts: s.pts,
+      form: s.formLast5.join(''),
+    };
+  });
+
+  const standingsColumns: Column<StandingsRow>[] = [
     { key: 'pos', header: 'Pos', isNumeric: true, className: 'w-12 font-bold text-[#10B981]' },
     { key: 'team', header: 'Team', render: (r) => <span className="font-bold text-[#F0FDF4]">{r.team}</span> },
     { key: 'p', header: 'P', isNumeric: true },
@@ -44,7 +83,7 @@ export default function CompetitionDetailPage() {
     { key: 'pts', header: 'Pts', isNumeric: true, render: (r) => <span className="font-mono font-bold text-base text-[#F0FDF4]">{r.pts}</span> },
     { key: 'form', header: 'Form (Last 5)', render: (r) => (
         <div className="flex gap-1 font-mono text-[10px] font-bold">
-          {r.form.split('').map((c, i) => (
+          {r.form ? r.form.split('').map((c, i) => (
             <span
               key={i}
               className={`px-1.5 py-0.5 rounded ${
@@ -53,42 +92,32 @@ export default function CompetitionDetailPage() {
             >
               {c}
             </span>
-          ))}
+          )) : <span className="text-slate-500">—</span>}
         </div>
       )
     },
   ];
 
+  const tabs = [
+    { id: 'overview', label: 'Overview' },
+    { id: 'standings', label: 'Standings', count: teams.length },
+    { id: 'statistics', label: 'Statistics' },
+  ];
+
+  const compTitle = competition?.name || compId || 'Competition';
+
   return (
     <div className="space-y-6">
-      {/* Top Context Navigation & Season Selector */}
+      {/* Top Context Navigation */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <HistoricalSubNav
-          title={`Premier League (${compId})`}
-          subtitle="Tier 1 Core Competition • 7 Seasons Ingested (2,660 Matches)"
-          badge="Gold Layer Verified"
+          title={`${compTitle}`}
+          subtitle={`Gold Layer Verified • ${competition ? `${competition.totalMatches} Matches` : 'Awaiting Ingestion'}`}
+          badge={competition ? "Gold Layer Verified" : "Data Pending"}
           tabs={tabs}
           activeTab={activeTab}
           onTabChange={setActiveTab}
         />
-
-        <div className="flex items-center gap-2 bg-[#111827] p-2 rounded-xl border border-[#1F2937] shrink-0">
-          <Calendar className="h-4 w-4 text-[#10B981]" />
-          <span className="text-xs font-mono text-[#9CA3AF]">Season:</span>
-          <select
-            value={season}
-            onChange={(e) => setSeason(e.target.value)}
-            className="bg-[#0B0F0E] border border-[#1F2937] text-[#F0FDF4] text-xs font-mono rounded-lg px-2.5 py-1 focus:outline-none focus:border-[#10B981]"
-          >
-            <option value="2024-2025">2024-2025</option>
-            <option value="2023-2024">2023-2024</option>
-            <option value="2022-2023">2022-2023</option>
-            <option value="2021-2022">2021-2022</option>
-            <option value="2020-2021">2020-2021</option>
-            <option value="2019-2020">2019-2020</option>
-            <option value="2018-2019">2018-2019</option>
-          </select>
-        </div>
       </div>
 
       {/* OVERVIEW TAB CONTENT */}
@@ -96,23 +125,31 @@ export default function CompetitionDetailPage() {
         <div className="space-y-6">
           {/* Key Metrics Grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <StatCard title="Matches Played" value="380 / 380" subtitle={`Season ${season}`} icon={Calendar} />
-            <StatCard title="Total Goals" value="1,067" subtitle="Avg 2.81 goals/match" change="+0.12 vs avg" changeType="positive" icon={TrendingUp} />
-            <StatCard title="Home Win %" value="46.2%" subtitle="Draw 23.8% | Away 30.0%" icon={Trophy} />
-            <StatCard title="Over 2.5 Goals %" value="55.4%" subtitle="BTTS 52.1%" change="+3.2%" changeType="positive" icon={LineChart} />
+            <StatCard title="Matches Ingested" value={competition ? `${competition.totalMatches.toLocaleString()}` : '0'} subtitle="Total Verified" icon={Calendar} />
+            <StatCard title="Avg Goals" value={competition ? `${competition.avgGoals.toFixed(2)}` : '—'} subtitle="Historical Average" icon={TrendingUp} />
+            <StatCard title="Home Win %" value={competition ? `${(competition.homeWinPct * 100).toFixed(1)}%` : '—'} subtitle={`Draw ${(competition ? competition.drawPct * 100 : 0).toFixed(1)}%`} icon={Trophy} />
+            <StatCard title="Over 2.5 Goals %" value={competition ? `${(competition.over25Pct * 100).toFixed(1)}%` : '—'} subtitle={`BTTS ${(competition ? competition.bttsPct * 100 : 0).toFixed(1)}%`} icon={LineChart} />
           </div>
 
           {/* Standings Snippet */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="text-xs font-mono uppercase tracking-widest text-[#9CA3AF] font-semibold">
-                Official Season Standings ({season})
+                Season Standings
               </h3>
-              <button onClick={() => setActiveTab('standings')} className="text-xs font-mono text-[#10B981] hover:underline">
-                View Full Table →
-              </button>
+              {standingsData.length > 0 && (
+                <button onClick={() => setActiveTab('standings')} className="text-xs font-mono text-[#10B981] hover:underline">
+                  View Full Table →
+                </button>
+              )}
             </div>
-            <DataTable columns={standingsColumns} data={standingsData} keyExtractor={(r) => r.team} />
+            {standingsData.length > 0 ? (
+              <DataTable columns={standingsColumns} data={standingsData} keyExtractor={(r) => r.team} />
+            ) : (
+              <div className="p-8 text-center bg-[#111827] border border-[#1F2937] rounded-xl font-mono text-xs text-[#9CA3AF]">
+                No standings records available in Gold Layer for this competition.
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -121,7 +158,13 @@ export default function CompetitionDetailPage() {
       {activeTab === 'standings' && (
         <div className="space-y-4">
           <h3 className="text-xs font-mono uppercase tracking-widest text-[#9CA3AF] font-semibold">Full Standings Table</h3>
-          <DataTable columns={standingsColumns} data={standingsData} keyExtractor={(r) => r.team} />
+          {standingsData.length > 0 ? (
+            <DataTable columns={standingsColumns} data={standingsData} keyExtractor={(r) => r.team} />
+          ) : (
+            <div className="p-8 text-center bg-[#111827] border border-[#1F2937] rounded-xl font-mono text-xs text-[#9CA3AF]">
+              No standings records available in Gold Layer for this competition.
+            </div>
+          )}
         </div>
       )}
     </div>

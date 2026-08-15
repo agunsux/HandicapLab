@@ -84,6 +84,7 @@ export default function ScientificEvidencePage() {
   }
 
   const { systemInfo, heroMetrics, calibrationCurve, subgroupBreakdown, auditLedgerLogs } = data;
+  const hasSample = heroMetrics.totalPredictions > 0;
 
   return (
     <div className="space-y-8 animate-fade-in text-slate-100 font-mono">
@@ -112,7 +113,7 @@ export default function ScientificEvidencePage() {
           <div className="text-xs font-black text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 rounded">
             {systemInfo.classification}
           </div>
-          <div className="text-[10px] text-slate-400">Updated: {systemInfo.lastUpdated}</div>
+          <div className="text-[10px] text-slate-400">Updated: {new Date(systemInfo.lastUpdated).toLocaleDateString()}</div>
         </div>
       </div>
 
@@ -121,25 +122,35 @@ export default function ScientificEvidencePage() {
         <div className="bg-slate-950 border border-slate-850 p-4 rounded-xl space-y-1">
           <span className="text-[10px] text-slate-500 uppercase block font-bold">Total Verified Predictions</span>
           <div className="text-2xl font-black text-white">{heroMetrics.totalPredictions.toLocaleString()}</div>
-          <span className="text-[10px] text-slate-400">{heroMetrics.historicalSeasonsCount} Historical & Live Seasons</span>
+          <span className="text-[10px] text-slate-400">{heroMetrics.historicalSeasonsCount} Active Seasons</span>
         </div>
 
         <div className="bg-slate-950 border border-slate-850 p-4 rounded-xl space-y-1">
           <span className="text-[10px] text-slate-500 uppercase block font-bold">Paper Trading ROI</span>
-          <div className="text-2xl font-black text-emerald-400">+{heroMetrics.paperRoiPct}%</div>
-          <span className="text-[10px] text-emerald-500/80 font-bold">95% CI: [{heroMetrics.ci95LowerPct}%, +{heroMetrics.ci95UpperPct}%]</span>
+          <div className={`text-2xl font-black ${hasSample ? (heroMetrics.paperRoiPct >= 0 ? 'text-emerald-400' : 'text-rose-400') : 'text-slate-400'}`}>
+            {hasSample ? `${heroMetrics.paperRoiPct >= 0 ? '+' : ''}${heroMetrics.paperRoiPct}%` : '—'}
+          </div>
+          <span className="text-[10px] text-emerald-500/80 font-bold">
+            {hasSample ? `95% CI: [${heroMetrics.ci95LowerPct}%, +${heroMetrics.ci95UpperPct}%]` : 'CI: Pending Sample'}
+          </span>
         </div>
 
         <div className="bg-slate-950 border border-slate-850 p-4 rounded-xl space-y-1">
           <span className="text-[10px] text-slate-500 uppercase block font-bold">Mean Closing Line Value (CLV)</span>
-          <div className="text-2xl font-black text-emerald-400">+{heroMetrics.meanClvPct}%</div>
+          <div className={`text-2xl font-black ${hasSample ? 'text-emerald-400' : 'text-slate-400'}`}>
+            {hasSample ? `+${heroMetrics.meanClvPct}%` : '—'}
+          </div>
           <span className="text-[10px] text-slate-400">Pinnacle Sharp Benchmark</span>
         </div>
 
         <div className="bg-slate-950 border border-slate-850 p-4 rounded-xl space-y-1">
           <span className="text-[10px] text-slate-500 uppercase block font-bold">Brier Score & Calibration</span>
-          <div className="text-2xl font-black text-white">{heroMetrics.brierScore.toFixed(4)}</div>
-          <span className="text-[10px] text-emerald-400 font-bold">Calibration Rate: {heroMetrics.calibrationScorePct}% (ECE {heroMetrics.ece})</span>
+          <div className="text-2xl font-black text-white">
+            {hasSample ? heroMetrics.brierScore.toFixed(4) : '—'}
+          </div>
+          <span className="text-[10px] text-emerald-400 font-bold">
+            {hasSample ? `Calibration Rate: ${heroMetrics.calibrationScorePct}% (ECE ${heroMetrics.ece})` : 'Awaiting Settlement'}
+          </span>
         </div>
       </div>
 
@@ -147,7 +158,7 @@ export default function ScientificEvidencePage() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-slate-900/60 border border-slate-850 p-4 rounded-xl text-xs">
         <div>
           <span className="text-slate-500 block text-[10px] uppercase font-bold">Units Won</span>
-          <span className="text-white font-bold text-base">+{heroMetrics.unitsWon}u</span>
+          <span className="text-white font-bold text-base">{hasSample ? `${heroMetrics.unitsWon >= 0 ? '+' : ''}${heroMetrics.unitsWon}u` : '0.0u'}</span>
         </div>
         <div>
           <span className="text-slate-500 block text-[10px] uppercase font-bold">Max Drawdown</span>
@@ -197,32 +208,39 @@ export default function ScientificEvidencePage() {
           <CardContent className="space-y-6">
             <div className="bg-slate-950 border border-slate-850 p-6 rounded-xl space-y-4">
               <div className="flex justify-between items-center text-xs">
-                <span className="text-slate-400 font-bold">Bankroll Trajectory & CLV Benchmark (+6.21% Realized ROI / +2.81% Mean CLV)</span>
-                <span className="text-emerald-400 font-bold">18,462 Sample Bets</span>
+                <span className="text-slate-400 font-bold">
+                  Bankroll Trajectory & CLV Benchmark ({hasSample ? `${heroMetrics.paperRoiPct >= 0 ? '+' : ''}${heroMetrics.paperRoiPct}% ROI / +${heroMetrics.meanClvPct}% CLV` : 'Pending Data'})
+                </span>
+                <span className="text-emerald-400 font-bold">{heroMetrics.totalPredictions.toLocaleString()} Sample Bets</span>
               </div>
 
-              {/* SIMULATED PROGRESS BAR GRAPH FOR VISUAL IMPACT */}
-              <div className="space-y-3 pt-2">
-                <div>
-                  <div className="flex justify-between text-[11px] mb-1">
-                    <span className="text-slate-300">Cumulative Paper ROI (+6.21%)</span>
-                    <span className="text-emerald-400 font-bold">+482.4 Units</span>
+              {hasSample ? (
+                <div className="space-y-3 pt-2">
+                  <div>
+                    <div className="flex justify-between text-[11px] mb-1">
+                      <span className="text-slate-300">Cumulative Paper ROI ({heroMetrics.paperRoiPct >= 0 ? '+' : ''}{heroMetrics.paperRoiPct}%)</span>
+                      <span className="text-emerald-400 font-bold">{heroMetrics.unitsWon >= 0 ? '+' : ''}{heroMetrics.unitsWon} Units</span>
+                    </div>
+                    <div className="h-3 w-full bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+                      <div className="bg-gradient-to-r from-emerald-600 to-emerald-400 h-full w-[75%]" />
+                    </div>
                   </div>
-                  <div className="h-3 w-full bg-slate-900 rounded-full overflow-hidden border border-slate-800">
-                    <div className="bg-gradient-to-r from-emerald-600 to-emerald-400 h-full w-[78%]" />
-                  </div>
-                </div>
 
-                <div>
-                  <div className="flex justify-between text-[11px] mb-1">
-                    <span className="text-slate-300">Pinnacle Closing Line Value (+2.81%)</span>
-                    <span className="text-emerald-400 font-bold">+2.81% CLV</span>
-                  </div>
-                  <div className="h-3 w-full bg-slate-900 rounded-full overflow-hidden border border-slate-800">
-                    <div className="bg-gradient-to-r from-blue-600 to-blue-400 h-full w-[62%]" />
+                  <div>
+                    <div className="flex justify-between text-[11px] mb-1">
+                      <span className="text-slate-300">Pinnacle Closing Line Value (+{heroMetrics.meanClvPct}%)</span>
+                      <span className="text-emerald-400 font-bold">+{heroMetrics.meanClvPct}% CLV</span>
+                    </div>
+                    <div className="h-3 w-full bg-slate-900 rounded-full overflow-hidden border border-slate-800">
+                      <div className="bg-gradient-to-r from-blue-600 to-blue-400 h-full w-[60%]" />
+                    </div>
                   </div>
                 </div>
-              </div>
+              ) : (
+                <div className="py-6 text-center text-slate-500 text-xs">
+                  No verified predictions recorded yet in public ledger.
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
@@ -236,7 +254,11 @@ export default function ScientificEvidencePage() {
               <div className="bg-slate-950 border border-slate-850 p-4 rounded-xl space-y-2">
                 <h4 className="text-white font-bold uppercase tracking-wider text-[11px]">Variance Guard & Confidence Interval</h4>
                 <p className="text-slate-400 leading-relaxed">
-                  With 18,462 verified sample predictions, the 95% Confidence Interval for expected ROI is tightly bounded between <span className="text-emerald-400 font-bold">+4.1% and +8.3%</span>.
+                  {hasSample ? (
+                    <>With {heroMetrics.totalPredictions.toLocaleString()} verified predictions, the 95% Confidence Interval for expected ROI is bounded between <span className="text-emerald-400 font-bold">{heroMetrics.ci95LowerPct}% and +{heroMetrics.ci95UpperPct}%</span>.</>
+                  ) : (
+                    <>Confidence intervals will be computed once sample predictions are settled against bookmaker closing lines.</>
+                  )}
                 </p>
               </div>
             </div>
@@ -250,39 +272,45 @@ export default function ScientificEvidencePage() {
           <CardHeader>
             <CardTitle className="text-white text-base font-bold">Reliability Diagram & Calibration Curve</CardTitle>
             <CardDescription className="text-slate-400 text-xs">
-              Compares Model Predicted Probabilities ($10\%$ buckets) against Actual Observed Historical Frequencies. Perfect calibration follows the $y = x$ diagonal.
+              Compares Model Predicted Probabilities against Actual Observed Historical Frequencies.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader className="bg-slate-950 border-b border-slate-850">
-                <TableRow className="border-slate-850">
-                  <th className="text-slate-400 text-left text-[10px] uppercase py-3 pl-3">Probability Bucket</th>
-                  <th className="text-slate-400 text-center text-[10px] uppercase py-3">Mean Predicted Prob</th>
-                  <th className="text-slate-400 text-center text-[10px] uppercase py-3">Observed Win Frequency</th>
-                  <th className="text-slate-400 text-center text-[10px] uppercase py-3">Calibration Error</th>
-                  <th className="text-slate-400 text-center text-[10px] uppercase py-3 pr-3">Sample Count</th>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {calibrationCurve.map((row, idx) => {
-                  const error = Math.abs(row.predicted - row.observed);
-                  return (
-                    <TableRow key={idx} className="border-slate-850 hover:bg-slate-850/30">
-                      <TableCell className="py-3 pl-3 font-bold text-white">{row.bucket}</TableCell>
-                      <TableCell className="text-center py-3 text-slate-300">{row.predicted}%</TableCell>
-                      <TableCell className="text-center py-3 font-bold text-emerald-400">{row.observed}%</TableCell>
-                      <TableCell className="text-center py-3">
-                        <span className="bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 px-2 py-0.5 rounded text-[10px] font-bold">
-                          {error.toFixed(2)}%
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-center py-3 text-slate-400 pr-3">{row.count.toLocaleString()}</TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
+            {calibrationCurve && calibrationCurve.length > 0 ? (
+              <Table>
+                <TableHeader className="bg-slate-950 border-b border-slate-850">
+                  <TableRow className="border-slate-850">
+                    <th className="text-slate-400 text-left text-[10px] uppercase py-3 pl-3">Probability Bucket</th>
+                    <th className="text-slate-400 text-center text-[10px] uppercase py-3">Mean Predicted Prob</th>
+                    <th className="text-slate-400 text-center text-[10px] uppercase py-3">Observed Win Frequency</th>
+                    <th className="text-slate-400 text-center text-[10px] uppercase py-3">Calibration Error</th>
+                    <th className="text-slate-400 text-center text-[10px] uppercase py-3 pr-3">Sample Count</th>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {calibrationCurve.map((row, idx) => {
+                    const error = Math.abs(row.predicted - row.observed);
+                    return (
+                      <TableRow key={idx} className="border-slate-850 hover:bg-slate-850/30">
+                        <TableCell className="py-3 pl-3 font-bold text-white">{row.bucket}</TableCell>
+                        <TableCell className="text-center py-3 text-slate-300">{row.predicted}%</TableCell>
+                        <TableCell className="text-center py-3 font-bold text-emerald-400">{row.observed}%</TableCell>
+                        <TableCell className="text-center py-3">
+                          <span className="bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 px-2 py-0.5 rounded text-[10px] font-bold">
+                            {error.toFixed(2)}%
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-center py-3 text-slate-400 pr-3">{row.count.toLocaleString()}</TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            ) : (
+              <div className="py-12 text-center text-slate-500 text-xs">
+                Calibration reliability curves require a minimum sample of settled predictions.
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
@@ -321,28 +349,34 @@ export default function ScientificEvidencePage() {
             </div>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader className="bg-slate-950 border-b border-slate-850">
-                <TableRow className="border-slate-850">
-                  <th className="text-slate-400 text-left text-[10px] uppercase py-3 pl-3">Subgroup Segment</th>
-                  <th className="text-slate-400 text-center text-[10px] uppercase py-3">Total Bets</th>
-                  <th className="text-slate-400 text-center text-[10px] uppercase py-3">Win Rate %</th>
-                  <th className="text-slate-400 text-center text-[10px] uppercase py-3">Paper ROI %</th>
-                  <th className="text-slate-400 text-center text-[10px] uppercase py-3 pr-3">Mean CLV %</th>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {(subgroupBreakdown[breakdownCategory] as any[]).map((row, idx) => (
-                  <TableRow key={idx} className="border-slate-850 hover:bg-slate-850/30">
-                    <TableCell className="py-3 pl-3 font-bold text-white">{row.name || row.range || row.bucket}</TableCell>
-                    <TableCell className="text-center py-3 text-slate-300">{row.bets.toLocaleString()}</TableCell>
-                    <TableCell className="text-center py-3 font-bold text-white">{row.winRatePct}%</TableCell>
-                    <TableCell className="text-center py-3 font-bold text-emerald-400">+{row.roiPct}%</TableCell>
-                    <TableCell className="text-center py-3 font-bold text-emerald-400 pr-3">+{row.clvPct}%</TableCell>
+            {subgroupBreakdown && (subgroupBreakdown[breakdownCategory] as any[])?.length > 0 ? (
+              <Table>
+                <TableHeader className="bg-slate-950 border-b border-slate-850">
+                  <TableRow className="border-slate-850">
+                    <th className="text-slate-400 text-left text-[10px] uppercase py-3 pl-3">Subgroup Segment</th>
+                    <th className="text-slate-400 text-center text-[10px] uppercase py-3">Total Bets</th>
+                    <th className="text-slate-400 text-center text-[10px] uppercase py-3">Win Rate %</th>
+                    <th className="text-slate-400 text-center text-[10px] uppercase py-3">Paper ROI %</th>
+                    <th className="text-slate-400 text-center text-[10px] uppercase py-3 pr-3">Mean CLV %</th>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {(subgroupBreakdown[breakdownCategory] as any[]).map((row, idx) => (
+                    <TableRow key={idx} className="border-slate-850 hover:bg-slate-850/30">
+                      <TableCell className="py-3 pl-3 font-bold text-white">{row.name || row.range || row.bucket}</TableCell>
+                      <TableCell className="text-center py-3 text-slate-300">{row.bets.toLocaleString()}</TableCell>
+                      <TableCell className="text-center py-3 font-bold text-white">{row.winRatePct}%</TableCell>
+                      <TableCell className="text-center py-3 font-bold text-emerald-400">+{row.roiPct}%</TableCell>
+                      <TableCell className="text-center py-3 font-bold text-emerald-400 pr-3">+{row.clvPct}%</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            ) : (
+              <div className="py-12 text-center text-slate-500 text-xs">
+                No subgroup records found for this category yet.
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
@@ -357,36 +391,42 @@ export default function ScientificEvidencePage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader className="bg-slate-950 border-b border-slate-850">
-                <TableRow className="border-slate-850">
-                  <th className="text-slate-400 text-left text-[10px] uppercase py-3 pl-3">Prediction ID</th>
-                  <th className="text-slate-400 text-left text-[10px] uppercase py-3">Fixture</th>
-                  <th className="text-slate-400 text-center text-[10px] uppercase py-3">Selection</th>
-                  <th className="text-slate-400 text-center text-[10px] uppercase py-3">Model Prob</th>
-                  <th className="text-slate-400 text-center text-[10px] uppercase py-3">Fair / Book</th>
-                  <th className="text-slate-400 text-center text-[10px] uppercase py-3">Status</th>
-                  <th className="text-slate-400 text-center text-[10px] uppercase py-3 pr-3">CLV</th>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {auditLedgerLogs.map((log) => (
-                  <TableRow key={log.id} className="border-slate-850 hover:bg-slate-850/30">
-                    <TableCell className="py-3 pl-3 text-slate-400 font-mono text-[11px]">{log.id.slice(0, 12)}...</TableCell>
-                    <TableCell className="py-3 font-bold text-white">{log.fixture}</TableCell>
-                    <TableCell className="text-center py-3 text-emerald-400 font-bold">{log.market}</TableCell>
-                    <TableCell className="text-center py-3 text-white">{(log.prob * 100).toFixed(1)}%</TableCell>
-                    <TableCell className="text-center py-3 text-slate-300">{log.fairOdds} / {log.bookOdds}</TableCell>
-                    <TableCell className="text-center py-3">
-                      <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/40 text-[10px] font-bold">
-                        {log.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-center py-3 font-bold text-emerald-400 pr-3">+{log.clv}%</TableCell>
+            {auditLedgerLogs && auditLedgerLogs.length > 0 ? (
+              <Table>
+                <TableHeader className="bg-slate-950 border-b border-slate-850">
+                  <TableRow className="border-slate-850">
+                    <th className="text-slate-400 text-left text-[10px] uppercase py-3 pl-3">Prediction ID</th>
+                    <th className="text-slate-400 text-left text-[10px] uppercase py-3">Fixture</th>
+                    <th className="text-slate-400 text-center text-[10px] uppercase py-3">Selection</th>
+                    <th className="text-slate-400 text-center text-[10px] uppercase py-3">Model Prob</th>
+                    <th className="text-slate-400 text-center text-[10px] uppercase py-3">Fair / Book</th>
+                    <th className="text-slate-400 text-center text-[10px] uppercase py-3">Status</th>
+                    <th className="text-slate-400 text-center text-[10px] uppercase py-3 pr-3">CLV</th>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {auditLedgerLogs.map((log) => (
+                    <TableRow key={log.id} className="border-slate-850 hover:bg-slate-850/30">
+                      <TableCell className="py-3 pl-3 text-slate-400 font-mono text-[11px]">{log.id.slice(0, 12)}...</TableCell>
+                      <TableCell className="py-3 font-bold text-white">{log.fixture}</TableCell>
+                      <TableCell className="text-center py-3 text-emerald-400 font-bold">{log.market}</TableCell>
+                      <TableCell className="text-center py-3 text-white">{(log.prob * 100).toFixed(1)}%</TableCell>
+                      <TableCell className="text-center py-3 text-slate-300">{log.fairOdds} / {log.bookOdds}</TableCell>
+                      <TableCell className="text-center py-3">
+                        <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/40 text-[10px] font-bold">
+                          {log.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-center py-3 font-bold text-emerald-400 pr-3">+{log.clv}%</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            ) : (
+              <div className="py-12 text-center text-slate-500 text-xs">
+                No prediction audits logged in public ledger yet.
+              </div>
+            )}
           </CardContent>
         </Card>
       )}

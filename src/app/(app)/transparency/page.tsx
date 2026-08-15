@@ -35,6 +35,8 @@ export default function TransparencyDashboardPage() {
     }
   };
 
+  const hasSettled = (data?.settledPredictions || 0) > 0;
+
   return (
     <div className="min-h-screen bg-[#0A0D14] text-slate-100 font-mono p-6 space-y-6">
       {/* Header */}
@@ -59,23 +61,29 @@ export default function TransparencyDashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
         <div className="bg-[#0F131C] border border-slate-800 p-4 rounded-lg space-y-1">
           <div className="text-slate-400">TOTAL PREDICTIONS</div>
-          <div className="text-2xl font-bold text-slate-100">{data?.totalPredictions || 4820}</div>
-          <div className="text-[10px] text-slate-500">{data?.settledPredictions || 4510} Settled</div>
+          <div className="text-2xl font-bold text-slate-100">{data?.totalPredictions ?? 0}</div>
+          <div className="text-[10px] text-slate-500">{data?.settledPredictions ?? 0} Settled</div>
         </div>
         <div className="bg-[#0F131C] border border-slate-800 p-4 rounded-lg space-y-1">
           <div className="text-slate-400">REALIZED ROI / YIELD</div>
-          <div className="text-2xl font-bold text-emerald-400">+{data?.roiPct || 8.4}%</div>
-          <div className="text-[10px] text-slate-500">Verified Return</div>
+          <div className={`text-2xl font-bold ${hasSettled ? (data?.roiPct >= 0 ? 'text-emerald-400' : 'text-rose-400') : 'text-slate-500'}`}>
+            {hasSettled ? `${data?.roiPct >= 0 ? '+' : ''}${data?.roiPct}%` : '—'}
+          </div>
+          <div className="text-[10px] text-slate-500">{hasSettled ? 'Verified Return' : 'Pending Settlement'}</div>
         </div>
         <div className="bg-[#0F131C] border border-slate-800 p-4 rounded-lg space-y-1">
           <div className="text-slate-400">POSITIVE CLV %</div>
-          <div className="text-2xl font-bold text-sky-400">{data?.positiveClvPct || 78.5}%</div>
-          <div className="text-[10px] text-slate-500">Avg +{data?.avgClvPct || 4.1}% CLV</div>
+          <div className="text-2xl font-bold text-sky-400">
+            {hasSettled ? `${data?.positiveClvPct}%` : '—'}
+          </div>
+          <div className="text-[10px] text-slate-500">{hasSettled ? `Avg ${data?.avgClvPct >= 0 ? '+' : ''}${data?.avgClvPct}% CLV` : 'Pending Lines'}</div>
         </div>
         <div className="bg-[#0F131C] border border-slate-800 p-4 rounded-lg space-y-1">
           <div className="text-slate-400">BRIER SCORE / ECE</div>
-          <div className="text-2xl font-bold text-purple-400">{data?.brierScore || 0.181}</div>
-          <div className="text-[10px] text-slate-500">ECE: {data?.ecePct || 1.6}%</div>
+          <div className="text-2xl font-bold text-purple-400">
+            {data?.brierScore !== null && data?.brierScore !== undefined ? data.brierScore : '—'}
+          </div>
+          <div className="text-[10px] text-slate-500">{data?.ecePct !== null && data?.ecePct !== undefined ? `ECE: ${data.ecePct}%` : 'ECE: —'}</div>
         </div>
       </div>
     </div>

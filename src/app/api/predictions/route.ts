@@ -134,45 +134,47 @@ export async function GET(request: Request) {
       grouped[matchKey].isLocked = isMatchLocked;
 
       if (pred.market_type === 'ML') {
-        // V3 stores selected probability in calibrated_probability
-        const p = pred.calibrated_probability || 0.4;
-        
-        // Map confidence from explainability_json
+        const p = pred.calibrated_probability || 0;
+        const probs = pred.probabilities || {};
+        const homeP = probs.home !== undefined ? probs.home : (pred.selection === 'home' ? p : null);
+        const drawP = probs.draw !== undefined ? probs.draw : (pred.selection === 'draw' ? p : null);
+        const awayP = probs.away !== undefined ? probs.away : (pred.selection === 'away' ? p : null);
+
         const finalConf = pred.explainability_json?.modelInfo?.confidenceScore || 50;
         grouped[matchKey].confidence = finalConf >= 75 ? '🟢 High' : finalConf >= 60 ? '🟡 Medium' : '⚪ Low';
 
         grouped[matchKey].prediction = {
-          home: isMatchLocked ? null : Math.round((pred.selection === 'home' ? p : 0.3) * 100),
-          draw: isMatchLocked ? null : Math.round((pred.selection === 'draw' ? p : 0.25) * 100),
-          away: isMatchLocked ? null : Math.round((pred.selection === 'away' ? p : 0.35) * 100),
-          homeOdds: pred.selection === 'home' ? pred.market_odds : 2.5,
-          drawOdds: pred.selection === 'draw' ? pred.market_odds : 3.0,
-          awayOdds: pred.selection === 'away' ? pred.market_odds : 2.8,
+          home: isMatchLocked ? null : (homeP !== null ? Math.round(homeP * 100) : null),
+          draw: isMatchLocked ? null : (drawP !== null ? Math.round(drawP * 100) : null),
+          away: isMatchLocked ? null : (awayP !== null ? Math.round(awayP * 100) : null),
+          homeOdds: pred.selection === 'home' ? (pred.market_odds || 0) : 0,
+          drawOdds: pred.selection === 'draw' ? (pred.market_odds || 0) : 0,
+          awayOdds: pred.selection === 'away' ? (pred.market_odds || 0) : 0,
         };
       } else if (pred.market_type === 'AH') {
-        const lineStr = pred.line > 0 ? `+${pred.line}` : `${pred.line || -0.5}`;
-        const ahProb = pred.calibrated_probability || 0.5;
-        const ahOdds = pred.market_odds || 1.95;
+        const lineStr = pred.line !== undefined && pred.line !== null ? (pred.line > 0 ? `+${pred.line}` : `${pred.line}`) : '';
+        const ahProb = pred.calibrated_probability || 0;
+        const ahOdds = pred.market_odds || 0;
 
         grouped[matchKey].asianHandicap = {
-          line: `${homeTeam} ${lineStr}`,
-          confidence: isMatchLocked ? null : Math.round(ahProb * 100),
+          line: lineStr ? `${homeTeam} ${lineStr}` : 'AH',
+          confidence: isMatchLocked ? null : (ahProb > 0 ? Math.round(ahProb * 100) : null),
           odds: ahOdds,
-          fairOdds: isMatchLocked ? null : Number((1 / ahProb).toFixed(2)),
-          edge: isMatchLocked ? null : Number(((ahOdds * ahProb - 1) * 100).toFixed(1))
+          fairOdds: isMatchLocked ? null : (ahProb > 0 ? Number((1 / ahProb).toFixed(2)) : null),
+          edge: isMatchLocked ? null : (ahOdds > 0 && ahProb > 0 ? Number(((ahOdds * ahProb - 1) * 100).toFixed(1)) : null)
         };
       } else if (pred.market_type === 'OU') {
-        const line = pred.line || 2.5;
-        const overProb = pred.calibrated_probability || 0.5;
-        const ouOdds = pred.market_odds || 1.91;
+        const line = pred.line !== undefined && pred.line !== null ? pred.line : 2.5;
+        const overProb = pred.calibrated_probability || 0;
+        const ouOdds = pred.market_odds || 0;
 
         grouped[matchKey].overUnder = {
           line: `O/U ${line}`,
-          over: isMatchLocked ? null : Math.round(overProb * 100),
-          under: isMatchLocked ? null : Math.round((1 - overProb) * 100),
+          over: isMatchLocked ? null : (overProb > 0 ? Math.round(overProb * 100) : null),
+          under: isMatchLocked ? null : (overProb > 0 ? Math.round((1 - overProb) * 100) : null),
           odds: ouOdds,
-          fairOdds: isMatchLocked ? null : Number((1 / overProb).toFixed(2)),
-          edge: isMatchLocked ? null : Number(((ouOdds * overProb - 1) * 100).toFixed(1))
+          fairOdds: isMatchLocked ? null : (overProb > 0 ? Number((1 / overProb).toFixed(2)) : null),
+          edge: isMatchLocked ? null : (ouOdds > 0 && overProb > 0 ? Number(((ouOdds * overProb - 1) * 100).toFixed(1)) : null)
         };
       }
     }

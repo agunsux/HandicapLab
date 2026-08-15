@@ -8,6 +8,13 @@ import { FootballIntelligenceService } from '@/services/football-intelligence.se
 
 export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const matchId = searchParams.get('matchId') || '';
+
+    if (!matchId) {
+      return ApiHelper.response(false, null, 'matchId query parameter is required.', 400);
+    }
+
     const authHeader = request.headers.get('authorization');
     const token = authHeader?.split(' ')[1];
     let userId: string | undefined;
@@ -35,9 +42,9 @@ export async function GET(request: Request) {
       return ApiHelper.response(false, null, 'Rate limit exceeded.', 429);
     }
 
-    const result = await FootballIntelligenceService.getMatchIntelligence('match-1001');
+    const result = await FootballIntelligenceService.getMatchIntelligence(matchId);
     if (!result) {
-      return ApiHelper.response(false, null, 'Failed to fetch recommendations.', 500);
+      return ApiHelper.response(false, null, `No recommendations found for match ${matchId}.`, 404);
     }
 
     return NextResponse.json({

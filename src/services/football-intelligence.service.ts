@@ -172,34 +172,32 @@ export class FootballIntelligenceService {
   }
 
   /**
-   * Generates Explainability contributions for a match.
+   * Generates Explainability contributions for a match from real database ledger.
    */
   public static async getMatchExplanations(
     matchId: string
   ): Promise<EnterpriseResponse<FeatureContribution[]> | null> {
     const startTime = performance.now();
 
-    // Default mock features
-    const features = {
-      homeAttack: 2.15,
-      awayAttack: 1.85,
-      homeDefense: 1.70,
-      awayDefense: 2.05,
-      homeRestDays: 5,
-      awayRestDays: 3,
-      isHomeAdvantage: true,
-      weatherRain: false,
-      missingLineupKeyPlayers: 1
-    };
+    const { data: record, error } = await supabase
+      .from('prediction_ledger_v3')
+      .select('model_version, explainability_json, created_at')
+      .eq('match_id', matchId)
+      .limit(1)
+      .single();
 
-    const graph = ExplainabilityEngine.explainPrediction(features);
+    if (error || !record) {
+      return null;
+    }
+
+    const graph = (record.explainability_json?.featureContributions as FeatureContribution[]) || [];
     const endTime = performance.now();
 
     return {
       metadata: {
-        model_version: 'ensemble-platt-v1',
+        model_version: record.model_version || 'ensemble-platt-v1',
         dataset_version: 'Gold_v1',
-        prediction_timestamp: new Date().toISOString(),
+        prediction_timestamp: record.created_at || new Date().toISOString(),
         generated_at: new Date().toISOString(),
         processing_time_ms: Number((endTime - startTime).toFixed(1)),
         metrics: {
@@ -216,29 +214,41 @@ export class FootballIntelligenceService {
   }
 
   /**
-   * Replays prediction snapshots over a timeline trajectory.
+   * Replays prediction snapshots over a timeline trajectory from real records.
    */
   public static async getMatchTimeline(
     matchId: string
   ): Promise<EnterpriseResponse<any> | null> {
     const startTime = performance.now();
 
-    // Mock timeline points
-    const horizons = [
-      { horizon: 'T-7 days', probability: 0.55, edge: 1.2, fairOdds: 1.82, bookmakerOdds: 1.80, ev: -1.1, decision: 'NO_ACTION' },
-      { horizon: 'T-3 days', probability: 0.57, edge: 4.8, fairOdds: 1.75, bookmakerOdds: 1.84, ev: 4.8, decision: 'VALUE' },
-      { horizon: 'T-1 day', probability: 0.58, edge: 6.7, fairOdds: 1.72, bookmakerOdds: 1.84, ev: 6.7, decision: 'VALUE' },
-      { horizon: 'Lineup Release', probability: 0.602, edge: 10.8, fairOdds: 1.66, bookmakerOdds: 1.84, ev: 10.8, decision: 'STRONG_VALUE' },
-      { horizon: 'Kickoff', probability: 0.602, edge: 10.8, fairOdds: 1.66, bookmakerOdds: 1.84, ev: 10.8, decision: 'STRONG_VALUE' }
-    ];
+    const { data: records, error } = await supabase
+      .from('prediction_ledger_v3')
+      .select('market_type, calibrated_probability, raw_edge, market_odds, fair_odds, created_at, model_version')
+      .eq('match_id', matchId)
+      .order('created_at', { ascending: true });
+
+    if (error || !records || records.length === 0) {
+      return null;
+    }
+
+    const horizons = records.map((r, i) => ({
+      horizon: `Snapshot ${i + 1}`,
+      probability: r.calibrated_probability,
+      edge: r.raw_edge,
+      fairOdds: r.fair_odds,
+      bookmakerOdds: r.market_odds,
+      ev: r.raw_edge,
+      decision: Number(r.raw_edge) > 0.05 ? 'STRONG_VALUE' : Number(r.raw_edge) > 0.02 ? 'VALUE' : 'NO_ACTION',
+      timestamp: r.created_at
+    }));
 
     const endTime = performance.now();
 
     return {
       metadata: {
-        model_version: 'ensemble-platt-v1',
+        model_version: records[0]?.model_version || 'ensemble-platt-v1',
         dataset_version: 'Gold_v1',
-        prediction_timestamp: new Date().toISOString(),
+        prediction_timestamp: records[0]?.created_at || new Date().toISOString(),
         generated_at: new Date().toISOString(),
         processing_time_ms: Number((endTime - startTime).toFixed(1)),
         metrics: {
