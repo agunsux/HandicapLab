@@ -63,6 +63,14 @@ export class ApiFootballProvider extends BaseProvider {
     return await response.json();
   }
 
+  async getFixturesByDate(dateStr: string): Promise<any> {
+    const url = `${this.baseUrl}/fixtures?date=${dateStr}`;
+    const response = await this.fetchWithQuota('fixtures', url, 100, {
+      headers: this.defaultHeaders
+    });
+    return await response.json();
+  }
+
   /**
    * Health check
    */

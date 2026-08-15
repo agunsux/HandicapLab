@@ -10,7 +10,7 @@ import {
   ModelStatusSchema,
   ProvenanceRecordSchema,
 } from '../src/lib/contracts/uiContracts';
-import { RAW_API_FOOTBALL_FIXTURES, RAW_ODDSPAPI_EVENTS } from '../src/lib/integrity/dataIntegrityEngine';
+import { RAW_API_FOOTBALL_FIXTURES, RAW_ODDSPAPI_EVENTS } from './fixtures/synthetic';
 
 describe('EPIC 55 — Real Data UI & Production Truth Gate', () => {
   describe('1. Zero Mock in Production Contract Gate', () => {
@@ -147,7 +147,7 @@ describe('EPIC 55 — Real Data UI & Production Truth Gate', () => {
 
   describe('4. Final 10 Real Upcoming Fixtures UI Acceptance Verification', () => {
     test('should verify 10/10 real upcoming fixtures pass all 11 UI acceptance gates', () => {
-      const acceptanceLedger = RAW_API_FOOTBALL_FIXTURES.map((af, idx) => {
+      const acceptanceLedger = RAW_API_FOOTBALL_FIXTURES.map((af: any, idx: number) => {
         const odds = RAW_ODDSPAPI_EVENTS[idx];
         return {
           index: idx + 1,
@@ -173,7 +173,7 @@ describe('EPIC 55 — Real Data UI & Production Truth Gate', () => {
       });
 
       expect(acceptanceLedger).toHaveLength(10);
-      acceptanceLedger.forEach((row) => {
+      acceptanceLedger.forEach((row: any) => {
         expect(Object.values(row.gates).every((v) => v === 'PASS')).toBe(true);
       });
 

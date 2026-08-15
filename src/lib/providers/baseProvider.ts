@@ -24,7 +24,7 @@ export abstract class BaseProvider {
     }
 
     if (!response.ok) {
-      throw new Error(`[${this.provider}] Request failed: ${response.statusText}`);
+      throw new Error(`[${this.provider}] Request failed: HTTP ${response.status} ${response.statusText}`);
     }
 
     return response;

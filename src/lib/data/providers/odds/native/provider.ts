@@ -347,4 +347,18 @@ function mapErrorKindToStatus(kind: OddsPapiError['kind']): OddsProviderStatus {
   }
 }
 
-export const oddsPapiV4Provider = new OddsPapiV4Provider();
+// Lazily-constructed singleton: construction reads provider credentials, so it
+// is deferred until first use. Importing this module must never throw at
+// module scope when credentials are absent.
+let _oddsPapiV4Provider: OddsPapiV4Provider | null = null;
+export function getOddsPapiV4Provider(): OddsPapiV4Provider {
+  _oddsPapiV4Provider ??= new OddsPapiV4Provider();
+  return _oddsPapiV4Provider;
+}
+export const oddsPapiV4Provider = new Proxy({} as OddsPapiV4Provider, {
+  get: (_target, prop: string | symbol) => {
+    const instance = getOddsPapiV4Provider();
+    const value = Reflect.get(instance, prop);
+    return typeof value === 'function' ? (value as (...args: unknown[]) => unknown).bind(instance) : value;
+  },
+});

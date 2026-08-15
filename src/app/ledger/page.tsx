@@ -3,11 +3,42 @@ import { supabase } from '@/lib/supabase.server';
 export const revalidate = 60; // Cache for 60 seconds
 
 export default async function PublicLedgerPage() {
-  // We use service role to bypass RLS for public ledger viewing if necessary, 
-  // or just use supabase.server which should have access.
-  const { data: statsData } = await supabase
-    .from('paper_trades')
-    .select('status, profit_loss, stake, entry_odds, odds');
+  let statsData: any[] | null = null;
+  let recentTrades: any[] | null = null;
+
+  try {
+    const statsRes = await supabase
+      .from('paper_trades')
+      .select('status, profit_loss, stake, entry_odds, odds');
+    statsData = statsRes.data;
+
+    const recentRes = await supabase
+      .from('paper_trades')
+      .select(`
+        id,
+        created_at,
+        market_type,
+        selection,
+        odds,
+        entry_odds,
+        status,
+        profit_loss,
+        predictions (
+          confidence,
+          prediction
+        ),
+        matches (
+          home_team,
+          away_team,
+          kickoff
+        )
+      `)
+      .order('created_at', { ascending: false })
+      .limit(50);
+    recentTrades = recentRes.data;
+  } catch (err) {
+    console.error('[PublicLedgerPage] Failed to fetch ledger data:', err);
+  }
 
   let totalTrades = 0;
   let wonTrades = 0;
@@ -28,31 +59,6 @@ export default async function PublicLedgerPage() {
   }
 
   const winRate = settledTrades > 0 ? ((wonTrades / settledTrades) * 100).toFixed(1) + '%' : '--%';
-
-  // Fetch 50 latest
-  const { data: recentTrades } = await supabase
-    .from('paper_trades')
-    .select(`
-      id,
-      created_at,
-      market_type,
-      selection,
-      odds,
-      entry_odds,
-      status,
-      profit_loss,
-      predictions (
-        confidence,
-        prediction
-      ),
-      matches (
-        home_team,
-        away_team,
-        kickoff
-      )
-    `)
-    .order('created_at', { ascending: false })
-    .limit(50);
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col pt-16">

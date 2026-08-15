@@ -11,8 +11,6 @@ import {
 import { canonicalEntityResolver } from '../src/lib/warehouse/entityResolver';
 
 describe('EPIC 53 — Phase 1 Evidence-Based Data Integrity Gates', () => {
-  const report = runDataIntegrityCheck();
-
   describe('Stage A: Real Canonical Resolver Execution & Linkage Proof', () => {
     test('should resolve raw provider team strings to identical canonical team IDs', () => {
       // Test top European canonical pairs across providers
@@ -39,49 +37,10 @@ describe('EPIC 53 — Phase 1 Evidence-Based Data Integrity Gates', () => {
       );
     });
 
-    test('should achieve 10/10 confirmed linkage across >= 3 competitions', () => {
-      const stageA = executeStageALinkage();
-      expect(stageA.fixturesTested).toBe(10);
-      expect(stageA.correctLinkages).toBe(10);
-      expect(stageA.falseLinkages).toBe(0);
-      expect(stageA.ambiguousLinkages).toBe(0);
-      expect(stageA.leagueCount).toBeGreaterThanOrEqual(3);
-      expect(stageA.leaguesCovered).toContain('Premier League');
-      expect(stageA.leaguesCovered).toContain('La Liga');
-      expect(stageA.leaguesCovered).toContain('Serie A');
-      expect(stageA.leaguesCovered).toContain('Bundesliga');
-      expect(stageA.passed).toBe(true);
-    });
-
-    test('should strictly compute and flag kickoff discrepancies using two-tier rule', () => {
-      const stageA = executeStageALinkage();
-      stageA.records.forEach((record) => {
-        expect(record.kickoffDiffMinutes).toBeLessThanOrEqual(15);
-        if (record.kickoffDiffMinutes <= 5) {
-          expect(record.kickoffToleranceTier).toBe('NORMAL (0-5m)');
-        } else {
-          expect(record.kickoffToleranceTier).toBe('LINKED / QUALITY FLAG (>5-15m)');
-        }
-      });
-      // Sevilla vs Real Betis quality flag (+6m diff) must be explicitly flagged
-      const flagged = stageA.records.find((r) => r.rawApiFootballHome === 'Sevilla');
-      expect(flagged).toBeDefined();
-      expect(flagged?.kickoffDiffMinutes).toBe(6);
-      expect(flagged?.kickoffToleranceTier).toBe('LINKED / QUALITY FLAG (>5-15m)');
-    });
-
-    test('should verify sharp bookmakers and all target markets on every linked fixture', () => {
-      const stageA = executeStageALinkage();
-      stageA.records.forEach((record) => {
-        expect(record.bookmakers.pinnacle).toBe(true);
-        expect(record.bookmakers.circa).toBe(true);
-        expect(record.bookmakers.sbobet).toBe(true);
-        expect(record.markets.moneyline).toBe(true);
-        expect(record.markets.asianHandicap).toBe(true);
-        expect(record.markets.overUnder).toBe(true);
-        expect(record.markets.btts).toBe(true);
-        expect(record.snapshotCount).toBeGreaterThan(0);
-      });
+    test('should FAIL CLOSED instead of fabricating linkage from quarantined synthetic arrays', () => {
+      // The deterministic fixture arrays were quarantined to tests/fixtures/synthetic.ts.
+      // Any production integrity path that relied on them must crash loudly.
+      expect(() => executeStageALinkage()).toThrowError(/\[FAIL CLOSED\]/);
     });
   });
 
@@ -131,18 +90,11 @@ describe('EPIC 53 — Phase 1 Evidence-Based Data Integrity Gates', () => {
   });
 
   describe('Checkpoint 1 Decision Gate', () => {
-    test('should produce the mandatory declaration with zero false linkages', () => {
-      expect(report.checkpointStatus).toBe('PASSED — READY FOR PO SIGN-OFF');
-      expect(report.mandatoryDeclaration).toBe(
-        'ZERO FALSE-LINKED FIXTURES DETECTED IN THE 10-FIXTURE ACCEPTANCE TEST.'
-      );
-
-      // Persist verified evidence artifact
-      const fs = require('fs');
-      const path = require('path');
-      const outPath = path.resolve(process.cwd(), 'data', 'verification', 'data_integrity_checkpoint.json');
-      fs.writeFileSync(outPath, JSON.stringify(report, null, 2), 'utf8');
-      expect(fs.existsSync(outPath)).toBe(true);
+    test('should FAIL CLOSED rather than emit a fabricated PASS declaration', () => {
+      // Stage A linkage depends on quarantined synthetic arrays, so the full
+      // checkpoint must refuse to emit a PASS/ready declaration until real
+      // production queries back the evidence.
+      expect(() => runDataIntegrityCheck()).toThrowError(/\[FAIL CLOSED\]/);
     });
   });
 });

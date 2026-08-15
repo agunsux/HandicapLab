@@ -36,6 +36,8 @@ export interface ProviderApiConfig {
   };
 }
 
+import { validateCredential } from '../../../auth/credentialValidator';
+
 const DEFAULT_CONFIG: ProviderApiConfig = {
   theStatsApi: {
     baseUrl: 'https://api.thestatsapi.com/v1', // Update to correct Base URL if needed
@@ -60,6 +62,12 @@ const DEFAULT_CONFIG: ProviderApiConfig = {
 let providerConfig: ProviderApiConfig = { ...DEFAULT_CONFIG };
 
 export function getProviderConfig(): ProviderApiConfig {
+  // Validate credentials on first access
+  providerConfig.apiFootball.apiKey = validateCredential('APIFOOTBALL_KEY', providerConfig.apiFootball.apiKey);
+  providerConfig.oddsPapi.apiKey = validateCredential('ODDS_PAPI_KEY', providerConfig.oddsPapi.apiKey);
+  // Optionally validate theStatsApi if it's strictly required for provenance. 
+  // We'll leave it out of strict provenance validation for now unless requested.
+  
   return providerConfig;
 }
 

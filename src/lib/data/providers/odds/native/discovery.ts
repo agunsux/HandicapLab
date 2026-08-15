@@ -205,4 +205,18 @@ export class OddsPapiDiscovery {
   }
 }
 
-export const oddsPapiDiscovery = new OddsPapiDiscovery();
+// Lazily-constructed singleton: construction reads provider credentials, so it
+// is deferred until first use. Importing this module must never throw at
+// module scope when credentials are absent.
+let _oddsPapiDiscovery: OddsPapiDiscovery | null = null;
+export function getOddsPapiDiscovery(): OddsPapiDiscovery {
+  _oddsPapiDiscovery ??= new OddsPapiDiscovery();
+  return _oddsPapiDiscovery;
+}
+export const oddsPapiDiscovery = new Proxy({} as OddsPapiDiscovery, {
+  get: (_target, prop: string | symbol) => {
+    const instance = getOddsPapiDiscovery();
+    const value = Reflect.get(instance, prop);
+    return typeof value === 'function' ? (value as (...args: unknown[]) => unknown).bind(instance) : value;
+  },
+});
