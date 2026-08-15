@@ -1,6 +1,6 @@
 {
-  "experimentId": "exp-1786796865876",
-  "timestamp": "2026-08-15T12:27:45.879Z",
+  "experimentId": "exp-1786797572468",
+  "timestamp": "2026-08-15T12:39:32.473Z",
   "decision": "BLOCK",
   "reasons": [
     "Failed ECE or drawdown limit bounds"
