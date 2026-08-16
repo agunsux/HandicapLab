@@ -89,3 +89,6 @@ supabase/.temp/
 .playwright-mcp/
 brain/
 scratch_*.js
+
+# EPIC: European historical dataset (generated artifacts - reproducible via historical:europe)
+data/golden/europe/
