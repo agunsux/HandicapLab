@@ -75,23 +75,33 @@ SELECT
   m.season,
   1 AS matchday,
   m.match_date::TEXT AS kickoff_at,
-  NULL AS venue,
-  NULL AS referee,
+  NULL::TEXT AS venue,
+  NULL::TEXT AS referee,
   m.home_team,
   m.away_team,
   m.home_goals AS home_score,
   m.away_goals AS away_score,
-  NULL AS home_xg,
-  NULL AS away_xg,
-  NULL AS home_shots,
-  NULL AS away_shots,
-  NULL AS home_corners,
-  NULL AS away_corners,
-  NULL AS home_possession,
-  NULL AS away_possession,
-  o.ml_h, o.ml_d, o.ml_a
+  NULL::NUMERIC AS home_xg,
+  NULL::NUMERIC AS away_xg,
+  NULL::INT AS home_shots,
+  NULL::INT AS away_shots,
+  NULL::INT AS home_corners,
+  NULL::INT AS away_corners,
+  NULL::NUMERIC AS home_possession,
+  NULL::NUMERIC AS away_possession,
+  ml.opening_home AS ml_h,
+  ml.opening_draw AS ml_d,
+  ml.opening_away AS ml_a
 FROM public.historical_matches m
-LEFT JOIN public.historical_odds o USING (canonical_id);
+LEFT JOIN (
+  SELECT canonical_id,
+         MAX(home_odds) FILTER (WHERE bookmaker_source = 'pinnacle') AS opening_home,
+         MAX(draw_odds) FILTER (WHERE bookmaker_source = 'pinnacle') AS opening_draw,
+         MAX(away_odds) FILTER (WHERE bookmaker_source = 'pinnacle') AS opening_away
+  FROM public.historical_odds
+  WHERE market = 'ML' AND observation = 'opening'
+  GROUP BY canonical_id
+) ml ON ml.canonical_id = m.canonical_id;
 
 -- 4. gold_odds_explorer — real 1X2 opening rows from historical_odds (with the
 --    actual source bookmaker + closing reference where present; CLV/ROI NULL

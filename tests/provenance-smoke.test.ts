@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import { validateCredential, CredentialKind } from '../src/lib/auth/credentialValidator';
-import { PROVENANCE_STATUSES } from '../src/app/api/v1/provenance/smoke/route';
+import { PROVENANCE_STATUSES, evaluateRecordEligibility } from '../src/app/api/v1/provenance/smoke/route';
 
 const CRED_KEYS = [
   'ODDS_PAPI_KEY',
@@ -174,6 +174,154 @@ describe('EPIC 57 Preflight — Provenance Smoke', () => {
         expect(source).not.toContain(writeOp);
       }
       expect(source).toContain('.select(');
+    });
+  });
+
+  describe('5. Record Eligibility Hardening — principled exclusion of non-genuine records', () => {
+    const validResolvedRecord = {
+      ledgerId: 'ledger-uuid-001',
+      matchId: 'match-uuid-001',
+      providerFixtureId: '123456',
+      home: 'Manchester City',
+      away: 'Chelsea',
+      kickoff: '2026-08-22T15:00:00.000Z',
+      competition: 'Premier League',
+      source: 'PROVIDER',
+      modelId: 'prematch-v1',
+      rowFields: {
+        home: true,
+        away: true,
+        kickoff: true,
+        matchId: true,
+        providerFixtureId: true,
+        league: true,
+      },
+      matchJoin: 'joined' as const,
+      matchJoinError: null,
+    };
+
+    const validRow = {
+      id: 'ledger-uuid-001',
+      match_id: 'match-uuid-001',
+      model_id: 'prematch-v1',
+      source_type: 'PROVIDER',
+      data_status: 'ACTIVE',
+      prediction_timestamp: '2026-08-22T12:00:00.000Z',
+      explainability_json: {
+        summary: 'Form and xG advantage for home team',
+        reasonCodes: ['Positive Expected Value', 'Form Advantage'],
+      },
+      feature_version: 'v1.0',
+      feature_vector_snapshot: { matchId: '123456' },
+    };
+
+    const validMatch = {
+      id: 'match-uuid-001',
+      home_team: 'Manchester City',
+      away_team: 'Chelsea',
+      kickoff: '2026-08-22T15:00:00.000Z',
+      league: 'Premier League',
+      status: 'upcoming',
+      source_type: 'PROVIDER',
+      data_status: 'ACTIVE',
+    };
+
+    it('accepts genuine production record as eligible for live verification', () => {
+      const res = evaluateRecordEligibility(validRow, validResolvedRecord, validMatch);
+      expect(res.eligible).toBe(true);
+      expect(res.status).toBe('VERIFICATION_FAILED');
+      expect(res.reason).toBe('pending live verification');
+    });
+
+    it('excludes records labelled "Real test run" in explainability metadata', () => {
+      const testRow = {
+        ...validRow,
+        explainability_json: {
+          summary: 'Real test run',
+          reasonCodes: ['Positive Expected Value', 'Quarantined: High Calibration Uncertainty'],
+        },
+      };
+      const res = evaluateRecordEligibility(testRow, validResolvedRecord, validMatch);
+      expect(res.eligible).toBe(false);
+      expect(res.status).toBe('SCHEMA_INVALID');
+      expect(res.reason).toMatch(/Explainability metadata indicates a validation or test script execution/);
+    });
+
+    it('excludes records with test model identifiers (e.g. prematch-v2-test)', () => {
+      const testRow = {
+        ...validRow,
+        model_id: 'prematch-v2-test',
+      };
+      const res = evaluateRecordEligibility(testRow, validResolvedRecord, validMatch);
+      expect(res.eligible).toBe(false);
+      expect(res.status).toBe('SCHEMA_INVALID');
+      expect(res.reason).toMatch(/Model identifier.*indicates a test or validation model/);
+    });
+
+    it('excludes quarantined records', () => {
+      const quarantinedRow = {
+        ...validRow,
+        data_status: 'QUARANTINED',
+      };
+      const res = evaluateRecordEligibility(quarantinedRow, validResolvedRecord, validMatch);
+      expect(res.eligible).toBe(false);
+      expect(res.status).toBe('PROVENANCE_MISSING');
+      expect(res.reason).toMatch(/quarantined by data governance/);
+    });
+
+    it('excludes records with synthetic or test source_type', () => {
+      const syntheticRow = {
+        ...validRow,
+        source_type: 'SYNTHETIC',
+      };
+      const res = evaluateRecordEligibility(syntheticRow, validResolvedRecord, validMatch);
+      expect(res.eligible).toBe(false);
+      expect(res.status).toBe('PROVENANCE_MISSING');
+      expect(res.reason).toMatch(/flagged as non-genuine/);
+    });
+
+    it('excludes records with shadow-match identifiers in feature snapshot', () => {
+      const shadowRow = {
+        ...validRow,
+        feature_vector_snapshot: { matchId: 'shadow-match-123' },
+      };
+      const res = evaluateRecordEligibility(shadowRow, validResolvedRecord, validMatch);
+      expect(res.eligible).toBe(false);
+      expect(res.status).toBe('SCHEMA_INVALID');
+      expect(res.reason).toMatch(/Feature snapshot contains test match identifier/);
+    });
+
+    it('excludes post-kickoff predictions (look-ahead leakage violation)', () => {
+      const postKickoffRow = {
+        ...validRow,
+        prediction_timestamp: '2026-08-22T16:00:00.000Z', // 1 hour after 15:00 kickoff
+      };
+      const res = evaluateRecordEligibility(postKickoffRow, validResolvedRecord, validMatch);
+      expect(res.eligible).toBe(false);
+      expect(res.status).toBe('SCHEMA_INVALID');
+      expect(res.reason).toMatch(/Prediction timestamp violates pre-kickoff invariant/);
+    });
+
+    it('excludes archived test fixtures', () => {
+      const archivedMatch = {
+        ...validMatch,
+        status: 'archived',
+      };
+      const res = evaluateRecordEligibility(validRow, validResolvedRecord, archivedMatch);
+      expect(res.eligible).toBe(false);
+      expect(res.status).toBe('PROVENANCE_MISSING');
+      expect(res.reason).toMatch(/archived test fixture/);
+    });
+
+    it('excludes dummy team names', () => {
+      const dummyRecord = {
+        ...validResolvedRecord,
+        home: 'Test Team Synthetic',
+      };
+      const res = evaluateRecordEligibility(validRow, dummyRecord, validMatch);
+      expect(res.eligible).toBe(false);
+      expect(res.status).toBe('SCHEMA_INVALID');
+      expect(res.reason).toMatch(/Record contains dummy, mock, synthetic, or shadow match identifiers/);
     });
   });
 });

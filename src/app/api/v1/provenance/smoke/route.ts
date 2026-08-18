@@ -42,7 +42,11 @@ function isDummyIdentifier(name: string | null): boolean {
     lower.includes('dummy') ||
     lower.includes('synthetic') ||
     lower.includes('placeholder') ||
-    lower.includes('test team')
+    lower.includes('test team') ||
+    lower.includes('shadow-match') ||
+    lower.includes('fixture-test') ||
+    lower.includes('demo') ||
+    lower.includes('sample')
   );
 }
 
@@ -55,6 +59,7 @@ interface ResolvedRecord {
   kickoff: string | null;
   competition: string | null;
   source: string | null;
+  modelId: string | null;
   rowFields: {
     home: boolean;
     away: boolean;
@@ -74,7 +79,7 @@ interface ResolvedRecord {
 // present; otherwise joins the canonical `matches` row by match_id (read-only).
 // Eligibility semantics are unchanged; this only records WHY a row could not be
 // resolved so the gate can distinguish validator bugs from incomplete records.
-async function resolveRecord(row: any, supabase: any): Promise<ResolvedRecord> {
+async function resolveRecord(row: any, supabase: any): Promise<{ record: ResolvedRecord; match: any }> {
   const rowHome = cleanTeamName(row.home_team);
   const rowAway = cleanTeamName(row.away_team);
   const rowKickoff = cleanTeamName(row.kickoff) ?? cleanTeamName(row.kickoff_utc);
@@ -88,6 +93,7 @@ async function resolveRecord(row: any, supabase: any): Promise<ResolvedRecord> {
       ? row.external_match_id
       : null;
   let source = cleanTeamName(row.source);
+  const modelId = cleanTeamName(row.model_id);
 
   const rowFields = {
     home: rowHome !== null,
@@ -100,29 +106,40 @@ async function resolveRecord(row: any, supabase: any): Promise<ResolvedRecord> {
 
   let matchJoin: ResolvedRecord['matchJoin'] = matchId ? 'not_found' : 'skipped';
   let matchJoinError: string | null = null;
+  let joinedMatch: any = null;
 
   if ((!home || !away || !kickoff || !providerFixtureId) && matchId) {
     try {
       // NOTE: only columns that exist on the live production `matches` table
-      // may be selected here. `external_match_id` and `source` are defined in
-      // an early migration but are absent from the deployed schema (verified in
-      // production: `column matches.external_match_id does not exist`), and a
-      // PostgREST 400 on the join silently left every record SCHEMA_INVALID.
-      const { data: match, error: matchError } = await supabase
+      // may be selected here.
+      let { data: match, error: matchError } = await supabase
         .from('matches')
-        .select('id, home_team, away_team, kickoff, league')
+        .select('id, home_team, away_team, kickoff, league, status, source_type, data_status')
         .eq('id', matchId)
         .maybeSingle();
+
+      if (matchError && /column matches\.(source_type|data_status)/i.test(matchError.message || '')) {
+        // Fallback for schemas where migration 20260813000001 columns are absent
+        const fallback = await supabase
+          .from('matches')
+          .select('id, home_team, away_team, kickoff, league, status')
+          .eq('id', matchId)
+          .maybeSingle();
+        match = fallback.data;
+        matchError = fallback.error;
+      }
+
       if (matchError) {
         matchJoin = 'error';
         matchJoinError = String(matchError?.message || matchError);
       } else if (match) {
         matchJoin = 'joined';
+        joinedMatch = match;
         home = home ?? cleanTeamName(match.home_team);
         away = away ?? cleanTeamName(match.away_team);
         kickoff = kickoff ?? cleanTeamName(match.kickoff);
         providerFixtureId = providerFixtureId ?? cleanTeamName(match.external_match_id);
-        source = source ?? cleanTeamName(match.source);
+        source = source ?? cleanTeamName(match.source) ?? cleanTeamName(match.source_type);
         competition = competition ?? cleanTeamName(match.league);
       } else {
         matchJoin = 'not_found';
@@ -136,17 +153,182 @@ async function resolveRecord(row: any, supabase: any): Promise<ResolvedRecord> {
   }
 
   return {
-    ledgerId: typeof row.id === 'string' ? row.id : null,
-    matchId,
-    providerFixtureId,
-    home,
-    away,
-    kickoff,
-    competition,
-    source,
-    rowFields,
-    matchJoin,
-    matchJoinError,
+    record: {
+      ledgerId: typeof row.id === 'string' ? row.id : null,
+      matchId,
+      providerFixtureId,
+      home,
+      away,
+      kickoff,
+      competition,
+      source,
+      modelId,
+      rowFields,
+      matchJoin,
+      matchJoinError,
+    },
+    match: joinedMatch,
+  };
+}
+
+// Principles-based eligibility evaluator to exclude synthetic, test, validation, mock, seed, replay, and archived test data
+export function evaluateRecordEligibility(
+  row: any,
+  r: ResolvedRecord,
+  match: any
+): { eligible: boolean; status: ProvenanceStatus; reason: string } {
+  // 1. Basic schema presence
+  if (!r.home || !r.away || !r.kickoff || Number.isNaN(Date.parse(r.kickoff))) {
+    return {
+      eligible: false,
+      status: 'SCHEMA_INVALID',
+      reason: 'Record is missing home_team/away_team/kickoff or has an invalid kickoff.',
+    };
+  }
+
+  // 2. Dummy / synthetic entity or match identifiers
+  if (
+    isDummyIdentifier(r.home) ||
+    isDummyIdentifier(r.away) ||
+    isDummyIdentifier(r.matchId) ||
+    isDummyIdentifier(r.providerFixtureId)
+  ) {
+    return {
+      eligible: false,
+      status: 'SCHEMA_INVALID',
+      reason: 'Record contains dummy, mock, synthetic, or shadow match identifiers.',
+    };
+  }
+
+  // 3. Data governance & quarantine tags on record or joined match
+  const recordSource = String(row.source_type || r.source || '').toUpperCase();
+  const recordDataStatus = String(row.data_status || '').toUpperCase();
+  const matchSource = String(match?.source_type || '').toUpperCase();
+  const matchDataStatus = String(match?.data_status || '').toUpperCase();
+
+  if (recordDataStatus === 'QUARANTINED' || matchDataStatus === 'QUARANTINED') {
+    return {
+      eligible: false,
+      status: 'PROVENANCE_MISSING',
+      reason: 'Record or linked match is explicitly quarantined by data governance.',
+    };
+  }
+
+  if (
+    ['SYNTHETIC', 'TEST', 'MOCK', 'SEED', 'REPLAY'].includes(recordSource) ||
+    ['SYNTHETIC', 'TEST', 'MOCK', 'SEED', 'REPLAY'].includes(matchSource)
+  ) {
+    return {
+      eligible: false,
+      status: 'PROVENANCE_MISSING',
+      reason: 'Record or linked match source_type is flagged as non-genuine (synthetic/test/seed/replay).',
+    };
+  }
+
+  // 4. Model identifier check (exclude test/validation models)
+  const modelId = typeof row.model_id === 'string' ? row.model_id.toLowerCase() : '';
+  if (
+    modelId.includes('test') ||
+    modelId.includes('mock') ||
+    modelId.includes('synthetic') ||
+    modelId.includes('seed') ||
+    modelId.includes('dummy') ||
+    modelId.includes('shadow')
+  ) {
+    return {
+      eligible: false,
+      status: 'SCHEMA_INVALID',
+      reason: `Model identifier (${row.model_id}) indicates a test or validation model.`,
+    };
+  }
+
+  // 5. Explainability metadata audit (check for validation/test labels)
+  const explainabilityRaw = row.explainability_json;
+  let explainabilityStr = '';
+  if (typeof explainabilityRaw === 'string') {
+    explainabilityStr = explainabilityRaw.toLowerCase();
+  } else if (explainabilityRaw && typeof explainabilityRaw === 'object') {
+    try {
+      explainabilityStr = JSON.stringify(explainabilityRaw).toLowerCase();
+    } catch {
+      // ignore
+    }
+  }
+
+  if (
+    explainabilityStr.includes('real test run') ||
+    explainabilityStr.includes('test run') ||
+    explainabilityStr.includes('validation run') ||
+    explainabilityStr.includes('quarantined: high calibration uncertainty') ||
+    explainabilityStr.includes('mock fair odds')
+  ) {
+    return {
+      eligible: false,
+      status: 'SCHEMA_INVALID',
+      reason: 'Explainability metadata indicates a validation or test script execution.',
+    };
+  }
+
+  // 6. Feature snapshot audit
+  const featureVersion = typeof row.feature_version === 'string' ? row.feature_version.toLowerCase() : '';
+  if (featureVersion.includes('test') || featureVersion.includes('mock') || featureVersion.includes('synthetic')) {
+    return {
+      eligible: false,
+      status: 'SCHEMA_INVALID',
+      reason: `Feature version (${row.feature_version}) indicates test feature generation.`,
+    };
+  }
+
+  const featureSnapshot = row.feature_vector_snapshot;
+  if (featureSnapshot && typeof featureSnapshot === 'object') {
+    const snapMatchId = String(featureSnapshot.matchId || '').toLowerCase();
+    if (isDummyIdentifier(snapMatchId)) {
+      return {
+        eligible: false,
+        status: 'SCHEMA_INVALID',
+        reason: `Feature snapshot contains test match identifier (${featureSnapshot.matchId}).`,
+      };
+    }
+  }
+
+  // 7. Match status & pipeline mode
+  if (match?.status === 'archived' || match?.pipeline_mode === 'TEST') {
+    return {
+      eligible: false,
+      status: 'PROVENANCE_MISSING',
+      reason: 'Linked match is an archived test fixture or configured in pipeline test mode.',
+    };
+  }
+
+  // 8. Zero look-ahead / Pre-kickoff invariant (T_pred < T_kickoff)
+  const predTimestamp = row.prediction_timestamp || row.created_at;
+  if (predTimestamp && r.kickoff) {
+    const predMs = Date.parse(predTimestamp);
+    const kickMs = Date.parse(r.kickoff);
+    if (!Number.isNaN(predMs) && !Number.isNaN(kickMs)) {
+      if (predMs >= kickMs) {
+        return {
+          eligible: false,
+          status: 'SCHEMA_INVALID',
+          reason: 'Prediction timestamp violates pre-kickoff invariant (T_prediction >= T_kickoff).',
+        };
+      }
+    }
+  }
+
+  // 9. Provider or canonical fixture identity presence
+  if (!r.matchId && !r.providerFixtureId) {
+    return {
+      eligible: false,
+      status: 'PROVENANCE_MISSING',
+      reason: 'Record has no provider or canonical fixture identity to verify.',
+    };
+  }
+
+  return {
+    eligible: true,
+    status: 'VERIFICATION_FAILED',
+    reason: 'pending live verification',
   };
 }
 
@@ -164,6 +346,7 @@ function diagnosticsFor(resolved: Array<{ record: ResolvedRecord; status: Proven
     kickoff_valid: r.kickoff ? !Number.isNaN(Date.parse(r.kickoff)) : false,
     league: r.competition,
     source: r.source,
+    model_id: r.modelId,
     row_fields: r.rowFields,
     match_join: r.matchJoin,
     match_join_error: r.matchJoinError,
@@ -239,28 +422,23 @@ export async function GET() {
   }
 
   if (rows.length === 0) {
-    return fail('RECORD_NOT_FOUND', 'No records found in prediction_ledger_v3.', { verifiedCount: 0 });
+    return fail('RECORD_NOT_FOUND', 'No records found in prediction_ledger_v3.', {
+      code: 'INSUFFICIENT_GENUINE_PRODUCTION_RECORDS',
+      verifiedCount: 0,
+      eligibleCount: 0,
+    });
   }
 
   // ─── 3. Resolve records, enforce schema + provenance-identity eligibility ───
   const resolved: Array<{ record: ResolvedRecord; status: ProvenanceStatus; reason: string }> = [];
   for (const row of rows) {
-    const r = await resolveRecord(row, supabase);
-
-    if (!r.home || !r.away || !r.kickoff || Number.isNaN(Date.parse(r.kickoff))) {
-      resolved.push({ record: r, status: 'SCHEMA_INVALID', reason: 'Record is missing home_team/away_team/kickoff or has an invalid kickoff.' });
-      continue;
-    }
-    if (isDummyIdentifier(r.home) || isDummyIdentifier(r.away) || isDummyIdentifier(r.matchId)) {
-      resolved.push({ record: r, status: 'SCHEMA_INVALID', reason: 'Record contains dummy, mock, or synthetic identifiers.' });
-      continue;
-    }
-    if (!r.matchId && !r.providerFixtureId) {
-      resolved.push({ record: r, status: 'PROVENANCE_MISSING', reason: 'Record has no provider or canonical fixture identity to verify.' });
-      continue;
-    }
-
-    resolved.push({ record: r, status: 'VERIFICATION_FAILED', reason: 'pending live verification' });
+    const { record: r, match } = await resolveRecord(row, supabase);
+    const evalResult = evaluateRecordEligibility(row, r, match);
+    resolved.push({
+      record: r,
+      status: evalResult.status,
+      reason: evalResult.reason,
+    });
   }
 
   const eligible = resolved.filter((r) => r.status === 'VERIFICATION_FAILED');
@@ -268,25 +446,23 @@ export async function GET() {
   const provenanceMissing = resolved.filter((r) => r.status === 'PROVENANCE_MISSING');
 
   if (eligible.length < 3) {
+    const exclusionSummary = {
+      code: 'INSUFFICIENT_GENUINE_PRODUCTION_RECORDS',
+      totalRecordsScanned: rows.length,
+      eligibleGenuineCount: eligible.length,
+      excludedTestValidationCount: resolved.length - eligible.length,
+      schemaInvalidCount: schemaInvalid.length,
+      provenanceMissingCount: provenanceMissing.length,
+      diagnostics: diagnosticsFor(resolved),
+    };
+
     if (resolved.length > 0 && schemaInvalid.length === resolved.length) {
-      return fail('SCHEMA_INVALID', 'All scanned records failed schema validation.', {
-        eligibleCount: eligible.length,
-        totalRecordsScanned: rows.length,
-        diagnostics: diagnosticsFor(resolved),
-      });
+      return fail('SCHEMA_INVALID', 'All scanned records failed schema / genuine production validation.', exclusionSummary);
     }
     if (provenanceMissing.length > 0 && eligible.length === 0) {
-      return fail('PROVENANCE_MISSING', 'No scanned record carries a genuine provider fixture identity.', {
-        eligibleCount: 0,
-        totalRecordsScanned: rows.length,
-        diagnostics: diagnosticsFor(resolved),
-      });
+      return fail('PROVENANCE_MISSING', 'No scanned record carries genuine provider fixture provenance.', exclusionSummary);
     }
-    return fail('RECORD_NOT_FOUND', `Only ${eligible.length} eligible records found (need 3).`, {
-      eligibleCount: eligible.length,
-      totalRecordsScanned: rows.length,
-      diagnostics: diagnosticsFor(resolved),
-    });
+    return fail('RECORD_NOT_FOUND', `Only ${eligible.length} genuine eligible records found (need 3): INSUFFICIENT_GENUINE_PRODUCTION_RECORDS.`, exclusionSummary);
   }
 
   const selected = eligible.slice(0, 3);
