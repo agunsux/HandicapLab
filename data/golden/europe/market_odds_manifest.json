@@ -1,0 +1,78 @@
+{
+  "dataset_version": "europe-dataset-v1",
+  "ingestion_version": "europe-odds-v1",
+  "odds_row_count": 77471,
+  "by_market": {
+    "ML": 29732,
+    "AH": 23864,
+    "OU": 23875
+  },
+  "by_league": [
+    {
+      "leagueId": "ENG-PL",
+      "matches": 4180,
+      "ml_rows": 15200,
+      "ml_matches": 4180,
+      "ml_coverage_pct": 100,
+      "ah_rows": 13678,
+      "ah_matches": 4180,
+      "ah_coverage_pct": 100,
+      "ou_rows": 13679,
+      "ou_matches": 4180,
+      "ou_coverage_pct": 100
+    },
+    {
+      "leagueId": "ESP-LALIGA",
+      "matches": 1520,
+      "ml_rows": 4939,
+      "ml_matches": 1520,
+      "ml_coverage_pct": 100,
+      "ah_rows": 3790,
+      "ah_matches": 1518,
+      "ah_coverage_pct": 99.87,
+      "ou_rows": 3800,
+      "ou_matches": 1520,
+      "ou_coverage_pct": 100
+    },
+    {
+      "leagueId": "DEU-BUNDESLIGA",
+      "matches": 918,
+      "ml_rows": 2753,
+      "ml_matches": 918,
+      "ml_coverage_pct": 100,
+      "ah_rows": 1836,
+      "ah_matches": 918,
+      "ah_coverage_pct": 100,
+      "ou_rows": 1836,
+      "ou_matches": 918,
+      "ou_coverage_pct": 100
+    },
+    {
+      "leagueId": "ITA-SERIEA",
+      "matches": 1140,
+      "ml_rows": 3420,
+      "ml_matches": 1140,
+      "ml_coverage_pct": 100,
+      "ah_rows": 2280,
+      "ah_matches": 1140,
+      "ah_coverage_pct": 100,
+      "ou_rows": 2280,
+      "ou_matches": 1140,
+      "ou_coverage_pct": 100
+    },
+    {
+      "leagueId": "FRA-LIGUE1",
+      "matches": 1140,
+      "ml_rows": 3420,
+      "ml_matches": 1140,
+      "ml_coverage_pct": 100,
+      "ah_rows": 2280,
+      "ah_matches": 1140,
+      "ah_coverage_pct": 100,
+      "ou_rows": 2280,
+      "ou_matches": 1140,
+      "ou_coverage_pct": 100
+    }
+  ],
+  "hash": "7eff06578f6863125afb5c0cdc190396ab76f3c23492862492a2f94b68d3e07e"
+}
