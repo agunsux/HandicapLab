@@ -91,4 +91,6 @@ brain/
 scratch_*.js
 
 # EPIC: European historical dataset (generated artifacts - reproducible via historical:europe)
-data/golden/europe/
+# NOTE: The two large JSONL files below are explicitly included for prod LOAD by goldLoad endpoint
+!data/golden/europe/canonical_matches.jsonl
+!data/golden/europe/market_odds.jsonl
