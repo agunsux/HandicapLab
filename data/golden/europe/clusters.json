@@ -1,0 +1,35 @@
+[
+  {
+    "cluster": "A",
+    "leaguesIncluded": 5,
+    "seasons": 11,
+    "matches": 8898,
+    "valid": 8898,
+    "ml": 8898,
+    "ah": 8895,
+    "ou": 8898,
+    "btts": 8898
+  },
+  {
+    "cluster": "B",
+    "leaguesIncluded": 0,
+    "seasons": 0,
+    "matches": 0,
+    "valid": 0,
+    "ml": 0,
+    "ah": 0,
+    "ou": 0,
+    "btts": 0
+  },
+  {
+    "cluster": "C",
+    "leaguesIncluded": 0,
+    "seasons": 0,
+    "matches": 0,
+    "valid": 0,
+    "ml": 0,
+    "ah": 0,
+    "ou": 0,
+    "btts": 0
+  }
+]

@@ -1,0 +1,290 @@
+[
+  {
+    "leagueId": "ENG-PL",
+    "name": "Premier League",
+    "cluster": "A",
+    "status": "INCLUDED",
+    "readiness": {
+      "ml": "READY",
+      "ah": "READY",
+      "ou": "READY",
+      "btts": "READY"
+    }
+  },
+  {
+    "leagueId": "ESP-LALIGA",
+    "name": "La Liga",
+    "cluster": "A",
+    "status": "INCLUDED",
+    "readiness": {
+      "ml": "READY",
+      "ah": "READY",
+      "ou": "READY",
+      "btts": "READY"
+    }
+  },
+  {
+    "leagueId": "DEU-BUNDESLIGA",
+    "name": "Bundesliga",
+    "cluster": "A",
+    "status": "INCLUDED",
+    "readiness": {
+      "ml": "READY",
+      "ah": "READY",
+      "ou": "READY",
+      "btts": "READY"
+    }
+  },
+  {
+    "leagueId": "ITA-SERIEA",
+    "name": "Serie A",
+    "cluster": "A",
+    "status": "INCLUDED",
+    "readiness": {
+      "ml": "READY",
+      "ah": "READY",
+      "ou": "READY",
+      "btts": "READY"
+    }
+  },
+  {
+    "leagueId": "FRA-LIGUE1",
+    "name": "Ligue 1",
+    "cluster": "A",
+    "status": "INCLUDED",
+    "readiness": {
+      "ml": "READY",
+      "ah": "READY",
+      "ou": "READY",
+      "btts": "READY"
+    }
+  },
+  {
+    "leagueId": "NED-ERE",
+    "name": "Eredivisie",
+    "cluster": "B",
+    "status": "EXCLUDED",
+    "readiness": {
+      "ml": "INSUFFICIENT",
+      "ah": "INSUFFICIENT",
+      "ou": "INSUFFICIENT",
+      "btts": "INSUFFICIENT"
+    }
+  },
+  {
+    "leagueId": "POR-PRIMEIRA",
+    "name": "Primeira Liga",
+    "cluster": "B",
+    "status": "EXCLUDED",
+    "readiness": {
+      "ml": "INSUFFICIENT",
+      "ah": "INSUFFICIENT",
+      "ou": "INSUFFICIENT",
+      "btts": "INSUFFICIENT"
+    }
+  },
+  {
+    "leagueId": "BEL-PRO",
+    "name": "Belgian Pro League",
+    "cluster": "B",
+    "status": "EXCLUDED",
+    "readiness": {
+      "ml": "INSUFFICIENT",
+      "ah": "INSUFFICIENT",
+      "ou": "INSUFFICIENT",
+      "btts": "INSUFFICIENT"
+    }
+  },
+  {
+    "leagueId": "SCO-PREM",
+    "name": "Scottish Premiership",
+    "cluster": "B",
+    "status": "EXCLUDED",
+    "readiness": {
+      "ml": "INSUFFICIENT",
+      "ah": "INSUFFICIENT",
+      "ou": "INSUFFICIENT",
+      "btts": "INSUFFICIENT"
+    }
+  },
+  {
+    "leagueId": "TUR-SL",
+    "name": "Süper Lig",
+    "cluster": "B",
+    "status": "EXCLUDED",
+    "readiness": {
+      "ml": "INSUFFICIENT",
+      "ah": "INSUFFICIENT",
+      "ou": "INSUFFICIENT",
+      "btts": "INSUFFICIENT"
+    }
+  },
+  {
+    "leagueId": "AUT-BUND",
+    "name": "Austrian Bundesliga",
+    "cluster": "B",
+    "status": "EXCLUDED",
+    "readiness": {
+      "ml": "INSUFFICIENT",
+      "ah": "INSUFFICIENT",
+      "ou": "INSUFFICIENT",
+      "btts": "INSUFFICIENT"
+    }
+  },
+  {
+    "leagueId": "SUI-SL",
+    "name": "Swiss Super League",
+    "cluster": "B",
+    "status": "EXCLUDED",
+    "readiness": {
+      "ml": "INSUFFICIENT",
+      "ah": "INSUFFICIENT",
+      "ou": "INSUFFICIENT",
+      "btts": "INSUFFICIENT"
+    }
+  },
+  {
+    "leagueId": "DNK-SL",
+    "name": "Danish Superliga",
+    "cluster": "C",
+    "status": "EXCLUDED",
+    "readiness": {
+      "ml": "INSUFFICIENT",
+      "ah": "INSUFFICIENT",
+      "ou": "INSUFFICIENT",
+      "btts": "INSUFFICIENT"
+    }
+  },
+  {
+    "leagueId": "NOR-EL",
+    "name": "Eliteserien",
+    "cluster": "C",
+    "status": "EXCLUDED",
+    "readiness": {
+      "ml": "INSUFFICIENT",
+      "ah": "INSUFFICIENT",
+      "ou": "INSUFFICIENT",
+      "btts": "INSUFFICIENT"
+    }
+  },
+  {
+    "leagueId": "SWE-AL",
+    "name": "Allsvenskan",
+    "cluster": "C",
+    "status": "EXCLUDED",
+    "readiness": {
+      "ml": "INSUFFICIENT",
+      "ah": "INSUFFICIENT",
+      "ou": "INSUFFICIENT",
+      "btts": "INSUFFICIENT"
+    }
+  },
+  {
+    "leagueId": "POL-EKS",
+    "name": "Ekstraklasa",
+    "cluster": "C",
+    "status": "EXCLUDED",
+    "readiness": {
+      "ml": "INSUFFICIENT",
+      "ah": "INSUFFICIENT",
+      "ou": "INSUFFICIENT",
+      "btts": "INSUFFICIENT"
+    }
+  },
+  {
+    "leagueId": "CZE-1L",
+    "name": "Czech First League",
+    "cluster": "C",
+    "status": "EXCLUDED",
+    "readiness": {
+      "ml": "INSUFFICIENT",
+      "ah": "INSUFFICIENT",
+      "ou": "INSUFFICIENT",
+      "btts": "INSUFFICIENT"
+    }
+  },
+  {
+    "leagueId": "GRC-SL",
+    "name": "Greek Super League",
+    "cluster": "C",
+    "status": "EXCLUDED",
+    "readiness": {
+      "ml": "INSUFFICIENT",
+      "ah": "INSUFFICIENT",
+      "ou": "INSUFFICIENT",
+      "btts": "INSUFFICIENT"
+    }
+  },
+  {
+    "leagueId": "ROU-L1",
+    "name": "Liga I",
+    "cluster": "C",
+    "status": "EXCLUDED",
+    "readiness": {
+      "ml": "INSUFFICIENT",
+      "ah": "INSUFFICIENT",
+      "ou": "INSUFFICIENT",
+      "btts": "INSUFFICIENT"
+    }
+  },
+  {
+    "leagueId": "HRV-HNL",
+    "name": "HNL",
+    "cluster": "C",
+    "status": "EXCLUDED",
+    "readiness": {
+      "ml": "INSUFFICIENT",
+      "ah": "INSUFFICIENT",
+      "ou": "INSUFFICIENT",
+      "btts": "INSUFFICIENT"
+    }
+  },
+  {
+    "leagueId": "SRB-SL",
+    "name": "SuperLiga",
+    "cluster": "C",
+    "status": "EXCLUDED",
+    "readiness": {
+      "ml": "INSUFFICIENT",
+      "ah": "INSUFFICIENT",
+      "ou": "INSUFFICIENT",
+      "btts": "INSUFFICIENT"
+    }
+  },
+  {
+    "leagueId": "HUN-NB1",
+    "name": "NB I",
+    "cluster": "C",
+    "status": "EXCLUDED",
+    "readiness": {
+      "ml": "INSUFFICIENT",
+      "ah": "INSUFFICIENT",
+      "ou": "INSUFFICIENT",
+      "btts": "INSUFFICIENT"
+    }
+  },
+  {
+    "leagueId": "FIN-VL",
+    "name": "Veikkausliiga",
+    "cluster": "C",
+    "status": "EXCLUDED",
+    "readiness": {
+      "ml": "INSUFFICIENT",
+      "ah": "INSUFFICIENT",
+      "ou": "INSUFFICIENT",
+      "btts": "INSUFFICIENT"
+    }
+  },
+  {
+    "leagueId": "IRL-PD",
+    "name": "Premier Division",
+    "cluster": "C",
+    "status": "EXCLUDED",
+    "readiness": {
+      "ml": "INSUFFICIENT",
+      "ah": "INSUFFICIENT",
+      "ou": "INSUFFICIENT",
+      "btts": "INSUFFICIENT"
+    }
+  }
+]
