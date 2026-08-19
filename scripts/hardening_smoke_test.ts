@@ -83,9 +83,9 @@ async function main() {
   console.log('\n[F. HOMEPAGE AGGREGATE PARITY]');
   const homepage = await HomepageService.getHomepageData();
   console.log(`Historical Status: ${homepage.historical.status}`);
-  console.log(`Historical Matches: ${homepage.historical.summary.matches}`);
-  console.log(`Historical Bets: ${homepage.historical.summary.bets}`);
-  console.log(`Historical ROI: ${homepage.historical.summary.roi.toFixed(2)}%`);
+  console.log(`Historical Matches: ${homepage.historical.summary?.matches ?? 0}`);
+  console.log(`Historical Bets: ${homepage.historical.summary?.bets ?? 0}`);
+  console.log(`Historical ROI: ${homepage.historical.summary?.roi?.toFixed(2) ?? '0.00'}%`);
   console.log(`Live State: ${homepage.live.state}`);
 
   console.log('\n========================================');
