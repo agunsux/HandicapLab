@@ -316,9 +316,8 @@ export async function fetchMatches(dateFrom?: string, dateTo?: string): Promise<
     }
   }
 
-  // Final Fallback: Mock Engine (FAZE 1 Active)
-  console.warn('[API Service] API key not configured — using mock data');
-  return generateMockMatches(12, dateFrom || 'today');
+  // Fail-closed fallback: return empty array when providers fail or are unconfigured
+  return [];
 }
 
 export async function fetchLiveMatches(): Promise<Match[]> {
@@ -358,9 +357,7 @@ export async function fetchLiveMatches(): Promise<Match[]> {
     }
   }
 
-  // Final Fallback: Mock Engine
-  console.warn('[API Service] API key not configured — using mock data');
-  return generateMockMatches(12).filter((m) => m.status === 'LIVE');
+  return [];
 }
 
 export async function fetchCompetitions(): Promise<any[]> {
@@ -403,8 +400,7 @@ export async function fetchMatchStats(fixtureId: number | string): Promise<any> 
     }
   }
 
-  console.warn('[API Service] API key not configured — using mock data');
-  return generateMockMatchStats(fixtureId);
+  return null;
 }
 
 export async function fetchTeamForm(teamId: number | string, last: number = 5): Promise<any> {
@@ -452,8 +448,7 @@ export async function fetchPredictions(fixtureId: number | string): Promise<any>
     }
   }
 
-  console.warn('[API Service] API key not configured — using mock data');
-  return generateMockPredictions(fixtureId);
+  return null;
 }
 
 export async function fetchOdds(
@@ -473,9 +468,7 @@ export async function fetchOdds(
     }
   }
 
-  // Final Fallback: Mock Engine
-  console.warn('[API Service] API key not configured — using mock data');
-  return generateMockOdds('m-101', tick);
+  return [];
 }
 
 export async function fetchOddsHistory(eventId: string): Promise<any> {
@@ -494,22 +487,78 @@ export async function fetchOddsHistory(eventId: string): Promise<any> {
 
 export async function fetchSignals(filters?: any): Promise<Signal[]> {
   try {
-    const res = await valueEngineClient.get('/signals', { params: filters });
-    if (res.data?.length > 0) return res.data;
+    if (typeof window === 'undefined') {
+      const { OpportunitiesService } = await import('@/lib/homepage/opportunities/service');
+      const oppsResponse = await OpportunitiesService.getOpportunities();
+      const opps = oppsResponse.opportunities || [];
+      return opps.map((o: any) => ({
+        id: o.id || o.fixtureId || String(Math.random()),
+        matchId: o.fixtureId,
+        type: (o.signal || 'value').toLowerCase(),
+        market: o.market?.toLowerCase() || 'asian_handicap',
+        selection: o.selection,
+        confidence: o.grade === 'A' ? 90 : o.grade === 'B' ? 75 : 60,
+        ev: Number((Number(o.ev || 0) * 100).toFixed(1)),
+        odds: Number(o.odds || 0),
+        fairOdds: Number(o.fairOdds || 0),
+        edge: Number((Number(o.edge || 0) * 100).toFixed(1)),
+        bookmaker: o.bookmaker || 'Pinnacle',
+        timestamp: o.snapshotTime || new Date().toISOString(),
+        expiresAt: '',
+        reason: o.rationale || `Model estimated fair price at ${Number(o.fairOdds || 0).toFixed(2)} vs ${o.bookmaker || 'Pinnacle'} market price ${Number(o.odds || 0).toFixed(2)}.`,
+        sharpMoneyIndicator: 80,
+        lineMovement: 'stable',
+        publicMoneyPercent: 50,
+        homeTeam: o.homeTeam,
+        awayTeam: o.awayTeam,
+        league: o.competition,
+        kickoff: o.kickoff,
+        marketType: o.market || 'ML',
+        signalCategory: o.signal || 'VALUE',
+        isHighValue: Number(o.ev || 0) >= 0.05,
+      }));
+    }
+
+    const res = await fetch('/api/v1/opportunities');
+    const json = await res.json();
+    const opps = json.data?.opportunities || json.opportunities || [];
+    if (Array.isArray(opps)) {
+      return opps.map((o: any) => ({
+        id: o.id || o.fixtureId || String(Math.random()),
+        matchId: o.fixtureId,
+        type: (o.signal || 'value').toLowerCase(),
+        market: o.market?.toLowerCase() || 'asian_handicap',
+        selection: o.selection,
+        confidence: o.grade === 'A' ? 90 : o.grade === 'B' ? 75 : 60,
+        ev: Number((Number(o.ev || 0) * 100).toFixed(1)),
+        odds: Number(o.odds || 0),
+        fairOdds: Number(o.fairOdds || 0),
+        edge: Number((Number(o.edge || 0) * 100).toFixed(1)),
+        bookmaker: o.bookmaker || 'Pinnacle',
+        timestamp: o.snapshotTime || new Date().toISOString(),
+        expiresAt: '',
+        reason: o.rationale || `Model estimated fair price at ${Number(o.fairOdds || 0).toFixed(2)} vs ${o.bookmaker || 'Pinnacle'} market price ${Number(o.odds || 0).toFixed(2)}.`,
+        sharpMoneyIndicator: 80,
+        lineMovement: 'stable',
+        publicMoneyPercent: 50,
+        homeTeam: o.homeTeam,
+        awayTeam: o.awayTeam,
+        league: o.competition,
+        kickoff: o.kickoff,
+        marketType: o.market || 'ML',
+        signalCategory: o.signal || 'VALUE',
+        isHighValue: Number(o.ev || 0) >= 0.05,
+      }));
+    }
   } catch (err) {
-    console.warn('[API Service] fetchSignals failed, using mock engine:', err);
+    console.warn('[API Service] fetchSignals failed:', err);
   }
-  console.warn('[API Service] API key not configured — using mock data');
-  return generateMockSignals(10);
+  return [];
 }
 
 export async function fetchSignalDetails(signalId: string): Promise<Signal | null> {
-  try {
-    const res = await valueEngineClient.get(`/signals/${signalId}`);
-    if (res.data) return res.data;
-  } catch {}
-  const signals = generateMockSignals(10);
-  return signals.find((s) => s.id === signalId) || signals[0] || null;
+  const all = await fetchSignals();
+  return all.find((s) => s.id === signalId) || null;
 }
 
 export async function fetchMarketDepth(matchId: string, market: MarketType): Promise<MarketDepth> {
@@ -517,15 +566,19 @@ export async function fetchMarketDepth(matchId: string, market: MarketType): Pro
     const res = await valueEngineClient.get('/market-depth', { params: { matchId, market } });
     if (res.data) return res.data;
   } catch {}
-  console.warn('[API Service] API key not configured — using mock data');
-  return generateMockMarketDepth(matchId, market);
+  return {
+    matchId,
+    market,
+    selections: [],
+  };
 }
 
 export async function fetchPerformanceReport(days: number = 30): Promise<PerformanceStats[]> {
   try {
-    const res = await valueEngineClient.get('/performance', { params: { days } });
-    if (res.data?.length > 0) return res.data;
+    const res = await valueEngineClient.get('/backtest/summary');
+    if (res.data) {
+      return [];
+    }
   } catch {}
-  console.warn('[API Service] API key not configured — using mock data');
-  return generateMockPerformance(days);
+  return [];
 }

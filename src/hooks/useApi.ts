@@ -14,12 +14,6 @@ import {
   fetchPredictions,
   fetchOddsHistory,
 } from '@/services/api';
-import {
-  generateMockMatches,
-  generateMockOdds,
-  generateMockSignals,
-  generateMockPerformance,
-} from '@/services/mockEngine';
 import { MarketType, PerformanceStats } from '@/types';
 import { useAppStore } from '@/store/appStore';
 
@@ -31,7 +25,6 @@ export function useMatches(dateFrom?: string, dateTo?: string) {
     queryFn: () => fetchMatches(dateFrom, dateTo),
     staleTime: 30000,
     refetchInterval: autoRefresh ? 60000 : false,
-    placeholderData: generateMockMatches(12, dateFrom || 'today'),
   });
 }
 
@@ -43,7 +36,6 @@ export function useLiveMatches() {
     queryFn: fetchLiveMatches,
     staleTime: 15000,
     refetchInterval: autoRefresh ? 15000 : false,
-    placeholderData: generateMockMatches(12).filter((m) => m.status === 'LIVE'),
   });
 }
 
@@ -64,7 +56,6 @@ export function useOdds(matchId?: string) {
     queryFn: () => fetchOdds('soccer_epl', 'eu', tick),
     staleTime: 10000,
     refetchInterval: autoRefresh ? 15000 : false,
-    placeholderData: generateMockOdds(matchId || 'm-101', tick),
   });
 }
 
@@ -76,7 +67,6 @@ export function useSignals(filters?: any) {
     queryFn: () => fetchSignals(filters),
     staleTime: 5000,
     refetchInterval: autoRefresh ? 10000 : false,
-    placeholderData: generateMockSignals(10),
   });
 }
 
@@ -114,26 +104,14 @@ export function usePerformance(days: number = 30) {
       const cumPnL = history.length > 0 ? history[history.length - 1].cumulative : 0;
       return {
         days,
-        totalBets: days * 3,
-        winRate: 58.6,
+        totalBets: history.length,
+        winRate: 0,
         cumulativePnL: cumPnL,
-        roi: 12.8,
+        roi: 0,
         dailyHistory: history,
       };
     },
     staleTime: 300000, // 5 min
-    placeholderData: {
-      days,
-      totalBets: days * 3,
-      winRate: 58.6,
-      cumulativePnL: 18.4,
-      roi: 12.8,
-      dailyHistory: generateMockPerformance(days).map((r) => ({
-        date: String(r.date || new Date().toISOString().split('T')[0]),
-        pnl: Number(r.profit || 0),
-        cumulative: Number(r.cumulative || 0),
-      })),
-    },
   });
 }
 

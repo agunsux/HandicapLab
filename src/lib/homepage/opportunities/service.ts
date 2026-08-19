@@ -3,6 +3,7 @@
 // value classification. No synthetic fixtures, no fabricated odds.
 
 import { supabase } from '@/lib/supabase.server';
+import { LEAGUE_REGISTRY } from '@/lib/crons/leagueRegistry';
 import { HOMEPAGE_INTELLIGENCE } from '../constants';
 
 export type OpportunitySignal = 'STRONG_VALUE' | 'VALUE' | 'LOW_EDGE' | 'NO_VALUE' | 'NOT_MODELABLE' | 'STALE';
@@ -115,13 +116,14 @@ export class OpportunitiesService {
     const now = new Date();
     const generatedAt = now.toISOString();
 
-    // 1. Fetch upcoming matches (pre-match only).
+    // 1. Fetch upcoming matches (pre-match only, future kickoff only, non-synthetic only).
     let matches: Array<any> | null = null;
     try {
       const { data, error: matchErr } = await supabase
         .from('matches')
-        .select('id, league, kickoff, home_team, away_team, status')
+        .select('id, league, kickoff, home_team, away_team, status, source_type')
         .eq('status', 'upcoming')
+        .gte('kickoff', now.toISOString())
         .order('kickoff', { ascending: true });
 
       if (matchErr) {
@@ -134,7 +136,14 @@ export class OpportunitiesService {
           lastOddsUpdate: null,
         };
       }
-      matches = data;
+
+      // Quarantine synthetic records and validate league whitelist
+      matches = (data || []).filter((m: any) => {
+        if (m.source_type === 'SYNTHETIC') return false;
+        if (!m.home_team || !m.away_team || m.home_team === m.away_team) return false;
+        const leagueName = (m.league || '').trim().toLowerCase();
+        return LEAGUE_REGISTRY.some((l) => l.name.toLowerCase() === leagueName);
+      });
     } catch {
       return {
         generatedAt,

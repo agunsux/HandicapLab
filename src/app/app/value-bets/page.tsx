@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Target, Zap, Clock, Users, ArrowUpRight, X, Shield, Plus, Check } from 'lucide-react';
+import { Target, Zap, Clock, Users, ArrowUpRight, X, Shield, Plus, Check, Calendar, Activity, Info } from 'lucide-react';
 import { useSignals } from '@/hooks/useApi';
 import { useAppStore } from '@/store/appStore';
 import { EVBadge } from '@/components/ui/EVBadge';
@@ -11,7 +11,7 @@ const CATEGORIES = ['All', 'Value', 'Steam', 'Drift', 'Sharp', 'Reverse Line'];
 
 export default function ValueBetsPage() {
   const { userTier, autoRefresh } = useAppStore();
-  const { data: signals, isLoading } = useSignals();
+  const { data: signals, isLoading, isError, refetch } = useSignals();
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [activeSignal, setActiveSignal] = useState<Signal | null>(null);
   const [addedToSlip, setAddedToSlip] = useState<Record<string, boolean>>({});
@@ -28,9 +28,26 @@ export default function ValueBetsPage() {
     }, 2500);
   };
 
+  const formatKickoff = (kickoffStr?: string) => {
+    if (!kickoffStr) return null;
+    try {
+      const d = new Date(kickoffStr);
+      if (isNaN(d.getTime())) return null;
+      return d.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        timeZoneName: 'short',
+      });
+    } catch {
+      return null;
+    }
+  };
+
   return (
     <div className="flex flex-col space-y-6 pb-8">
-      {/* Header with Auto-Refresh 10s Indicator */}
+      {/* Header with Live Telemetry Indicator */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
@@ -73,17 +90,57 @@ export default function ValueBetsPage() {
       {/* Signal Cards List */}
       {isLoading ? (
         <div className="rounded-xl border border-[#1F2937] bg-[#111827] p-12 text-center text-sm text-[#9CA3AF] animate-pulse">
-          Scanning engine for live high-EV value bets...
+          <Activity className="h-8 w-8 text-[#10B981] mx-auto mb-3 animate-spin" />
+          Scanning quantitative engine for live high-EV value bets...
+        </div>
+      ) : isError ? (
+        <div className="rounded-xl border border-[#EF4444]/30 bg-[#111827] p-8 text-center text-sm text-[#9CA3AF]">
+          <p className="text-[#EF4444] font-semibold mb-2">Unable to load live signals</p>
+          <button
+            onClick={() => refetch()}
+            className="px-4 py-2 rounded-lg bg-[#1F2937] hover:bg-[#374151] text-[#F0FDF4] text-xs transition-colors"
+          >
+            Retry Connection
+          </button>
         </div>
       ) : filteredSignals.length === 0 ? (
-        <div className="rounded-xl border border-[#1F2937] bg-[#111827] p-12 text-center text-sm text-[#9CA3AF]">
-          No active signals found for category "{selectedCategory}".
+        <div className="rounded-2xl border border-[#1F2937] bg-[#111827]/80 p-10 text-center space-y-4">
+          <div className="h-12 w-12 rounded-full bg-[#10B981]/10 border border-[#10B981]/30 flex items-center justify-center mx-auto text-[#10B981]">
+            <Target className="h-6 w-6" />
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-[#F0FDF4]">
+              No Positive-EV Opportunities at Current Market Prices
+            </h3>
+            <p className="text-xs text-[#9CA3AF] max-w-lg mx-auto mt-1 leading-relaxed">
+              The quantitative engine is actively evaluating upcoming fixtures against Pinnacle closing lines. Opportunities are published only when Expected Value (EV) exceeds the minimum +2.0% threshold.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl mx-auto pt-4 text-left">
+            <div className="p-3 rounded-lg bg-[#0B0F0E] border border-[#1F2937]">
+              <div className="text-[10px] text-[#9CA3AF] uppercase font-mono">Season</div>
+              <div className="text-sm font-bold text-[#F0FDF4] font-mono mt-0.5">2026/27</div>
+            </div>
+            <div className="p-3 rounded-lg bg-[#0B0F0E] border border-[#1F2937]">
+              <div className="text-[10px] text-[#9CA3AF] uppercase font-mono">Min Threshold</div>
+              <div className="text-sm font-bold text-[#10B981] font-mono mt-0.5">+2.0% EV</div>
+            </div>
+            <div className="p-3 rounded-lg bg-[#0B0F0E] border border-[#1F2937]">
+              <div className="text-[10px] text-[#9CA3AF] uppercase font-mono">Ground Truth</div>
+              <div className="text-sm font-bold text-[#F0FDF4] font-mono mt-0.5">Pinnacle</div>
+            </div>
+            <div className="p-3 rounded-lg bg-[#0B0F0E] border border-[#1F2937]">
+              <div className="text-[10px] text-[#9CA3AF] uppercase font-mono">Model Architecture</div>
+              <div className="text-sm font-bold text-[#F0FDF4] font-mono mt-0.5">Poisson+Elo</div>
+            </div>
+          </div>
         </div>
       ) : (
         <div className="space-y-4">
           {filteredSignals.map((sig) => {
             const isLocked = userTier === 'free' && sig.confidence > 75;
             const isHighValue = sig.ev > 8.0 || sig.isHighValue;
+            const formattedKickoff = formatKickoff(sig.kickoff);
 
             return (
               <div
@@ -103,11 +160,19 @@ export default function ValueBetsPage() {
                 {/* Main Card Content */}
                 <div className={`space-y-4 ${isLocked ? 'filter blur-[5px] opacity-30 select-none pointer-events-none' : ''}`}>
                   {/* Category Badge & Teams */}
-                  <div className="flex items-center gap-3">
-                    <span className="px-2.5 py-1 rounded-md bg-[#10B981]/10 border border-[#10B981]/30 text-[#10B981] text-xs font-bold">
-                      {sig.signalCategory || sig.marketType}
-                    </span>
-                    <span className="text-xs text-[#9CA3AF]">{sig.league}</span>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="px-2.5 py-1 rounded-md bg-[#10B981]/10 border border-[#10B981]/30 text-[#10B981] text-xs font-bold font-mono">
+                        {sig.signalCategory || sig.marketType}
+                      </span>
+                      <span className="text-xs text-[#9CA3AF] font-medium">{sig.league}</span>
+                    </div>
+                    {formattedKickoff && (
+                      <div className="flex items-center gap-1.5 text-xs text-[#9CA3AF] font-mono">
+                        <Calendar className="h-3.5 w-3.5 text-[#10B981]" />
+                        <span>{formattedKickoff}</span>
+                      </div>
+                    )}
                   </div>
 
                   {/* Selection Name & Bookmaker */}
@@ -124,57 +189,32 @@ export default function ValueBetsPage() {
                     <div className="flex items-baseline gap-3">
                       <div className="text-right">
                         <span className="text-2xl font-mono font-bold text-[#F0FDF4]">{sig.odds.toFixed(2)}</span>
-                        <span className="text-xs text-[#9CA3AF] ml-2">Fair: {sig.fairOdds.toFixed(2)}</span>
+                        <span className="text-xs text-[#9CA3AF] ml-2 font-mono">Fair: {sig.fairOdds.toFixed(2)}</span>
                       </div>
                       <EVBadge evPercent={sig.ev} size="lg" />
                     </div>
                   </div>
 
                   {/* Reason Text */}
-                  <p className="text-xs text-[#9CA3AF] leading-relaxed bg-[#0B0F0E] p-3 rounded-lg border border-[#1F2937]/50">
-                    {sig.reason}
-                  </p>
+                  {sig.reason && (
+                    <p className="text-xs text-[#9CA3AF] leading-relaxed bg-[#0B0F0E] p-3 rounded-lg border border-[#1F2937]/50">
+                      {sig.reason}
+                    </p>
+                  )}
 
-                  {/* Meta Bar: Expiry & Public Money */}
-                  <div className="flex items-center gap-6 text-xs text-[#9CA3AF]">
-                    <div className="flex items-center gap-1.5">
-                      <Clock className="h-3.5 w-3.5 text-[#10B981]" />
-                      <span>Expires in {sig.expiryTime}</span>
+                  {/* Quantitative Edge Stats */}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2 border-t border-[#1F2937] text-xs font-mono">
+                    <div className="p-2 rounded bg-[#0B0F0E]/60 border border-[#1F2937]/50">
+                      <div className="text-[10px] text-[#9CA3AF]">Model Probability</div>
+                      <div className="text-sm font-bold text-[#10B981] mt-0.5">{sig.confidence}%</div>
                     </div>
-                    <div className="flex items-center gap-1.5">
-                      <Users className="h-3.5 w-3.5 text-[#F59E0B]" />
-                      <span>Public Money: {sig.publicMoneyPercent}%</span>
+                    <div className="p-2 rounded bg-[#0B0F0E]/60 border border-[#1F2937]/50">
+                      <div className="text-[10px] text-[#9CA3AF]">Raw Edge</div>
+                      <div className="text-sm font-bold text-[#10B981] mt-0.5">+{sig.edge.toFixed(1)}%</div>
                     </div>
-                  </div>
-
-                  {/* Tony Bloom Metrics Bar */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-[#1F2937]">
-                    {/* Sharp Money Progress Bar */}
-                    <div>
-                      <div className="flex items-center justify-between text-[11px] font-semibold text-[#9CA3AF] mb-1">
-                        <span>Sharp Money Index</span>
-                        <span className="text-[#10B981] font-mono">{sig.sharpMoney}%</span>
-                      </div>
-                      <div className="h-2 w-full rounded-full bg-[#0B0F0E] overflow-hidden border border-[#1F2937]">
-                        <div
-                          className="h-full bg-[#10B981] rounded-full transition-all"
-                          style={{ width: `${sig.sharpMoney}%` }}
-                        />
-                      </div>
-                    </div>
-
-                    {/* Model Confidence Progress Bar */}
-                    <div>
-                      <div className="flex items-center justify-between text-[11px] font-semibold text-[#9CA3AF] mb-1">
-                        <span>Model Confidence Score</span>
-                        <span className="text-[#10B981] font-mono">{sig.confidence}%</span>
-                      </div>
-                      <div className="h-2 w-full rounded-full bg-[#0B0F0E] overflow-hidden border border-[#1F2937]">
-                        <div
-                          className="h-full bg-[#10B981] rounded-full transition-all"
-                          style={{ width: `${sig.confidence}%` }}
-                        />
-                      </div>
+                    <div className="p-2 rounded bg-[#0B0F0E]/60 border border-[#1F2937]/50 col-span-2 sm:col-span-1">
+                      <div className="text-[10px] text-[#9CA3AF]">Expected Value</div>
+                      <div className="text-sm font-bold text-[#10B981] mt-0.5">+{sig.ev.toFixed(1)}%</div>
                     </div>
                   </div>
                 </div>
@@ -227,6 +267,7 @@ export default function ValueBetsPage() {
               </h2>
               <p className="text-xs text-[#9CA3AF] mt-1">
                 {activeSignal.homeTeam} vs {activeSignal.awayTeam} · {activeSignal.league}
+                {formatKickoff(activeSignal.kickoff) && ` · ${formatKickoff(activeSignal.kickoff)}`}
               </p>
             </div>
 
@@ -256,13 +297,13 @@ export default function ValueBetsPage() {
               </p>
             </div>
 
-            {/* Line Movement Section */}
+            {/* Bookmaker Section */}
             <div className="flex items-center justify-between bg-[#0B0F0E] p-4 rounded-xl border border-[#1F2937] text-xs">
               <div>
-                <span className="font-semibold text-[#F0FDF4]">Line Movement Trend:</span>
-                <span className="ml-2 text-[#10B981] font-bold">Steam Up (+3.7% Inflow)</span>
+                <span className="font-semibold text-[#F0FDF4]">Pricing Source:</span>
+                <span className="ml-2 text-[#10B981] font-bold">{activeSignal.bookmaker}</span>
               </div>
-              <span className="text-[#9CA3AF]">Bookmaker: {activeSignal.bookmaker}</span>
+              <span className="text-[#9CA3AF]">Edge: +{activeSignal.edge.toFixed(1)}%</span>
             </div>
 
             {/* Action Buttons */}

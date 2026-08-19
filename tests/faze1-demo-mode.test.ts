@@ -40,15 +40,10 @@ describe('FAZE 1: Full Demo Mode & MockEngine', () => {
     expect(preds.advice).toBeDefined();
   });
 
-  it('should fallback gracefully in fetchMatches when API keys fail/are unconfigured', async () => {
-    const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+  it('should fail closed in fetchMatches returning empty array when API keys are unconfigured', async () => {
     const matches = await fetchMatches();
-
-    expect(matches.length).toBeGreaterThan(0);
-    expect(consoleWarnSpy).toHaveBeenCalledWith(
-      expect.stringContaining('API key not configured — using mock data')
-    );
-    consoleWarnSpy.mockRestore();
+    expect(Array.isArray(matches)).toBe(true);
+    expect(matches.length).toBe(0);
   });
 
   it('should have FAZE 2 proxy structure placeholders working', async () => {
