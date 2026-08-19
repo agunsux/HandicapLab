@@ -9973,5 +9973,195 @@
     "timestamp": "2026-08-16T17:57:42.524Z",
     "evidenceHash": "2c10b186bd718430435635987bf4057c40ef2c6017a2082eb1f3f217aaa1563f",
     "evidenceSignature": "signed_by_handicaplab_research_2c10b186bd718430"
+  },
+  {
+    "experimentId": "exp-1787125413344",
+    "datasetSha": "unknown-dataset-sha",
+    "gitCommitSha": "a1b2c3d4e5f6",
+    "featureVersion": "1.0.0",
+    "calibrationVersion": "platt-epl-default",
+    "modelVersion": "dixonColes",
+    "randomSeed": 42,
+    "validationMetrics": {
+      "totalMatches": 0,
+      "totalPredictions": 0,
+      "won": 0,
+      "lost": 0,
+      "voided": 0,
+      "roi": 0,
+      "yield": 0,
+      "avgClv": 0,
+      "winRate": 0,
+      "totalStake": 0,
+      "totalProfit": 0,
+      "brierScore": 0,
+      "logLoss": 0,
+      "avgKellyStake": 0,
+      "maxDrawdown": 0,
+      "sharpeRatio": null,
+      "sortinoRatio": null,
+      "profitFactor": 0,
+      "longestWinStreak": 0,
+      "longestLossStreak": 0,
+      "ece": 0,
+      "mce": 0,
+      "sharpness": 0,
+      "entropy": 0,
+      "accuracy": 0,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "rocauc": 0,
+      "prauc": 0,
+      "kellyRiskRatio": 0,
+      "psi": 0
+    },
+    "confidenceIntervals": [
+      {
+        "metric": "ROI (%)",
+        "observed": 0,
+        "mean": 0,
+        "stdErr": 0,
+        "ciLower": 0,
+        "ciUpper": 0,
+        "confidenceLevel": 0.95
+      },
+      {
+        "metric": "Brier Score",
+        "observed": 0,
+        "mean": 0,
+        "stdErr": 0,
+        "ciLower": 0,
+        "ciUpper": 0,
+        "confidenceLevel": 0.95
+      },
+      {
+        "metric": "CLV (%)",
+        "observed": 0,
+        "mean": 0,
+        "stdErr": 0,
+        "ciLower": 0,
+        "ciUpper": 0,
+        "confidenceLevel": 0.95
+      }
+    ],
+    "bootstrapResults": {
+      "mean": 0,
+      "median": 0,
+      "ciLower": 0,
+      "ciUpper": 0,
+      "isSignificant": false
+    },
+    "monteCarloResults": {
+      "cagr": 0,
+      "maxDrawdown": 0,
+      "ruinProbability": 0,
+      "medianBankroll": 100,
+      "worst5Pct": 100,
+      "best5Pct": 100
+    },
+    "runtime": {
+      "durationMs": 7,
+      "memoryMB": 0.23,
+      "cpuTimeMs": 7
+    },
+    "timestamp": "2026-08-19T07:43:33.344Z",
+    "evidenceHash": "8c7ab9cbac0bc60f4da385c9f22619f162060185d16f6c0a1079a0dac49a24b0",
+    "evidenceSignature": "signed_by_handicaplab_research_8c7ab9cbac0bc60f"
+  },
+  {
+    "experimentId": "exp-1787126906595",
+    "datasetSha": "unknown-dataset-sha",
+    "gitCommitSha": "a1b2c3d4e5f6",
+    "featureVersion": "1.0.0",
+    "calibrationVersion": "platt-epl-default",
+    "modelVersion": "dixonColes",
+    "randomSeed": 42,
+    "validationMetrics": {
+      "totalMatches": 0,
+      "totalPredictions": 0,
+      "won": 0,
+      "lost": 0,
+      "voided": 0,
+      "roi": 0,
+      "yield": 0,
+      "avgClv": 0,
+      "winRate": 0,
+      "totalStake": 0,
+      "totalProfit": 0,
+      "brierScore": 0,
+      "logLoss": 0,
+      "avgKellyStake": 0,
+      "maxDrawdown": 0,
+      "sharpeRatio": null,
+      "sortinoRatio": null,
+      "profitFactor": 0,
+      "longestWinStreak": 0,
+      "longestLossStreak": 0,
+      "ece": 0,
+      "mce": 0,
+      "sharpness": 0,
+      "entropy": 0,
+      "accuracy": 0,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "rocauc": 0,
+      "prauc": 0,
+      "kellyRiskRatio": 0,
+      "psi": 0
+    },
+    "confidenceIntervals": [
+      {
+        "metric": "ROI (%)",
+        "observed": 0,
+        "mean": 0,
+        "stdErr": 0,
+        "ciLower": 0,
+        "ciUpper": 0,
+        "confidenceLevel": 0.95
+      },
+      {
+        "metric": "Brier Score",
+        "observed": 0,
+        "mean": 0,
+        "stdErr": 0,
+        "ciLower": 0,
+        "ciUpper": 0,
+        "confidenceLevel": 0.95
+      },
+      {
+        "metric": "CLV (%)",
+        "observed": 0,
+        "mean": 0,
+        "stdErr": 0,
+        "ciLower": 0,
+        "ciUpper": 0,
+        "confidenceLevel": 0.95
+      }
+    ],
+    "bootstrapResults": {
+      "mean": 0,
+      "median": 0,
+      "ciLower": 0,
+      "ciUpper": 0,
+      "isSignificant": false
+    },
+    "monteCarloResults": {
+      "cagr": 0,
+      "maxDrawdown": 0,
+      "ruinProbability": 0,
+      "medianBankroll": 100,
+      "worst5Pct": 100,
+      "best5Pct": 100
+    },
+    "runtime": {
+      "durationMs": 6,
+      "memoryMB": 0.24,
+      "cpuTimeMs": 6
+    },
+    "timestamp": "2026-08-19T08:08:26.595Z",
+    "evidenceHash": "418d42ec98045d3b2a91b3ec247dbb1ffc2af882f1aec465e35aaa89c14da705",
+    "evidenceSignature": "signed_by_handicaplab_research_418d42ec98045d3b"
   }
 ]

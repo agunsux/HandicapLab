@@ -28,6 +28,7 @@
     "historical:odds-250-299": "tsx src/historical/odds250/validate.ts",
     "phase2b:research": "tsx src/historical/research/phase2b/runner.ts",
     "test": "vitest run",
+    "homepage:backtest": "tsx src/scripts/run-homepage-backtest.ts",
     "backtest:level2": "tsx src/scripts/backtest-level2-production.ts",
     "import:football-data": "tsx src/scripts/importFootballData.ts",
     "reproduce:epl-2024": "tsx src/scripts/validate-prediction-engine.ts",

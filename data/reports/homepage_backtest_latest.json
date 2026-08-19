@@ -1,0 +1,288 @@
+{
+  "status": "COMPLETE",
+  "datasetVersion": "europe-dataset-v1",
+  "datasetHash": "europe-dataset-v1",
+  "modelVersion": "prematch-v1",
+  "backtestVersion": "walk-forward-v1",
+  "windowStart": "2015-08-08",
+  "windowEnd": "2026-05-24",
+  "methodology": "walk-forward-expanding-window",
+  "matchesTested": 8898,
+  "totalBets": 8455,
+  "winRate": 29.343583678296863,
+  "profitUnits": -453.8499999999992,
+  "roiPct": -5.367829686575981,
+  "avgEvPct": 81.03879361324705,
+  "avgClvPct": 0.1444521547037872,
+  "brierScore": 0.19822353248734983,
+  "logLoss": 0.5831408571456159,
+  "maxDrawdown": 508.4499999999993,
+  "avgOdds": 5.411539917208746,
+  "stakeUnits": 8455,
+  "ci95Low": -0.095483364285182,
+  "ci95High": -0.011873229446337612,
+  "markets": [
+    {
+      "market": "ML",
+      "totalBets": 5510,
+      "winRate": 18.638838475499092,
+      "profitUnits": -343.6599999999999,
+      "roiPct": -6.237023593466423,
+      "avgClvPct": -0.026593181465223163,
+      "brierScore": 0.16492022391162228,
+      "avgEdgePct": 109.47898003629798,
+      "avgEvPct": 109.47898003629798
+    },
+    {
+      "market": "AH",
+      "totalBets": 1281,
+      "winRate": 58.07962529274005,
+      "profitUnits": -6.469999999999998,
+      "roiPct": -0.5050741608118655,
+      "avgClvPct": 0.9181478222442131,
+      "brierScore": 0.24767035531948184,
+      "avgEdgePct": 22.464371584699432,
+      "avgEvPct": 22.464371584699432
+    },
+    {
+      "market": "OU",
+      "totalBets": 1664,
+      "winRate": 42.668269230769226,
+      "profitUnits": -103.71999999999996,
+      "roiPct": -6.233173076923074,
+      "avgClvPct": 0.9255894271483076,
+      "brierScore": 0.27043498092742985,
+      "avgEdgePct": 31.957307692307726,
+      "avgEvPct": 31.957307692307726
+    }
+  ],
+  "leagues": [
+    {
+      "leagueId": "ENG-PL",
+      "totalBets": 4093,
+      "winRate": 30.222330808697777,
+      "profitUnits": -43.034999999999776,
+      "roiPct": -1.0514292694844802
+    },
+    {
+      "leagueId": "FRA-LIGUE1",
+      "totalBets": 1046,
+      "winRate": 29.923518164435947,
+      "profitUnits": -106.04499999999999,
+      "roiPct": -10.13814531548757
+    },
+    {
+      "leagueId": "ESP-LALIGA",
+      "totalBets": 1432,
+      "winRate": 28.56145251396648,
+      "profitUnits": -107.81499999999998,
+      "roiPct": -7.528980446927373
+    },
+    {
+      "leagueId": "ITA-SERIEA",
+      "totalBets": 1052,
+      "winRate": 23.954372623574145,
+      "profitUnits": -145.0450000000001,
+      "roiPct": -13.78754752851712
+    },
+    {
+      "leagueId": "DEU-BUNDESLIGA",
+      "totalBets": 832,
+      "winRate": 32.45192307692308,
+      "profitUnits": -51.910000000000025,
+      "roiPct": -6.239182692307695
+    }
+  ],
+  "seasons": [
+    {
+      "season": "2015",
+      "totalBets": 107,
+      "winRate": 35.51401869158878,
+      "profitUnits": 28.980000000000004,
+      "roiPct": 27.084112149532714
+    },
+    {
+      "season": "2016",
+      "totalBets": 714,
+      "winRate": 28.431372549019606,
+      "profitUnits": -127.23,
+      "roiPct": -17.81932773109244
+    },
+    {
+      "season": "2017",
+      "totalBets": 1867,
+      "winRate": 27.85216925549009,
+      "profitUnits": -188.69499999999994,
+      "roiPct": -10.106855918585964
+    },
+    {
+      "season": "2018",
+      "totalBets": 1802,
+      "winRate": 29.3007769145394,
+      "profitUnits": -66.88000000000001,
+      "roiPct": -3.7114317425083247
+    },
+    {
+      "season": "2019",
+      "totalBets": 1305,
+      "winRate": 29.195402298850574,
+      "profitUnits": -25.095000000000013,
+      "roiPct": -1.9229885057471272
+    },
+    {
+      "season": "2020",
+      "totalBets": 536,
+      "winRate": 33.02238805970149,
+      "profitUnits": 19.38500000000001,
+      "roiPct": 3.616604477611942
+    },
+    {
+      "season": "2021",
+      "totalBets": 408,
+      "winRate": 30.14705882352941,
+      "profitUnits": 45.475,
+      "roiPct": 11.145833333333334
+    },
+    {
+      "season": "2022",
+      "totalBets": 361,
+      "winRate": 30.193905817174517,
+      "profitUnits": -2.2899999999999774,
+      "roiPct": -0.6343490304709078
+    },
+    {
+      "season": "2023",
+      "totalBets": 412,
+      "winRate": 28.640776699029125,
+      "profitUnits": -27.954999999999995,
+      "roiPct": -6.785194174757281
+    },
+    {
+      "season": "2024",
+      "totalBets": 372,
+      "winRate": 27.688172043010752,
+      "profitUnits": -55.80999999999999,
+      "roiPct": -15.002688172043008
+    },
+    {
+      "season": "2025",
+      "totalBets": 378,
+      "winRate": 29.629629629629626,
+      "profitUnits": -55.589999999999996,
+      "roiPct": -14.706349206349206
+    },
+    {
+      "season": "2026",
+      "totalBets": 193,
+      "winRate": 35.751295336787564,
+      "profitUnits": 1.8549999999999973,
+      "roiPct": 0.9611398963730555
+    }
+  ],
+  "calibration": [
+    {
+      "bucketLabel": "8-24%",
+      "bucketLow": 0.08148691416579808,
+      "bucketHigh": 0.24305836290321067,
+      "modelProbability": 0.2175539397877473,
+      "actualWinRate": 0.09349112426035502,
+      "sampleCount": 845
+    },
+    {
+      "bucketLabel": "24-26%",
+      "bucketLow": 0.24306147694666383,
+      "bucketHigh": 0.26161627755137634,
+      "modelProbability": 0.2531148057524887,
+      "actualWinRate": 0.1242603550295858,
+      "sampleCount": 845
+    },
+    {
+      "bucketLabel": "26-28%",
+      "bucketLow": 0.26161905681786357,
+      "bucketHigh": 0.2833478794261094,
+      "modelProbability": 0.27017916589175367,
+      "actualWinRate": 0.15266272189349112,
+      "sampleCount": 845
+    },
+    {
+      "bucketLabel": "28-37%",
+      "bucketLow": 0.283388052614582,
+      "bucketHigh": 0.3709407176793786,
+      "modelProbability": 0.3249224178243063,
+      "actualWinRate": 0.1727810650887574,
+      "sampleCount": 845
+    },
+    {
+      "bucketLabel": "37-40%",
+      "bucketLow": 0.37104276532504654,
+      "bucketHigh": 0.4026320333082236,
+      "modelProbability": 0.389179256298642,
+      "actualWinRate": 0.2106508875739645,
+      "sampleCount": 845
+    },
+    {
+      "bucketLabel": "40-43%",
+      "bucketLow": 0.40264625101200857,
+      "bucketHigh": 0.4297839325393656,
+      "modelProbability": 0.4145279107213557,
+      "actualWinRate": 0.2733727810650888,
+      "sampleCount": 845
+    },
+    {
+      "bucketLabel": "43-57%",
+      "bucketLow": 0.4298047212681657,
+      "bucketHigh": 0.5687624484041546,
+      "modelProbability": 0.49993214167821276,
+      "actualWinRate": 0.37988165680473374,
+      "sampleCount": 845
+    },
+    {
+      "bucketLabel": "57-59%",
+      "bucketLow": 0.5687691406298179,
+      "bucketHigh": 0.5869507031757755,
+      "modelProbability": 0.5798615978851086,
+      "actualWinRate": 0.4804733727810651,
+      "sampleCount": 845
+    },
+    {
+      "bucketLabel": "59-61%",
+      "bucketLow": 0.5869792023892829,
+      "bucketHigh": 0.6137910640414788,
+      "modelProbability": 0.596856900179453,
+      "actualWinRate": 0.48757396449704143,
+      "sampleCount": 845
+    },
+    {
+      "bucketLabel": "61-75%",
+      "bucketLow": 0.6137941019063928,
+      "bucketHigh": 0.7533398987177676,
+      "modelProbability": 0.673591335186185,
+      "actualWinRate": 0.5585798816568047,
+      "sampleCount": 845
+    },
+    {
+      "bucketLabel": "75-80%",
+      "bucketLow": 0.7546767297640662,
+      "bucketHigh": 0.7952099472048433,
+      "modelProbability": 0.7692557262624151,
+      "actualWinRate": 0.4,
+      "sampleCount": 5
+    }
+  ],
+  "distributionSanity": {
+    "check1": {
+      "pass": true,
+      "p5": 0.3502,
+      "p95": 0.5027
+    },
+    "check2": {
+      "pass": true,
+      "meanBtts": 0.4753
+    },
+    "check3": {
+      "pass": true,
+      "fracAbove75": 0
+    },
+    "overall": true
+  }
+}

@@ -23,12 +23,15 @@ export async function GET(request: Request) {
     console.log('📡 Fetching upcoming fixtures for all registered leagues...');
     
     const { LEAGUE_REGISTRY } = await import('@/lib/crons/leagueRegistry');
+    const { getDynamicSeason } = await import('@/lib/homepage/opportunities/service');
+    const currentSeason = getDynamicSeason(new Date());
     let totalSavedMatches = 0;
     let totalFixturesCount = 0;
 
     console.log(`[INGEST START]`);
     console.log(`provider selected: ${process.env.DATA_PROVIDER || 'api-football'}`);
     console.log(`competition registry: loaded (${LEAGUE_REGISTRY.length} competitions)`);
+    console.log(`season dynamically detected: ${currentSeason}`);
     
     const activeLeagues = LEAGUE_REGISTRY.filter(l => l.enabled && (l.status === 'ACTIVE' || l.status === 'BETA'));
     console.log(`leagues requested: ${activeLeagues.map(l => l.name).join(', ')}`);
@@ -37,16 +40,17 @@ export async function GET(request: Request) {
       console.log(`\n[INGEST]`);
       console.log(`provider: ${process.env.DATA_PROVIDER || 'api-football'}`);
       console.log(`competition: ${leagueConfig.name}`);
+      console.log(`season: ${currentSeason}`);
       console.log(`fixtures requested: true`);
 
       try {
-        const fixtures = await provider.getFixtures(leagueConfig, 2026);
+        const fixtures = await provider.getFixtures(leagueConfig, currentSeason);
         console.log(`fixtures received: ${fixtures.length}`);
         
         totalFixturesCount += fixtures.length;
 
         if (fixtures.length === 0) {
-          console.log(`[INGEST] reason for 0 fixtures: no fixtures returned by provider for season 2026`);
+          console.log(`[INGEST] reason for 0 fixtures: no fixtures returned by provider for season ${currentSeason}`);
           continue;
         }
 
