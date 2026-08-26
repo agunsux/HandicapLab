@@ -180,14 +180,14 @@ export class DeVigService {
   ): number {
     if (typeof closingOdds === 'number') {
       if (closingOdds <= 1 || takenOdds <= 1) return NaN;
-      return round6(1 / closingOdds - 1 / takenOdds);
+      return round6((takenOdds / closingOdds) - 1.0);
     }
     if (!selection) return NaN;
     const result = this.removeVig(closingOdds, method);
     const fairProb = result.fair[selection];
     if (!fairProb || fairProb <= 0 || takenOdds <= 1) return NaN;
-    const takenImplied = 1 / takenOdds;
-    return round6(fairProb - takenImplied);
+    // CLV against fair closing price: (takenOdds / (1 / fairProb)) - 1.0 = takenOdds * fairProb - 1.0
+    return round6(fairProb * takenOdds - 1.0);
   }
 }
 

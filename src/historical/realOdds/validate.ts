@@ -59,7 +59,7 @@ export interface BetRecord {
   closing_fair_p: number | null;
   edge: number;
   ev: number;
-  outcome: 'WIN' | 'HALF_WIN' | 'PUSH' | 'HALF_LOSS' | 'LOSS';
+  outcome: SettlementOutcome;
   profit: number;
   stake: number;
   clv: number | null;
@@ -132,9 +132,9 @@ export function modelOuProbs(lx: number, ly: number, line: number, maxGoals = 10
 
 // ---- settlement via shared module ----------------------------------------
 
-import { settleAsianHandicap, settleAsianTotal, profitOfOutcome } from '../settlement/settlement';
+import { settleAsianHandicap, settleAsianTotal, profitOfOutcome, SettlementOutcome } from '../settlement/settlement';
 
-export function settleBet(market: 'ML' | 'OU25' | 'AH', selection: string, line: number | null, hg: number, ag: number): 'WIN' | 'HALF_WIN' | 'PUSH' | 'HALF_LOSS' | 'LOSS' {
+export function settleBet(market: 'ML' | 'OU25' | 'AH', selection: string, line: number | null, hg: number, ag: number): SettlementOutcome {
   if (market === 'ML') {
     const actual = hg > ag ? 'home' : hg < ag ? 'away' : 'draw';
     return actual === selection ? 'WIN' : 'LOSS';
@@ -370,7 +370,7 @@ function makeBet(
   entryFairP: number,
   closeFairP: number | null,
   ev: number,
-  outcome: 'WIN' | 'HALF_WIN' | 'PUSH' | 'HALF_LOSS' | 'LOSS',
+  outcome: SettlementOutcome,
   profit: number,
   clv: number | null
 ): BetRecord {

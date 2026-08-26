@@ -110,6 +110,10 @@ export class EdgeScanner {
     } else if (marketType === 'AH') {
       // Scan Asian Handicap outcomes
       const lineNum = marketOdds.line !== undefined ? marketOdds.line : 0.0;
+      // Gating: sparse AH lines (|line| >= 2.25) cannot emit edge picks
+      if (Math.abs(lineNum) >= 2.25) {
+        return [];
+      }
       const lineKey = this.formatAhLine(lineNum);
 
       const pHome = modelOutput.pAhHome[lineKey] || 0;
@@ -118,8 +122,11 @@ export class EdgeScanner {
       evaluateOutcome('home', lineKey, pHome, marketOdds.homeOdds, closingOdds?.homeOdds);
       evaluateOutcome('away', lineKey, pAway, marketOdds.awayOdds, closingOdds?.awayOdds);
     } else if (marketType === 'OU') {
-      // Scan Over/Under outcomes
+      // Scan Over/Under outcomes (Evidence ceiling: line 2.5 only has historical odds)
       const lineNum = marketOdds.line !== undefined ? marketOdds.line : 2.5;
+      if (lineNum !== 2.5) {
+        return []; // Non-2.5 OU lines tagged NO_HISTORICAL_EVIDENCE; zero edge picks emitted
+      }
       const lineKey = this.formatOuLine(lineNum);
 
       const pOver = modelOutput.pOver[lineKey] || 0;
@@ -129,10 +136,9 @@ export class EdgeScanner {
       evaluateOutcome('over', lineKey, pOver, marketOdds.homeOdds, closingOdds?.homeOdds);
       evaluateOutcome('under', lineKey, pUnder, marketOdds.awayOdds, closingOdds?.awayOdds);
     } else if (marketType === 'BTTS' as any) {
-      // Scan BTTS outcomes
-      // For BTTS, homeOdds represents Yes and awayOdds represents No
-      evaluateOutcome('btts_yes' as any, 'BTTS', modelOutput.pBttsYes || 0, marketOdds.homeOdds, closingOdds?.homeOdds);
-      evaluateOutcome('btts_no' as any, 'BTTS', modelOutput.pBttsNo || 0, marketOdds.awayOdds, closingOdds?.awayOdds);
+      // BTTS is calibration-only (zero historical odds rows in gold dataset).
+      // Hard gate: zero edge picks / EV / stake sizing permitted.
+      return [];
     }
 
     // Sort by expected value descending

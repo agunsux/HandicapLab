@@ -1,4 +1,4 @@
-export type SettlementOutcome = 'WIN' | 'HALF_WIN' | 'PUSH' | 'HALF_LOSS' | 'LOSS';
+export type SettlementOutcome = 'WIN' | 'HALF_WIN' | 'PUSH' | 'HALF_LOSS' | 'LOSS' | 'VOID';
 
 export type MlSelection = 'home' | 'draw' | 'away';
 export type AhSide = 'home' | 'away';
@@ -12,6 +12,7 @@ function settleHalfStep(margin: number): SettlementOutcome {
 }
 
 function combineHalf(r1: SettlementOutcome, r2: SettlementOutcome): SettlementOutcome {
+  if (r1 === 'VOID' || r2 === 'VOID') return 'VOID';
   if (r1 === r2) return r1;
   const hasPush = r1 === 'PUSH' || r2 === 'PUSH';
   if (!hasPush) return 'PUSH';
@@ -33,22 +34,47 @@ function settleAsian(diff: number, line: number): SettlementOutcome {
   return settleHalfStep(diff + line);
 }
 
-export function settleMoneyline(selection: MlSelection, homeGoals: number, awayGoals: number): SettlementOutcome {
+export function settleMoneyline(
+  selection: MlSelection,
+  homeGoals: number,
+  awayGoals: number,
+  voided = false
+): SettlementOutcome {
+  if (voided || homeGoals < 0 || awayGoals < 0) return 'VOID';
   const actual: MlSelection = homeGoals > awayGoals ? 'home' : homeGoals < awayGoals ? 'away' : 'draw';
   return actual === selection ? 'WIN' : 'LOSS';
 }
 
-export function settleBtts(selection: BttsSide, homeGoals: number, awayGoals: number): SettlementOutcome {
+export function settleBtts(
+  selection: BttsSide,
+  homeGoals: number,
+  awayGoals: number,
+  voided = false
+): SettlementOutcome {
+  if (voided || homeGoals < 0 || awayGoals < 0) return 'VOID';
   const yes = homeGoals >= 1 && awayGoals >= 1;
   return (selection === 'yes' && yes) || (selection === 'no' && !yes) ? 'WIN' : 'LOSS';
 }
 
-export function settleAsianHandicap(selection: AhSide, line: number, homeGoals: number, awayGoals: number): SettlementOutcome {
+export function settleAsianHandicap(
+  selection: AhSide,
+  line: number,
+  homeGoals: number,
+  awayGoals: number,
+  voided = false
+): SettlementOutcome {
+  if (voided || homeGoals < 0 || awayGoals < 0) return 'VOID';
   const diff = selection === 'home' ? homeGoals - awayGoals : awayGoals - homeGoals;
   return settleAsian(diff, line);
 }
 
-export function settleAsianTotal(selection: OuSide, line: number, totalGoals: number): SettlementOutcome {
+export function settleAsianTotal(
+  selection: OuSide,
+  line: number,
+  totalGoals: number,
+  voided = false
+): SettlementOutcome {
+  if (voided || totalGoals < 0) return 'VOID';
   const diff = selection === 'over' ? totalGoals - line : line - totalGoals;
   if (isQuarterLine(line)) {
     const base = Math.floor(line * 2) / 2;
@@ -66,5 +92,68 @@ export function profitOfOutcome(outcome: SettlementOutcome, decimalOdds: number,
     case 'PUSH': return 0;
     case 'HALF_LOSS': return -0.5 * stake;
     case 'LOSS': return -stake;
+    case 'VOID': return 0;
   }
+}
+
+/**
+ * Calculates realized performance metrics with strict exclusion of VOID bets from denominators.
+ */
+export function calculateSettlementPerformance(
+  bets: Array<{ outcome: SettlementOutcome; stake: number; decimalOdds: number }>
+): {
+  totalBets: number;
+  voidBets: number;
+  evaluatedBets: number;
+  wins: number;
+  losses: number;
+  pushes: number;
+  totalStaked: number;
+  totalProfit: number;
+  roi: number;
+  hitRate: number;
+} {
+  let voidBets = 0;
+  let wins = 0;
+  let losses = 0;
+  let pushes = 0;
+  let totalStaked = 0;
+  let totalProfit = 0;
+
+  for (const bet of bets) {
+    if (bet.outcome === 'VOID') {
+      voidBets++;
+      continue; // Stake returned, completely excluded from ROI & win rate denominators
+    }
+
+    totalStaked += bet.stake;
+    const p = profitOfOutcome(bet.outcome, bet.decimalOdds, bet.stake);
+    totalProfit += p;
+
+    if (bet.outcome === 'WIN' || bet.outcome === 'HALF_WIN') {
+      wins += bet.outcome === 'WIN' ? 1 : 0.5;
+    } else if (bet.outcome === 'LOSS' || bet.outcome === 'HALF_LOSS') {
+      losses += bet.outcome === 'LOSS' ? 1 : 0.5;
+    } else if (bet.outcome === 'PUSH') {
+      pushes += 1;
+    }
+  }
+
+  const evaluatedBets = bets.length - voidBets;
+  const roi = totalStaked > 0 ? Number(((totalProfit / totalStaked) * 100).toFixed(2)) : 0;
+  const nonPushBets = evaluatedBets - pushes;
+  const hitRate = nonPushBets > 0 ? Number(((wins / nonPushBets) * 100).toFixed(2)) : 0;
+
+  return {
+    totalBets: bets.length,
+    voidBets,
+    evaluatedBets,
+    wins,
+    losses,
+    pushes,
+    totalStaked: Number(totalStaked.toFixed(2)),
+    totalProfit: Number(totalProfit.toFixed(2)),
+    roi,
+    hitRate,
+  };
 }

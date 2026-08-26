@@ -107,4 +107,30 @@ export class LeakageGuard {
       }
     }
   }
+
+  /**
+   * Asserts date-granularity point-in-time cutoff for historical datasets (e.g. data/golden/europe/).
+   * 
+   * IMPORTANT (EPIC 60 Stage E):
+   * Historical datasets from sources such as football-data.co.uk carry date-granularity timestamps
+   * (matchDate in YYYY-MM-DD format with opening vs closing labels). They DO NOT have intraday/minute-level
+   * snapshot timestamps. All anti-leakage guards for historical datasets must strictly evaluate:
+   * 
+   *    priorMatchDate < targetMatchDate
+   * 
+   * Code, models, and backtests must NOT assume intraday timestamp precision exists on historical gold data.
+   */
+  static assertHistoricalDateCutoff(
+    priorMatchDate: string,
+    targetMatchDate: string,
+    matchId: string = 'historical'
+  ): void {
+    if (priorMatchDate >= targetMatchDate) {
+      throw new LeakageError(
+        matchId,
+        'MATCH_EVENT_LEAK',
+        `Historical feature leak: record date ${priorMatchDate} is not strictly before target match date ${targetMatchDate}.`
+      );
+    }
+  }
 }

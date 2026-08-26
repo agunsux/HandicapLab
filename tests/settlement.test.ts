@@ -89,11 +89,14 @@ describe('Settlement Modules', () => {
   });
 
   describe('CLVCalculator', () => {
-    it('should calculate CLV using de-vig aligned formula 1/closingOdds - 1/predictionOdds', () => {
-      // predOdds = 2.0, closingOdds = 2.20
-      // clv = 1/2.20 - 1/2.0 = -0.045455
-      const clv = CLVCalculator.calculate(2.0, 2.20);
-      expect(clv).toBeCloseTo(-0.045455, 6);
+    it('should calculate CLV using canonical formula (predictionOdds / closingOdds) - 1.0', () => {
+      // predOdds = 2.20, closingOdds = 2.00 (beat closing line by 10%)
+      const clvWin = CLVCalculator.calculate(2.20, 2.00);
+      expect(clvWin).toBeCloseTo(0.100000, 6);
+
+      // predOdds = 2.00, closingOdds = 2.20 (worse than closing)
+      const clvLoss = CLVCalculator.calculate(2.00, 2.20);
+      expect(clvLoss).toBeCloseTo(-0.090909, 6);
     });
 
     it('should return null if closing odds are invalid', () => {

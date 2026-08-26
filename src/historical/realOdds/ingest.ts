@@ -13,7 +13,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { settleAsianHandicap, settleAsianTotal } from '../settlement/settlement';
+import { settleAsianHandicap, settleAsianTotal, SettlementOutcome } from '../settlement/settlement';
 
 export const REAL_ODDS_OUT = path.resolve(process.cwd(), 'data', 'historical', 'real_odds.jsonl');
 
@@ -181,7 +181,7 @@ export function pairRealOdds(records: RealOddsRecord[]): RealOddsPair[] {
   return [...byKey.values()];
 }
 
-export function settleRealOutcome(market: RealMarket, selection: string, line: number | null, homeGoals: number, awayGoals: number): 'WIN' | 'HALF_WIN' | 'PUSH' | 'HALF_LOSS' | 'LOSS' {
+export function settleRealOutcome(market: RealMarket, selection: string, line: number | null, homeGoals: number, awayGoals: number): SettlementOutcome {
   if (market === 'ML') {
     const actual = homeGoals > awayGoals ? 'home' : homeGoals < awayGoals ? 'away' : 'draw';
     return actual === selection ? 'WIN' : 'LOSS';
@@ -195,13 +195,14 @@ export function settleRealOutcome(market: RealMarket, selection: string, line: n
   throw new Error(`Unknown market ${market}`);
 }
 
-export function profitOfOutcome(outcome: 'WIN' | 'HALF_WIN' | 'PUSH' | 'HALF_LOSS' | 'LOSS', decimalOdds: number, stake = 1): number {
+export function profitOfOutcome(outcome: SettlementOutcome, decimalOdds: number, stake = 1): number {
   switch (outcome) {
     case 'WIN': return (decimalOdds - 1) * stake;
     case 'HALF_WIN': return ((decimalOdds - 1) / 2) * stake;
     case 'PUSH': return 0;
     case 'HALF_LOSS': return -0.5 * stake;
     case 'LOSS': return -stake;
+    case 'VOID': return 0;
   }
 }
 

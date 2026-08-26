@@ -58,14 +58,30 @@ utilisation.
 ### 1.3 CLV (Closing Line Value)
 
 ```
-CLV = mean( impliedProb(closingOdds) - impliedProb(takenOdds) ) × 100
+CLV = mean( (takenOdds / closingOdds) - 1.0 ) × 100
 ```
 
-- **Formula:** `mean( 1/closingOdds - 1/takenOdds ) × 100`  
-- **Unit:** Percentage points (%)  
-- **Requires:** closingOdds > 1 AND takenOdds > 1; null otherwise  
+- **Formula:** `mean( (takenOdds / closingOdds) - 1.0 ) × 100`  
+- **Unit:** Percentage (%)  
+- **Requires:** `closingOdds > 1.0` AND `takenOdds > 1.0`; null otherwise  
+- **Mathematical Justification & Reconciliation (EPIC 60 Stage C):**
+  - **Why Odds Ratio over Implied Probability Difference:**
+    In quantitative sports betting and financial market literature (Pinnacle, Buchdahl, Spox, Miller & Davidow), Closing Line Value represents the **expected percentage return on turnover** relative to the efficient closing market price:
+    $$\text{Expected Edge} = \frac{\text{Taken Odds}}{\text{Closing Odds}} - 1.0$$
+    The legacy implied probability difference formula $\Delta P = \frac{1}{\text{closingOdds}} - \frac{1}{\text{takenOdds}}$ measures raw implied probability drift, which does not scale linearly with payout edge across different odds magnitudes.
+  - **Worked Numeric Example of Divergence:**
+    - *Scenario A (Moderate Underdog)*: Bet taken at `2.20`, market closes at `2.00` (positive steam move):
+      - **Canonical Odds Ratio**: $(2.20 / 2.00 - 1) \times 100 = \mathbf{+10.00\%}$ expected ROI against closing price.
+      - **Legacy Probability Diff**: $(1/2.00 - 1/2.20) \times 100 = 0.5000 - 0.4545 = \mathbf{+4.55\text{ pp}}$ probability drift.
+    - *Scenario B (Heavy Favorite)*: Bet taken at `1.25`, market closes at `1.20`:
+      - **Canonical Odds Ratio**: $(1.25 / 1.20 - 1) \times 100 = \mathbf{+4.17\%}$.
+      - **Legacy Probability Diff**: $(1/1.20 - 1/1.25) \times 100 = 0.8333 - 0.8000 = \mathbf{+3.33\text{ pp}}$.
+    - *Scenario C (Longshot)*: Bet taken at `5.00`, market closes at `4.00`:
+      - **Canonical Odds Ratio**: $(5.00 / 4.00 - 1) \times 100 = \mathbf{+25.00\%}$.
+      - **Legacy Probability Diff**: $(1/4.00 - 1/5.00) \times 100 = 0.2500 - 0.2000 = \mathbf{+5.00\text{ pp}}$.
+  - The canonical odds ratio directly measures the financial edge delivered to the bettor per unit staked.
 - **Interpretation:**  
-  - `CLV > 0` → model beat the closing line (bet into steam)  
+  - `CLV > 0` → model beat the closing line (bet into steam; positive price edge)  
   - `CLV < 0` → model was shaded by the market (bet against steam)  
 - **Priority:** CLV is the primary measure of model success, prioritizing over raw hit-rate or daily ROI. Consistently beating the Pinnacle Closing Line is the strongest indicator of long-term profitability.
 - **Provenance:** `CLV → Trades → Odds Snapshots → Provider Closing Prices`

@@ -81,3 +81,15 @@ export async function buildPreMatchFeatures(matchId: string, kickoffAt: Date) {
    ```bash
    pnpm test
    ```
+
+---
+
+## 📅 Historical Dataset Date-Granularity Invariant (EPIC 60 Stage E)
+
+1. **Date-Level Resolution Only**: Historical datasets (`data/golden/europe/`, sourced from `football-data.co.uk`) carry `match_date` at calendar day granularity (`YYYY-MM-DD`) with binary observation labels (`opening` vs `closing`). They do NOT contain intraday minute-level timestamps.
+2. **Cutoff Definition**: For all historical modeling and walk-forward evaluations, the point-in-time anti-leakage cutoff is strictly defined as:
+   ```typescript
+   LeakageGuard.assertHistoricalDateCutoff(priorMatchDate, targetMatchDate);
+   // Equivalent to: priorMatchDate < targetMatchDate
+   ```
+3. **No Intraday Claims on Historical Data**: Any feature or report that implies intraday odds movement or minute-by-minute line updates using this dataset is unsupportable and prohibited. Intraday line movement tracking is reserved exclusively for live snapshot infrastructure (e.g. OddsPAPI).
