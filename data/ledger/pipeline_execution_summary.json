@@ -1,0 +1,18 @@
+{
+  "runId": "run-1788007095096",
+  "timestamp": "2026-08-29T12:38:15.096Z",
+  "mode": "SHADOW_UNATTENDED",
+  "monetizationEnabled": false,
+  "fixturesIngested": 1,
+  "predictionsGenerated": 4,
+  "predictionsSettled": 4,
+  "settledCountTotal": 4,
+  "targetSettledGate": 175,
+  "gateProgressPct": 2.3,
+  "meanLiveClv": -0.055,
+  "liveClvZScore": -0.037,
+  "failuresCount": 0,
+  "failureRatePct": 0,
+  "alertTriggered": false,
+  "failures": []
+}

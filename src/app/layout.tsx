@@ -24,29 +24,8 @@ const monoFont = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://handicaplab.com'),
-  title: {
-    default: 'HandicapLab | Football Market Intelligence',
-    template: '%s | HandicapLab',
-  },
-  description:
-    'Professional football market intelligence. Identify statistical inefficiencies and betting market edges with quantitative modeling, closing line value, and transparent historical validation.',
-  keywords:
-    'football market intelligence, betting edge, closing line value, CLV, expected value, EV, quantitative modeling, Asian handicap, value betting, sports analytics',
-  openGraph: {
-    type: 'website',
-    locale: 'en_US',
-    siteName: 'HandicapLab',
-    title: 'HandicapLab | Football Market Intelligence',
-    description:
-      'Professional football market intelligence. Identify statistical inefficiencies and betting market edges with quantitative modeling.',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'HandicapLab | Football Market Intelligence',
-    description:
-      'Professional football market intelligence. Identify statistical inefficiencies and betting market edges with quantitative modeling.',
-  },
+  title: 'HandicapLab — Transparent Sports Analytics Research',
+  description: 'Live model predictions with full transparency. Research terminal, not betting advice.',
   robots: {
     index: true,
     follow: true,

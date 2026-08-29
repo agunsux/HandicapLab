@@ -195,35 +195,29 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="mt-8 border-t border-[#1F2937] pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#9CA3AF]">
           <div>
-            &copy; {new Date().getFullYear()} HandicapLab. All rights reserved.
+            &copy; 2026 HandicapLab. Research transparency, always.
           </div>
 
           <div className="flex items-center gap-6">
-            <Link href="/trust-center/security" className="hover:text-[#10B981] transition-colors">
-              Privacy Policy
+            <Link href="/methodology" className="hover:text-[#10B981] transition-colors">
+              Methodology
             </Link>
-            <Link href="/trust-center/verification-policy" className="hover:text-[#10B981] transition-colors">
-              Terms of Service
+            <Link href="/models" className="hover:text-[#10B981] transition-colors">
+              Models
             </Link>
-            <Link href="/trust-center/security" className="hover:text-[#10B981] transition-colors">
-              Cookie Policy
+            <Link href="/track-record" className="hover:text-[#10B981] transition-colors">
+              Track Record
             </Link>
-
-            {/* Dark/Light mode icon toggle */}
-            <button
-              onClick={() => setIsDark(!isDark)}
-              className="p-1.5 rounded-lg bg-[#111827] border border-[#1F2937] text-[#9CA3AF] hover:text-[#F0FDF4] transition-colors"
-              aria-label="Toggle theme"
-            >
-              {isDark ? <Moon className="h-3.5 w-3.5" /> : <Sun className="h-3.5 w-3.5" />}
-            </button>
           </div>
         </div>
 
-        {/* Disclaimer */}
-        <div className="mt-6 pt-4 border-t border-[#1F2937]/50">
-          <p className="text-[11px] text-[#9CA3AF]/60 leading-relaxed max-w-5xl">
-            HandicapLab provides sports market data analysis for informational and quantitative research purposes only. Analysis does not constitute financial or wagering advice. Pinnacle close prices serve as the ground truth for Closing Line Value (CLV) evaluation.
+        {/* Responsible Gambling Disclaimer */}
+        <div className="mt-6 pt-4 border-t border-[#1F2937]/50 space-y-2">
+          <p className="text-xs text-[#F59E0B]/90 font-medium">
+            HandicapLab is a sports analytics research project. All content is for informational purposes only. Nothing on this site constitutes betting advice.
+          </p>
+          <p className="text-[11px] text-[#9CA3AF]/70 leading-relaxed max-w-5xl">
+            If you or someone you know has a gambling problem, seek help. Gamble responsibly and only where legal. Pinnacle close prices serve as the ground truth for Closing Line Value (CLV) evaluation.
           </p>
         </div>
       </div>
