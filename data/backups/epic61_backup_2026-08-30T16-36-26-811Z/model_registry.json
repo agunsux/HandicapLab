@@ -1,0 +1,29 @@
+[
+  {
+    "id": "2015cfbb-77b2-48db-85ca-b1fcfd91151f",
+    "model_id": "prematch-v1",
+    "version": "1.0.0",
+    "description": "Production Poisson model for matches",
+    "role": "champion",
+    "parameters": {
+      "lambda_scale": 1
+    },
+    "performance_metrics": {},
+    "created_at": "2026-07-06T00:07:12.172163+00:00",
+    "updated_at": "2026-07-06T00:07:12.172163+00:00"
+  },
+  {
+    "id": "8f10910a-62a9-49f5-b777-dc380a944417",
+    "model_id": "prematch-v2-test",
+    "version": "1.1.0-beta",
+    "description": "Challenger model with temperature scaling adjustments",
+    "role": "challenger",
+    "parameters": {
+      "temperature": 1.05,
+      "lambda_scale": 1.02
+    },
+    "performance_metrics": {},
+    "created_at": "2026-07-06T00:07:12.172163+00:00",
+    "updated_at": "2026-07-06T00:07:12.172163+00:00"
+  }
+]

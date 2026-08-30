@@ -1,0 +1,1059 @@
+[
+  {
+    "page": "src/app/(app)/analytics/page.tsx",
+    "imports": [
+      "import React, { useState, useEffect } from 'react';",
+      "import { BarChart3, TrendingUp, ShieldCheck, Activity } from 'lucide-react';",
+      "import { StatCard } from '@/components/ui/StatCard';",
+      "import { GoldService, GoldCompetition, GoldMatchDetail } from '@/services/goldService';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/(app)/clv/page.tsx",
+    "imports": [
+      "import { useState, useEffect } from 'react';",
+      "import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';",
+      "import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';",
+      "import { Badge } from '@/components/ui/badge';",
+      "import Link from 'next/link';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/(app)/dashboard/page.tsx",
+    "imports": [
+      "import React, { useState, useEffect } from 'react';",
+      "import Link from 'next/link';",
+      "import {",
+      "import { GoldService, GoldCompetition } from '@/services/goldService';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/(app)/dashboard/paper-trading/page.tsx",
+    "imports": [
+      "import PaperTradingPage from '../../../paper-trading/page';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/(app)/data-quality/page.tsx",
+    "imports": [
+      "import React, { useState, useEffect } from 'react';",
+      "import {"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/(app)/documentation/page.tsx",
+    "imports": [
+      "import React, { useState } from 'react';",
+      "import {"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/(app)/evidence/page.tsx",
+    "imports": [
+      "import { useState, useEffect } from 'react';",
+      "import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';",
+      "import { Badge } from '@/components/ui/badge';",
+      "import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';"
+    ],
+    "hasMockKeywords": true,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/(app)/hall-of-fame/page.tsx",
+    "imports": [
+      "import React, { useState, useEffect } from 'react';",
+      "import {"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/(app)/historical/competitions/page.tsx",
+    "imports": [
+      "import React, { useState, useEffect } from 'react';",
+      "import Link from 'next/link';",
+      "import { GoldService, GoldCompetition } from '@/services/goldService';",
+      "import { Trophy, ArrowRight, Filter } from 'lucide-react';",
+      "import { StatCard } from '@/components/ui/StatCard';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/(app)/historical/competitions/[id]/page.tsx",
+    "imports": [
+      "import React, { useState, useEffect } from 'react';",
+      "import { useParams } from 'next/navigation';",
+      "import { HistoricalSubNav } from '@/components/layout/HistoricalSubNav';",
+      "import { StatCard } from '@/components/ui/StatCard';",
+      "import { DataTable, Column } from '@/components/ui/DataTable';",
+      "import { Trophy, Calendar, LineChart, TrendingUp } from 'lucide-react';",
+      "import { GoldService, GoldCompetition, GoldTeam } from '@/services/goldService';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/(app)/historical/h2h/page.tsx",
+    "imports": [
+      "import React from 'react';",
+      "import { GitCompare, Trophy } from 'lucide-react';",
+      "import { DataTable, Column } from '@/components/ui/DataTable';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/(app)/historical/matches/page.tsx",
+    "imports": [
+      "import React, { useState, useEffect } from 'react';",
+      "import Link from 'next/link';",
+      "import { Calendar, ArrowRight } from 'lucide-react';",
+      "import { FilterBar } from '@/components/ui/FilterBar';",
+      "import { DataTable, Column } from '@/components/ui/DataTable';",
+      "import { GoldService, GoldMatchDetail } from '@/services/goldService';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": true,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/(app)/historical/matches/[id]/page.tsx",
+    "imports": [
+      "import React, { useState, useEffect } from 'react';",
+      "import { useParams } from 'next/navigation';",
+      "import { HistoricalSubNav } from '@/components/layout/HistoricalSubNav';",
+      "import { StatCard } from '@/components/ui/StatCard';",
+      "import { Calendar, ShieldCheck, Activity, LineChart, TrendingUp } from 'lucide-react';",
+      "import { supabase } from '@/lib/supabase.client';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": [
+      "supabase"
+    ]
+  },
+  {
+    "page": "src/app/(app)/historical/odds-explorer/page.tsx",
+    "imports": [
+      "import React, { useState, useEffect } from 'react';",
+      "import { GoldService, GoldOddsRecord } from '@/services/goldService';",
+      "import { FilterBar } from '@/components/ui/FilterBar';",
+      "import { DataTable, Column } from '@/components/ui/DataTable';",
+      "import { StatCard } from '@/components/ui/StatCard';",
+      "import { LineChart, Download, Sparkles, TrendingUp, ShieldCheck } from 'lucide-react';"
+    ],
+    "hasMockKeywords": true,
+    "hasMoneyline": true,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/(app)/historical/page.tsx",
+    "imports": [
+      "import React, { useEffect, useState } from 'react';",
+      "import Link from 'next/link';",
+      "import {",
+      "import { SearchBar } from '@/components/ui/SearchBar';",
+      "import type { HistoricalStatusPayload, LeagueRow } from '@/lib/historical/historicalResearchService';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": true,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/(app)/historical/players/page.tsx",
+    "imports": [
+      "import React from 'react';",
+      "import { UserCheck, Search } from 'lucide-react';",
+      "import { DataTable, Column } from '@/components/ui/DataTable';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/(app)/historical/records/page.tsx",
+    "imports": [
+      "import React from 'react';",
+      "import { Award, Trophy } from 'lucide-react';",
+      "import { DataTable, Column } from '@/components/ui/DataTable';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/(app)/historical/search/page.tsx",
+    "imports": [
+      "import React, { useState } from 'react';",
+      "import { Search, Command, Users, Calendar, Trophy, ArrowRight } from 'lucide-react';",
+      "import Link from 'next/link';"
+    ],
+    "hasMockKeywords": true,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/(app)/historical/teams/page.tsx",
+    "imports": [
+      "import React, { useState, useEffect } from 'react';",
+      "import Link from 'next/link';",
+      "import { GoldService, GoldTeam } from '@/services/goldService';",
+      "import { Users, Filter, ArrowRight, ShieldCheck } from 'lucide-react';"
+    ],
+    "hasMockKeywords": true,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/(app)/historical/teams/[id]/page.tsx",
+    "imports": [
+      "import React, { useState, useEffect } from 'react';",
+      "import { useParams } from 'next/navigation';",
+      "import { HistoricalSubNav } from '@/components/layout/HistoricalSubNav';",
+      "import { StatCard } from '@/components/ui/StatCard';",
+      "import { Users, TrendingUp, ShieldCheck, Activity } from 'lucide-react';",
+      "import { GoldService, GoldTeam } from '@/services/goldService';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/(app)/historical/trends/page.tsx",
+    "imports": [
+      "import React, { useState, useEffect } from 'react';",
+      "import { TrendingDown, LineChart } from 'lucide-react';",
+      "import { StatCard } from '@/components/ui/StatCard';",
+      "import { GoldService, GoldCompetition } from '@/services/goldService';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/(app)/history/page.tsx",
+    "imports": [
+      "import { useState, useEffect } from 'react';",
+      "import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';",
+      "import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';",
+      "import { Badge } from '@/components/ui/badge';",
+      "import Link from 'next/link';"
+    ],
+    "hasMockKeywords": true,
+    "hasMoneyline": true,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/(app)/live/page.tsx",
+    "imports": [
+      "import React, { useState, useEffect } from 'react';",
+      "import { Radio, Activity, LineChart, ShieldCheck } from 'lucide-react';",
+      "import Link from 'next/link';",
+      "import { supabase } from '@/lib/supabase.client';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": [
+      "supabase"
+    ]
+  },
+  {
+    "page": "src/app/(app)/market-quant/page.tsx",
+    "imports": [
+      "import React, { useState, useEffect } from 'react';",
+      "import {"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/(app)/performance/page.tsx",
+    "imports": [
+      "import React, { useState, useEffect } from 'react';",
+      "import Link from 'next/link';"
+    ],
+    "hasMockKeywords": true,
+    "hasMoneyline": true,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/(app)/public-ledger/page.tsx",
+    "imports": [
+      "import React, { useState, useEffect } from 'react';",
+      "import {"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/(app)/research-console/page.tsx",
+    "imports": [
+      "import React, { useState, useEffect } from 'react';",
+      "import {"
+    ],
+    "hasMockKeywords": true,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/(app)/research-lab/page.tsx",
+    "imports": [
+      "import Link from 'next/link';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/(app)/results/page.tsx",
+    "imports": [
+      "import { fetchSettledResults } from '@/lib/queries/results';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": true,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/(app)/scanner/page.tsx",
+    "imports": [
+      "import { useState, useEffect, useMemo } from 'react';",
+      "import { Card, CardContent } from '@/components/ui/card';",
+      "import { Badge } from '@/components/ui/badge';",
+      "import { Input } from '@/components/ui/input';",
+      "import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';",
+      "import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';",
+      "import { WatchlistButton } from '@/components/WatchlistButton';",
+      "import Link from 'next/link';"
+    ],
+    "hasMockKeywords": true,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/(app)/scientific-research/page.tsx",
+    "imports": [
+      "import React, { useState, useEffect } from 'react';",
+      "import {"
+    ],
+    "hasMockKeywords": true,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/(app)/shadow-mode/page.tsx",
+    "imports": [
+      "import React, { useState, useEffect } from 'react';",
+      "import {"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/(app)/transparency/page.tsx",
+    "imports": [
+      "import React, { useState, useEffect } from 'react';",
+      "import {"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/(app)/value-bets/page.tsx",
+    "imports": [
+      "import React, { useState, useEffect } from 'react';",
+      "import {"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/(app)/watchlist/page.tsx",
+    "imports": [
+      "import { useState, useEffect, useMemo } from 'react';",
+      "import { Card, CardContent } from '@/components/ui/card';",
+      "import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';",
+      "import { WatchlistButton } from '@/components/WatchlistButton';",
+      "import { Badge } from '@/components/ui/badge';",
+      "import Link from 'next/link';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": true,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/admin/login/page.tsx",
+    "imports": [
+      "import React, { useState, useEffect, Suspense } from 'react';",
+      "import { useRouter, useSearchParams } from 'next/navigation';"
+    ],
+    "hasMockKeywords": true,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/admin/page.tsx",
+    "imports": [
+      "import React from 'react';",
+      "import { cookies } from 'next/headers';",
+      "import { redirect } from 'next/navigation';",
+      "import { supabase } from '@/lib/supabase.server';",
+      "import { runHealthCheck } from '@/lib/services/healthChecker';"
+    ],
+    "hasMockKeywords": true,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": [
+      "supabase"
+    ]
+  },
+  {
+    "page": "src/app/admin/scheduler/page.tsx",
+    "imports": [
+      "import { useEffect, useState } from 'react';",
+      "import Link from 'next/link';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/admin/shadow/page.tsx",
+    "imports": [
+      "import { useEffect, useState } from 'react';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/admin/system/page.tsx",
+    "imports": [
+      "import { getProviderHealth } from '@/lib/providers/quotaManager';",
+      "import React from 'react';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/app/analysis/page.tsx",
+    "imports": [
+      "import React, { useState } from 'react';",
+      "import {",
+      "import { usePerformance } from '@/hooks/useApi';",
+      "import { BarChart3, TrendingUp, Target, Percent, DollarSign } from 'lucide-react';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/app/dashboard/page.tsx",
+    "imports": [
+      "import React from 'react';",
+      "import Link from 'next/link';",
+      "import { Activity, Target, TrendingUp, Flame, ArrowRight, Shield, Zap } from 'lucide-react';",
+      "import { useLiveMatches, useSignals, usePerformance } from '@/hooks/useApi';",
+      "import { useAppStore } from '@/store/appStore';",
+      "import { EngineStatusWidget } from '@/components/engine/EngineStatusWidget';",
+      "import { EVBadge } from '@/components/ui/EVBadge';",
+      "import { Signal, Match } from '@/types';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/app/ledger/page.tsx",
+    "imports": [
+      "import { supabase } from '@/lib/supabase.server';",
+      "import { LedgerTable } from './_components/LedgerTable';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": [
+      "supabase"
+    ]
+  },
+  {
+    "page": "src/app/app/ledger/[id]/page.tsx",
+    "imports": [
+      "import { supabase } from '@/lib/supabase.server';",
+      "import Link from 'next/link';",
+      "import Navbar from '@/app/(marketing)/_components/Navbar';",
+      "import Footer from '@/app/(marketing)/_components/Footer';",
+      "import { ShieldCheck, Lock, ArrowLeft, CheckCircle2, FileText, Database, Award, LineChart } from 'lucide-react';",
+      "import { notFound } from 'next/navigation';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": [
+      "supabase"
+    ]
+  },
+  {
+    "page": "src/app/app/markets/asian-handicap/page.tsx",
+    "imports": [
+      "import { MarketPage } from '@/components/terminal/MarketPage';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/app/markets/btts/page.tsx",
+    "imports": [
+      "import { MarketPage } from '@/components/terminal/MarketPage';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/app/markets/moneyline/page.tsx",
+    "imports": [
+      "import { MarketPage } from '@/components/terminal/MarketPage';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": true,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/app/markets/over-under/page.tsx",
+    "imports": [
+      "import { MarketPage } from '@/components/terminal/MarketPage';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/app/matches/page.tsx",
+    "imports": [
+      "import Link from 'next/link';",
+      "import React from 'react';",
+      "import { supabase } from '@/lib/supabase.server';",
+      "import { MatchCard } from '@/components/MatchCard';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": [
+      "supabase"
+    ]
+  },
+  {
+    "page": "src/app/app/matches/[id]/page.tsx",
+    "imports": [
+      "import { MatchDetailView } from '@/components/terminal/MatchDetailView';",
+      "import { DEMO_VALUE_BETS } from '@/app/app/_data/terminal';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": true,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/app/page.tsx",
+    "imports": [
+      "import { redirect } from 'next/navigation';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/app/profile/page.tsx",
+    "imports": [
+      "import Link from 'next/link';",
+      "import { Bell, CreditCard, Shield, User } from 'lucide-react';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/app/settings/page.tsx",
+    "imports": [
+      "import React from 'react';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/app/value-bets/page.tsx",
+    "imports": [
+      "import React, { useState } from 'react';",
+      "import { Target, Zap, Clock, Users, ArrowUpRight, X, Shield, Plus, Check, Calendar, Activity, Info } from 'lucide-react';",
+      "import { useSignals } from '@/hooks/useApi';",
+      "import { useAppStore } from '@/store/appStore';",
+      "import { EVBadge } from '@/components/ui/EVBadge';",
+      "import { Signal } from '@/types';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/audit/page.tsx",
+    "imports": [
+      "import React from 'react';",
+      "import SummaryHeader from '@/components/audit/SummaryHeader';",
+      "import FilterSection from '@/components/audit/FilterSection';",
+      "import PredictionTable, { AuditPredictionRow } from '@/components/audit/PredictionTable';",
+      "import HistoricalCharts from '@/components/audit/HistoricalCharts';",
+      "import { supabase } from '@/lib/supabase.server';",
+      "import { Metadata } from 'next';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": true,
+    "hasHardcodedNumbers": false,
+    "dataSources": [
+      "supabase"
+    ]
+  },
+  {
+    "page": "src/app/blog/page.tsx",
+    "imports": [
+      "import Link from 'next/link';",
+      "import { ArrowRight, BookOpen } from 'lucide-react';",
+      "import { StructuredData } from '@/components/StructuredData';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": true,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/blog/what-is-closing-line-value/page.tsx",
+    "imports": [
+      "import Link from 'next/link';",
+      "import { ArrowLeft, ArrowRight } from 'lucide-react';",
+      "import { StructuredData } from '@/components/StructuredData';"
+    ],
+    "hasMockKeywords": true,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/checkout/mock-success/page.tsx",
+    "imports": [
+      "import { supabase } from '@/lib/supabase.server';",
+      "import Link from 'next/link';"
+    ],
+    "hasMockKeywords": true,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": [
+      "supabase"
+    ]
+  },
+  {
+    "page": "src/app/competitions/page.tsx",
+    "imports": [
+      "import { getTopLeagues } from '@/lib/data/leagues';",
+      "import { CompetitionsList } from './_components/CompetitionsList';",
+      "import { StructuredData } from '@/components/StructuredData';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/competitions/[slug]/page.tsx",
+    "imports": [
+      "import { notFound } from 'next/navigation';",
+      "import Link from 'next/link';",
+      "import { getLeagueBySlug, getLeagueMatches, STATIC_LEAGUES } from '@/lib/data/leagues';",
+      "import { LeagueMatchesTable } from './_components/LeagueMatchesTable';",
+      "import { StructuredData } from '@/components/StructuredData';",
+      "import { Card, CardContent } from '@/components/ui/card';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/leagues/page.tsx",
+    "imports": [
+      "import { redirect } from 'next/navigation';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/leagues/[slug]/page.tsx",
+    "imports": [
+      "import { redirect } from 'next/navigation';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/ledger/page.tsx",
+    "imports": [
+      "import { supabase } from '@/lib/supabase.server';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": [
+      "supabase"
+    ]
+  },
+  {
+    "page": "src/app/methodology/page.tsx",
+    "imports": [
+      "import React from 'react';",
+      "import Link from 'next/link';",
+      "import { ResearchBanner } from '@/components/terminal/ResearchBanner';",
+      "import { FileText, Cpu, Calculator, ShieldCheck, AlertTriangle, ArrowRight } from 'lucide-react';"
+    ],
+    "hasMockKeywords": true,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/models/page.tsx",
+    "imports": [
+      "import React from 'react';",
+      "import Link from 'next/link';",
+      "import { getTerminalModels } from '@/lib/terminalData';",
+      "import { ResearchBanner } from '@/components/terminal/ResearchBanner';",
+      "import { Cpu, ArrowRight, ShieldAlert, CheckCircle2 } from 'lucide-react';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": [
+      "getTerminalModels"
+    ]
+  },
+  {
+    "page": "src/app/models/[versionId]/page.tsx",
+    "imports": [
+      "import React from 'react';",
+      "import Link from 'next/link';",
+      "import { getTerminalModels, getTerminalPredictions } from '@/lib/terminalData';",
+      "import { ResearchBanner } from '@/components/terminal/ResearchBanner';",
+      "import { PredictionCard } from '@/components/terminal/PredictionCard';",
+      "import { ArrowLeft, Cpu, ShieldAlert, CheckCircle2, Lock } from 'lucide-react';",
+      "import { notFound } from 'next/navigation';"
+    ],
+    "hasMockKeywords": true,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": [
+      "getTerminalPredictions",
+      "getTerminalModels"
+    ]
+  },
+  {
+    "page": "src/app/page.tsx",
+    "imports": [
+      "import React from 'react';",
+      "import Link from 'next/link';",
+      "import { getTerminalPredictions, getTerminalModels } from '@/lib/terminalData';",
+      "import { ResearchBanner } from '@/components/terminal/ResearchBanner';",
+      "import { PredictionCard } from '@/components/terminal/PredictionCard';",
+      "import { ArrowRight, BarChart3, Database, Shield, FileText } from 'lucide-react';"
+    ],
+    "hasMockKeywords": true,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": [
+      "getTerminalPredictions",
+      "getTerminalModels"
+    ]
+  },
+  {
+    "page": "src/app/paper-trading/page.tsx",
+    "imports": [
+      "import { supabase } from '@/lib/supabase.server';",
+      "import { PaperTradingDashboard } from './_components/PaperTradingDashboard';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": [
+      "supabase"
+    ]
+  },
+  {
+    "page": "src/app/predictions/page.tsx",
+    "imports": [
+      "import React from 'react';",
+      "import { getTerminalPredictions } from '@/lib/terminalData';",
+      "import { PredictionsView } from '@/components/terminal/PredictionsView';"
+    ],
+    "hasMockKeywords": true,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": [
+      "getTerminalPredictions"
+    ]
+  },
+  {
+    "page": "src/app/predictions/[fixtureId]/page.tsx",
+    "imports": [
+      "import React from 'react';",
+      "import Link from 'next/link';",
+      "import { getTerminalPredictions } from '@/lib/terminalData';",
+      "import { ResearchBanner } from '@/components/terminal/ResearchBanner';",
+      "import { ArrowLeft, ShieldAlert, Activity, CheckCircle, Clock } from 'lucide-react';",
+      "import { notFound } from 'next/navigation';"
+    ],
+    "hasMockKeywords": true,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": [
+      "getTerminalPredictions"
+    ]
+  },
+  {
+    "page": "src/app/pricing/page.tsx",
+    "imports": [
+      "import { headers } from 'next/headers';",
+      "import { PricingCards } from './PricingCards';"
+    ],
+    "hasMockKeywords": true,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/research/datasets/page.tsx",
+    "imports": [
+      "import React from 'react';",
+      "import Link from 'next/link';",
+      "import Navbar from '../../(marketing)/_components/Navbar';",
+      "import Footer from '../../(marketing)/_components/Footer';",
+      "import { Database, Download, ArrowLeft, ShieldCheck, FileSpreadsheet, CheckCircle2, Lock, Code } from 'lucide-react';"
+    ],
+    "hasMockKeywords": true,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/research/hall-of-mistakes/page.tsx",
+    "imports": [
+      "import React from 'react';",
+      "import Link from 'next/link';",
+      "import Navbar from '../../(marketing)/_components/Navbar';",
+      "import Footer from '../../(marketing)/_components/Footer';",
+      "import { ShieldCheck, AlertTriangle, ArrowLeft, CheckCircle2, FileText, Cpu, Search, HelpCircle } from 'lucide-react';"
+    ],
+    "hasMockKeywords": true,
+    "hasMoneyline": true,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/research/probability/page.tsx",
+    "imports": [
+      "import React from 'react';",
+      "import { ProbabilityCharts } from '../../../components/research/ProbabilityCharts';",
+      "import { supabase } from '@/lib/supabase.server';"
+    ],
+    "hasMockKeywords": true,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": [
+      "supabase"
+    ]
+  },
+  {
+    "page": "src/app/research/reports/page.tsx",
+    "imports": [
+      "import React from 'react';",
+      "import Link from 'next/link';",
+      "import Navbar from '../../(marketing)/_components/Navbar';",
+      "import Footer from '../../(marketing)/_components/Footer';",
+      "import { FileText, Calendar, ArrowLeft, Download, ShieldCheck, CheckCircle2, BookOpen } from 'lucide-react';"
+    ],
+    "hasMockKeywords": true,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/research/timeline/page.tsx",
+    "imports": [
+      "import React from 'react';",
+      "import Link from 'next/link';",
+      "import Navbar from '../../(marketing)/_components/Navbar';",
+      "import Footer from '../../(marketing)/_components/Footer';",
+      "import { Activity, ShieldCheck, ArrowLeft, GitCommit, CheckCircle2, Award, Cpu, LineChart, FileText, ArrowRight } from 'lucide-react';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/track-record/page.tsx",
+    "imports": [
+      "import React from 'react';",
+      "import { getTerminalPredictions } from '@/lib/terminalData';",
+      "import { ResearchBanner } from '@/components/terminal/ResearchBanner';",
+      "import { AhValueEngine } from '@/lib/research/ah-solo/ahValueEngine';",
+      "import { BarChart3, TrendingUp, ShieldCheck, Target, AlertCircle } from 'lucide-react';"
+    ],
+    "hasMockKeywords": true,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": [
+      "getTerminalPredictions"
+    ]
+  },
+  {
+    "page": "src/app/trust-center/page.tsx",
+    "imports": [
+      "import React from 'react';",
+      "import Link from 'next/link';",
+      "import Navbar from '../(marketing)/_components/Navbar';",
+      "import Footer from '../(marketing)/_components/Footer';",
+      "import { ShieldCheck, Cpu, Database, FileCheck, ArrowUpRight, CheckCircle2, Lock, Activity, Server, FileText } from 'lucide-react';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/trust-center/security/page.tsx",
+    "imports": [
+      "import React from 'react';",
+      "import Link from 'next/link';",
+      "import Navbar from '../../(marketing)/_components/Navbar';",
+      "import Footer from '../../(marketing)/_components/Footer';",
+      "import { ShieldCheck, Lock, Server, ArrowLeft, CheckCircle2 } from 'lucide-react';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/trust-center/verification-policy/page.tsx",
+    "imports": [
+      "import React from 'react';",
+      "import Link from 'next/link';",
+      "import Navbar from '../../(marketing)/_components/Navbar';",
+      "import Footer from '../../(marketing)/_components/Footer';",
+      "import { ShieldCheck, Lock, CheckCircle2, FileText, ArrowLeft } from 'lucide-react';"
+    ],
+    "hasMockKeywords": false,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": []
+  },
+  {
+    "page": "src/app/validation/page.tsx",
+    "imports": [
+      "import React from 'react';",
+      "import Link from 'next/link';",
+      "import Navbar from '../(marketing)/_components/Navbar';",
+      "import Footer from '../(marketing)/_components/Footer';",
+      "import { ShieldCheck, Activity, LineChart, Award, CheckCircle2, Lock, ArrowUpRight, Cpu, Database, RefreshCw, BarChart2 } from 'lucide-react';",
+      "import { supabase } from '@/lib/supabase.server';",
+      "import { calculateQuantitativeMetrics } from '@/lib/validation/metricsCalculator';"
+    ],
+    "hasMockKeywords": true,
+    "hasMoneyline": false,
+    "hasHardcodedNumbers": false,
+    "dataSources": [
+      "supabase"
+    ]
+  }
+]

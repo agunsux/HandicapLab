@@ -13,16 +13,14 @@ interface MatchDetailViewProps {
 const MARKET_META: Record<string, { icon: React.ElementType; label: string }> = {
   asian_handicap: { icon: Scale, label: 'Asian Handicap' },
   over_under: { icon: LineChart, label: 'Over / Under' },
-  moneyline: { icon: Trophy, label: 'Moneyline' },
   btts: { icon: CircleDot, label: 'BTTS' },
   AH: { icon: Scale, label: 'Asian Handicap' },
   OU: { icon: LineChart, label: 'Over / Under' },
-  ML: { icon: Trophy, label: 'Moneyline' },
   BTTS: { icon: CircleDot, label: 'BTTS' },
 };
 
 function MarketCard({ bet }: { bet: ValueBet }) {
-  const Meta = MARKET_META[bet.market] || MARKET_META.moneyline;
+  const Meta = MARKET_META[bet.market] || MARKET_META.AH || MARKET_META.asian_handicap;
   const movement = (bet.lineMovement?.current || 0) - (bet.lineMovement?.opening || 0);
   const isDrifting = movement > 0;
   const ev = bet.ev ?? 0;

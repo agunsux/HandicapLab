@@ -18,7 +18,7 @@ const STORAGE_KEY = 'sth-storage';
 
 const defaultState: AppState = {
   userTier: 'free',
-  selectedMarkets: ['asian_handicap', 'over_under', 'moneyline', 'btts'],
+  selectedMarkets: ['asian_handicap', 'over_under', 'btts'],
   selectedLeagues: [],
   oddsFormat: 'decimal',
   autoRefresh: true,

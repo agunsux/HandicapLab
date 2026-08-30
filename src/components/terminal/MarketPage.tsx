@@ -9,26 +9,23 @@ import { useMatches, useOdds } from '@/hooks/useApi';
 import { useAppStore } from '@/store/appStore';
 import { MatchOdds, Match } from '@/types';
 
-type MarketCategory = 'asian-handicap' | 'over-under' | 'moneyline' | 'btts';
+type MarketCategory = 'asian-handicap' | 'over-under' | 'btts';
 
 const MARKET_TITLE_MAP: Record<MarketCategory, string> = {
   'asian-handicap': 'Asian Handicap',
   'over-under': 'Over / Under',
-  'moneyline': 'Moneyline (1X2)',
   'btts': 'Both Teams to Score (BTTS)',
 };
 
 const MARKET_KEY_MAP: Record<MarketCategory, string> = {
   'asian-handicap': 'AH',
   'over-under': 'OU',
-  'moneyline': 'ML',
   'btts': 'BTTS',
 };
 
 const TABS = [
   { slug: 'asian-handicap', label: 'Asian Handicap' },
   { slug: 'over-under', label: 'Over / Under' },
-  { slug: 'moneyline', label: 'Moneyline (1X2)' },
   { slug: 'btts', label: 'BTTS' },
 ];
 

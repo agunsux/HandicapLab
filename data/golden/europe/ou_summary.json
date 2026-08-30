@@ -1,0 +1,170 @@
+{
+  "metadata": {
+    "generatedAt": "2026-08-29T16:40:01.575Z",
+    "totalRecords": 4180,
+    "league": "ENG-PL",
+    "supportedLines": [
+      2.5,
+      2.75,
+      3,
+      3.25,
+      3.5
+    ]
+  },
+  "preVar": {
+    "eraName": "Pre-VAR (2015-2019)",
+    "seasons": [
+      "2015-2016",
+      "2016-2017",
+      "2017-2018",
+      "2018-2019"
+    ],
+    "totalMatches": 1520,
+    "averageGoals": 2.75,
+    "under3Wins": 715,
+    "under3Pushes": 335,
+    "under3Losses": 470,
+    "over3Wins": 470,
+    "over3Pushes": 335,
+    "over3Losses": 715,
+    "under3RawWinRate": 47.04,
+    "under3DecidedWinRate": 60.34,
+    "over3RawWinRate": 30.92,
+    "over3DecidedWinRate": 39.66,
+    "goalsDistribution": {
+      "zero": 113,
+      "one": 251,
+      "two": 351,
+      "three": 335,
+      "four": 258,
+      "five": 127,
+      "sixPlus": 85
+    }
+  },
+  "postVar": {
+    "eraName": "Post-VAR (2019-2026)",
+    "seasons": [
+      "2019-2020",
+      "2020-2021",
+      "2021-2022",
+      "2022-2023",
+      "2023-2024",
+      "2024-2025",
+      "2025-2026"
+    ],
+    "totalMatches": 2660,
+    "averageGoals": 2.864,
+    "under3Wins": 1197,
+    "under3Pushes": 605,
+    "under3Losses": 858,
+    "over3Wins": 858,
+    "over3Pushes": 605,
+    "over3Losses": 1197,
+    "under3RawWinRate": 45,
+    "under3DecidedWinRate": 58.25,
+    "over3RawWinRate": 32.26,
+    "over3DecidedWinRate": 41.75,
+    "goalsDistribution": {
+      "zero": 150,
+      "one": 411,
+      "two": 636,
+      "three": 605,
+      "four": 437,
+      "five": 252,
+      "sixPlus": 169
+    }
+  },
+  "recent3Seasons": {
+    "eraName": "Recent 3 Seasons (2023-2026)",
+    "seasons": [
+      "2023-2024",
+      "2024-2025",
+      "2025-2026"
+    ],
+    "totalMatches": 1140,
+    "averageGoals": 2.988,
+    "under3Wins": 470,
+    "under3Pushes": 266,
+    "under3Losses": 404,
+    "over3Wins": 404,
+    "over3Pushes": 266,
+    "over3Losses": 470,
+    "under3RawWinRate": 41.23,
+    "under3DecidedWinRate": 53.78,
+    "over3RawWinRate": 35.44,
+    "over3DecidedWinRate": 46.22,
+    "goalsDistribution": {
+      "zero": 54,
+      "one": 150,
+      "two": 266,
+      "three": 266,
+      "four": 210,
+      "five": 118,
+      "sixPlus": 76
+    }
+  },
+  "latestSeason": {
+    "eraName": "Latest Season (2025-2026)",
+    "seasons": [
+      "2025-2026"
+    ],
+    "totalMatches": 380,
+    "averageGoals": 2.75,
+    "under3Wins": 171,
+    "under3Pushes": 101,
+    "under3Losses": 108,
+    "over3Wins": 108,
+    "over3Pushes": 101,
+    "over3Losses": 171,
+    "under3RawWinRate": 45,
+    "under3DecidedWinRate": 61.29,
+    "over3RawWinRate": 28.42,
+    "over3DecidedWinRate": 38.71,
+    "goalsDistribution": {
+      "zero": 27,
+      "one": 53,
+      "two": 91,
+      "three": 101,
+      "four": 59,
+      "five": 33,
+      "sixPlus": 16
+    }
+  },
+  "allAvailable": {
+    "eraName": "All Available (2015-2026)",
+    "seasons": [
+      "2015-2016",
+      "2016-2017",
+      "2017-2018",
+      "2018-2019",
+      "2019-2020",
+      "2020-2021",
+      "2021-2022",
+      "2022-2023",
+      "2023-2024",
+      "2024-2025",
+      "2025-2026"
+    ],
+    "totalMatches": 4180,
+    "averageGoals": 2.823,
+    "under3Wins": 1912,
+    "under3Pushes": 940,
+    "under3Losses": 1328,
+    "over3Wins": 1328,
+    "over3Pushes": 940,
+    "over3Losses": 1912,
+    "under3RawWinRate": 45.74,
+    "under3DecidedWinRate": 59.01,
+    "over3RawWinRate": 31.77,
+    "over3DecidedWinRate": 40.99,
+    "goalsDistribution": {
+      "zero": 263,
+      "one": 662,
+      "two": 987,
+      "three": 940,
+      "four": 695,
+      "five": 379,
+      "sixPlus": 254
+    }
+  }
+}

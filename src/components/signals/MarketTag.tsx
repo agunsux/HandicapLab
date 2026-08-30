@@ -15,9 +15,6 @@ export function MarketTag({ marketCategory }: MarketTagProps) {
   } else if (cat === 'over_under' || cat === 'ou') {
     label = 'Over/Under';
     badgeColor = 'bg-purple-950 text-purple-400 border-purple-900';
-  } else if (cat === 'moneyline' || cat === 'ml') {
-    label = 'Moneyline';
-    badgeColor = 'bg-indigo-950 text-indigo-400 border-indigo-900';
   } else if (cat === 'btts') {
     label = 'BTTS';
     badgeColor = 'bg-pink-950 text-pink-400 border-pink-900';

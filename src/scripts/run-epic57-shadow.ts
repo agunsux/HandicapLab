@@ -89,7 +89,7 @@ async function runEpic571Execution() {
     console.log(`  Generated AH Lines:`);
     records.forEach((r) => {
       console.log(
-        `    - ${r.side.toUpperCase()} ${r.line >= 0 ? '+' + r.line : r.line} @ ${r.takenOdds} | Fair Prob: ${(r.fairProbability * 100).toFixed(1)}% | Market Prob: ${(r.devigMarketProbability * 100).toFixed(1)}% | Edge: ${(r.edge * 100).toFixed(1)}% | EV: ${r.ev > 0 ? '+' + r.ev : r.ev}% | Qualification: [${r.valueQualificationState}]`
+        `    - ${r.side.toUpperCase()} ${r.line >= 0 ? '+' + r.line : r.line} @ ${r.takenOdds ?? r.marketOdds} | Fair Prob: ${(((r.fairProbability ?? r.modelProb) ?? 0) * 100).toFixed(1)}% | Market Prob: ${(((r.devigMarketProbability ?? r.marketProb) ?? 0) * 100).toFixed(1)}% | Edge: ${(r.edge * 100).toFixed(1)}% | EV: ${r.ev > 0 ? '+' + r.ev : r.ev}% | Qualification: [${r.valueQualificationState}]`
       );
     });
   });
@@ -131,3 +131,4 @@ async function runEpic571Execution() {
 }
 
 runEpic571Execution().catch(console.error);
+

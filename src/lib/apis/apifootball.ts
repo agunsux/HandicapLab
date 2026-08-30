@@ -1,4 +1,4 @@
-import { z } from 'zod';
+﻿import { z } from 'zod';
 import { globalGateway } from '@/lib/providers/providerGateway';
 
 // Ensure this module is only imported/run on the server side
@@ -240,6 +240,7 @@ export class ApiFootballClient {
   }
 
   private ensureApiKey(): void {
+    if (!this.apiKey) { this.apiKey = (process.env.APIFOOTBALL_KEY || process.env.API_FOOTBALL_KEY || '').replace(/['"]/g, ''); }
     if (!this.apiKey) {
       console.error('[ApiFootballClient] Error: API key is not defined in environment variables.');
       throw new ApiError('API key is missing in environment variables.', 'auth', 401);
@@ -427,7 +428,7 @@ export class ApiFootballClient {
   }
 
   /**
-   * EPIC 52 Stage B — Fetch current injuries for a team or fixture
+   * EPIC 52 Stage B â€” Fetch current injuries for a team or fixture
    */
   public async getInjuries(
     params: { team?: number; fixture?: number; league?: number; season?: number },
@@ -442,7 +443,7 @@ export class ApiFootballClient {
   }
 
   /**
-   * EPIC 52 Stage B — Fetch lineups for a specific fixture
+   * EPIC 52 Stage B â€” Fetch lineups for a specific fixture
    */
   public async getLineups(
     fixtureId: number,
@@ -452,7 +453,7 @@ export class ApiFootballClient {
   }
 
   /**
-   * EPIC 52 Stage B — Fetch venue details (for weather coordinates)
+   * EPIC 52 Stage B â€” Fetch venue details (for weather coordinates)
    */
   public async getVenue(
     venueId: number,
@@ -463,3 +464,4 @@ export class ApiFootballClient {
 }
 
 export const apiFootballClient = new ApiFootballClient();
+

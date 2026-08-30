@@ -27,7 +27,7 @@ async function step3() {
   // 4. Check Markets
   const ahRes = await (await getAh(req)).json();
   const ouRes = await (await getOu(req)).json();
-  const mlRes = await (await getMl(req)).json();
+  const mlRes = await (await getMl()).json();
   const bttsRes = await (await getBtts(req)).json();
 
   console.log('AH Count:', ahRes.count);

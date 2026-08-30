@@ -1,0 +1,838 @@
+{
+  "dataset_version": "europe-dataset-v1",
+  "generated_at": "2026-08-30T16:34:08.176Z",
+  "source": "football-data.co.uk CSVs (data/bronze/football_data + research/quant/data/bronze/football_data_co_uk)",
+  "schema_version": "europe-match-v1",
+  "normalization_version": "europe-v1",
+  "leagues": [
+    {
+      "leagueId": "ENG-PL",
+      "name": "Premier League",
+      "country": "England",
+      "cluster": "A",
+      "status": "INCLUDED",
+      "seasons": [
+        "2015-2016",
+        "2016-2017",
+        "2017-2018",
+        "2018-2019",
+        "2019-2020",
+        "2020-2021",
+        "2021-2022",
+        "2022-2023",
+        "2023-2024",
+        "2024-2025",
+        "2025-2026"
+      ],
+      "earliestMatchDate": "2015-08-08",
+      "latestMatchDate": "2026-05-24",
+      "matches": 4180,
+      "valid": 4180,
+      "rejected": 0,
+      "duplicates": 1520,
+      "coverage": {
+        "ml": 4180,
+        "ah": 4179,
+        "ou": 4180,
+        "btts": 4180
+      },
+      "mlPct": 100,
+      "ahPct": 99.98,
+      "ouPct": 100,
+      "bttsPct": 100,
+      "readiness": {
+        "ml": "READY",
+        "ah": "READY",
+        "ou": "READY",
+        "btts": "READY"
+      }
+    },
+    {
+      "leagueId": "ESP-LALIGA",
+      "name": "La Liga",
+      "country": "Spain",
+      "cluster": "A",
+      "status": "INCLUDED",
+      "seasons": [
+        "2016-2017",
+        "2017-2018",
+        "2018-2019",
+        "2019-2020"
+      ],
+      "earliestMatchDate": "2016-08-19",
+      "latestMatchDate": "2020-07-19",
+      "matches": 1520,
+      "valid": 1520,
+      "rejected": 0,
+      "duplicates": 0,
+      "coverage": {
+        "ml": 1520,
+        "ah": 1518,
+        "ou": 1520,
+        "btts": 1520
+      },
+      "mlPct": 100,
+      "ahPct": 99.87,
+      "ouPct": 100,
+      "bttsPct": 100,
+      "readiness": {
+        "ml": "READY",
+        "ah": "READY",
+        "ou": "READY",
+        "btts": "READY"
+      }
+    },
+    {
+      "leagueId": "DEU-BUNDESLIGA",
+      "name": "Bundesliga",
+      "country": "Germany",
+      "cluster": "A",
+      "status": "INCLUDED",
+      "seasons": [
+        "2016-2017",
+        "2017-2018",
+        "2018-2019"
+      ],
+      "earliestMatchDate": "2016-08-26",
+      "latestMatchDate": "2019-05-18",
+      "matches": 918,
+      "valid": 918,
+      "rejected": 0,
+      "duplicates": 0,
+      "coverage": {
+        "ml": 918,
+        "ah": 918,
+        "ou": 918,
+        "btts": 918
+      },
+      "mlPct": 100,
+      "ahPct": 100,
+      "ouPct": 100,
+      "bttsPct": 100,
+      "readiness": {
+        "ml": "READY",
+        "ah": "READY",
+        "ou": "READY",
+        "btts": "READY"
+      }
+    },
+    {
+      "leagueId": "ITA-SERIEA",
+      "name": "Serie A",
+      "country": "Italy",
+      "cluster": "A",
+      "status": "INCLUDED",
+      "seasons": [
+        "2016-2017",
+        "2017-2018",
+        "2018-2019"
+      ],
+      "earliestMatchDate": "2016-08-20",
+      "latestMatchDate": "2019-05-26",
+      "matches": 1140,
+      "valid": 1140,
+      "rejected": 0,
+      "duplicates": 0,
+      "coverage": {
+        "ml": 1140,
+        "ah": 1140,
+        "ou": 1140,
+        "btts": 1140
+      },
+      "mlPct": 100,
+      "ahPct": 100,
+      "ouPct": 100,
+      "bttsPct": 100,
+      "readiness": {
+        "ml": "READY",
+        "ah": "READY",
+        "ou": "READY",
+        "btts": "READY"
+      }
+    },
+    {
+      "leagueId": "FRA-LIGUE1",
+      "name": "Ligue 1",
+      "country": "France",
+      "cluster": "A",
+      "status": "INCLUDED",
+      "seasons": [
+        "2016-2017",
+        "2017-2018",
+        "2018-2019"
+      ],
+      "earliestMatchDate": "2016-08-12",
+      "latestMatchDate": "2019-05-24",
+      "matches": 1140,
+      "valid": 1140,
+      "rejected": 0,
+      "duplicates": 0,
+      "coverage": {
+        "ml": 1140,
+        "ah": 1140,
+        "ou": 1140,
+        "btts": 1140
+      },
+      "mlPct": 100,
+      "ahPct": 100,
+      "ouPct": 100,
+      "bttsPct": 100,
+      "readiness": {
+        "ml": "READY",
+        "ah": "READY",
+        "ou": "READY",
+        "btts": "READY"
+      }
+    },
+    {
+      "leagueId": "NED-ERE",
+      "name": "Eredivisie",
+      "country": "Netherlands",
+      "cluster": "B",
+      "status": "EXCLUDED",
+      "excludeReason": "SOURCE_DATA_ABSENT: no football-data.co.uk source file present in repository",
+      "seasons": [],
+      "earliestMatchDate": null,
+      "latestMatchDate": null,
+      "matches": 0,
+      "valid": 0,
+      "rejected": 0,
+      "duplicates": 0,
+      "coverage": {
+        "ml": 0,
+        "ah": 0,
+        "ou": 0,
+        "btts": 0
+      },
+      "mlPct": 0,
+      "ahPct": 0,
+      "ouPct": 0,
+      "bttsPct": 0,
+      "readiness": {
+        "ml": "INSUFFICIENT",
+        "ah": "INSUFFICIENT",
+        "ou": "INSUFFICIENT",
+        "btts": "INSUFFICIENT"
+      }
+    },
+    {
+      "leagueId": "POR-PRIMEIRA",
+      "name": "Primeira Liga",
+      "country": "Portugal",
+      "cluster": "B",
+      "status": "EXCLUDED",
+      "excludeReason": "SOURCE_DATA_ABSENT: no football-data.co.uk source file present in repository",
+      "seasons": [],
+      "earliestMatchDate": null,
+      "latestMatchDate": null,
+      "matches": 0,
+      "valid": 0,
+      "rejected": 0,
+      "duplicates": 0,
+      "coverage": {
+        "ml": 0,
+        "ah": 0,
+        "ou": 0,
+        "btts": 0
+      },
+      "mlPct": 0,
+      "ahPct": 0,
+      "ouPct": 0,
+      "bttsPct": 0,
+      "readiness": {
+        "ml": "INSUFFICIENT",
+        "ah": "INSUFFICIENT",
+        "ou": "INSUFFICIENT",
+        "btts": "INSUFFICIENT"
+      }
+    },
+    {
+      "leagueId": "BEL-PRO",
+      "name": "Belgian Pro League",
+      "country": "Belgium",
+      "cluster": "B",
+      "status": "EXCLUDED",
+      "excludeReason": "SOURCE_DATA_ABSENT: no football-data.co.uk source file present in repository",
+      "seasons": [],
+      "earliestMatchDate": null,
+      "latestMatchDate": null,
+      "matches": 0,
+      "valid": 0,
+      "rejected": 0,
+      "duplicates": 0,
+      "coverage": {
+        "ml": 0,
+        "ah": 0,
+        "ou": 0,
+        "btts": 0
+      },
+      "mlPct": 0,
+      "ahPct": 0,
+      "ouPct": 0,
+      "bttsPct": 0,
+      "readiness": {
+        "ml": "INSUFFICIENT",
+        "ah": "INSUFFICIENT",
+        "ou": "INSUFFICIENT",
+        "btts": "INSUFFICIENT"
+      }
+    },
+    {
+      "leagueId": "SCO-PREM",
+      "name": "Scottish Premiership",
+      "country": "Scotland",
+      "cluster": "B",
+      "status": "EXCLUDED",
+      "excludeReason": "SOURCE_DATA_ABSENT: no football-data.co.uk source file present in repository",
+      "seasons": [],
+      "earliestMatchDate": null,
+      "latestMatchDate": null,
+      "matches": 0,
+      "valid": 0,
+      "rejected": 0,
+      "duplicates": 0,
+      "coverage": {
+        "ml": 0,
+        "ah": 0,
+        "ou": 0,
+        "btts": 0
+      },
+      "mlPct": 0,
+      "ahPct": 0,
+      "ouPct": 0,
+      "bttsPct": 0,
+      "readiness": {
+        "ml": "INSUFFICIENT",
+        "ah": "INSUFFICIENT",
+        "ou": "INSUFFICIENT",
+        "btts": "INSUFFICIENT"
+      }
+    },
+    {
+      "leagueId": "TUR-SL",
+      "name": "Süper Lig",
+      "country": "Turkey",
+      "cluster": "B",
+      "status": "EXCLUDED",
+      "excludeReason": "SOURCE_DATA_ABSENT: no football-data.co.uk source file present in repository",
+      "seasons": [],
+      "earliestMatchDate": null,
+      "latestMatchDate": null,
+      "matches": 0,
+      "valid": 0,
+      "rejected": 0,
+      "duplicates": 0,
+      "coverage": {
+        "ml": 0,
+        "ah": 0,
+        "ou": 0,
+        "btts": 0
+      },
+      "mlPct": 0,
+      "ahPct": 0,
+      "ouPct": 0,
+      "bttsPct": 0,
+      "readiness": {
+        "ml": "INSUFFICIENT",
+        "ah": "INSUFFICIENT",
+        "ou": "INSUFFICIENT",
+        "btts": "INSUFFICIENT"
+      }
+    },
+    {
+      "leagueId": "AUT-BUND",
+      "name": "Austrian Bundesliga",
+      "country": "Austria",
+      "cluster": "B",
+      "status": "EXCLUDED",
+      "excludeReason": "SOURCE_DATA_ABSENT: no football-data.co.uk source file present in repository",
+      "seasons": [],
+      "earliestMatchDate": null,
+      "latestMatchDate": null,
+      "matches": 0,
+      "valid": 0,
+      "rejected": 0,
+      "duplicates": 0,
+      "coverage": {
+        "ml": 0,
+        "ah": 0,
+        "ou": 0,
+        "btts": 0
+      },
+      "mlPct": 0,
+      "ahPct": 0,
+      "ouPct": 0,
+      "bttsPct": 0,
+      "readiness": {
+        "ml": "INSUFFICIENT",
+        "ah": "INSUFFICIENT",
+        "ou": "INSUFFICIENT",
+        "btts": "INSUFFICIENT"
+      }
+    },
+    {
+      "leagueId": "SUI-SL",
+      "name": "Swiss Super League",
+      "country": "Switzerland",
+      "cluster": "B",
+      "status": "EXCLUDED",
+      "excludeReason": "SOURCE_DATA_ABSENT: no football-data.co.uk source file present in repository",
+      "seasons": [],
+      "earliestMatchDate": null,
+      "latestMatchDate": null,
+      "matches": 0,
+      "valid": 0,
+      "rejected": 0,
+      "duplicates": 0,
+      "coverage": {
+        "ml": 0,
+        "ah": 0,
+        "ou": 0,
+        "btts": 0
+      },
+      "mlPct": 0,
+      "ahPct": 0,
+      "ouPct": 0,
+      "bttsPct": 0,
+      "readiness": {
+        "ml": "INSUFFICIENT",
+        "ah": "INSUFFICIENT",
+        "ou": "INSUFFICIENT",
+        "btts": "INSUFFICIENT"
+      }
+    },
+    {
+      "leagueId": "DNK-SL",
+      "name": "Danish Superliga",
+      "country": "Denmark",
+      "cluster": "C",
+      "status": "EXCLUDED",
+      "excludeReason": "SOURCE_DATA_ABSENT: no verified football-data.co.uk source file present in repository",
+      "seasons": [],
+      "earliestMatchDate": null,
+      "latestMatchDate": null,
+      "matches": 0,
+      "valid": 0,
+      "rejected": 0,
+      "duplicates": 0,
+      "coverage": {
+        "ml": 0,
+        "ah": 0,
+        "ou": 0,
+        "btts": 0
+      },
+      "mlPct": 0,
+      "ahPct": 0,
+      "ouPct": 0,
+      "bttsPct": 0,
+      "readiness": {
+        "ml": "INSUFFICIENT",
+        "ah": "INSUFFICIENT",
+        "ou": "INSUFFICIENT",
+        "btts": "INSUFFICIENT"
+      }
+    },
+    {
+      "leagueId": "NOR-EL",
+      "name": "Eliteserien",
+      "country": "Norway",
+      "cluster": "C",
+      "status": "EXCLUDED",
+      "excludeReason": "SOURCE_DATA_ABSENT: no verified football-data.co.uk source file present in repository",
+      "seasons": [],
+      "earliestMatchDate": null,
+      "latestMatchDate": null,
+      "matches": 0,
+      "valid": 0,
+      "rejected": 0,
+      "duplicates": 0,
+      "coverage": {
+        "ml": 0,
+        "ah": 0,
+        "ou": 0,
+        "btts": 0
+      },
+      "mlPct": 0,
+      "ahPct": 0,
+      "ouPct": 0,
+      "bttsPct": 0,
+      "readiness": {
+        "ml": "INSUFFICIENT",
+        "ah": "INSUFFICIENT",
+        "ou": "INSUFFICIENT",
+        "btts": "INSUFFICIENT"
+      }
+    },
+    {
+      "leagueId": "SWE-AL",
+      "name": "Allsvenskan",
+      "country": "Sweden",
+      "cluster": "C",
+      "status": "EXCLUDED",
+      "excludeReason": "SOURCE_DATA_ABSENT: no verified football-data.co.uk source file present in repository",
+      "seasons": [],
+      "earliestMatchDate": null,
+      "latestMatchDate": null,
+      "matches": 0,
+      "valid": 0,
+      "rejected": 0,
+      "duplicates": 0,
+      "coverage": {
+        "ml": 0,
+        "ah": 0,
+        "ou": 0,
+        "btts": 0
+      },
+      "mlPct": 0,
+      "ahPct": 0,
+      "ouPct": 0,
+      "bttsPct": 0,
+      "readiness": {
+        "ml": "INSUFFICIENT",
+        "ah": "INSUFFICIENT",
+        "ou": "INSUFFICIENT",
+        "btts": "INSUFFICIENT"
+      }
+    },
+    {
+      "leagueId": "POL-EKS",
+      "name": "Ekstraklasa",
+      "country": "Poland",
+      "cluster": "C",
+      "status": "EXCLUDED",
+      "excludeReason": "SOURCE_DATA_ABSENT: no verified football-data.co.uk source file present in repository",
+      "seasons": [],
+      "earliestMatchDate": null,
+      "latestMatchDate": null,
+      "matches": 0,
+      "valid": 0,
+      "rejected": 0,
+      "duplicates": 0,
+      "coverage": {
+        "ml": 0,
+        "ah": 0,
+        "ou": 0,
+        "btts": 0
+      },
+      "mlPct": 0,
+      "ahPct": 0,
+      "ouPct": 0,
+      "bttsPct": 0,
+      "readiness": {
+        "ml": "INSUFFICIENT",
+        "ah": "INSUFFICIENT",
+        "ou": "INSUFFICIENT",
+        "btts": "INSUFFICIENT"
+      }
+    },
+    {
+      "leagueId": "CZE-1L",
+      "name": "Czech First League",
+      "country": "Czech Republic",
+      "cluster": "C",
+      "status": "EXCLUDED",
+      "excludeReason": "SOURCE_DATA_ABSENT: no verified football-data.co.uk source file present in repository",
+      "seasons": [],
+      "earliestMatchDate": null,
+      "latestMatchDate": null,
+      "matches": 0,
+      "valid": 0,
+      "rejected": 0,
+      "duplicates": 0,
+      "coverage": {
+        "ml": 0,
+        "ah": 0,
+        "ou": 0,
+        "btts": 0
+      },
+      "mlPct": 0,
+      "ahPct": 0,
+      "ouPct": 0,
+      "bttsPct": 0,
+      "readiness": {
+        "ml": "INSUFFICIENT",
+        "ah": "INSUFFICIENT",
+        "ou": "INSUFFICIENT",
+        "btts": "INSUFFICIENT"
+      }
+    },
+    {
+      "leagueId": "GRC-SL",
+      "name": "Greek Super League",
+      "country": "Greece",
+      "cluster": "C",
+      "status": "EXCLUDED",
+      "excludeReason": "SOURCE_DATA_ABSENT: no verified football-data.co.uk source file present in repository",
+      "seasons": [],
+      "earliestMatchDate": null,
+      "latestMatchDate": null,
+      "matches": 0,
+      "valid": 0,
+      "rejected": 0,
+      "duplicates": 0,
+      "coverage": {
+        "ml": 0,
+        "ah": 0,
+        "ou": 0,
+        "btts": 0
+      },
+      "mlPct": 0,
+      "ahPct": 0,
+      "ouPct": 0,
+      "bttsPct": 0,
+      "readiness": {
+        "ml": "INSUFFICIENT",
+        "ah": "INSUFFICIENT",
+        "ou": "INSUFFICIENT",
+        "btts": "INSUFFICIENT"
+      }
+    },
+    {
+      "leagueId": "ROU-L1",
+      "name": "Liga I",
+      "country": "Romania",
+      "cluster": "C",
+      "status": "EXCLUDED",
+      "excludeReason": "SOURCE_DATA_ABSENT: no verified football-data.co.uk source file present in repository",
+      "seasons": [],
+      "earliestMatchDate": null,
+      "latestMatchDate": null,
+      "matches": 0,
+      "valid": 0,
+      "rejected": 0,
+      "duplicates": 0,
+      "coverage": {
+        "ml": 0,
+        "ah": 0,
+        "ou": 0,
+        "btts": 0
+      },
+      "mlPct": 0,
+      "ahPct": 0,
+      "ouPct": 0,
+      "bttsPct": 0,
+      "readiness": {
+        "ml": "INSUFFICIENT",
+        "ah": "INSUFFICIENT",
+        "ou": "INSUFFICIENT",
+        "btts": "INSUFFICIENT"
+      }
+    },
+    {
+      "leagueId": "HRV-HNL",
+      "name": "HNL",
+      "country": "Croatia",
+      "cluster": "C",
+      "status": "EXCLUDED",
+      "excludeReason": "SOURCE_DATA_ABSENT: no verified football-data.co.uk source file present in repository",
+      "seasons": [],
+      "earliestMatchDate": null,
+      "latestMatchDate": null,
+      "matches": 0,
+      "valid": 0,
+      "rejected": 0,
+      "duplicates": 0,
+      "coverage": {
+        "ml": 0,
+        "ah": 0,
+        "ou": 0,
+        "btts": 0
+      },
+      "mlPct": 0,
+      "ahPct": 0,
+      "ouPct": 0,
+      "bttsPct": 0,
+      "readiness": {
+        "ml": "INSUFFICIENT",
+        "ah": "INSUFFICIENT",
+        "ou": "INSUFFICIENT",
+        "btts": "INSUFFICIENT"
+      }
+    },
+    {
+      "leagueId": "SRB-SL",
+      "name": "SuperLiga",
+      "country": "Serbia",
+      "cluster": "C",
+      "status": "EXCLUDED",
+      "excludeReason": "SOURCE_DATA_ABSENT: no verified football-data.co.uk source file present in repository",
+      "seasons": [],
+      "earliestMatchDate": null,
+      "latestMatchDate": null,
+      "matches": 0,
+      "valid": 0,
+      "rejected": 0,
+      "duplicates": 0,
+      "coverage": {
+        "ml": 0,
+        "ah": 0,
+        "ou": 0,
+        "btts": 0
+      },
+      "mlPct": 0,
+      "ahPct": 0,
+      "ouPct": 0,
+      "bttsPct": 0,
+      "readiness": {
+        "ml": "INSUFFICIENT",
+        "ah": "INSUFFICIENT",
+        "ou": "INSUFFICIENT",
+        "btts": "INSUFFICIENT"
+      }
+    },
+    {
+      "leagueId": "HUN-NB1",
+      "name": "NB I",
+      "country": "Hungary",
+      "cluster": "C",
+      "status": "EXCLUDED",
+      "excludeReason": "SOURCE_DATA_ABSENT: no verified football-data.co.uk source file present in repository",
+      "seasons": [],
+      "earliestMatchDate": null,
+      "latestMatchDate": null,
+      "matches": 0,
+      "valid": 0,
+      "rejected": 0,
+      "duplicates": 0,
+      "coverage": {
+        "ml": 0,
+        "ah": 0,
+        "ou": 0,
+        "btts": 0
+      },
+      "mlPct": 0,
+      "ahPct": 0,
+      "ouPct": 0,
+      "bttsPct": 0,
+      "readiness": {
+        "ml": "INSUFFICIENT",
+        "ah": "INSUFFICIENT",
+        "ou": "INSUFFICIENT",
+        "btts": "INSUFFICIENT"
+      }
+    },
+    {
+      "leagueId": "FIN-VL",
+      "name": "Veikkausliiga",
+      "country": "Finland",
+      "cluster": "C",
+      "status": "EXCLUDED",
+      "excludeReason": "SOURCE_DATA_ABSENT: no verified football-data.co.uk source file present in repository",
+      "seasons": [],
+      "earliestMatchDate": null,
+      "latestMatchDate": null,
+      "matches": 0,
+      "valid": 0,
+      "rejected": 0,
+      "duplicates": 0,
+      "coverage": {
+        "ml": 0,
+        "ah": 0,
+        "ou": 0,
+        "btts": 0
+      },
+      "mlPct": 0,
+      "ahPct": 0,
+      "ouPct": 0,
+      "bttsPct": 0,
+      "readiness": {
+        "ml": "INSUFFICIENT",
+        "ah": "INSUFFICIENT",
+        "ou": "INSUFFICIENT",
+        "btts": "INSUFFICIENT"
+      }
+    },
+    {
+      "leagueId": "IRL-PD",
+      "name": "Premier Division",
+      "country": "Ireland",
+      "cluster": "C",
+      "status": "EXCLUDED",
+      "excludeReason": "SOURCE_DATA_ABSENT: no verified football-data.co.uk source file present in repository",
+      "seasons": [],
+      "earliestMatchDate": null,
+      "latestMatchDate": null,
+      "matches": 0,
+      "valid": 0,
+      "rejected": 0,
+      "duplicates": 0,
+      "coverage": {
+        "ml": 0,
+        "ah": 0,
+        "ou": 0,
+        "btts": 0
+      },
+      "mlPct": 0,
+      "ahPct": 0,
+      "ouPct": 0,
+      "bttsPct": 0,
+      "readiness": {
+        "ml": "INSUFFICIENT",
+        "ah": "INSUFFICIENT",
+        "ou": "INSUFFICIENT",
+        "btts": "INSUFFICIENT"
+      }
+    }
+  ],
+  "clusters": [
+    {
+      "cluster": "A",
+      "leaguesIncluded": 5,
+      "seasons": 11,
+      "matches": 8898,
+      "valid": 8898,
+      "ml": 8898,
+      "ah": 8895,
+      "ou": 8898,
+      "btts": 8898
+    },
+    {
+      "cluster": "B",
+      "leaguesIncluded": 0,
+      "seasons": 0,
+      "matches": 0,
+      "valid": 0,
+      "ml": 0,
+      "ah": 0,
+      "ou": 0,
+      "btts": 0
+    },
+    {
+      "cluster": "C",
+      "leaguesIncluded": 0,
+      "seasons": 0,
+      "matches": 0,
+      "valid": 0,
+      "ml": 0,
+      "ah": 0,
+      "ou": 0,
+      "btts": 0
+    }
+  ],
+  "seasons": [
+    "2015-2016",
+    "2016-2017",
+    "2017-2018",
+    "2018-2019",
+    "2019-2020",
+    "2020-2021",
+    "2021-2022",
+    "2022-2023",
+    "2023-2024",
+    "2024-2025",
+    "2025-2026"
+  ],
+  "raw_record_count": 10418,
+  "match_count": 8898,
+  "valid_match_count": 8898,
+  "rejected_match_count": 0,
+  "duplicate_resolved_count": 1520,
+  "duplicate_count": 0,
+  "odds_coverage": {
+    "ml": 8898,
+    "ah": 8895,
+    "ou": 8898,
+    "btts": 8898
+  },
+  "hash": "e2500a7b01c7569798b15429354408eb5a982e13d20567c9f17e8b6c54f80281"
+}

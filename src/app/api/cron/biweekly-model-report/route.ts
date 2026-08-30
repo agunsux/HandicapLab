@@ -66,7 +66,7 @@ async function handleBiweeklyReport(request: Request) {
     const marketStats: Record<string, { count: number; wins: number; halfWins: number; losses: number; halfLosses: number; pushes: number; profit: number; clvSum: number }> = {
       asian_handicap: { count: 0, wins: 0, halfWins: 0, losses: 0, halfLosses: 0, pushes: 0, profit: 0.0, clvSum: 0.0 },
       over_under: { count: 0, wins: 0, halfWins: 0, losses: 0, halfLosses: 0, pushes: 0, profit: 0.0, clvSum: 0.0 },
-      moneyline: { count: 0, wins: 0, halfWins: 0, losses: 0, halfLosses: 0, pushes: 0, profit: 0.0, clvSum: 0.0 }
+      btts: { count: 0, wins: 0, halfWins: 0, losses: 0, halfLosses: 0, pushes: 0, profit: 0.0, clvSum: 0.0 }
     };
 
     const confidenceBuckets: Record<string, { count: number; wins: number; halfWins: number; pushes: number }> = {
@@ -136,7 +136,7 @@ async function handleBiweeklyReport(request: Request) {
 
     reportText += `<b>Performance by Market:</b>\n`;
     for (const [marketKey, m] of Object.entries(marketStats)) {
-      const displayName = marketKey === 'asian_handicap' ? 'Asian Handicap' : marketKey === 'over_under' ? 'Over/Under' : 'Moneyline';
+      const displayName = marketKey === 'asian_handicap' ? 'Asian Handicap' : marketKey === 'over_under' ? 'Over/Under' : 'Both Teams To Score (BTTS)';
       if (m.count === 0) {
         reportText += `- ${displayName} (n=0): No data\n`;
       } else {

@@ -1,48 +1,6 @@
-import { DailyAhShadowPipeline } from '@/lib/pipeline/dailyAhShadowPipeline';
+import { DailyAhShadowPipeline, AhPredictionLedgerRecord } from './pipeline/dailyAhShadowPipeline';
 
-export interface TerminalModelVersion {
-  id: string;
-  market_scope: string;
-  architecture_description: string;
-  hypothesis: string;
-  frozen_parameters: Record<string, any>;
-  backtest_status: string;
-  validation_state: string;
-  backtest_realized_roi: number;
-  backtest_clv_mean: number;
-  backtest_clv_pvalue: number;
-  backtest_n_bets: number;
-}
-
-export interface TerminalPrediction {
-  id: string;
-  fixture_id: string;
-  league_id: string;
-  league_name: string;
-  country?: string;
-  kickoff_at: string;
-  home_team: string;
-  away_team: string;
-  model_version: string;
-  line: number;
-  side: 'home' | 'away';
-  fair_probability: number;
-  fair_odds: number;
-  devig_market_probability: number;
-  taken_odds: number;
-  closing_odds?: number | null;
-  edge: number;
-  ev: number;
-  clv?: number | null;
-  settlement_status: 'PENDING' | 'SETTLED' | 'VOID';
-  actual_outcome?: string | null;
-  profit_loss?: number | null;
-  settled_at?: string | null;
-  created_at: string;
-  updated_at: string;
-}
-
-export const SEEDED_MODELS: TerminalModelVersion[] = [
+export const SEEDED_MODELS = [
   {
     id: 'AH-dixoncoles-v1.0.0',
     market_scope: 'AH',
@@ -97,74 +55,82 @@ export const SEEDED_MODELS: TerminalModelVersion[] = [
   },
 ];
 
-export async function getTerminalPredictions(): Promise<TerminalPrediction[]> {
-  const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+export interface TerminalPredictionRow {
+  id: string;
+  fixture_id: string;
+  league_id: string;
+  league_name: string;
+  match_date: string;
+  kickoff_at: string;
+  home_team: string;
+  away_team: string;
+  market: 'ASIAN_HANDICAP';
+  line: number;
+  side: 'home' | 'away';
+  fair_probability: number;
+  fair_odds: number;
+  devig_market_probability: number;
+  taken_odds: number;
+  closing_odds?: number | null;
+  edge: number;
+  ev: number;
+  kelly_fraction: number;
+  recommended_stake_pct: number;
+  value_qualification_state: string;
+  sample_size: number;
+  sample_status: string;
+  model_version: string;
+  validation_state: string;
+  settlement_status: 'PENDING' | 'SETTLED' | 'VOID';
+  clv: number | null;
+  actual_outcome: string | null;
+  profit_loss: number | null;
+  research_honesty_banner: string;
+  created_at: string;
+  updated_at: string;
+}
 
-  if (supabaseUrl && supabaseKey) {
-    try {
-      const { createClient } = await import('@supabase/supabase-js');
-      const supabase = createClient(supabaseUrl, supabaseKey);
-      const { data, error } = await supabase
-        .from('public_predictions')
-        .select('*')
-        .order('kickoff_at', { ascending: false });
+export type TerminalPrediction = TerminalPredictionRow;
 
-      if (!error && data && data.length > 0) {
-        return data as TerminalPrediction[];
-      }
-    } catch (err) {
-      console.warn('[getTerminalPredictions] Supabase fetch error, fallback to JSONL:', err);
-    }
-  }
+export function getTerminalModels() {
+  return SEEDED_MODELS;
+}
 
-  const localLedger = DailyAhShadowPipeline.loadLedger();
-  return localLedger.map((r) => ({
-    id: r.id,
+export function getTerminalPredictions(): TerminalPredictionRow[] {
+  const ledger = DailyAhShadowPipeline.loadLedger();
+  return ledger.map((r: AhPredictionLedgerRecord) => ({
+    id: String(r.id || r.predictionId || ''),
     fixture_id: r.fixtureId,
     league_id: r.leagueId,
     league_name: r.leagueName,
-    country: r.leagueName,
-    kickoff_at: r.kickoffAt,
+    match_date: r.matchDate,
+    kickoff_at: String(r.kickoffAt || r.kickoffTime || ''),
     home_team: r.homeTeam,
     away_team: r.awayTeam,
-    model_version: r.modelVersion,
+    market: r.market,
     line: r.line,
     side: r.side,
-    fair_probability: r.fairProbability,
+    fair_probability: Number(r.fairProbability ?? r.modelProb ?? 0),
     fair_odds: r.fairOdds,
-    devig_market_probability: r.devigMarketProbability,
-    taken_odds: r.takenOdds,
-    closing_odds: r.closingOdds || null,
+    devig_market_probability: Number(r.devigMarketProbability ?? r.marketProb ?? 0),
+    taken_odds: Number(r.takenOdds ?? r.marketOdds ?? 0),
+    closing_odds: r.closingOdds ?? null,
     edge: r.edge,
     ev: r.ev,
-    clv: r.clv || null,
+    kelly_fraction: r.kellyFraction,
+    recommended_stake_pct: r.recommendedStakePct,
+    value_qualification_state: r.valueQualificationState,
+    sample_size: r.sampleSize,
+    sample_status: r.sampleStatus,
+    model_version: r.modelVersion,
+    validation_state: r.validationState,
     settlement_status: r.settlementStatus,
-    actual_outcome: r.actualOutcome || null,
-    profit_loss: r.profitLoss || null,
-    settled_at: r.settledAt || null,
-    created_at: r.createdAt,
-    updated_at: r.updatedAt,
+    clv: r.clv ?? r.closingClv ?? null,
+    actual_outcome: r.actualOutcome ?? r.settlementOutcome ?? null,
+    profit_loss: r.profitLoss ?? r.profit ?? null,
+    research_honesty_banner: r.researchHonestyBanner,
+    created_at: String(r.createdAt || r.generatedAt || ''),
+    updated_at: String(r.updatedAt || r.generatedAt || ''),
   }));
 }
 
-export async function getTerminalModels(): Promise<TerminalModelVersion[]> {
-  const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (supabaseUrl && supabaseKey) {
-    try {
-      const { createClient } = await import('@supabase/supabase-js');
-      const supabase = createClient(supabaseUrl, supabaseKey);
-      const { data, error } = await supabase.from('model_versions').select('*');
-
-      if (!error && data && data.length > 0) {
-        return data as TerminalModelVersion[];
-      }
-    } catch (err) {
-      console.warn('[getTerminalModels] Supabase fetch error, fallback to seeded:', err);
-    }
-  }
-
-  return SEEDED_MODELS;
-}

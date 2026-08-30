@@ -131,8 +131,7 @@ export function MarketPanel({ marketData }: MarketPanelProps) {
       </div>
 
       {/* Grid of market bookmaker panels */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {renderMarketCard(marketData.moneyline, 'Moneyline (1X2)', 'ML', 'text-emerald-400 bg-emerald-500/10')}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {renderMarketCard(marketData.asianHandicap, 'Asian Handicap', 'AH', 'text-indigo-400 bg-indigo-500/10')}
         {renderMarketCard(marketData.overUnder, 'Over / Under', 'OU', 'text-amber-400 bg-amber-500/10')}
         {renderMarketCard(marketData.btts, 'Both Teams to Score', 'BTTS', 'text-rose-400 bg-rose-500/10')}

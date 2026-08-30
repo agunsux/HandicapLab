@@ -44,9 +44,9 @@ export default function FilterSection() {
           </div>
           <select className="bg-transparent border-none text-sm font-medium focus:ring-0 px-3 py-2 text-slate-700 dark:text-slate-300 outline-none">
             <option>All Markets</option>
-            <option>Moneyline</option>
             <option>Asian Handicap</option>
             <option>Over/Under</option>
+            <option>BTTS</option>
           </select>
         </div>
 

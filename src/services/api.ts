@@ -195,18 +195,18 @@ export function transformOddsApi(data: any[]): MatchOdds[] {
   data.forEach((match: any) => {
     match.bookmakers?.forEach((b: any) => {
       b.markets?.forEach((m: any) => {
+        let canonicalMarket: MarketType | null = null;
+        if (m.key === 'totals') canonicalMarket = 'over_under';
+        else if (m.key === 'spreads') canonicalMarket = 'asian_handicap';
+        else if (m.key === 'btts' || m.key === 'both_teams_to_score') canonicalMarket = 'btts';
+
+        if (!canonicalMarket) return; // Skip unsupported markets (e.g. h2h/moneyline)
+
         m.outcomes?.forEach((o: any) => {
           result.push({
             matchId: match.id,
             bookmaker: b.title || b.key,
-            market:
-              m.key === 'h2h'
-                ? 'moneyline'
-                : m.key === 'totals'
-                ? 'over_under'
-                : m.key === 'spreads'
-                ? 'asian_handicap'
-                : 'btts',
+            market: canonicalMarket!,
             selection: o.name,
             odds: o.price,
             line: o.point,
@@ -242,23 +242,22 @@ export function transformApiFootballOdds(data: any[]): MatchOdds[] {
     const fixtureId = String(item.fixture?.id);
     item.bookmakers?.forEach((b: any) => {
       b.bets?.forEach((bet: any) => {
-        const market: MarketType =
-          bet.name?.toLowerCase().includes('handicap')
-            ? 'asian_handicap'
-            : bet.name?.toLowerCase().includes('over/under')
-            ? 'over_under'
-            : bet.name?.toLowerCase().includes('both teams')
-            ? 'btts'
-            : 'moneyline';
+        const betName = (bet.name || '').toLowerCase();
+        let market: MarketType | null = null;
+        if (betName.includes('handicap')) market = 'asian_handicap';
+        else if (betName.includes('over/under') || betName.includes('goals over/under')) market = 'over_under';
+        else if (betName.includes('both teams to score') || betName.includes('btts')) market = 'btts';
+
+        if (!market) return; // Skip non-canonical markets (1X2, Moneyline, etc.)
 
         bet.values?.forEach((val: any) => {
           result.push({
             matchId: fixtureId,
-            bookmaker: b.name,
+            bookmaker: b.name || 'Unknown',
             market,
-            selection: val.value,
+            selection: String(val.value),
             odds: Number(val.odd),
-            timestamp: new Date().toISOString(),
+            timestamp: item.update || new Date().toISOString(),
           });
         });
       });

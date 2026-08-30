@@ -2,10 +2,9 @@ import { DbPrediction } from '../data/match';
 
 export interface MappedPrediction {
   hasPrediction: boolean;
-  moneyline: {
-    homeProb: number;
-    drawProb: number;
-    awayProb: number;
+  btts: {
+    yesProb: number;
+    noProb: number;
   };
   asianHandicap: {
     recommendedLine: number;
@@ -37,7 +36,7 @@ export interface MappedPrediction {
 export function mapPredictions(preds: DbPrediction[]): MappedPrediction {
   const result: MappedPrediction = {
     hasPrediction: preds.length > 0,
-    moneyline: { homeProb: 0, drawProb: 0, awayProb: 0 },
+    btts: { yesProb: 0, noProb: 0 },
     asianHandicap: { recommendedLine: 0, probability: 0, edge: 0 },
     overUnder: { line: 2.5, overProb: 0, underProb: 0 },
     expectedGoals: { homeXg: null, awayXg: null, totalXg: null },
@@ -79,11 +78,7 @@ export function mapPredictions(preds: DbPrediction[]): MappedPrediction {
       result.expectedGoals.awayXg = predObj.away_xg;
     }
 
-    if (p.market_type === 'ML') {
-      result.moneyline.homeProb = predObj.home_prob || predObj.homeWinProb || 0;
-      result.moneyline.drawProb = predObj.draw_prob || predObj.drawProb || 0;
-      result.moneyline.awayProb = predObj.away_prob || predObj.awayWinProb || 0;
-    } else if (p.market_type === 'AH') {
+    if (p.market_type === 'AH') {
       result.asianHandicap.recommendedLine = predObj.ah_line || 0;
       result.asianHandicap.probability = predObj.ah_prob || 0;
       result.asianHandicap.edge = edge;
@@ -91,6 +86,9 @@ export function mapPredictions(preds: DbPrediction[]): MappedPrediction {
       result.overUnder.line = predObj.ou_line || 2.5;
       result.overUnder.overProb = predObj.over_prob || 0;
       result.overUnder.underProb = predObj.under_prob || (predObj.over_prob ? 1 - predObj.over_prob : 0);
+    } else if (p.market_type === 'BTTS') {
+      result.btts.yesProb = predObj.pBttsYes || predObj.btts_yes_prob || 0;
+      result.btts.noProb = predObj.pBttsNo || predObj.btts_no_prob || (result.btts.yesProb ? 1 - result.btts.yesProb : 0);
     }
   }
 

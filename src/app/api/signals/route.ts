@@ -6,7 +6,7 @@ import { ApiHelper } from '@/lib/utils/apiHelper';
 import { z } from 'zod';
 
 const signalsQuerySchema = z.object({
-  market: z.enum(['moneyline', 'asian_handicap', 'over_under']).optional(),
+  market: z.enum(['asian_handicap', 'over_under', 'btts']).optional(),
   minEdge: z.preprocess((val) => val ? parseFloat(val as string) : undefined, z.number().min(0).max(100)).optional(),
   limit: z.preprocess((val) => val ? parseInt(val as string, 10) : undefined, z.number().min(1).max(100)).default(50),
   page: z.preprocess((val) => val ? parseInt(val as string, 10) : undefined, z.number().min(1).max(1000)).default(1),
@@ -15,7 +15,7 @@ const signalsQuerySchema = z.object({
 /**
  * GET handler for retrieving intelligence signals.
  * Supports filters:
- * - ?market=moneyline|asian_handicap|over_under
+ * - ?market=asian_handicap|over_under|btts
  * - ?minEdge=5.0 (percentage edge e.g. 5%)
  * - ?limit=20
  * - ?page=1

@@ -1,0 +1,25 @@
+{
+  "timestamp": "2026-08-30T17:00:20.453Z",
+  "totalScanned": 1224,
+  "passedCount": 0,
+  "rejectedCount": 1224,
+  "rejectionBreakdown": {
+    "FIXTURE_ALREADY_PLAYED": 918,
+    "MOCK_OR_MISSING_PROVIDER_ID": 0,
+    "INVALID_OR_MISSING_KICKOFF": 0,
+    "INVALID_STATUS": 0,
+    "INVALID_MARKET": 306,
+    "MISSING_REAL_ODDS": 0,
+    "MISSING_TEAMS": 0,
+    "MISSING_MODEL_OUTPUT": 0
+  },
+  "liverpoolEverton": {
+    "total": 616,
+    "passed": 0,
+    "rejected": 616,
+    "reasons": {
+      "FIXTURE_ALREADY_PLAYED": 462,
+      "INVALID_MARKET": 154
+    }
+  }
+}

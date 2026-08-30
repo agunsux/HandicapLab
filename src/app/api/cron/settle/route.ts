@@ -296,11 +296,19 @@ async function runSignalsSettlement(logId: string | null) {
               status = ouResult.status.toLowerCase();
               profit_loss = ouResult.profit_loss;
               if (status === 'push') status = 'void';
-            } else {
-              // Moneyline
+            } else if (market === 'btts') {
+              const yes = homeGoals >= 1 && awayGoals >= 1;
+              const isWin = (selection === 'yes' && yes) || (selection === 'no' && !yes);
+              status = isWin ? 'won' : 'lost';
+              profit_loss = isWin ? (odds - 1.0) : -1.0;
+            } else if (market === 'moneyline' || market === '1x2' || market === 'ml') {
+              // Legacy Moneyline settlement for historical signals
               const mlResult = settleMoneyline(homeGoals, awayGoals, selection as 'home' | 'draw' | 'away', odds);
               status = mlResult.status.toLowerCase();
               profit_loss = mlResult.profit_loss;
+            } else {
+              status = 'void';
+              profit_loss = 0.0;
             }
           }
 

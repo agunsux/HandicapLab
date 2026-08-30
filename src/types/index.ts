@@ -1,4 +1,5 @@
-export type MarketType = 'asian_handicap' | 'over_under' | 'moneyline' | 'btts';
+export type CanonicalMarket = 'AH' | 'OU' | 'BTTS';
+export type MarketType = 'asian_handicap' | 'over_under' | 'btts';
 export type OddsFormat = 'decimal' | 'american' | 'fractional';
 export type SignalType = 'value' | 'steam' | 'drift' | 'reverse_line' | 'sharp';
 export type UserTier = 'free' | 'pro' | 'elite';

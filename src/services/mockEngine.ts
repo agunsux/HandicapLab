@@ -79,7 +79,7 @@ export function generateMockMatches(count: number = 12, dateKey: string = 'today
 export function generateMockOdds(matchId: string = 'm-101', tick: number = 0): MatchOdds[] {
   const rng = createSeededRandom(`odds-${matchId}`);
   const bookies = ['Pinnacle', 'Bet365', 'Betfair', 'SBOBet', 'MaxBet', '188Bet'];
-  const markets: MarketType[] = ['asian_handicap', 'over_under', 'moneyline', 'btts'];
+  const markets: MarketType[] = ['asian_handicap', 'over_under', 'btts'];
   const result: MatchOdds[] = [];
 
   markets.forEach((market) => {
@@ -98,9 +98,7 @@ export function generateMockOdds(matchId: string = 'm-101', tick: number = 0): M
         bookmaker: b,
         market,
         selection:
-          market === 'moneyline'
-            ? 'Home Win'
-            : market === 'over_under'
+          market === 'over_under'
             ? 'Over 2.5'
             : market === 'btts'
             ? 'BTTS Yes'
@@ -125,7 +123,7 @@ export function generateMockSignals(count: number = 10, dateKey: string = 'today
   const rng = createSeededRandom(`signals-${dateKey}`);
   const matches = generateMockMatches(count, dateKey);
   const signalTypes: SignalType[] = ['value', 'steam', 'drift', 'reverse_line', 'sharp'];
-  const markets: MarketType[] = ['asian_handicap', 'over_under', 'moneyline', 'btts'];
+  const markets: MarketType[] = ['asian_handicap', 'over_under', 'btts'];
   const bookies = ['Pinnacle', 'SBOBet', 'Bet365', 'Betfair'];
 
   return matches.map((m, idx) => {
@@ -143,7 +141,7 @@ export function generateMockSignals(count: number = 10, dateKey: string = 'today
       type,
       market,
       selection: `${m.homeTeam} ${
-        market === 'asian_handicap' ? '-0.75' : market === 'over_under' ? 'Over 2.5' : 'Win'
+        market === 'asian_handicap' ? '-0.75' : market === 'over_under' ? 'Over 2.5' : 'BTTS Yes'
       }`,
       confidence,
       ev,
@@ -162,7 +160,7 @@ export function generateMockSignals(count: number = 10, dateKey: string = 'today
       league: m.league,
       kickoff: m.kickoff,
       marketType:
-        market === 'asian_handicap' ? 'AH' : market === 'over_under' ? 'OU' : market === 'moneyline' ? 'ML' : 'BTTS',
+        market === 'asian_handicap' ? 'AH' : market === 'over_under' ? 'OU' : 'BTTS',
       signalCategory: type.toUpperCase().replace('_', ' '),
       isHighValue: ev > 8.0,
     };
@@ -255,25 +253,18 @@ export function generateMockMarketDepth(matchId: string, market: MarketType): Ma
     market,
     selections: [
       {
-        name: market === 'moneyline' ? 'Home Win' : 'Selection A',
+        name: market === 'over_under' ? 'Over' : market === 'btts' ? 'Yes' : 'Home',
         bestOdds: Number((1.95 + r * 0.3).toFixed(2)),
         bookmaker: 'Pinnacle',
         volumeWeightedOdds: Number((1.92 + r * 0.28).toFixed(2)),
         liquidityScore: Math.floor(88 + r * 10),
       },
       {
-        name: market === 'moneyline' ? 'Draw' : 'Selection B',
-        bestOdds: Number((3.30 + r * 0.4).toFixed(2)),
-        bookmaker: 'Bet365',
-        volumeWeightedOdds: Number((3.25 + r * 0.35).toFixed(2)),
+        name: market === 'over_under' ? 'Under' : market === 'btts' ? 'No' : 'Away',
+        bestOdds: Number((1.95 + r * 0.4).toFixed(2)),
+        bookmaker: 'Pinnacle',
+        volumeWeightedOdds: Number((1.92 + r * 0.35).toFixed(2)),
         liquidityScore: Math.floor(80 + r * 12),
-      },
-      {
-        name: market === 'moneyline' ? 'Away Win' : 'Selection C',
-        bestOdds: Number((3.50 + r * 0.5).toFixed(2)),
-        bookmaker: 'SBOBet',
-        volumeWeightedOdds: Number((3.42 + r * 0.45).toFixed(2)),
-        liquidityScore: Math.floor(84 + r * 10),
       },
     ],
   };

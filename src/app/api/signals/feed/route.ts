@@ -27,8 +27,8 @@ export async function GET(request: Request) {
       dbMarketCategory = 'asian_handicap';
     } else if (normMarket === 'OU') {
       dbMarketCategory = 'over_under';
-    } else if (normMarket === 'ML') {
-      dbMarketCategory = 'moneyline';
+    } else if (normMarket === 'BTTS') {
+      dbMarketCategory = 'btts';
     }
 
     // Query signals

@@ -20,8 +20,10 @@ export async function GET(req: NextRequest) {
       // Replay mode: only consider picks generated BEFORE the evaluation_time
       query = query.lte('created_at', timestamp);
     } else {
-      // Real provider run: only consider upcoming fixtures
-      query = query.gt('kickoff_utc', new Date().toISOString());
+      // Real provider run: only consider upcoming fixtures with canonical markets
+      query = query
+        .gt('kickoff_utc', new Date().toISOString())
+        .in('market_type', ['ASIAN_HANDICAP', 'OVER_UNDER', 'BTTS']);
     }
 
     if (leagueParam) {

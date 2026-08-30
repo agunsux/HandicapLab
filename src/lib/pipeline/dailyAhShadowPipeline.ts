@@ -1,4 +1,4 @@
-// EPIC 57.1 — Daily Automated Asian Handicap Shadow Pipeline (Real API Integration)
+// EPIC 57.1 â€” Daily Automated Asian Handicap Shadow Pipeline (Real API Integration)
 // Location: src/lib/pipeline/dailyAhShadowPipeline.ts
 // Scope: Asian Handicap ONLY, shadow mode, unattended execution, honest status banner
 
@@ -17,41 +17,26 @@ import { settleAsianHandicap } from '../research/ah-solo/ahSettlementEngine';
 import { apiFootballClient } from '../apis/apifootball';
 import { oddsApiClient } from '../apis/oddspapi';
 
+export interface OddsPapiV4Fixture {
+  fixtureId: string;
+  participant1Name: string;
+  participant2Name: string;
+  startTime: string;
+  hasOdds?: boolean;
+}
+
 export const RESEARCH_HONESTY_BANNER =
   'RESEARCH STATUS: NOT YET VALIDATED. Historical backtest on 2015-2026 data shows no statistically significant edge (CLV Z=0.523, p=0.601; realized ROI -2.30% to -2.40% across tested configurations). This prediction is logged for track-record building, not as a recommendation.';
 
-// Confirmed League IDs from EPIC 57 Phase 1 Audit
 export const CONFIRMED_LEAGUES: Record<number, { name: string; country: string; sportKey?: string }> = {
-  // Top 5 & Tier 2 Europe
   39: { name: 'Premier League', country: 'England', sportKey: 'soccer_epl' },
-  40: { name: 'Championship', country: 'England', sportKey: 'soccer_efl_champ' },
   140: { name: 'La Liga', country: 'Spain', sportKey: 'soccer_spain_la_liga' },
-  141: { name: 'Segunda Division', country: 'Spain', sportKey: 'soccer_spain_segunda_division' },
   135: { name: 'Serie A', country: 'Italy', sportKey: 'soccer_italy_serie_a' },
-  136: { name: 'Serie B', country: 'Italy', sportKey: 'soccer_italy_serie_b' },
   78: { name: 'Bundesliga', country: 'Germany', sportKey: 'soccer_germany_bundesliga' },
-  79: { name: '2. Bundesliga', country: 'Germany', sportKey: 'soccer_germany_bundesliga2' },
   61: { name: 'Ligue 1', country: 'France', sportKey: 'soccer_france_ligue_one' },
-  62: { name: 'Ligue 2', country: 'France', sportKey: 'soccer_france_ligue_two' },
   88: { name: 'Eredivisie', country: 'Netherlands', sportKey: 'soccer_netherlands_eredivisie' },
   94: { name: 'Primeira Liga', country: 'Portugal', sportKey: 'soccer_portugal_primeira_liga' },
-  144: { name: 'Belgian Pro League', country: 'Belgium', sportKey: 'soccer_belgium_first_div' },
-  179: { name: 'Scottish Premiership', country: 'Scotland', sportKey: 'soccer_spl' },
-  103: { name: 'Eliteserien', country: 'Norway', sportKey: 'soccer_norway_eliteserien' },
-  113: { name: 'Allsvenskan', country: 'Sweden', sportKey: 'soccer_sweden_allsvenskan' },
-  119: { name: 'Superliga', country: 'Denmark', sportKey: 'soccer_denmark_superliga' },
-  244: { name: 'Veikkausliiga', country: 'Finland', sportKey: 'soccer_finland_veikkausliiga' },
-  // Asia (Verified Odds Coverage)
-  98: { name: 'J1 League', country: 'Japan', sportKey: 'soccer_japan_j_league' },
-  292: { name: 'K League 1', country: 'South Korea', sportKey: 'soccer_korea_k_league' },
-  307: { name: 'Saudi Pro League', country: 'Saudi Arabia', sportKey: 'soccer_saudi_pro_league' },
-  188: { name: 'A-League', country: 'Australia', sportKey: 'soccer_australia_aleague' },
-  // Americas
-  253: { name: 'Major League Soccer', country: 'USA', sportKey: 'soccer_usa_mls' },
-  71: { name: 'Brazil Serie A', country: 'Brazil', sportKey: 'soccer_brazil_campeonato' },
-  262: { name: 'Liga MX', country: 'Mexico', sportKey: 'soccer_mexico_ligamx' },
-  128: { name: 'Liga Profesional', country: 'Argentina', sportKey: 'soccer_argentina_primera_division' },
-  239: { name: 'Primera A', country: 'Colombia', sportKey: 'soccer_colombia_primera_a' },
+  40: { name: 'Championship', country: 'England', sportKey: 'soccer_efl_champ' },
 };
 
 export interface DailyFixtureCandidate {
@@ -61,7 +46,7 @@ export interface DailyFixtureCandidate {
   country: string;
   homeTeam: string;
   awayTeam: string;
-  kickoffTime: string; // ISO
+  kickoffTime: string;
   status: 'NS' | 'FT' | 'LIVE' | 'PST' | 'CANC';
   homeGoals?: number;
   awayGoals?: number;
@@ -69,199 +54,289 @@ export interface DailyFixtureCandidate {
     line: number;
     homeOdds: number;
     awayOdds: number;
-    bookmaker: string;
-    timestamp: string;
+    bookmaker?: string;
+    timestamp?: string;
   }>;
   closingOdds?: Array<{
     line: number;
     homeOdds: number;
     awayOdds: number;
-    bookmaker: string;
-    timestamp: string;
+    bookmaker?: string;
+    timestamp?: string;
   }>;
 }
 
 export interface AhPredictionLedgerRecord {
-  id: string;
+  predictionId: string;
+  id?: string;
   fixtureId: string;
   leagueId: string;
   leagueName: string;
-  kickoffAt: string;
+  matchDate: string;
+  kickoffTime: string;
+  kickoffAt?: string;
   homeTeam: string;
   awayTeam: string;
-  modelVersion: string; // "AH-dixoncoles-v1.0.0"
-  featureVersion: string; // "pit-football-v1"
-  dataCutoffTimestamp: string;
-  oddsSnapshotTimestamp: string;
+  market: 'ASIAN_HANDICAP';
   line: number;
   side: AhSide;
-  fairProbability: number;
+  modelProb: number;
+  fairProbability?: number;
+  marketProb: number;
+  devigMarketProbability?: number;
   fairOdds: number;
-  devigMarketProbability: number;
-  takenOdds: number;
-  closingOdds?: number;
+  marketOdds: number;
+  takenOdds?: number;
   edge: number;
   ev: number;
-  clv?: number;
+  kellyFraction: number;
+  recommendedStakePct: number;
   valueQualificationState: ValueQualificationState;
+  sampleSize: number;
   sampleStatus: SampleSizeStatus;
-  researchStatusLabel: string;
+  modelVersion: string;
+  validationState: 'RESEARCH_ONLY';
+  featureVersion?: string;
   settlementStatus: 'PENDING' | 'SETTLED' | 'VOID';
+  actualHomeScore?: number;
+  actualAwayScore?: number;
+  settlementOutcome?: 'WIN' | 'HALF_WIN' | 'PUSH' | 'HALF_LOSS' | 'LOSS';
   actualOutcome?: string;
+  closingLine?: number;
+  closingOdds?: number;
+  closingClv?: number;
+  clv?: number;
+  profit?: number;
   profitLoss?: number;
   settledAt?: string;
-  createdAt: string;
-  updatedAt: string;
+  researchHonestyBanner: string;
+  researchStatusLabel?: string;
+  generatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface PipelineExecutionSummary {
-  runId: string;
-  timestamp: string;
+  lastRunTimestamp: string;
   mode: 'SHADOW_UNATTENDED';
   monetizationEnabled: false;
   fixturesIngested: number;
   predictionsGenerated: number;
   predictionsSettled: number;
   settledCountTotal: number;
-  targetSettledGate: number; // 150-200
+  targetSettledGate: number;
   gateProgressPct: number;
   meanLiveClv: number;
   liveClvZScore: number;
+  activeModelVersion: string;
   failuresCount: number;
   failureRatePct: number;
   alertTriggered: boolean;
   failures: Array<{ fixtureId: string; stage: string; error: string }>;
 }
 
-export class DailyAhShadowPipeline {
-  private static ledgerFilePath = path.resolve(process.cwd(), 'data', 'ledger', 'ah_predictions_ledger.jsonl');
-  private static summaryFilePath = path.resolve(process.cwd(), 'data', 'ledger', 'pipeline_execution_summary.json');
+function normalizeTeamName(name: string): string {
+  return (name || '')
+    .toLowerCase()
+    .replace(/\b(fc|cf|cd|afc|ac|sc|ss|bv|sv|vfb|rb|athletic|club)\b/g, '')
+    .replace(/[^a-z0-9]/g, '')
+    .trim();
+}
 
-  public static ensureLedgerDir() {
-    const dir = path.dirname(this.ledgerFilePath);
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+export class DailyAhShadowPipeline {
+  private static ledgerPath = path.join(process.cwd(), 'data', 'ledger', 'ah_predictions_ledger.jsonl');
+
+  public static ensureLedgerDir(): void {
+    const dir = path.dirname(this.ledgerPath);
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
   }
 
   public static loadLedger(): AhPredictionLedgerRecord[] {
-    this.ensureLedgerDir();
-    if (!fs.existsSync(this.ledgerFilePath)) return [];
-    const content = fs.readFileSync(this.ledgerFilePath, 'utf8');
-    const lines = content.split('\n').filter((l) => l.trim().length > 0);
-    return lines.map((l) => JSON.parse(l));
+    if (!fs.existsSync(this.ledgerPath)) {
+      return [];
+    }
+    const lines = fs.readFileSync(this.ledgerPath, 'utf-8').trim().split('\n').filter(Boolean);
+    return lines.map((l) => {
+      const r = JSON.parse(l);
+      r.id = r.id || r.predictionId;
+      r.kickoffAt = r.kickoffAt || r.kickoffTime;
+      r.fairProbability = r.fairProbability !== undefined ? r.fairProbability : r.modelProb;
+      r.devigMarketProbability = r.devigMarketProbability !== undefined ? r.devigMarketProbability : r.marketProb;
+      r.takenOdds = r.takenOdds !== undefined ? r.takenOdds : r.marketOdds;
+      r.clv = r.clv !== undefined ? r.clv : r.closingClv;
+      r.actualOutcome = r.actualOutcome || r.settlementOutcome;
+      r.profitLoss = r.profitLoss !== undefined ? r.profitLoss : r.profit;
+      r.createdAt = r.createdAt || r.generatedAt;
+      r.updatedAt = r.updatedAt || r.generatedAt;
+      r.researchStatusLabel = r.researchStatusLabel || r.researchHonestyBanner;
+      r.featureVersion = r.featureVersion || 'pit-football-v1';
+      return r;
+    });
   }
 
-  public static saveLedger(records: AhPredictionLedgerRecord[]) {
+  public static appendLedger(records: AhPredictionLedgerRecord[]): void {
     this.ensureLedgerDir();
-    const content = records.map((r) => JSON.stringify(r)).join('\n');
-    fs.writeFileSync(this.ledgerFilePath, content + (records.length > 0 ? '\n' : ''), 'utf8');
+    const lines = records.map((r) => JSON.stringify(r)).join('\n') + '\n';
+    fs.appendFileSync(this.ledgerPath, lines, 'utf-8');
   }
 
-  /**
-   * TASK 1: Ingest live upcoming fixtures for next 24-48h from confirmed leagues.
-   */
+  public static saveLedger(records: AhPredictionLedgerRecord[]): void {
+    this.ensureLedgerDir();
+    const lines = records.map((r) => JSON.stringify(r)).join('\n') + '\n';
+    fs.writeFileSync(this.ledgerPath, lines, 'utf-8');
+  }
+
   public static async fetchLiveUpcomingFixtures(): Promise<DailyFixtureCandidate[]> {
     const today = new Date().toISOString().slice(0, 10);
     const tomorrow = new Date(Date.now() + 24 * 3600 * 1000).toISOString().slice(0, 10);
-    const confirmedLeagueIds = Object.keys(CONFIRMED_LEAGUES).map(Number);
-
     const candidates: DailyFixtureCandidate[] = [];
 
-    // Attempt live API fetch if API keys are configured
     const hasApiKey = !!(process.env.APIFOOTBALL_KEY || process.env.API_FOOTBALL_KEY);
+    if (!hasApiKey) {
+      console.warn('[DailyAhShadowPipeline] No APIFOOTBALL_KEY available.');
+      return [];
+    }
 
-    if (hasApiKey) {
+    // 1. Fetch live odds fixtures from OddsPapi V4
+    let oddsFixtures: OddsPapiV4Fixture[] = [];
+    try {
+      oddsFixtures = await (oddsApiClient as any).getFixtures?.(today, tomorrow, 10) || [];
+    } catch (err: any) {
+      console.warn('[DailyAhShadowPipeline] OddsPapi fixtures fetch notice:', err.message);
+    }
+
+    // 2. Fetch API-Football fixtures
+    for (const [leagueIdStr, meta] of Object.entries(CONFIRMED_LEAGUES)) {
+      const leagueId = Number(leagueIdStr);
+
       for (const date of [today, tomorrow]) {
         try {
           const res = await apiFootballClient.getFixturesByDate(date);
-          const items = res.response || [];
+          const items = Array.isArray(res) ? res : res?.response || [];
 
           for (const item of items) {
-            const leagueId = item.league.id;
-            if (!CONFIRMED_LEAGUES[leagueId]) continue; // Restricted to confirmed leagues
-            if (item.fixture.status.short !== 'NS') continue; // Not started
+            if (!item?.fixture || item.fixture.status.short !== 'NS' || item.league?.id !== leagueId) continue;
 
-            const fixtureId = `LIVE-${CONFIRMED_LEAGUES[leagueId].name.replace(/\s+/g, '-').toUpperCase()}-${item.fixture.id}`;
+            const fixtureId = `LIVE-${meta.name.replace(/\s+/g, '-').toUpperCase()}-${item.fixture.id}`;
+            const homeName = item.teams.home.name;
+            const awayName = item.teams.away.name;
             const kickoffTime = item.fixture.date;
+            const fixTimeMs = new Date(kickoffTime).getTime();
 
-            // Fetch live AH odds from Odds provider if available
-            const openingOdds: any[] = [];
-            // When Odds API is live, odds are extracted per bookmaker
-            // Sample standard line structure if live odds API responds
+            const openingOdds: Array<{ line: number; homeOdds: number; awayOdds: number; bookmaker?: string; timestamp?: string }> = [];
+
+            // Match with OddsPapi V4 fixture
+            const hNorm = normalizeTeamName(homeName);
+            const aNorm = normalizeTeamName(awayName);
+
+            const matchedOddsFixture = oddsFixtures.find((of) => {
+              const ofHNorm = normalizeTeamName(of.participant1Name);
+              const ofANorm = normalizeTeamName(of.participant2Name);
+              const ofTimeMs = new Date(of.startTime).getTime();
+              const diffHours = Math.abs(fixTimeMs - ofTimeMs) / (3600 * 1000);
+
+              const isHome = ofHNorm.includes(hNorm) || hNorm.includes(ofHNorm);
+              const isAway = ofANorm.includes(aNorm) || aNorm.includes(ofANorm);
+              return isHome && isAway && diffHours <= 3.0;
+            });
+
+            // If matched and has odds, fetch real odds from OddsPapi V4
+            if (matchedOddsFixture && matchedOddsFixture.hasOdds) {
+              try {
+                const oddsResp: any = await (oddsApiClient as any).getOddsByFixtureId?.(matchedOddsFixture.fixtureId);
+                if (oddsResp && oddsResp.bookmakerOdds) {
+                  const bks = Object.entries(oddsResp.bookmakerOdds);
+                  for (const [bkName, bkData] of bks) {
+                    const bk = bkData as any;
+                    if (!bk.markets) continue;
+                    for (const [mId, mData] of Object.entries(bk.markets)) {
+                      const m = mData as any;
+                      if (m.outcomes && typeof m.outcomes === 'object') {
+                        const outcomesArr = Array.isArray(m.outcomes) ? m.outcomes : Object.values(m.outcomes);
+                        if (outcomesArr.length >= 2) {
+                          const o1 = outcomesArr[0] as any;
+                          const o2 = outcomesArr[1] as any;
+                          if (typeof o1.point === 'number' && typeof o1.price === 'number' && typeof o2.price === 'number') {
+                            openingOdds.push({
+                              line: o1.point,
+                              homeOdds: o1.price,
+                              awayOdds: o2.price,
+                              bookmaker: bkName,
+                              timestamp: new Date().toISOString(),
+                            });
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              } catch (err: any) {
+                console.warn(`[DailyAhShadowPipeline] Odds fetch error for ${fixtureId}:`, err.message);
+              }
+            }
+
             candidates.push({
               fixtureId,
               leagueId: String(leagueId),
-              leagueName: CONFIRMED_LEAGUES[leagueId].name,
-              country: CONFIRMED_LEAGUES[leagueId].country,
-              homeTeam: item.teams.home.name,
-              awayTeam: item.teams.away.name,
+              leagueName: meta.name,
+              country: meta.country,
+              homeTeam: homeName,
+              awayTeam: awayName,
               kickoffTime,
               status: 'NS',
               openingOdds: openingOdds.length > 0 ? openingOdds : undefined,
             });
           }
         } catch (err: any) {
-          console.warn(`[DailyAhShadowPipeline] Live API-Football fetch for ${date} error:`, err.message);
+          console.warn(`[DailyAhShadowPipeline] Live fetch error for ${meta.name} (${date}):`, err.message);
         }
       }
-    }    // If live API returned 0 fixtures, return empty array without falling back to golden/synthetic data
-    if (candidates.length === 0) {
-      console.warn('[DailyAhShadowPipeline] WARNING: 0 fixtures returned from API. Possible off-day.');
-      return [];
     }
 
     return candidates;
   }
 
-  /**
-   * TASK 2: Fetch finished fixtures from yesterday to perform real automated settlement.
-   */
   public static async fetchLiveFinishedFixtures(): Promise<DailyFixtureCandidate[]> {
     const yesterday = new Date(Date.now() - 24 * 3600 * 1000).toISOString().slice(0, 10);
     const finished: DailyFixtureCandidate[] = [];
 
     const hasApiKey = !!(process.env.APIFOOTBALL_KEY || process.env.API_FOOTBALL_KEY);
+    if (!hasApiKey) return [];
 
-    if (hasApiKey) {
-      try {
-        const res = await apiFootballClient.getFixturesByDate(yesterday);
-        const items = res.response || [];
+    try {
+      const res = await apiFootballClient.getFixturesByDate(yesterday);
+      const items = Array.isArray(res) ? res : res?.response || [];
 
-        for (const item of items) {
-          const leagueId = item.league.id;
-          if (!CONFIRMED_LEAGUES[leagueId]) continue;
-          if (item.fixture.status.short !== 'FT') continue;
+      for (const item of items) {
+        const leagueId = item.league?.id;
+        if (!CONFIRMED_LEAGUES[leagueId]) continue;
+        if (!item?.fixture || item.fixture.status.short !== 'FT') continue;
 
-          const fixtureId = `LIVE-${CONFIRMED_LEAGUES[leagueId].name.replace(/\s+/g, '-').toUpperCase()}-${item.fixture.id}`;
+        const meta = CONFIRMED_LEAGUES[leagueId];
+        const fixtureId = `LIVE-${meta.name.replace(/\s+/g, '-').toUpperCase()}-${item.fixture.id}`;
 
-          finished.push({
-            fixtureId,
-            leagueId: String(leagueId),
-            leagueName: CONFIRMED_LEAGUES[leagueId].name,
-            country: CONFIRMED_LEAGUES[leagueId].country,
-            homeTeam: item.teams.home.name,
-            awayTeam: item.teams.away.name,
-            kickoffTime: item.fixture.date,
-            status: 'FT',
-            homeGoals: item.goals.home ?? undefined,
-            awayGoals: item.goals.away ?? undefined,
-          });
-        }
-      } catch (err: any) {
-        console.warn(`[DailyAhShadowPipeline] Live API-Football settlement fetch error:`, err.message);
+        finished.push({
+          fixtureId,
+          leagueId: String(leagueId),
+          leagueName: meta.name,
+          country: meta.country,
+          homeTeam: item.teams.home.name,
+          awayTeam: item.teams.away.name,
+          kickoffTime: item.fixture.date,
+          status: 'FT',
+          homeGoals: item.goals.home ?? undefined,
+          awayGoals: item.goals.away ?? undefined,
+        });
       }
-    }
-
-    if (finished.length === 0) {
-      console.warn('[DailyAhShadowPipeline] 0 finished fixtures found from yesterday.');
-      return [];
+    } catch (err: any) {
+      console.warn(`[DailyAhShadowPipeline] Settlement fetch error:`, err.message);
     }
 
     return finished;
   }
 
-  /**
-   * Run daily shadow prediction generation for upcoming fixtures.
-   */
   public static async executeDailyPredictions(
     upcomingFixtures: DailyFixtureCandidate[],
     historicalMatches: CanonicalMatch[],
@@ -283,7 +358,6 @@ export class DailyAhShadowPipeline {
     for (const fixture of upcomingFixtures) {
       try {
         if (!fixture.openingOdds || fixture.openingOdds.length === 0) {
-          // Normal expected skip if no odds quotes for fixture
           continue;
         }
 
@@ -329,316 +403,221 @@ export class DailyAhShadowPipeline {
               homeTrainingCount > 0 ? homeTrainingCount : historicalMatches.length
             );
 
-            // HARD OVERRIDE: valueQualificationState must be NOT_VALIDATED per EPIC 56 research
-            let homeState = AhValueEngine.qualifyValueState(homeEv, homeEdge, homeSampleStatus);
-            if (homeState === 'QUALIFIED_VALUE') {
-              homeState = 'NOT_VALIDATED';
-            }
-
-            const homeRecord: AhPredictionLedgerRecord = {
-              id: `pred-${fixture.fixtureId}-${odds.line}-home-${Date.now()}`,
+            const predId = `PRED-${fixture.fixtureId}-${odds.line.toFixed(2)}-HOME`;
+            generatedRecords.push({
+              predictionId: predId,
+              id: predId,
               fixtureId: fixture.fixtureId,
               leagueId: fixture.leagueId,
               leagueName: fixture.leagueName,
+              matchDate: fixture.kickoffTime.slice(0, 10),
+              kickoffTime: fixture.kickoffTime,
               kickoffAt: fixture.kickoffTime,
               homeTeam: fixture.homeTeam,
               awayTeam: fixture.awayTeam,
-              modelVersion: 'AH-dixoncoles-v1.0.0',
-              featureVersion: 'pit-football-v1',
-              dataCutoffTimestamp: nowIso,
-              oddsSnapshotTimestamp: odds.timestamp || nowIso,
+              market: 'ASIAN_HANDICAP',
               line: odds.line,
               side: 'home',
-              fairProbability: homeProbs.pCover,
-              fairOdds: homeProbs.fairOdds,
-              devigMarketProbability: devig.homeFairProb,
+              modelProb: Number(homeProbs.pCover.toFixed(4)),
+              fairProbability: Number(homeProbs.pCover.toFixed(4)),
+              marketProb: Number(devig.homeFairProb.toFixed(4)),
+              devigMarketProbability: Number(devig.homeFairProb.toFixed(4)),
+              fairOdds: Number((1 / homeProbs.pCover).toFixed(2)),
+              marketOdds: odds.homeOdds,
               takenOdds: odds.homeOdds,
               edge: homeEdge,
               ev: homeEv,
-              valueQualificationState: homeState,
+              kellyFraction: 0,
+              recommendedStakePct: 0,
+              valueQualificationState: 'NOT_VALIDATED',
+              sampleSize: homeTrainingCount,
               sampleStatus: homeSampleStatus,
-              researchStatusLabel: RESEARCH_HONESTY_BANNER,
+              modelVersion: 'AH-dixoncoles-v1.0.0',
+              validationState: 'RESEARCH_ONLY',
+              featureVersion: 'pit-football-v1',
               settlementStatus: 'PENDING',
+              researchHonestyBanner: RESEARCH_HONESTY_BANNER,
+              researchStatusLabel: RESEARCH_HONESTY_BANNER,
+              generatedAt: nowIso,
               createdAt: nowIso,
               updatedAt: nowIso,
-            };
-
-            generatedRecords.push(homeRecord);
-            existingKeys.add(homeKey);
+            });
           }
 
-          // 2. Away prediction (line inverted)
-          const awayLine = -odds.line;
-          const awayKey = `${fixture.fixtureId}|${awayLine.toFixed(2)}|away`;
+          // 2. Away prediction
+          const awayKey = `${fixture.fixtureId}|${odds.line.toFixed(2)}|away`;
           if (!existingKeys.has(awayKey)) {
-            const awayProbs = AhProbabilityModels.deriveAhSettlementProbabilities(gdPmf, awayLine, 'away');
+            const awayProbs = AhProbabilityModels.deriveAhSettlementProbabilities(gdPmf, odds.line, 'away');
             const awayEv = AhValueEngine.computeSettlementAwareEv(awayProbs, odds.awayOdds);
             const awayEdge = Number((awayProbs.pCover - devig.awayFairProb).toFixed(4));
             const awayTrainingCount = computeActualSampleSize(
-              awayLine,
+              odds.line,
               fixture.leagueId,
-              historicalMatches.map((m) => ({ line: awayLine, leagueId: m.leagueId }))
+              historicalMatches.map((m) => ({ line: odds.line, leagueId: m.leagueId }))
             );
             const awaySampleStatus = AhValueEngine.getSampleSizeStatus(
-              awayLine,
+              odds.line,
               awayTrainingCount > 0 ? awayTrainingCount : historicalMatches.length
             );
 
-            // HARD OVERRIDE: valueQualificationState must be NOT_VALIDATED per EPIC 56 research
-            let awayState = AhValueEngine.qualifyValueState(awayEv, awayEdge, awaySampleStatus);
-            if (awayState === 'QUALIFIED_VALUE') {
-              awayState = 'NOT_VALIDATED';
-            }
-
-            const awayRecord: AhPredictionLedgerRecord = {
-              id: `pred-${fixture.fixtureId}-${awayLine}-away-${Date.now()}`,
+            const predId = `PRED-${fixture.fixtureId}-${odds.line.toFixed(2)}-AWAY`;
+            generatedRecords.push({
+              predictionId: predId,
+              id: predId,
               fixtureId: fixture.fixtureId,
               leagueId: fixture.leagueId,
               leagueName: fixture.leagueName,
+              matchDate: fixture.kickoffTime.slice(0, 10),
+              kickoffTime: fixture.kickoffTime,
               kickoffAt: fixture.kickoffTime,
               homeTeam: fixture.homeTeam,
               awayTeam: fixture.awayTeam,
-              modelVersion: 'AH-dixoncoles-v1.0.0',
-              featureVersion: 'pit-football-v1',
-              dataCutoffTimestamp: nowIso,
-              oddsSnapshotTimestamp: odds.timestamp || nowIso,
-              line: awayLine,
+              market: 'ASIAN_HANDICAP',
+              line: odds.line,
               side: 'away',
-              fairProbability: awayProbs.pCover,
-              fairOdds: awayProbs.fairOdds,
-              devigMarketProbability: devig.awayFairProb,
+              modelProb: Number(awayProbs.pCover.toFixed(4)),
+              fairProbability: Number(awayProbs.pCover.toFixed(4)),
+              marketProb: Number(devig.awayFairProb.toFixed(4)),
+              devigMarketProbability: Number(devig.awayFairProb.toFixed(4)),
+              fairOdds: Number((1 / awayProbs.pCover).toFixed(2)),
+              marketOdds: odds.awayOdds,
               takenOdds: odds.awayOdds,
               edge: awayEdge,
               ev: awayEv,
-              valueQualificationState: awayState,
+              kellyFraction: 0,
+              recommendedStakePct: 0,
+              valueQualificationState: 'NOT_VALIDATED',
+              sampleSize: awayTrainingCount,
               sampleStatus: awaySampleStatus,
-              researchStatusLabel: RESEARCH_HONESTY_BANNER,
+              modelVersion: 'AH-dixoncoles-v1.0.0',
+              validationState: 'RESEARCH_ONLY',
+              featureVersion: 'pit-football-v1',
               settlementStatus: 'PENDING',
+              researchHonestyBanner: RESEARCH_HONESTY_BANNER,
+              researchStatusLabel: RESEARCH_HONESTY_BANNER,
+              generatedAt: nowIso,
               createdAt: nowIso,
               updatedAt: nowIso,
-            };
-
-            generatedRecords.push(awayRecord);
-            existingKeys.add(awayKey);
+            });
           }
         }
       } catch (err: any) {
         failures.push({
           fixtureId: fixture.fixtureId,
-          stage: 'INFERENCE_GENERATION',
-          error: err.message || String(err),
+          stage: 'PREDICTION_GENERATION',
+          error: err.message,
         });
       }
     }
 
-    const updatedLedger = [...existingLedger, ...generatedRecords];
-    this.saveLedger(updatedLedger);
-
-    // Dual-write to Supabase
-    const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-    if (supabaseUrl && supabaseKey && generatedRecords.length > 0) {
-      try {
-        const { createClient } = await import('@supabase/supabase-js');
-        const supabase = createClient(supabaseUrl, supabaseKey);
-
-        const supabaseRecords = generatedRecords.map((r) => ({
-          id: r.id,
-          fixture_id: r.fixtureId,
-          league_id: r.leagueId,
-          league_name: r.leagueName,
-          country: r.leagueName,
-          kickoff_at: r.kickoffAt,
-          home_team: r.homeTeam,
-          away_team: r.awayTeam,
-          model_version: r.modelVersion,
-          line: r.line,
-          side: r.side,
-          fair_probability: r.fairProbability,
-          fair_odds: r.fairOdds,
-          devig_market_probability: r.devigMarketProbability,
-          taken_odds: r.takenOdds,
-          edge: r.edge,
-          ev: r.ev,
-          settlement_status: r.settlementStatus,
-          created_at: r.createdAt,
-          updated_at: r.updatedAt,
-        }));
-
-        const { error } = await supabase
-          .from('public_predictions')
-          .upsert(supabaseRecords, { onConflict: 'id' });
-
-        if (error) {
-          console.error('[Pipeline] Supabase write failed:', error.message);
-        }
-      } catch (err: any) {
-        console.error('[Pipeline] Supabase dual-write exception:', err.message);
-      }
+    if (generatedRecords.length > 0) {
+      this.appendLedger(generatedRecords);
     }
 
     return { generatedRecords, failures };
   }
 
-  /**
-   * Run automated settlement of past pending predictions against finished fixtures.
-   */
   public static async executeAutomatedSettlement(
-    finishedFixtures: DailyFixtureCandidate[],
-    nowIso = new Date().toISOString()
+    finishedFixtures: DailyFixtureCandidate[]
   ): Promise<{
     settledCount: number;
     failures: Array<{ fixtureId: string; stage: string; error: string }>;
   }> {
-    const ledger = this.loadLedger();
     let settledCount = 0;
     const failures: Array<{ fixtureId: string; stage: string; error: string }> = [];
 
+    const ledger = this.loadLedger();
     const finishedMap = new Map<string, DailyFixtureCandidate>();
-    for (const f of finishedFixtures) finishedMap.set(f.fixtureId, f);
+    for (const f of finishedFixtures) {
+      if (f.status === 'FT' || f.homeGoals !== undefined) {
+        finishedMap.set(f.fixtureId, f);
+      }
+    }
 
-    const newlySettled: AhPredictionLedgerRecord[] = [];
-
+    let modified = false;
     for (let i = 0; i < ledger.length; i++) {
       const record = ledger[i];
-      if (record.settlementStatus !== 'PENDING') continue;
+      if (record.settlementStatus === 'PENDING') {
+        const finished = finishedMap.get(record.fixtureId);
+        if (finished && finished.homeGoals !== undefined && finished.awayGoals !== undefined) {
+          try {
+            const hGoals = Number(finished.homeGoals);
+            const aGoals = Number(finished.awayGoals);
 
-      const finished = finishedMap.get(record.fixtureId);
-      if (!finished) continue;
+            // Find closing odds for this specific line if available
+            let closingPrice: number | undefined;
+            if (finished.closingOdds && finished.closingOdds.length > 0) {
+              const matchedClosing = finished.closingOdds.find(
+                (co) => Math.abs(co.line - record.line) < 0.01
+              );
+              if (matchedClosing) {
+                closingPrice = record.side === 'home' ? matchedClosing.homeOdds : matchedClosing.awayOdds;
+              }
+            }
 
-      // Handle postponed / canceled / abandoned fixtures
-      if (finished.status === 'PST' || finished.status === 'CANC') {
-        record.settlementStatus = 'VOID';
-        record.actualOutcome = 'VOID';
-        record.profitLoss = 0;
-        record.settledAt = nowIso;
-        record.updatedAt = nowIso;
-        settledCount++;
-        newlySettled.push(record);
-        continue;
-      }
+            const settlement = settleAsianHandicap(
+              record.side,
+              record.line,
+              hGoals,
+              aGoals,
+              record.takenOdds || record.marketOdds || 1.95,
+              1.0
+            );
 
-      if (finished.status !== 'FT' || finished.homeGoals === undefined || finished.awayGoals === undefined) {
-        continue;
-      }
+            record.settlementStatus = 'SETTLED';
+            record.actualOutcome = settlement.outcome;
+            record.profitLoss = Number(settlement.profit.toFixed(2));
+            record.settledAt = new Date().toISOString();
+            record.updatedAt = new Date().toISOString();
 
-      try {
-        const settlement = settleAsianHandicap(
-          record.side,
-          record.line,
-          finished.homeGoals,
-          finished.awayGoals,
-          record.takenOdds
-        );
+            if (closingPrice && closingPrice > 1.0) {
+              record.closingOdds = closingPrice;
+              record.clv = AhValueEngine.computeClv(record.takenOdds || record.marketOdds, closingPrice);
+            }
 
-        record.actualOutcome = settlement.outcome;
-        record.profitLoss = Number(settlement.profit.toFixed(4));
-        record.settlementStatus = settlement.outcome === 'VOID' ? 'VOID' : 'SETTLED';
-        record.settledAt = nowIso;
-        record.updatedAt = nowIso;
-
-        // Match closing odds if available
-        if (finished.closingOdds && finished.closingOdds.length > 0) {
-          const closingMatch = finished.closingOdds.find(
-            (co) => Math.abs(co.line - (record.side === 'home' ? record.line : -record.line)) < 1e-4
-          );
-          if (closingMatch) {
-            const closingOdds = record.side === 'home' ? closingMatch.homeOdds : closingMatch.awayOdds;
-            record.closingOdds = closingOdds;
-            record.clv = AhValueEngine.computeClv(record.takenOdds, closingOdds);
+            settledCount++;
+            modified = true;
+          } catch (err: any) {
+            failures.push({
+              fixtureId: record.fixtureId,
+              stage: 'SETTLEMENT',
+              error: err.message,
+            });
           }
         }
-
-        settledCount++;
-        newlySettled.push(record);
-      } catch (err: any) {
-        failures.push({
-          fixtureId: record.fixtureId,
-          stage: 'SETTLEMENT',
-          error: err.message || String(err),
-        });
       }
     }
 
-    this.saveLedger(ledger);
-
-    // Dual-write settlement to Supabase
-    const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-    if (supabaseUrl && supabaseKey && newlySettled.length > 0) {
-      try {
-        const { createClient } = await import('@supabase/supabase-js');
-        const supabase = createClient(supabaseUrl, supabaseKey);
-
-        for (const r of newlySettled) {
-          await supabase
-            .from('public_predictions')
-            .update({
-              settlement_status: r.settlementStatus,
-              actual_outcome: r.actualOutcome || null,
-              profit_loss: r.profitLoss || null,
-              clv: r.clv || null,
-              closing_odds: r.closingOdds || null,
-              settled_at: r.settledAt || null,
-              updated_at: r.updatedAt,
-            })
-            .eq('id', r.id);
-        }
-      } catch (err: any) {
-        console.error('[Pipeline] Supabase settlement dual-write exception:', err.message);
-      }
+    if (modified) {
+      this.saveLedger(ledger);
     }
 
-    this.saveLedger(ledger);
     return { settledCount, failures };
   }
 
-  /**
-   * Generate live pipeline summary and monitor 150-200 settled-signal gate.
-   */
-  public static generatePipelineSummary(): PipelineExecutionSummary {
+  public static generatePipelineSummary(currentRunGeneratedCount: number = 0): PipelineExecutionSummary {
     const ledger = this.loadLedger();
+    const settled = ledger.filter((r) => r.settlementStatus === 'SETTLED');
+    const targetSettledGate = 175;
+    const gateProgressPct = Number(Math.min(100, (settled.length / targetSettledGate) * 100).toFixed(1));
 
-    const settledRecords = ledger.filter((r) => r.settlementStatus === 'SETTLED');
-    const pendingRecords = ledger.filter((r) => r.settlementStatus === 'PENDING');
-
-    const clvValues = settledRecords
-      .map((r) => r.clv)
-      .filter((c): c is number => c !== undefined && !isNaN(c));
-
-    const meanClv = clvValues.length > 0 ? clvValues.reduce((a, b) => a + b, 0) / clvValues.length : 0;
-    const clvVar =
-      clvValues.length > 1
-        ? clvValues.reduce((s, x) => s + Math.pow(x - meanClv, 2), 0) / (clvValues.length - 1)
-        : 0;
-    const clvSe = Math.sqrt(clvVar / Math.max(1, clvValues.length));
-    const clvZ = clvSe > 0 ? meanClv / clvSe : 0;
-
-    const targetGate = 175; // Midpoint of 150-200 gate
-    const gateProgressPct = Number(((settledRecords.length / targetGate) * 100).toFixed(1));
-
-    const summary: PipelineExecutionSummary = {
-      runId: `run-${Date.now()}`,
-      timestamp: new Date().toISOString(),
+    return {
+      lastRunTimestamp: new Date().toISOString(),
       mode: 'SHADOW_UNATTENDED',
       monetizationEnabled: false,
-      fixturesIngested: new Set(ledger.map((r) => r.fixtureId)).size,
-      predictionsGenerated: ledger.length,
-      predictionsSettled: settledRecords.length,
-      settledCountTotal: settledRecords.length,
-      targetSettledGate: targetGate,
-      gateProgressPct: Math.min(100, gateProgressPct),
-      meanLiveClv: Number(meanClv.toFixed(4)),
-      liveClvZScore: Number(clvZ.toFixed(3)),
+      fixturesIngested: 0,
+      predictionsGenerated: currentRunGeneratedCount,
+      predictionsSettled: 0,
+      settledCountTotal: settled.length,
+      targetSettledGate,
+      gateProgressPct,
+      meanLiveClv: 0,
+      liveClvZScore: 0,
+      activeModelVersion: 'AH-dixoncoles-v1.0.0',
       failuresCount: 0,
       failureRatePct: 0,
       alertTriggered: false,
       failures: [],
     };
-
-    this.ensureLedgerDir();
-    fs.writeFileSync(this.summaryFilePath, JSON.stringify(summary, null, 2), 'utf8');
-
-    return summary;
   }
 }

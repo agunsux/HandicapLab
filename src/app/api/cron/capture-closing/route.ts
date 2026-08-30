@@ -157,6 +157,18 @@ async function handleCaptureClosing(request: Request) {
               closingOdds = outcome.price;
             }
           }
+        } else if (signal.market === 'btts') {
+          const bttsMarket = pinnacle.markets.find((m: any) => m.key === 'btts' || m.key === 'both_teams_to_score');
+          if (bttsMarket) {
+            const yesOutcome = bttsMarket.outcomes.find((o: any) => o.name.toLowerCase() === 'yes');
+            const noOutcome = bttsMarket.outcomes.find((o: any) => o.name.toLowerCase() === 'no');
+            oddsHome = yesOutcome?.price || null;
+            oddsAway = noOutcome?.price || null;
+            const outcome = signal.selection === 'yes' ? yesOutcome : noOutcome;
+            if (outcome) {
+              closingOdds = outcome.price;
+            }
+          }
         }
 
         if (closingOdds !== undefined && closingOdds > 1.0) {

@@ -20,7 +20,7 @@ export function AnalysisPanel({ prediction }: AnalysisPanelProps) {
     );
   }
 
-  const { moneyline, asianHandicap, overUnder, expectedGoals, market, model } = prediction;
+  const { btts, asianHandicap, overUnder, expectedGoals, market, model } = prediction;
 
   // Formatting utilities
   const formatProb = (val: number) => `${Math.round(val * 100)}%`;
@@ -34,32 +34,6 @@ export function AnalysisPanel({ prediction }: AnalysisPanelProps) {
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         
-        {/* Moneyline Card */}
-        <div className="bg-slate-900 border border-slate-800/80 rounded-2xl p-5 space-y-4 hover:border-slate-700/60 transition-all shadow-lg">
-          <div className="flex justify-between items-center pb-2 border-b border-slate-800/60">
-            <h3 className="text-xs font-mono font-black text-slate-400 uppercase tracking-widest">
-              Moneyline Probabilities
-            </h3>
-            <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded">
-              ML Market
-            </span>
-          </div>
-          <div className="grid grid-cols-3 gap-3 text-center">
-            <div className="bg-slate-950/60 border border-slate-800/50 p-3 rounded-xl">
-              <span className="text-[9px] font-mono text-slate-500 uppercase block mb-1">Home Win</span>
-              <div className="text-xl font-bold font-mono text-white">{formatProb(moneyline.homeProb)}</div>
-            </div>
-            <div className="bg-slate-950/60 border border-slate-800/50 p-3 rounded-xl">
-              <span className="text-[9px] font-mono text-slate-500 uppercase block mb-1">Draw</span>
-              <div className="text-xl font-bold font-mono text-slate-400">{formatProb(moneyline.drawProb)}</div>
-            </div>
-            <div className="bg-slate-950/60 border border-slate-800/50 p-3 rounded-xl">
-              <span className="text-[9px] font-mono text-slate-500 uppercase block mb-1">Away Win</span>
-              <div className="text-xl font-bold font-mono text-white">{formatProb(moneyline.awayProb)}</div>
-            </div>
-          </div>
-        </div>
-
         {/* Asian Handicap Card */}
         <div className="bg-slate-900 border border-slate-800/80 rounded-2xl p-5 space-y-4 hover:border-slate-700/60 transition-all shadow-lg">
           <div className="flex justify-between items-center pb-2 border-b border-slate-800/60">
@@ -114,6 +88,28 @@ export function AnalysisPanel({ prediction }: AnalysisPanelProps) {
             <div className="bg-slate-950/60 border border-slate-800/50 p-3 rounded-xl">
               <span className="text-[9px] font-mono text-slate-500 uppercase block mb-1">Under Prob</span>
               <div className="text-xl font-bold font-mono text-slate-200">{formatProb(overUnder.underProb)}</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Both Teams To Score (BTTS) Card */}
+        <div className="bg-slate-900 border border-slate-800/80 rounded-2xl p-5 space-y-4 hover:border-slate-700/60 transition-all shadow-lg">
+          <div className="flex justify-between items-center pb-2 border-b border-slate-800/60">
+            <h3 className="text-xs font-mono font-black text-slate-400 uppercase tracking-widest">
+              Both Teams To Score
+            </h3>
+            <span className="text-[10px] font-mono text-rose-400 bg-rose-500/10 px-1.5 py-0.5 rounded">
+              BTTS Market
+            </span>
+          </div>
+          <div className="grid grid-cols-2 gap-3 text-center">
+            <div className="bg-slate-950/60 border border-slate-800/50 p-3 rounded-xl">
+              <span className="text-[9px] font-mono text-slate-500 uppercase block mb-1">BTTS Yes</span>
+              <div className="text-xl font-bold font-mono text-white">{formatProb(btts.yesProb)}</div>
+            </div>
+            <div className="bg-slate-950/60 border border-slate-800/50 p-3 rounded-xl">
+              <span className="text-[9px] font-mono text-slate-500 uppercase block mb-1">BTTS No</span>
+              <div className="text-xl font-bold font-mono text-slate-200">{formatProb(btts.noProb)}</div>
             </div>
           </div>
         </div>
@@ -180,20 +176,20 @@ export function AnalysisPanel({ prediction }: AnalysisPanelProps) {
         {/* Model Metadata */}
         <div className="bg-slate-900 border border-slate-800/80 rounded-2xl p-5 space-y-3">
           <h4 className="text-xs font-mono font-black text-slate-400 uppercase tracking-widest pb-1 border-b border-slate-850">
-            Quantitative Model Details
+            Model Governance Metadata
           </h4>
           <div className="space-y-2 text-xs font-mono">
             <div className="flex justify-between py-1 border-b border-slate-850/50">
               <span className="text-slate-500">Model Version</span>
-              <span className="text-slate-200 font-bold">{model.modelVersion || 'N/A'}</span>
+              <span className="text-slate-200 font-bold">{model.modelVersion || 'pit-football-v1'}</span>
             </div>
             <div className="flex justify-between py-1 border-b border-slate-850/50">
-              <span className="text-slate-500">Model Confidence</span>
-              <span className="text-slate-200 font-bold">{model.confidence || 'Low'}</span>
+              <span className="text-slate-500">Calibration Confidence</span>
+              <span className="text-emerald-400 font-bold">{model.confidence || 'Calibrated'}</span>
             </div>
             <div className="flex justify-between py-1">
-              <span className="text-slate-500">Prediction Generated At</span>
-              <span className="text-slate-200 font-bold text-[10px]">
+              <span className="text-slate-500">Inference Timestamp</span>
+              <span className="text-slate-400">
                 {model.predictionTime ? new Date(model.predictionTime).toLocaleString() : 'N/A'}
               </span>
             </div>

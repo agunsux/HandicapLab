@@ -246,6 +246,37 @@ async function handleCaptureOdds(request: Request) {
               });
             }
           }
+        } else if (signal.market === 'btts') {
+          const bttsMarket = pinnacle.markets.find((m: any) => m.key === 'btts' || m.key === 'both_teams_to_score');
+          if (!bttsMarket) {
+            ctx.reject({
+              signalId: signal.id,
+              homeTeam: signal.home_team,
+              awayTeam: signal.away_team,
+              market: signal.market,
+              reason: 'missing_market',
+              detail: 'btts market key not found in pinnacle markets',
+            });
+          } else {
+            const yesOutcome = bttsMarket.outcomes.find((o: any) => o.name.toLowerCase() === 'yes');
+            const noOutcome = bttsMarket.outcomes.find((o: any) => o.name.toLowerCase() === 'no');
+            oddsHome = yesOutcome?.price || null;
+            oddsAway = noOutcome?.price || null;
+            const outcome = signal.selection === 'yes' ? yesOutcome : noOutcome;
+            if (outcome) {
+              closingOdds = outcome.price;
+              closingLine = 0.0;
+            } else {
+              ctx.reject({
+                signalId: signal.id,
+                homeTeam: signal.home_team,
+                awayTeam: signal.away_team,
+                market: signal.market,
+                reason: 'missing_line',
+                detail: `No ${signal.selection} outcome found in btts market`,
+              });
+            }
+          }
         }
 
         if (closingOdds !== undefined && closingLine !== undefined && (!Number.isFinite(closingOdds) || closingOdds <= 1.0)) {

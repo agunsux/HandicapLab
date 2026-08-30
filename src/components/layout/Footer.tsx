@@ -35,7 +35,7 @@ export function Footer() {
             </div>
 
             <p className="text-sm text-[#9CA3AF] leading-relaxed">
-              Trade the Edge. Not the Hype. Quantitative football market intelligence for Asian Handicap, Over/Under, Moneyline &amp; BTTS.
+              Trade the Edge. Not the Hype. Quantitative football market intelligence for Asian Handicap, Over/Under &amp; BTTS.
             </p>
 
             {/* Social Icons Row */}
@@ -108,11 +108,6 @@ export function Footer() {
               <li>
                 <Link href="/app/markets/over-under" className="text-[#9CA3AF] hover:text-[#10B981] transition-colors">
                   Over / Under
-                </Link>
-              </li>
-              <li>
-                <Link href="/app/markets/moneyline" className="text-[#9CA3AF] hover:text-[#10B981] transition-colors">
-                  Moneyline (1X2)
                 </Link>
               </li>
               <li>
