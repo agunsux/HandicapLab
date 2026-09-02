@@ -9,9 +9,13 @@
  */
 
 export const ROUTES = {
-  // Terminal routes
-  predictions: '/predictions',
+  // Primary markets
+  asianHandicap: '/asian-handicap',
+  overUnder: '/over-under',
+  btts: '/btts',
   trackRecord: '/track-record',
+  // Supporting & legacy routes
+  predictions: '/predictions',
   models: '/models',
   methodology: '/methodology',
   pricing: '/pricing',
@@ -19,32 +23,38 @@ export const ROUTES = {
   trustCenter: '/trust-center',
   validation: '/validation',
   dashboard: '/app/dashboard',
-  valueBets: '/predictions',
-  markets: '/predictions',
+  profile: '/app/profile',
+  valueBets: '/asian-handicap',
+  markets: '/asian-handicap',
 } as const;
 
 export const PRIMARY_NAV = [
-  { label: 'Predictions', href: ROUTES.predictions },
-  { label: 'Track Record', href: ROUTES.trackRecord },
-  { label: 'Models', href: ROUTES.models },
-  { label: 'Methodology', href: ROUTES.methodology },
+  { label: 'Asian Handicap', href: ROUTES.asianHandicap, shortLabel: 'AH' },
+  { label: 'Over / Under', href: ROUTES.overUnder, shortLabel: 'O/U' },
+  { label: 'BTTS', href: ROUTES.btts, shortLabel: 'BTTS' },
+  { label: 'Track Record', href: ROUTES.trackRecord, shortLabel: 'Track Record' },
 ];
 
 export const APP_SIDEBAR_NAV = [
-  { label: 'Predictions', href: ROUTES.predictions },
+  { label: 'Asian Handicap', href: ROUTES.asianHandicap },
+  { label: 'Over / Under', href: ROUTES.overUnder },
+  { label: 'BTTS', href: ROUTES.btts },
   { label: 'Track Record', href: ROUTES.trackRecord },
+  { label: 'Dashboard', href: ROUTES.dashboard },
 ];
 
 export const FOOTER_NAV: Record<string, { label: string; href: string }[]> = {
   product: [
-    { label: 'Predictions', href: ROUTES.predictions },
+    { label: 'Asian Handicap', href: ROUTES.asianHandicap },
+    { label: 'Over / Under', href: ROUTES.overUnder },
+    { label: 'BTTS', href: ROUTES.btts },
     { label: 'Track Record', href: ROUTES.trackRecord },
-    { label: 'Models', href: ROUTES.models },
-    { label: 'Methodology', href: ROUTES.methodology },
   ],
   resources: [
-    { label: 'Trust Center', href: ROUTES.trustCenter },
+    { label: 'Methodology', href: ROUTES.methodology },
+    { label: 'Models', href: ROUTES.models },
     { label: 'Validation', href: ROUTES.validation },
+    { label: 'Trust Center', href: ROUTES.trustCenter },
   ],
   company: []
 };

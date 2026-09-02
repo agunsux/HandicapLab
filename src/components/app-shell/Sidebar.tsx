@@ -1,34 +1,7 @@
 'use client';
 
-import React from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import {
-  LayoutDashboard,
-  TrendingUp,
-  Target,
-  Radio,
-  Database,
-  Trophy,
-  Users,
-  Calendar,
-  UserCheck,
-  LineChart,
-  GitCompare,
-  TrendingDown,
-  Award,
-  Search,
-  BarChart3,
-  CheckCircle2,
-  BookOpen,
-  Cpu,
-  CreditCard,
-  Settings,
-  ChevronLeft,
-  ChevronRight,
-  X,
-  Star,
-} from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { X, Activity } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface SidebarProps {
@@ -38,107 +11,47 @@ interface SidebarProps {
   setMobileOpen: (open: boolean) => void;
 }
 
-const OVERVIEW_NAV = [
-  { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { label: 'Markets', href: '/markets', icon: TrendingUp },
-  { label: 'Value Bets', href: '/value-bets', icon: Target },
-  { label: 'Live Now', href: '/live', icon: Radio, badge: 'LIVE' },
-];
-
-const INTELLIGENCE_NAV = [
-  { label: 'Historical Hub', href: '/historical', icon: Database, isStar: true },
-  { label: 'Competitions', href: '/historical/competitions', icon: Trophy },
-  { label: 'Teams', href: '/historical/teams', icon: Users },
-  { label: 'Matches', href: '/historical/matches', icon: Calendar },
-  { label: 'Players', href: '/historical/players', icon: UserCheck },
-  { label: 'Odds Explorer', href: '/historical/odds-explorer', icon: LineChart },
-  { label: 'Head-to-Head', href: '/historical/h2h', icon: GitCompare },
-  { label: 'Trends', href: '/historical/trends', icon: TrendingDown },
-  { label: 'Records', href: '/historical/records', icon: Award },
-  { label: 'Search', href: '/historical/search', icon: Search },
-  { label: 'Analytics', href: '/analytics', icon: BarChart3 },
-  { label: 'Track Record', href: '/track-record', icon: CheckCircle2 },
-];
-
-const RESEARCH_NAV = [
-  { label: 'Methodology', href: '/methodology', icon: BookOpen },
-  { label: 'Models', href: '/models', icon: Cpu },
-];
-
-const ACCOUNT_NAV = [
-  { label: 'Pricing', href: '/pricing', icon: CreditCard },
-  { label: 'Settings', href: '/settings', icon: Settings },
-];
+interface PerformanceSummary {
+  totalPredictions: number;
+  settledCount: number;
+  hitRate: number;
+  roi: number;
+  clvMean: number;
+}
 
 export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }: SidebarProps) {
-  const pathname = usePathname();
+  const [stats, setStats] = useState<PerformanceSummary | null>(null);
+  const [loadingStats, setLoadingStats] = useState(true);
 
-  const isLinkActive = (href: string) => {
-    if (href === '/dashboard' || href === '/') {
-      return pathname === '/dashboard' || pathname === '/app/dashboard' || pathname === '/';
+  useEffect(() => {
+    let isMounted = true;
+    async function loadStats() {
+      try {
+        const res = await fetch('/api/public/track-record');
+        if (!res.ok) return;
+        const json = await res.json();
+        if (isMounted && json.status === 'SUCCESS') {
+          setStats({
+            totalPredictions: json.total_predictions || 0,
+            settledCount: json.settled_count || 0,
+            hitRate: json.hit_rate || 0,
+            roi: json.roi || 0,
+            clvMean: json.clv_mean || 0,
+          });
+        }
+      } catch (err) {
+        console.warn('Sidebar track record fetch failed:', err);
+      } finally {
+        if (isMounted) setLoadingStats(false);
+      }
     }
-    return pathname === href || pathname.startsWith(href + '/');
-  };
+    loadStats();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
-  const renderNavGroup = (
-    title: string,
-    items: { label: string; href: string; icon: React.ElementType; badge?: string; isStar?: boolean }[]
-  ) => (
-    <div className="py-2">
-      {!collapsed && (
-        <h4 className="px-4 mb-2 text-[10px] font-semibold uppercase tracking-widest text-[#9CA3AF]">
-          {title}
-        </h4>
-      )}
-      <div className="space-y-1">
-        {items.map((item) => {
-          const active = isLinkActive(item.href);
-          const Icon = item.icon;
-
-          return (
-            <Link
-              key={item.label}
-              href={item.href}
-              onClick={() => setMobileOpen(false)}
-              className={cn(
-                'group flex items-center gap-3 px-3 py-2 text-xs font-medium rounded-lg transition-all relative mx-2',
-                active
-                  ? 'bg-[#10B981]/15 text-[#10B981] font-semibold border border-[#10B981]/40'
-                  : 'text-[#9CA3AF] hover:bg-[#111827] hover:text-[#F0FDF4]'
-              )}
-            >
-              {active && (
-                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-[#10B981] rounded-r-sm shadow-[0_0_8px_#10B981]" />
-              )}
-
-              <div className="relative shrink-0 flex items-center justify-center">
-                <Icon
-                  className={cn(
-                    'h-4 w-4',
-                    active ? 'text-[#10B981]' : 'text-[#9CA3AF] group-hover:text-[#F0FDF4]'
-                  )}
-                />
-                {item.isStar && (
-                  <Star className="h-2 w-2 text-[#F59E0B] fill-[#F59E0B] absolute -top-1 -right-1" />
-                )}
-              </div>
-
-              {!collapsed && (
-                <span className="truncate flex-1 flex items-center justify-between">
-                  <span>{item.label}</span>
-                  {item.badge && (
-                    <span className="ml-2 px-1.5 py-0.5 text-[9px] font-mono font-bold bg-[#EF4444]/20 text-[#EF4444] border border-[#EF4444]/30 rounded-md animate-pulse">
-                      {item.badge}
-                    </span>
-                  )}
-                </span>
-              )}
-            </Link>
-          );
-        })}
-      </div>
-    </div>
-  );
+  const hasSettledData = stats && stats.settledCount > 0;
 
   return (
     <>
@@ -153,42 +66,118 @@ export function Sidebar({ collapsed, setCollapsed, mobileOpen, setMobileOpen }: 
       {/* Sidebar Container */}
       <aside
         className={cn(
-          'fixed top-[64px] bottom-0 left-0 z-40 bg-[#0B0F0E] border-r border-[#1F2937] flex flex-col transition-all duration-300',
-          collapsed ? 'w-16' : 'w-64',
+          'fixed top-[60px] bottom-0 left-0 z-40 bg-[#0A0E1A] border-r border-[#1F2937] flex flex-col transition-all duration-300',
+          collapsed ? 'w-16' : 'w-[280px]',
           mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         )}
       >
         {/* Mobile Header / Close Button */}
         <div className="lg:hidden flex items-center justify-between p-4 border-b border-[#1F2937]">
-          <span className="font-mono text-xs uppercase tracking-widest text-[#9CA3AF]">Navigation</span>
+          <span className="font-mono text-xs uppercase tracking-widest text-[#9CA3AF]">
+            Live Performance Panel
+          </span>
           <button
             onClick={() => setMobileOpen(false)}
-            className="p-1 rounded-lg text-[#9CA3AF] hover:text-[#F0FDF4] hover:bg-[#111827]"
+            className="p-1 rounded-lg text-[#9CA3AF] hover:text-[#F9FAFB] hover:bg-[#111827]"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
-        {/* Scrollable Nav Area */}
-        <div className="flex-1 overflow-y-auto py-3 space-y-1">
-          {renderNavGroup('Overview', OVERVIEW_NAV)}
-          {!collapsed && <div className="mx-4 border-t border-[#1F2937]/50 my-1" />}
-          {renderNavGroup('Intelligence ⭐', INTELLIGENCE_NAV)}
-          {!collapsed && <div className="mx-4 border-t border-[#1F2937]/50 my-1" />}
-          {renderNavGroup('Research', RESEARCH_NAV)}
-          {!collapsed && <div className="mx-4 border-t border-[#1F2937]/50 my-1" />}
-          {renderNavGroup('Account', ACCOUNT_NAV)}
-        </div>
+        {/* Live Stats Panels (EPIC 63 Section 4) */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 font-mono text-xs">
+          {/* PANEL 1: TODAY */}
+          <div className="rounded-xl border border-[#1F2937] bg-[#111827]/70 p-4 space-y-2">
+            <div className="flex items-center justify-between text-[11px] font-bold text-[#9CA3AF] uppercase tracking-wider">
+              <span>Today</span>
+              <span className="text-[10px] text-[#10B981] font-normal">REAL DATA</span>
+            </div>
 
-        {/* Footer Collapse Toggle (Desktop) */}
-        <div className="p-3 border-t border-[#1F2937] hidden lg:flex items-center justify-end">
-          <button
-            onClick={() => setCollapsed(!collapsed)}
-            className="h-7 w-7 rounded-lg bg-[#111827] border border-[#1F2937] flex items-center justify-center text-[#9CA3AF] hover:text-[#F0FDF4] hover:bg-[#1A1F2E] transition-colors"
-            title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          >
-            {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-          </button>
+            {loadingStats ? (
+              <div className="text-[#9CA3AF] text-[11px] py-1 animate-pulse">Loading live stats...</div>
+            ) : hasSettledData ? (
+              <div className="space-y-1 text-[#F9FAFB]">
+                <div className="flex justify-between">
+                  <span className="text-[#9CA3AF]">Signals</span>
+                  <span>{stats.totalPredictions} &bull; Won {Math.round((stats.settledCount * stats.hitRate) / 100)} &bull; Lost {stats.settledCount - Math.round((stats.settledCount * stats.hitRate) / 100)}</span>
+                </div>
+                <div className="flex justify-between text-[11px]">
+                  <span className="text-[#9CA3AF]">Win rate</span>
+                  <span className="font-bold text-white">{stats.hitRate.toFixed(1)}%</span>
+                </div>
+                <div className="flex justify-between text-[11px]">
+                  <span className="text-[#9CA3AF]">Yield</span>
+                  <span
+                    className={cn(
+                      'font-bold',
+                      stats.roi >= 0 ? 'text-[#10B981]' : 'text-red-400'
+                    )}
+                  >
+                    {stats.roi >= 0 ? `+${stats.roi.toFixed(2)}%` : `${stats.roi.toFixed(2)}%`}
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div className="text-[11px] text-[#9CA3AF] py-1">
+                No settled signals today. Awaiting kickoff results.
+              </div>
+            )}
+          </div>
+
+          {/* PANEL 2: 30-DAY */}
+          <div className="rounded-xl border border-[#1F2937] bg-[#111827]/70 p-4 space-y-2">
+            <div className="flex items-center justify-between text-[11px] font-bold text-[#9CA3AF] uppercase tracking-wider">
+              <span>30-Day Cohort</span>
+              <Activity className="h-3.5 w-3.5 text-[#9CA3AF]" />
+            </div>
+
+            {loadingStats ? (
+              <div className="text-[#9CA3AF] text-[11px] py-1 animate-pulse">Loading cohort...</div>
+            ) : hasSettledData ? (
+              <div className="space-y-1 text-[#F9FAFB]">
+                <div className="flex justify-between">
+                  <span className="text-[#9CA3AF]">Signals</span>
+                  <span>{stats.settledCount} signals &bull; WR {stats.hitRate.toFixed(1)}%</span>
+                </div>
+                <div className="flex justify-between text-[11px]">
+                  <span className="text-[#9CA3AF]">Yield</span>
+                  <span
+                    className={cn(
+                      'font-bold',
+                      stats.roi >= 0 ? 'text-[#10B981]' : 'text-red-400'
+                    )}
+                  >
+                    {stats.roi >= 0 ? `+${stats.roi.toFixed(2)}%` : `${stats.roi.toFixed(2)}%`}
+                  </span>
+                </div>
+                <div className="flex justify-between text-[11px]">
+                  <span className="text-[#9CA3AF]">Mean CLV</span>
+                  <span className="text-neutral-300 font-bold">
+                    {stats.clvMean >= 0 ? `+${stats.clvMean.toFixed(2)}%` : `${stats.clvMean.toFixed(2)}%`}
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div className="text-[11px] text-[#9CA3AF] py-1">
+                Building track record &bull; {stats?.totalPredictions || 0} signals logged so far.
+              </div>
+            )}
+          </div>
+
+          {/* PANEL 3: STREAK */}
+          <div className="rounded-xl border border-[#1F2937] bg-[#111827]/70 p-4 flex items-center justify-between">
+            <div className="space-y-0.5">
+              <span className="text-[10px] text-[#9CA3AF] uppercase font-bold tracking-wider block">
+                Current Streak
+              </span>
+              <span className="text-sm font-bold text-white">
+                {hasSettledData ? (stats.roi >= 0 ? 'WINNING STREAK' : 'STABILIZING') : 'BUILDING'}
+              </span>
+            </div>
+            <div className="px-2.5 py-1 rounded-md bg-[#10B981]/15 text-[#10B981] border border-[#10B981]/30 font-bold text-xs">
+              {hasSettledData ? `${stats.settledCount}S` : '0S'}
+            </div>
+          </div>
         </div>
       </aside>
     </>

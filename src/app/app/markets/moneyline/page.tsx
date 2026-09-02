@@ -1,5 +1,5 @@
-import { notFound } from 'next/navigation';
+import { redirect } from 'next/navigation';
 
-export default function MoneylinePage() {
-  notFound();
+export default function MoneylineRedirect() {
+  redirect('/asian-handicap');
 }

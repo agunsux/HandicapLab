@@ -104,7 +104,7 @@ describe('EPIC P0 — Anti-Dummy & Data Provenance Regression Tests', () => {
     });
 
     it('Track Record page does not contain hardcoded ledgerSummary array', () => {
-      const filePath = path.resolve(__dirname, '../src/app/(app)/track-record/page.tsx');
+      const filePath = path.resolve(__dirname, '../src/app/track-record/page.tsx');
       const content = fs.readFileSync(filePath, 'utf-8');
       expect(content.includes('6239')).toBe(false);
       expect(content.includes('-3.97')).toBe(false);
