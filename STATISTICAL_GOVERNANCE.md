@@ -388,6 +388,19 @@ New data points or features must prove their worth through rigorous ablation tes
 - Do not buy or integrate new data (e.g., xG, player availability) unless an ablation test proves it significantly increases Brier Score, Log Loss, or CLV beyond standard noise.
 - The standard baseline is `Poisson + Dixon-Coles + ELO + Market Odds`. Any new feature must empirically beat this baseline to be adopted.
 
+### 8.3 Universal Real-Data Profitability Gate (EPIC 62 Invariant)
+```
+NO REAL HISTORICAL ODDS → NO EV → NO CLV → NO ROI → NO KELLY → NO PROFITABILITY CLAIM
+```
+1. Missing or unproven market odds MUST result in `EXCLUDED_FROM_PROFITABILITY_BACKTEST`.
+2. Strictly prohibited: fabrication, interpolation between lines, margin estimation, substituting model fair odds for bookmaker market odds, or default fallback odds (e.g. 1.95/1.95).
+3. Asian Handicap profitability observations require verified provenance: fixture identity, kickoff timestamp, market=AH, line, selection/side, odds, bookmaker, observation timestamp, and verified final score.
+
+### 8.4 Market-Specific Historical Constraints & Runtime VAR-Era Rule
+1. **Over/Under (OU):** Historical profitability validation is strictly restricted to **Line 2.5** (100% of the 23,875 gold OU odds rows). Non-2.5 lines are mathematical probability distributions only and must not claim historical ROI, EV, or CLV without verified historical odds.
+2. **BTTS:** Evaluated in **Calibration-Only Mode** (Brier Score, Log Loss, ECE). Zero historical odds exist ($N=0$); generating historical EV, CLV, ROI, or Kelly claims is strictly prohibited.
+3. **VAR-Era Classification:** Determined strictly by `kickoff timestamp >= league cutoff` (ENG-PL: 2019-08-01, ESP-LALIGA: 2018-08-01, DEU-BUNDESLIGA: 2017-08-01, ITA-SERIEA: 2017-08-01, FRA-LIGUE1: 2018-08-01), NOT from database columns. The resulting 5,172 matches are designated as the *"theoretical date-qualified VAR-era cohort"*.
+
 ---
 
 *This document is maintained as part of the HandicapLab Engineering Principles.*
