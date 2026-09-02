@@ -57,6 +57,7 @@
     "epic32:phases1-5": "tsx -e \"const{runPipeline}=require('./src/pipelines/orchestrator');runPipeline({phases:[1,2,3,4,5]}).then(r=>console.log(JSON.stringify(r,null,2)))\"",
     "epic32:phases6-10": "tsx -e \"const{runPipeline}=require('./src/pipelines/orchestrator');runPipeline({phases:[6,7,8,9,10]}).then(r=>console.log(JSON.stringify(r,null,2)))\"",
     "pipeline": "tsx src/pipeline/cli/run-pipeline.ts",
+    "research:epl-ah": "tsx scripts/run-epl-ah-research.ts",
     "verify:oddspapi-production": "node scripts/verify-oddspapi-production.mjs",
     "verify:providers": "node scripts/canonical_provider_probe.mjs"
   },
