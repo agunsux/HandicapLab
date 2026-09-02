@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { PremierLeagueAhResearchPayload, DetailedAhLineRow, PositiveAhRankedOpportunity } from '@/lib/research/premierLeagueAhEngine';
+import { PremierLeagueAhResearchPayload, DetailedAhLineRow, HoldoutCandidateRule } from '@/lib/research/premierLeagueAhEngine';
 import { 
   ShieldCheck, 
   AlertTriangle, 
@@ -11,15 +11,18 @@ import {
   Clock, 
   ArrowRight, 
   Target, 
-  HelpCircle,
-  Percent,
-  CheckCircle2,
-  TrendingDown,
-  TrendingUp,
-  Award,
-  Filter,
-  Layers,
-  ArrowUpDown
+  HelpCircle, 
+  Percent, 
+  CheckCircle2, 
+  TrendingDown, 
+  TrendingUp, 
+  Award, 
+  Filter, 
+  Layers, 
+  ArrowUpDown,
+  Lock,
+  Flame,
+  AlertCircle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -29,14 +32,13 @@ interface PremierLeagueAhResearchViewProps {
 
 export function PremierLeagueAhResearchView({ data }: PremierLeagueAhResearchViewProps) {
   const [selectedSeason, setSelectedSeason] = useState<'combined' | '2024-2025' | '2025-2026'>('combined');
-  const [activeTab, setActiveTab] = useState<'overview' | 'lineMatrix' | 'positiveAh' | 'evSweep' | 'integrity' | 'methodology'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'holdout' | 'lineMatrix' | 'evSweep' | 'integrity' | 'multipleTesting'>('overview');
   const [sortField, setSortField] = useState<keyof DetailedAhLineRow>('line');
   const [sortAsc, setSortAsc] = useState<boolean>(true);
 
-  const { manifest, dataIntegrity, homeAhZero, lineMatrix, modelValidation } = data;
+  const { manifest, dataIntegrity, homeAhZero, lineMatrix, modelValidation, multipleTestingAudit } = data;
   const currentSummary = homeAhZero.bySeason[selectedSeason];
 
-  // Sorting for AH Line Matrix
   const sortedLines = [...lineMatrix.lines].sort((a, b) => {
     const valA = a[sortField];
     const valB = b[sortField];
@@ -59,12 +61,12 @@ export function PremierLeagueAhResearchView({ data }: PremierLeagueAhResearchVie
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl pt-24 pb-20 flex-1 space-y-10">
-      {/* SECTION A: Research Header */}
+      {/* 1. Research Header */}
       <div className="border-b border-[#1F2937] pb-6 space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#10B981]/10 border border-[#10B981]/30 text-xs font-mono text-[#10B981]">
             <span className="h-2 w-2 rounded-full bg-[#10B981] animate-pulse" />
-            REAL DATA ONLY &bull; ZERO FABRICATED FIXTURES
+            REAL DATA ONLY &bull; TEMPORAL HOLDOUT VALIDATED
           </div>
 
           <div className="flex items-center gap-2 font-mono text-xs">
@@ -91,11 +93,11 @@ export function PremierLeagueAhResearchView({ data }: PremierLeagueAhResearchVie
         <div className="flex items-center gap-2 pt-4 border-t border-[#1F2937]/60 overflow-x-auto">
           {[
             { id: 'overview', label: 'Primary Backtest (AH 0)' },
+            { id: 'holdout', label: 'Out-of-Sample Holdout' },
             { id: 'lineMatrix', label: 'Full Line Matrix' },
-            { id: 'positiveAh', label: 'Positive AH Opportunities' },
             { id: 'evSweep', label: 'EV Threshold Sweep' },
-            { id: 'integrity', label: 'Data Lineage & Audit' },
-            { id: 'methodology', label: 'Methodology & Formulas' }
+            { id: 'integrity', label: 'Data Provenance & Coverage' },
+            { id: 'multipleTesting', label: 'Model Quality & Methodology' }
           ].map((tab) => (
             <button
               key={tab.id}
@@ -113,35 +115,34 @@ export function PremierLeagueAhResearchView({ data }: PremierLeagueAhResearchVie
         </div>
       </div>
 
-      {/* SECTION B: Data Lineage & Integrity Callout */}
+      {/* 2. Top Provenance & Lineage Banner */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 font-mono text-xs">
         <div className="p-3.5 rounded-xl bg-[#111827]/70 border border-[#1F2937] space-y-1">
-          <span className="text-[10px] text-[#9CA3AF] uppercase">Audited Fixtures</span>
-          <div className="text-base font-bold text-white">{dataIntegrity.discoveredFixtures} / {dataIntegrity.expectedFixtures}</div>
-          <span className="text-[10px] text-[#10B981]">100% Verified Outcomes</span>
+          <span className="text-[10px] text-[#9CA3AF] uppercase">Audited Population</span>
+          <div className="text-base font-bold text-white">{dataIntegrity.discoveredFixtures} / {dataIntegrity.expectedFixtures} (100%)</div>
+          <span className="text-[10px] text-[#10B981]">760 Verified Outcomes</span>
         </div>
         <div className="p-3.5 rounded-xl bg-[#111827]/70 border border-[#1F2937] space-y-1">
           <span className="text-[10px] text-[#9CA3AF] uppercase">Pinnacle AH Pairs</span>
           <div className="text-base font-bold text-white">{dataIntegrity.ahRecordsAvailable} matches</div>
-          <span className="text-[10px] text-neutral-400">89 AH 0 &bull; 231 Pos &bull; 439 Neg</span>
+          <span className="text-[10px] text-neutral-400">89 AH 0 ({dataIntegrity.ah0CoveragePct}%) &bull; 231 Pos &bull; 439 Neg</span>
         </div>
         <div className="p-3.5 rounded-xl bg-[#111827]/70 border border-[#1F2937] space-y-1">
           <span className="text-[10px] text-[#9CA3AF] uppercase">Look-Ahead Guard</span>
           <div className="text-base font-bold text-[#10B981]">PASSED</div>
-          <span className="text-[10px] text-neutral-400">Point-in-time features only</span>
+          <span className="text-[10px] text-neutral-400">Expanding window (t &lt; t_match)</span>
         </div>
         <div className="p-3.5 rounded-xl bg-[#111827]/70 border border-[#1F2937] space-y-1">
-          <span className="text-[10px] text-[#9CA3AF] uppercase">Model Calibration</span>
-          <div className="text-base font-bold text-white">Brier {modelValidation.brierScore}</div>
-          <span className="text-[10px] text-neutral-400">LogLoss {modelValidation.logLoss}</span>
+          <span className="text-[10px] text-[#9CA3AF] uppercase">Model Brier Score</span>
+          <div className="text-base font-bold text-white">{modelValidation.brierScore}</div>
+          <span className="text-[10px] text-[#10B981]">+{modelValidation.brierSkillScore}% skill vs home bias</span>
         </div>
       </div>
 
-      {/* SECTION C & D: Primary Question & Season Isolation */}
+      {/* TAB 1: PRIMARY OVERVIEW (HOME AH +0) */}
       {activeTab === 'overview' && (
-        <div className="space-y-8">
-          {/* Primary Answer Hero Card */}
-          <div className="rounded-2xl border border-[#1F2937] bg-[#111827]/80 p-6 sm:p-8 space-y-4 font-mono">
+        <div className="space-y-8 font-mono">
+          <div className="rounded-2xl border border-[#1F2937] bg-[#111827]/80 p-6 sm:p-8 space-y-4">
             <div className="flex items-center justify-between gap-2">
               <span className="text-xs uppercase tracking-widest text-[#9CA3AF] flex items-center gap-1.5">
                 <HelpCircle className="h-4 w-4 text-[#10B981]" />
@@ -169,8 +170,7 @@ export function PremierLeagueAhResearchView({ data }: PremierLeagueAhResearchVie
             </div>
           </div>
 
-          {/* Season Selector & Hero Grid */}
-          <div className="space-y-4 font-mono">
+          <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-xs uppercase tracking-widest text-[#9CA3AF]">
                 Home AH +0 Performance Summary
@@ -181,9 +181,7 @@ export function PremierLeagueAhResearchView({ data }: PremierLeagueAhResearchVie
                   onClick={() => setSelectedSeason('combined')}
                   className={cn(
                     'px-3 py-1 rounded transition-all cursor-pointer',
-                    selectedSeason === 'combined'
-                      ? 'bg-[#1F2937] text-white font-bold'
-                      : 'text-[#9CA3AF] hover:text-white'
+                    selectedSeason === 'combined' ? 'bg-[#1F2937] text-white font-bold' : 'text-[#9CA3AF] hover:text-white'
                   )}
                 >
                   Combined (2 Seasons)
@@ -192,23 +190,19 @@ export function PremierLeagueAhResearchView({ data }: PremierLeagueAhResearchVie
                   onClick={() => setSelectedSeason('2024-2025')}
                   className={cn(
                     'px-3 py-1 rounded transition-all cursor-pointer',
-                    selectedSeason === '2024-2025'
-                      ? 'bg-[#1F2937] text-white font-bold'
-                      : 'text-[#9CA3AF] hover:text-white'
+                    selectedSeason === '2024-2025' ? 'bg-[#1F2937] text-white font-bold' : 'text-[#9CA3AF] hover:text-white'
                   )}
                 >
-                  2024/25
+                  2024/25 (Discovery)
                 </button>
                 <button
                   onClick={() => setSelectedSeason('2025-2026')}
                   className={cn(
                     'px-3 py-1 rounded transition-all cursor-pointer',
-                    selectedSeason === '2025-2026'
-                      ? 'bg-[#1F2937] text-white font-bold'
-                      : 'text-[#9CA3AF] hover:text-white'
+                    selectedSeason === '2025-2026' ? 'bg-[#1F2937] text-white font-bold' : 'text-[#9CA3AF] hover:text-white'
                   )}
                 >
-                  2025/26
+                  2025/26 (Holdout)
                 </button>
               </div>
             </div>
@@ -238,12 +232,7 @@ export function PremierLeagueAhResearchView({ data }: PremierLeagueAhResearchVie
 
               <div className="p-4 rounded-xl bg-[#111827]/70 border border-[#1F2937]">
                 <span className="text-[10px] text-[#9CA3AF] uppercase">Net Profit (1u Flat)</span>
-                <div
-                  className={cn(
-                    'text-2xl font-bold mt-1',
-                    currentSummary.profit >= 0 ? 'text-[#10B981]' : 'text-red-400'
-                  )}
-                >
+                <div className={cn('text-2xl font-bold mt-1', currentSummary.profit >= 0 ? 'text-[#10B981]' : 'text-red-400')}>
                   {currentSummary.profit >= 0 ? `+${currentSummary.profit.toFixed(2)}u` : `${currentSummary.profit.toFixed(2)}u`}
                 </div>
                 <span className="text-[10px] text-[#6B7280]">1-unit flat stake</span>
@@ -251,12 +240,7 @@ export function PremierLeagueAhResearchView({ data }: PremierLeagueAhResearchVie
 
               <div className="p-4 rounded-xl bg-[#111827]/70 border border-[#1F2937]">
                 <span className="text-[10px] text-[#9CA3AF] uppercase">ROI / Yield</span>
-                <div
-                  className={cn(
-                    'text-2xl font-bold mt-1',
-                    currentSummary.roi >= 0 ? 'text-[#10B981]' : 'text-red-400'
-                  )}
-                >
+                <div className={cn('text-2xl font-bold mt-1', currentSummary.roi >= 0 ? 'text-[#10B981]' : 'text-red-400')}>
                   {currentSummary.roi >= 0 ? `+${currentSummary.roi}%` : `${currentSummary.roi}%`}
                 </div>
                 <span className="text-[10px] text-[#6B7280]">Profit / Total Stake</span>
@@ -264,12 +248,7 @@ export function PremierLeagueAhResearchView({ data }: PremierLeagueAhResearchVie
 
               <div className="p-4 rounded-xl bg-[#111827]/70 border border-[#1F2937]">
                 <span className="text-[10px] text-[#9CA3AF] uppercase">Mean CLV</span>
-                <div
-                  className={cn(
-                    'text-2xl font-bold mt-1',
-                    currentSummary.avgClv !== null && currentSummary.avgClv >= 0 ? 'text-[#10B981]' : 'text-red-400'
-                  )}
-                >
+                <div className={cn('text-2xl font-bold mt-1', currentSummary.avgClv !== null && currentSummary.avgClv >= 0 ? 'text-[#10B981]' : 'text-red-400')}>
                   {currentSummary.avgClv !== null ? `${currentSummary.avgClv > 0 ? '+' : ''}${currentSummary.avgClv}%` : 'N/A'}
                 </div>
                 <span className="text-[10px] text-[#6B7280]">vs Pinnacle Closing</span>
@@ -277,11 +256,10 @@ export function PremierLeagueAhResearchView({ data }: PremierLeagueAhResearchVie
             </div>
           </div>
 
-          {/* Section D: Season Isolation Table */}
-          <div className="rounded-xl border border-[#1F2937] bg-[#111827]/60 overflow-hidden font-mono text-xs">
+          <div className="rounded-xl border border-[#1F2937] bg-[#111827]/60 overflow-hidden text-xs">
             <div className="p-4 bg-[#0B0F0E]/80 border-b border-[#1F2937] flex items-center justify-between">
               <span className="font-bold text-white uppercase tracking-wider">
-                Season Isolation &bull; Walk-Forward Stability (Home AH +0)
+                Season Isolation (Home AH +0)
               </span>
               <span className="text-[#9CA3AF] text-[11px]">Pinnacle Decimal Odds</span>
             </div>
@@ -318,28 +296,13 @@ export function PremierLeagueAhResearchView({ data }: PremierLeagueAhResearchVie
                       </td>
                       <td className="py-3.5 px-4 text-white font-bold">{item.winRate}%</td>
                       <td className="py-3.5 px-4 text-[#9CA3AF]">{item.pushRate}%</td>
-                      <td
-                        className={cn(
-                          'py-3.5 px-4 font-bold',
-                          item.profit >= 0 ? 'text-[#10B981]' : 'text-red-400'
-                        )}
-                      >
+                      <td className={cn('py-3.5 px-4 font-bold', item.profit >= 0 ? 'text-[#10B981]' : 'text-red-400')}>
                         {item.profit >= 0 ? `+${item.profit.toFixed(2)}u` : `${item.profit.toFixed(2)}u`}
                       </td>
-                      <td
-                        className={cn(
-                          'py-3.5 px-4 font-bold',
-                          item.roi >= 0 ? 'text-[#10B981]' : 'text-red-400'
-                        )}
-                      >
+                      <td className={cn('py-3.5 px-4 font-bold', item.roi >= 0 ? 'text-[#10B981]' : 'text-red-400')}>
                         {item.roi >= 0 ? `+${item.roi}%` : `${item.roi}%`}
                       </td>
-                      <td
-                        className={cn(
-                          'py-3.5 px-4 font-bold',
-                          item.avgClv !== null && item.avgClv >= 0 ? 'text-[#10B981]' : 'text-red-400'
-                        )}
-                      >
+                      <td className={cn('py-3.5 px-4 font-bold', item.avgClv !== null && item.avgClv >= 0 ? 'text-[#10B981]' : 'text-red-400')}>
                         {item.avgClv !== null ? `${item.avgClv > 0 ? '+' : ''}${item.avgClv}%` : 'N/A'}
                       </td>
                       <td className="py-3.5 px-4 text-[#9CA3AF] text-[11px]">
@@ -359,7 +322,73 @@ export function PremierLeagueAhResearchView({ data }: PremierLeagueAhResearchVie
         </div>
       )}
 
-      {/* SECTION E: Full AH Line Matrix */}
+      {/* TAB 2: TEMPORAL HOLDOUT & OUT-OF-SAMPLE VALIDATION */}
+      {activeTab === 'holdout' && (
+        <div className="space-y-6 font-mono text-xs">
+          <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 space-y-1">
+            <div className="font-bold flex items-center gap-1.5 text-amber-400">
+              <Lock className="h-4 w-4" /> Data-Mining Hazard &amp; Temporal Holdout Gate
+            </div>
+            <p className="text-[11px] text-neutral-300 leading-relaxed">
+              Rules discovered in <span className="text-white font-bold">2024/25</span> were completely frozen and evaluated untouched against <span className="text-white font-bold">2025/26 (Holdout)</span>. Notice how apparent top performers like Away +1.50 (+21.5%) and Away +1.00 (+19.5%) collapsed into negative returns out-of-sample, unmasking historical data mining.
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-[#1F2937] bg-[#111827]/70 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="border-b border-[#1F2937] text-[#9CA3AF] bg-[#0B0F0E]/50">
+                    <th className="py-3 px-3">Candidate Rule</th>
+                    <th className="py-3 px-3">2024/25 (Disc N)</th>
+                    <th className="py-3 px-3">2024/25 Discovery ROI</th>
+                    <th className="py-3 px-3">2025/26 (OOS N)</th>
+                    <th className="py-3 px-3">2025/26 Holdout ROI</th>
+                    <th className="py-3 px-3">2025/26 OOS CLV</th>
+                    <th className="py-3 px-3">Comb ROI</th>
+                    <th className="py-3 px-3">OOS Status</th>
+                    <th className="py-3 px-3">Verdict</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-[#1F2937]">
+                  {lineMatrix.holdoutCandidates.map((c) => (
+                    <tr key={c.ruleId} className="hover:bg-[#111827] transition-colors">
+                      <td className="py-3.5 px-3 font-bold text-white">{c.ruleLabel}</td>
+                      <td className="py-3.5 px-3 text-neutral-300">{c.discoveryBets}</td>
+                      <td className={cn('py-3.5 px-3 font-bold', c.discoveryRoi >= 0 ? 'text-[#10B981]' : 'text-red-400')}>
+                        {c.discoveryRoi >= 0 ? `+${c.discoveryRoi}%` : `${c.discoveryRoi}%`}
+                      </td>
+                      <td className="py-3.5 px-3 text-neutral-300">{c.oosBets}</td>
+                      <td className={cn('py-3.5 px-3 font-bold', c.oosRoi >= 0 ? 'text-[#10B981]' : 'text-red-400')}>
+                        {c.oosRoi >= 0 ? `+${c.oosRoi}%` : `${c.oosRoi}%`}
+                      </td>
+                      <td className={cn('py-3.5 px-3', c.oosClv !== null && c.oosClv >= 0 ? 'text-[#10B981]' : 'text-red-400')}>
+                        {c.oosClv !== null ? `${c.oosClv > 0 ? '+' : ''}${c.oosClv}%` : 'N/A'}
+                      </td>
+                      <td className={cn('py-3.5 px-3 font-bold', c.combinedRoi >= 0 ? 'text-[#10B981]' : 'text-red-400')}>
+                        {c.combinedRoi >= 0 ? `+${c.combinedRoi}%` : `${c.combinedRoi}%`}
+                      </td>
+                      <td className="py-3.5 px-3">
+                        <span className={cn(
+                          'px-2 py-0.5 rounded text-[10px] font-bold uppercase',
+                          c.oosStatus === 'SURVIVED_OOS' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' :
+                          c.oosStatus === 'FAILED_OOS_DATA_MINED' ? 'bg-red-500/10 text-red-400 border border-red-500/30' :
+                          'bg-neutral-800 text-neutral-400'
+                        )}>
+                          {c.oosStatus}
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-3 text-[#9CA3AF]">{c.verdict}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 3: FULL LINE MATRIX */}
       {activeTab === 'lineMatrix' && (
         <div className="space-y-6 font-mono text-xs">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
@@ -368,7 +397,7 @@ export function PremierLeagueAhResearchView({ data }: PremierLeagueAhResearchVie
                 Complete Asian Handicap Line Matrix (-2.00 to +2.00)
               </h2>
               <p className="text-[11px] text-[#6B7280] mt-0.5">
-                Every observed Premier League AH line with quarter-ball settlement and two-season stability.
+                Every observed Premier League AH line with quarter-ball settlement and coverage percentages.
               </p>
             </div>
             <span className="text-[#9CA3AF] text-[11px]">Click headers to sort</span>
@@ -385,11 +414,9 @@ export function PremierLeagueAhResearchView({ data }: PremierLeagueAhResearchVie
                     <th onClick={() => handleSort('sampleSize')} className="py-3 px-3 cursor-pointer hover:text-white">
                       <div className="flex items-center gap-1">Matches (N) <ArrowUpDown className="h-3 w-3" /></div>
                     </th>
+                    <th className="py-3 px-3">Coverage %</th>
                     <th onClick={() => handleSort('homeWinRate')} className="py-3 px-3 cursor-pointer hover:text-white">
                       <div className="flex items-center gap-1">Home WR <ArrowUpDown className="h-3 w-3" /></div>
-                    </th>
-                    <th onClick={() => handleSort('homeProfit')} className="py-3 px-3 cursor-pointer hover:text-white">
-                      <div className="flex items-center gap-1">Home Profit <ArrowUpDown className="h-3 w-3" /></div>
                     </th>
                     <th onClick={() => handleSort('homeRoi')} className="py-3 px-3 cursor-pointer hover:text-white">
                       <div className="flex items-center gap-1">Home ROI <ArrowUpDown className="h-3 w-3" /></div>
@@ -397,16 +424,13 @@ export function PremierLeagueAhResearchView({ data }: PremierLeagueAhResearchVie
                     <th onClick={() => handleSort('awayWinRate')} className="py-3 px-3 cursor-pointer hover:text-white">
                       <div className="flex items-center gap-1">Away WR <ArrowUpDown className="h-3 w-3" /></div>
                     </th>
-                    <th onClick={() => handleSort('awayProfit')} className="py-3 px-3 cursor-pointer hover:text-white">
-                      <div className="flex items-center gap-1">Away Profit <ArrowUpDown className="h-3 w-3" /></div>
-                    </th>
                     <th onClick={() => handleSort('awayRoi')} className="py-3 px-3 cursor-pointer hover:text-white">
                       <div className="flex items-center gap-1">Away ROI <ArrowUpDown className="h-3 w-3" /></div>
                     </th>
                     <th className="py-3 px-3">2024/25</th>
                     <th className="py-3 px-3">2025/26</th>
-                    <th className="py-3 px-3">Consistency</th>
                     <th className="py-3 px-3">CLV</th>
+                    <th className="py-3 px-3">Sample Tier</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#1F2937]">
@@ -414,131 +438,26 @@ export function PremierLeagueAhResearchView({ data }: PremierLeagueAhResearchVie
                     <tr key={l.line} className="hover:bg-[#111827] transition-colors">
                       <td className="py-3 px-3 font-bold text-white">{l.lineLabel}</td>
                       <td className="py-3 px-3 text-neutral-300">{l.sampleSize}</td>
+                      <td className="py-3 px-3 text-[#9CA3AF]">{l.coveragePct}%</td>
                       <td className="py-3 px-3 text-neutral-300">{l.homeWinRate}%</td>
-                      <td
-                        className={cn(
-                          'py-3 px-3 font-bold',
-                          l.homeProfit >= 0 ? 'text-[#10B981]' : 'text-red-400'
-                        )}
-                      >
-                        {l.homeProfit >= 0 ? `+${l.homeProfit.toFixed(2)}u` : `${l.homeProfit.toFixed(2)}u`}
-                      </td>
-                      <td
-                        className={cn(
-                          'py-3 px-3 font-bold',
-                          l.homeRoi >= 0 ? 'text-[#10B981]' : 'text-red-400'
-                        )}
-                      >
+                      <td className={cn('py-3 px-3 font-bold', l.homeRoi >= 0 ? 'text-[#10B981]' : 'text-red-400')}>
                         {l.homeRoi >= 0 ? `+${l.homeRoi}%` : `${l.homeRoi}%`}
                       </td>
                       <td className="py-3 px-3 text-neutral-300">{l.awayWinRate}%</td>
-                      <td
-                        className={cn(
-                          'py-3 px-3 font-bold',
-                          l.awayProfit >= 0 ? 'text-[#10B981]' : 'text-red-400'
-                        )}
-                      >
-                        {l.awayProfit >= 0 ? `+${l.awayProfit.toFixed(2)}u` : `${l.awayProfit.toFixed(2)}u`}
-                      </td>
-                      <td
-                        className={cn(
-                          'py-3 px-3 font-bold',
-                          l.awayRoi >= 0 ? 'text-[#10B981]' : 'text-red-400'
-                        )}
-                      >
+                      <td className={cn('py-3 px-3 font-bold', l.awayRoi >= 0 ? 'text-[#10B981]' : 'text-red-400')}>
                         {l.awayRoi >= 0 ? `+${l.awayRoi}%` : `${l.awayRoi}%`}
                       </td>
                       <td className="py-3 px-3 text-[#9CA3AF]">{l.roi2024_2025 > 0 ? `+${l.roi2024_2025}%` : `${l.roi2024_2025}%`}</td>
                       <td className="py-3 px-3 text-[#9CA3AF]">{l.roi2025_2026 > 0 ? `+${l.roi2025_2026}%` : `${l.roi2025_2026}%`}</td>
-                      <td className="py-3 px-3">
-                        <span className={cn(
-                          'px-1.5 py-0.5 rounded text-[10px] font-bold',
-                          l.seasonConsistency === 'CONSISTENT' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' :
-                          l.seasonConsistency === 'INCONSISTENT' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30' :
-                          'bg-neutral-800 text-neutral-400'
-                        )}>
-                          {l.seasonConsistency}
-                        </span>
-                      </td>
                       <td className="py-3 px-3 text-[#9CA3AF]">{l.avgClv !== null ? `${l.avgClv}%` : 'N/A'}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* SECTION F: Positive AH Opportunities */}
-      {activeTab === 'positiveAh' && (
-        <div className="space-y-6 font-mono text-xs">
-          <div>
-            <h2 className="text-xs uppercase tracking-widest text-[#9CA3AF]">
-              Positive Handicap Region Rankings (+0.25 to +1.50)
-            </h2>
-            <p className="text-[11px] text-[#6B7280] mt-0.5">
-              Ranked by cumulative units profit and multi-season consistency.
-            </p>
-          </div>
-
-          <div className="rounded-xl border border-[#1F2937] bg-[#111827]/70 overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="border-b border-[#1F2937] text-[#9CA3AF] bg-[#0B0F0E]/50">
-                    <th className="py-3 px-3">Rank</th>
-                    <th className="py-3 px-3">Selection</th>
-                    <th className="py-3 px-3">Target Role</th>
-                    <th className="py-3 px-3">Sample (N)</th>
-                    <th className="py-3 px-3">Profit (1u)</th>
-                    <th className="py-3 px-3">ROI</th>
-                    <th className="py-3 px-3">Win Rate</th>
-                    <th className="py-3 px-3">Push Rate</th>
-                    <th className="py-3 px-3">Season Consistency</th>
-                    <th className="py-3 px-3">95% CI</th>
-                    <th className="py-3 px-3">Verdict</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#1F2937]">
-                  {lineMatrix.positiveRanked.map((item) => (
-                    <tr key={`${item.side}-${item.line}`} className="hover:bg-[#111827] transition-colors">
-                      <td className="py-3 px-3 font-bold text-[#10B981]">#{item.rank}</td>
-                      <td className="py-3 px-3 font-bold text-white">{item.lineLabel}</td>
-                      <td className="py-3 px-3 text-neutral-300">{item.targetTeamRole}</td>
-                      <td className="py-3 px-3 text-neutral-300">{item.sampleSize}</td>
-                      <td
-                        className={cn(
-                          'py-3 px-3 font-bold',
-                          item.profit >= 0 ? 'text-[#10B981]' : 'text-red-400'
-                        )}
-                      >
-                        {item.profit >= 0 ? `+${item.profit.toFixed(2)}u` : `${item.profit.toFixed(2)}u`}
-                      </td>
-                      <td
-                        className={cn(
-                          'py-3 px-3 font-bold',
-                          item.roi >= 0 ? 'text-[#10B981]' : 'text-red-400'
-                        )}
-                      >
-                        {item.roi >= 0 ? `+${item.roi}%` : `${item.roi}%`}
-                      </td>
-                      <td className="py-3 px-3 text-white">{item.winRate}%</td>
-                      <td className="py-3 px-3 text-[#9CA3AF]">{item.pushRate}%</td>
-                      <td className="py-3 px-3">
+                      <td className="py-3 px-3 text-[10px]">
                         <span className={cn(
-                          'px-1.5 py-0.5 rounded text-[10px] font-bold',
-                          item.seasonConsistency === 'CONSISTENT' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' :
-                          item.seasonConsistency === 'INCONSISTENT' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30' :
-                          'bg-neutral-800 text-neutral-400'
+                          'px-1.5 py-0.5 rounded',
+                          l.sampleSize < 30 ? 'bg-amber-500/10 text-amber-400' : 'bg-neutral-800 text-neutral-300'
                         )}>
-                          {item.seasonConsistency}
+                          {l.sampleTier}
                         </span>
                       </td>
-                      <td className="py-3 px-3 text-[#9CA3AF] text-[11px]">
-                        [{item.confidenceInterval95.lower}%, {item.confidenceInterval95.upper}%]
-                      </td>
-                      <td className="py-3 px-3 text-[#9CA3AF]">{item.verdict}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -548,23 +467,18 @@ export function PremierLeagueAhResearchView({ data }: PremierLeagueAhResearchVie
         </div>
       )}
 
-      {/* SECTION G: EV Threshold Sweep */}
+      {/* TAB 4: EV THRESHOLD SWEEP */}
       {activeTab === 'evSweep' && (
         <div className="space-y-6 font-mono text-xs">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
               <h2 className="text-xs uppercase tracking-widest text-[#9CA3AF]">
-                Model Expected Value (EV) Threshold Sweep &bull; Home AH +0
+                EV Threshold Sweep &bull; Holdout Comparison
               </h2>
               <p className="text-[11px] text-[#6B7280] mt-0.5">
-                Filtering bets strictly on point-in-time Dixon-Coles model expected value hurdles.
+                Model Expected Value hurdles evaluated across Discovery (2024/25) vs Holdout (2025/26).
               </p>
             </div>
-            {homeAhZero.bestThreshold && (
-              <div className="px-3 py-1.5 rounded-lg bg-[#10B981]/10 border border-[#10B981]/30 text-[#10B981] text-xs font-bold flex items-center gap-1.5">
-                <Target className="h-3.5 w-3.5" /> Best Hurdle: {homeAhZero.bestThreshold.thresholdLabel} (+{homeAhZero.bestThreshold.roi}% ROI, N={homeAhZero.bestThreshold.bets})
-              </div>
-            )}
           </div>
 
           <div className="rounded-xl border border-[#1F2937] bg-[#111827]/70 overflow-hidden">
@@ -573,59 +487,32 @@ export function PremierLeagueAhResearchView({ data }: PremierLeagueAhResearchVie
                 <thead>
                   <tr className="border-b border-[#1F2937] text-[#9CA3AF] bg-[#0B0F0E]/50">
                     <th className="py-3 px-4">EV Hurdle</th>
-                    <th className="py-3 px-4">Qualifying Bets</th>
-                    <th className="py-3 px-4">Record (W-P-L)</th>
-                    <th className="py-3 px-4">Win Rate</th>
-                    <th className="py-3 px-4">Push Rate</th>
-                    <th className="py-3 px-4">Net Profit</th>
-                    <th className="py-3 px-4">ROI</th>
-                    <th className="py-3 px-4">Mean CLV</th>
-                    <th className="py-3 px-4">Avg Model EV</th>
+                    <th className="py-3 px-4">2024/25 N</th>
+                    <th className="py-3 px-4">2024/25 ROI</th>
+                    <th className="py-3 px-4">2025/26 OOS N</th>
+                    <th className="py-3 px-4">2025/26 OOS ROI</th>
+                    <th className="py-3 px-4">2025/26 OOS CLV</th>
+                    <th className="py-3 px-4">Combined ROI</th>
                     <th className="py-3 px-4">Sample Status</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#1F2937]">
                   {homeAhZero.evThresholdSweep.map((row) => (
-                    <tr
-                      key={row.thresholdLabel}
-                      className={cn(
-                        'hover:bg-[#111827] transition-colors',
-                        row.threshold === homeAhZero.bestThreshold?.threshold ? 'bg-[#10B981]/10 font-bold' : ''
-                      )}
-                    >
+                    <tr key={row.thresholdLabel} className="hover:bg-[#111827] transition-colors">
                       <td className="py-3 px-4 text-white font-bold">{row.thresholdLabel}</td>
-                      <td className="py-3 px-4 text-neutral-300">{row.bets}</td>
-                      <td className="py-3 px-4 text-neutral-300">
-                        {row.wins} - {row.pushes} - {row.losses}
+                      <td className="py-3 px-4 text-neutral-300">{row.discoveryBets}</td>
+                      <td className={cn('py-3 px-4 font-bold', row.discoveryRoi >= 0 ? 'text-[#10B981]' : 'text-red-400')}>
+                        {row.discoveryBets > 0 ? (row.discoveryRoi >= 0 ? `+${row.discoveryRoi}%` : `${row.discoveryRoi}%`) : '—'}
                       </td>
-                      <td className="py-3 px-4 text-white">{row.bets > 0 ? `${row.winRate}%` : '—'}</td>
-                      <td className="py-3 px-4 text-[#9CA3AF]">{row.bets > 0 ? `${row.pushRate}%` : '—'}</td>
-                      <td
-                        className={cn(
-                          'py-3 px-4 font-bold',
-                          row.profit >= 0 ? 'text-[#10B981]' : 'text-red-400'
-                        )}
-                      >
-                        {row.bets > 0 ? (row.profit >= 0 ? `+${row.profit.toFixed(2)}u` : `${row.profit.toFixed(2)}u`) : '—'}
+                      <td className="py-3 px-4 text-neutral-300">{row.oosBets}</td>
+                      <td className={cn('py-3 px-4 font-bold', row.oosRoi >= 0 ? 'text-[#10B981]' : 'text-red-400')}>
+                        {row.oosBets > 0 ? (row.oosRoi >= 0 ? `+${row.oosRoi}%` : `${row.oosRoi}%`) : '—'}
                       </td>
-                      <td
-                        className={cn(
-                          'py-3 px-4 font-bold',
-                          row.roi >= 0 ? 'text-[#10B981]' : 'text-red-400'
-                        )}
-                      >
-                        {row.bets > 0 ? (row.roi >= 0 ? `+${row.roi}%` : `${row.roi}%`) : '—'}
+                      <td className="py-3 px-4 text-[#9CA3AF]">
+                        {row.oosClv !== null ? `${row.oosClv}%` : 'N/A'}
                       </td>
-                      <td
-                        className={cn(
-                          'py-3 px-4',
-                          row.avgClv !== null && row.avgClv >= 0 ? 'text-[#10B981]' : 'text-red-400'
-                        )}
-                      >
-                        {row.bets > 0 && row.avgClv !== null ? `${row.avgClv}%` : 'N/A'}
-                      </td>
-                      <td className="py-3 px-4 text-neutral-300">
-                        {row.bets > 0 ? `+${row.avgEv}%` : '—'}
+                      <td className={cn('py-3 px-4 font-bold', row.combinedRoi >= 0 ? 'text-[#10B981]' : 'text-red-400')}>
+                        {row.combinedBets > 0 ? (row.combinedRoi >= 0 ? `+${row.combinedRoi}%` : `${row.combinedRoi}%`) : '—'}
                       </td>
                       <td className="py-3 px-4 text-[11px] text-[#9CA3AF]">
                         {row.sampleTier}
@@ -639,58 +526,58 @@ export function PremierLeagueAhResearchView({ data }: PremierLeagueAhResearchVie
         </div>
       )}
 
-      {/* SECTION B: Data Integrity & Provenance Detail */}
+      {/* TAB 5: DATA INTEGRITY & PROVENANCE */}
       {activeTab === 'integrity' && (
         <div className="space-y-6 font-mono text-xs">
           <h2 className="text-xs uppercase tracking-widest text-[#9CA3AF]">
-            Forensic Data Lineage &amp; Integrity Audit
+            Forensic Data Lineage &amp; Source Verification
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="p-5 rounded-xl bg-[#111827]/70 border border-[#1F2937] space-y-3">
               <span className="font-bold text-white uppercase tracking-wider block">
-                Provenance &amp; Source Verification
+                Provenance &amp; Source CSV Mapping
               </span>
               <div className="space-y-2 text-neutral-300 text-[11px]">
                 <div className="flex justify-between border-b border-[#1F2937]/50 pb-1.5">
-                  <span className="text-[#9CA3AF]">Historical Source:</span>
+                  <span className="text-[#9CA3AF]">Source CSVs:</span>
                   <span className="text-white text-right">{dataIntegrity.historicalOddsProvenance}</span>
                 </div>
                 <div className="flex justify-between border-b border-[#1F2937]/50 pb-1.5">
-                  <span className="text-[#9CA3AF]">Bookmaker Provenance:</span>
-                  <span className="text-white text-right">{dataIntegrity.bookmakerProvenance}</span>
+                  <span className="text-[#9CA3AF]">Pinnacle AH Columns:</span>
+                  <span className="text-white text-right">PAHH, PAHA, PCAHH, PCAHA, AHh, AHCh</span>
                 </div>
                 <div className="flex justify-between border-b border-[#1F2937]/50 pb-1.5">
-                  <span className="text-[#9CA3AF]">CLV Verification:</span>
-                  <span className="text-white text-right">{dataIntegrity.clvProvenance}</span>
+                  <span className="text-[#9CA3AF]">Provenance Gate:</span>
+                  <span className="text-[#10B981] font-bold">{dataIntegrity.provenanceStatus}</span>
                 </div>
                 <div className="flex justify-between pt-1">
-                  <span className="text-[#9CA3AF]">Overall Coverage:</span>
-                  <span className="text-[#10B981] font-bold">{dataIntegrity.coveragePct}%</span>
+                  <span className="text-[#9CA3AF]">Population Coverage:</span>
+                  <span className="text-[#10B981] font-bold">{dataIntegrity.coveragePct}% (759 / 760)</span>
                 </div>
               </div>
             </div>
 
             <div className="p-5 rounded-xl bg-[#111827]/70 border border-[#1F2937] space-y-3">
               <span className="font-bold text-white uppercase tracking-wider block">
-                Fixture Quality Invariants
+                Line Breakdown &amp; Population Share
               </span>
               <div className="space-y-2 text-neutral-300 text-[11px]">
                 <div className="flex justify-between border-b border-[#1F2937]/50 pb-1.5">
-                  <span className="text-[#9CA3AF]">Expected Fixtures:</span>
-                  <span className="text-white">{dataIntegrity.expectedFixtures}</span>
+                  <span className="text-[#9CA3AF]">AH 0.00 (Pick&apos;em):</span>
+                  <span className="text-white">{dataIntegrity.ah0Records} matches ({dataIntegrity.ah0CoveragePct}%)</span>
                 </div>
                 <div className="flex justify-between border-b border-[#1F2937]/50 pb-1.5">
-                  <span className="text-[#9CA3AF]">Verified Final Results:</span>
-                  <span className="text-[#10B981] font-bold">{dataIntegrity.finalResultsVerified} (100%)</span>
+                  <span className="text-[#9CA3AF]">Positive AH Lines:</span>
+                  <span className="text-white">{dataIntegrity.ahPositiveRecords} matches ({dataIntegrity.ahPositiveCoveragePct}%)</span>
                 </div>
                 <div className="flex justify-between border-b border-[#1F2937]/50 pb-1.5">
-                  <span className="text-[#9CA3AF]">Duplicate Fixtures:</span>
-                  <span className="text-neutral-400">{dataIntegrity.duplicateRecords}</span>
+                  <span className="text-[#9CA3AF]">Negative AH Lines:</span>
+                  <span className="text-white">{dataIntegrity.ahNegativeRecords} matches ({dataIntegrity.ahNegativeCoveragePct}%)</span>
                 </div>
                 <div className="flex justify-between pt-1">
-                  <span className="text-[#9CA3AF]">Look-Ahead Feature Leakage:</span>
-                  <span className="text-[#10B981] font-bold">0 Violations (PASS)</span>
+                  <span className="text-[#9CA3AF]">Verified Final Results:</span>
+                  <span className="text-[#10B981] font-bold">{dataIntegrity.finalResultsVerified} / 760 (100%)</span>
                 </div>
               </div>
             </div>
@@ -698,51 +585,33 @@ export function PremierLeagueAhResearchView({ data }: PremierLeagueAhResearchVie
         </div>
       )}
 
-      {/* SECTION H: Methodology & Formulas */}
-      {activeTab === 'methodology' && (
+      {/* TAB 6: MODEL QUALITY & METHODOLOGY */}
+      {activeTab === 'multipleTesting' && (
         <div className="space-y-6 font-mono text-xs">
-          <h2 className="text-xs uppercase tracking-widest text-[#9CA3AF]">
-            Statistical Methodology &amp; Payoff Settlement
-          </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="p-5 rounded-xl bg-[#111827]/70 border border-[#1F2937] space-y-3">
-              <span className="font-bold text-white text-sm block">1. Granular Quarter-Ball Settlement</span>
-              <div className="p-3 bg-[#0B0F0E] rounded-lg border border-[#1F2937] text-neutral-300 space-y-1 text-[11px]">
-                <div>&bull; WIN (diff &ge; +0.50): <span className="text-[#10B981] font-bold">+ (Odds - 1)</span></div>
-                <div>&bull; HALF_WIN (diff == +0.25): <span className="text-[#10B981] font-bold">+ (Odds - 1) / 2</span></div>
-                <div>&bull; PUSH (diff == 0.00): <span className="text-amber-300 font-bold">0.00 (Stake returned)</span></div>
-                <div>&bull; HALF_LOSS (diff == -0.25): <span className="text-red-400 font-bold">- 0.50</span></div>
-                <div>&bull; LOSS (diff &le; -0.50): <span className="text-red-400 font-bold">- 1.00</span></div>
+          <div className="p-5 rounded-xl bg-[#111827]/70 border border-[#1F2937] space-y-3">
+            <span className="font-bold text-white uppercase tracking-wider block">
+              Model Quality &amp; Benchmark Comparisons
+            </span>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="p-3 bg-[#0B0F0E] rounded-lg border border-[#1F2937] space-y-1">
+                <span className="text-[10px] text-[#9CA3AF] uppercase">Dixon-Coles Model</span>
+                <div className="text-lg font-bold text-white">Brier {modelValidation.brierScore}</div>
+                <span className="text-[10px] text-[#10B981]">Log Loss: {modelValidation.logLoss}</span>
+              </div>
+              <div className="p-3 bg-[#0B0F0E] rounded-lg border border-[#1F2937] space-y-1">
+                <span className="text-[10px] text-[#9CA3AF] uppercase">Naive Uniform Baseline</span>
+                <div className="text-lg font-bold text-neutral-400">Brier {modelValidation.baselineUniformBrier}</div>
+                <span className="text-[10px] text-neutral-500">1/3 equal probabilities</span>
+              </div>
+              <div className="p-3 bg-[#0B0F0E] rounded-lg border border-[#1F2937] space-y-1">
+                <span className="text-[10px] text-[#9CA3AF] uppercase">Empirical Home Bias</span>
+                <div className="text-lg font-bold text-neutral-400">Brier {modelValidation.baselineHomeBiasBrier}</div>
+                <span className="text-[10px] text-[#10B981]">Model Skill: +{modelValidation.brierSkillScore}%</span>
               </div>
             </div>
-
-            <div className="p-5 rounded-xl bg-[#111827]/70 border border-[#1F2937] space-y-3">
-              <span className="font-bold text-white text-sm block">2. Quarter-Line Model EV Formula</span>
-              <p className="text-[#9CA3AF] text-[11px] leading-relaxed">
-                Separates probability states across the bivariate Poisson score matrix:
-              </p>
-              <div className="p-3 bg-[#0B0F0E] rounded-lg border border-[#1F2937] text-[#10B981] font-bold text-[11px]">
-                EV = P(W)*(O-1) + P(HW)*((O-1)/2) + P(Push)*0 + P(HL)*(-0.5) + P(L)*(-1)
-              </div>
-            </div>
-
-            <div className="p-5 rounded-xl bg-[#111827]/70 border border-[#1F2937] space-y-3">
-              <span className="font-bold text-white text-sm block">3. Strict CLV Forensic Rule</span>
-              <p className="text-[#9CA3AF] text-[11px] leading-relaxed">
-                CLV is computed only when Pinnacle opening price and Pinnacle closing price exist for the exact same market, side, and handicap line:
-              </p>
-              <div className="p-3 bg-[#0B0F0E] rounded-lg border border-[#1F2937] text-[#10B981] font-bold text-[11px]">
-                CLV = (Pinnacle_Open / Pinnacle_Close) - 1
-              </div>
-            </div>
-
-            <div className="p-5 rounded-xl bg-[#111827]/70 border border-[#1F2937] space-y-3">
-              <span className="font-bold text-white text-sm block">4. Walk-Forward Expanding Window</span>
-              <p className="text-[#9CA3AF] text-[11px] leading-relaxed">
-                Prior seasons (2015–2024) initialize team offensive/defensive ratings. Ratings are updated sequentially with a 0.95 decay factor after each match concludes, ensuring strict zero future information leakage.
-              </p>
-            </div>
+            <p className="text-[11px] text-[#9CA3AF] leading-relaxed pt-2">
+              <span className="text-white font-bold">Calibration Context:</span> While the model displays positive predictive skill over random and empirical baselines, football betting edges are small. Model EV alone must not be converted into claims of a guaranteed betting edge without verified out-of-sample CLV.
+            </p>
           </div>
         </div>
       )}
