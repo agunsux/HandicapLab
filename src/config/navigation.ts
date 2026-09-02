@@ -24,6 +24,7 @@ export const ROUTES = {
   validation: '/validation',
   dashboard: '/app/dashboard',
   profile: '/app/profile',
+  premierLeagueAhResearch: '/premier-league/ah-research',
   valueBets: '/asian-handicap',
   markets: '/asian-handicap',
 } as const;
@@ -51,6 +52,7 @@ export const FOOTER_NAV: Record<string, { label: string; href: string }[]> = {
     { label: 'Track Record', href: ROUTES.trackRecord },
   ],
   resources: [
+    { label: 'PL AH Research', href: ROUTES.premierLeagueAhResearch },
     { label: 'Methodology', href: ROUTES.methodology },
     { label: 'Models', href: ROUTES.models },
     { label: 'Validation', href: ROUTES.validation },
