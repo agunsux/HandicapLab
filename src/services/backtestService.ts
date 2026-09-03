@@ -54,14 +54,18 @@ export class BacktestService {
 
       let matches: Record<string, unknown>[] | null = rawMatches as Record<string, unknown>[] | null;
       if (!matches || matches.length === 0) {
-        console.log('ℹ️ No finished matches found in database. Using mock matches for simulation.');
-        matches = [
-          { id: '1001', home_team: 'Arsenal', away_team: 'Chelsea', league: 'Premier League', kickoff: '2026-06-01T15:00:00Z', status: 'finished', home_goals: 2, away_goals: 1 },
-          { id: '1002', home_team: 'Liverpool', away_team: 'Everton', league: 'Premier League', kickoff: '2026-06-05T15:00:00Z', status: 'finished', home_goals: 3, away_goals: 0 },
-          { id: '1003', home_team: 'Manchester City', away_team: 'Manchester United', league: 'Premier League', kickoff: '2026-06-10T15:00:00Z', status: 'finished', home_goals: 1, away_goals: 1 },
-          { id: '1004', home_team: 'Real Madrid', away_team: 'Barcelona', league: 'La Liga', kickoff: '2026-06-15T15:00:00Z', status: 'finished', home_goals: 2, away_goals: 3 },
-          { id: '1005', home_team: 'Bayern Munich', away_team: 'Dortmund', league: 'Bundesliga', kickoff: '2026-06-20T15:00:00Z', status: 'finished', home_goals: 4, away_goals: 2 }
-        ];
+        return {
+          totalBets: 0,
+          winningBets: 0,
+          winRate: 0.0,
+          roi: 0.0,
+          yield: 0.0,
+          maxDrawdown: 0.0,
+          averageClv: 0.0,
+          ece: 0.0,
+          brierScore: 0.0,
+          logLoss: 0.0,
+        };
       }
 
       let totalBets = 0;

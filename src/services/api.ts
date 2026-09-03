@@ -369,13 +369,7 @@ export async function fetchCompetitions(): Promise<any[]> {
       console.warn('[API Service] fetchCompetitions failed:', err);
     }
   }
-  return [
-    { id: 2021, name: 'Premier League', code: 'PL' },
-    { id: 2014, name: 'La Liga', code: 'PD' },
-    { id: 2002, name: 'Bundesliga', code: 'BL1' },
-    { id: 2019, name: 'Serie A', code: 'SA' },
-    { id: 2015, name: 'Ligue 1', code: 'FL1' },
-  ];
+  return [];
 }
 
 export async function fetchMatchStats(fixtureId: number | string): Promise<any> {
@@ -423,7 +417,7 @@ export async function fetchTeamForm(teamId: number | string, last: number = 5): 
     }
   }
 
-  return { form: 'WWDLW', goalsScored: 2.1, goalsConceded: 0.8 };
+  return null;
 }
 
 export async function fetchPredictions(fixtureId: number | string): Promise<any> {

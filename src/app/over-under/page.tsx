@@ -16,7 +16,7 @@ export default async function OverUnderRoutePage() {
     <div className="flex flex-col min-h-screen bg-[#0B0F0E]">
       <MarketSignalsFeed
         currentMarket="over-under"
-        title="Over / Under Signals"
+        title="Over / Under"
         description="Goal totals value opportunities identified by comparing our expected goals distributions against market consensus."
         signals={signals}
       />

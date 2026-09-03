@@ -80,6 +80,7 @@ supabase/.temp/
 
 # Scratch scripts
 /scratch/
+scripts/scratch/
 
 # Calibration artifacts
 /artifacts/calibration/

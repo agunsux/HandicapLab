@@ -1,4 +1,4 @@
-﻿// Let us add a test finished settlement in run-epic57-shadow.ts to demonstrate end-to-end settlement verification
+// Let us add a test finished settlement in run-epic57-shadow.ts to demonstrate end-to-end settlement verification
 import { DailyAhShadowPipeline, RESEARCH_HONESTY_BANNER, CONFIRMED_LEAGUES } from '../lib/pipeline/dailyAhShadowPipeline';
 import { AhDataLoader } from '../lib/research/ah-solo/ahDataLoader';
 
@@ -18,24 +18,6 @@ async function runEpic571Execution() {
   const upcomingFixtures = await DailyAhShadowPipeline.fetchLiveUpcomingFixtures();
   console.log(` -> Total upcoming fixtures retrieved: ${upcomingFixtures.length}`);
 
-  // Also include a finished candidate that was in pending state to demonstrate settlement
-  const finishedCandidateFixture = {
-    fixtureId: 'LIVE-SHADOW-ENG-PL-2026-RECENT-001',
-    leagueId: 'ENG-PL',
-    leagueName: 'Premier League',
-    country: 'England',
-    homeTeam: 'Liverpool',
-    awayTeam: 'Everton',
-    kickoffTime: new Date(Date.now() - 24 * 3600 * 1000).toISOString(),
-    status: 'NS' as const,
-    openingOdds: [
-      { line: -0.5, homeOdds: 1.95, awayOdds: 1.95, bookmaker: 'pinnacle', timestamp: new Date(Date.now() - 30 * 3600 * 1000).toISOString() },
-      { line: -0.25, homeOdds: 1.74, awayOdds: 2.16, bookmaker: 'pinnacle', timestamp: new Date(Date.now() - 30 * 3600 * 1000).toISOString() },
-    ],
-  };
-
-  upcomingFixtures.push(finishedCandidateFixture);
-
   // 3. Generate predictions & write to persistent ledger
   console.log('\n[STEP 3] Running AH-dixoncoles-v1.0.0 Shadow Inference...');
   const predResult = await DailyAhShadowPipeline.executeDailyPredictions(
@@ -46,26 +28,8 @@ async function runEpic571Execution() {
 
   // 4. Fetch finished fixtures and execute real automated settlement
   console.log('\n[STEP 4] Fetching Finished Fixtures & Executing Automated Settlement...');
-  const finishedFixtures = [
-    {
-      fixtureId: 'LIVE-SHADOW-ENG-PL-2026-RECENT-001',
-      leagueId: 'ENG-PL',
-      leagueName: 'Premier League',
-      country: 'England',
-      homeTeam: 'Liverpool',
-      awayTeam: 'Everton',
-      kickoffTime: new Date(Date.now() - 24 * 3600 * 1000).toISOString(),
-      status: 'FT' as const,
-      homeGoals: 2,
-      awayGoals: 0,
-      closingOdds: [
-        { line: -0.5, homeOdds: 1.90, awayOdds: 2.00, bookmaker: 'pinnacle', timestamp: new Date(Date.now() - 25 * 3600 * 1000).toISOString() },
-        { line: -0.25, homeOdds: 1.70, awayOdds: 2.22, bookmaker: 'pinnacle', timestamp: new Date(Date.now() - 25 * 3600 * 1000).toISOString() },
-      ],
-    },
-  ];
-
-  const settleResult = await DailyAhShadowPipeline.executeAutomatedSettlement(finishedFixtures);
+  // Only settle real fixtures present in ledger
+  const settleResult = await DailyAhShadowPipeline.executeAutomatedSettlement([]);
   console.log(` -> Total records settled: ${settleResult.settledCount}`);
 
   // 5. Generate summary & monitor 150-200 gate

@@ -16,7 +16,7 @@ export default async function AsianHandicapRoutePage() {
     <div className="flex flex-col min-h-screen bg-[#0B0F0E]">
       <MarketSignalsFeed
         currentMarket="asian-handicap"
-        title="Asian Handicap Signals"
+        title="Asian Handicap"
         description="Value opportunities where model probability deviates from Pinnacle handicap lines. Benchmarked strictly against Pinnacle closing odds."
         signals={signals}
       />

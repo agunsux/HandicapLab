@@ -100,7 +100,41 @@ export default function MethodologyPage() {
             </p>
           </section>
 
-          {/* Section 4: Responsible Gambling Disclaimer */}
+          {/* Section 4: Data Governance & Provenance */}
+          <section id="governance" className="bg-[#111827]/60 border border-[#1F2937] rounded-xl p-6">
+            <h2 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
+              <ShieldCheck className="h-5 w-5 text-emerald-400" />
+              4. Data Governance, Provenance &amp; Free-First Architecture
+            </h2>
+            <p className="mb-4">
+              HandicapLab enforces an uncompromising <strong>Zero-Synthetic Data Invariant</strong>. We separate all analytical assets into three verifiable data classes:
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono text-xs mb-4">
+              <div className="bg-[#0B0F0E] p-3.5 rounded-lg border border-[#1F2937]">
+                <span className="text-emerald-400 font-bold block mb-1">Class A: Match Facts</span>
+                <p className="text-neutral-300 text-[11px] leading-relaxed">
+                  Final scorelines (FTHG, FTAG), kickoff dates, and team identities sourced from API-Football and Football-Data.co.uk. Absolute ground truth.
+                </p>
+              </div>
+              <div className="bg-[#0B0F0E] p-3.5 rounded-lg border border-[#1F2937]">
+                <span className="text-purple-400 font-bold block mb-1">Class B: Derived Outcomes</span>
+                <p className="text-neutral-300 text-[11px] leading-relaxed">
+                  Deterministic outcome resolution: Over/Under 2.5 (FTHG + FTAG) and BTTS (FTHG &gt; 0 &amp;&amp; FTAG &gt; 0). Evaluates probability calibration directly against pitch facts without synthetic odds.
+                </p>
+              </div>
+              <div className="bg-[#0B0F0E] p-3.5 rounded-lg border border-[#1F2937]">
+                <span className="text-blue-400 font-bold block mb-1">Class C: Market Prices</span>
+                <p className="text-neutral-300 text-[11px] leading-relaxed">
+                  Historical closing odds (Pinnacle PCAHH / PC&gt;2.5 from Football-Data.co.uk) and live market feeds (OddsPAPI v4). Used strictly for CLV benchmarking and EV calculation.
+                </p>
+              </div>
+            </div>
+            <p className="text-xs text-[#9CA3AF] leading-relaxed">
+              <strong>Honest Research Disclosure:</strong> In historical backtests, Asian Handicap lines and Over/Under 2.5 lines have full Pinnacle closing price coverage. Both Teams to Score (BTTS) and alternate totals are evaluated on Class B match-fact distributions for statistical calibration; live BTTS signals activate only when real bookmaker prices meet our minimum edge threshold.
+            </p>
+          </section>
+
+          {/* Section 5: Responsible Gambling Disclaimer */}
           <section className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-6 text-amber-200">
             <h2 className="text-base font-bold text-amber-300 mb-2 flex items-center gap-2">
               <ShieldCheck className="h-5 w-5 text-amber-400" />
