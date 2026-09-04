@@ -60,7 +60,8 @@
     "research:epl-ah": "tsx scripts/run-epl-ah-research.ts",
     "verify:oddspapi-production": "node scripts/verify-oddspapi-production.mjs",
     "verify:providers": "node scripts/canonical_provider_probe.mjs",
-    "backtest:epic65": "tsx scripts/epic65_backtest_runner.ts"
+    "backtest:epic65": "tsx scripts/epic65_backtest_runner.ts",
+    "research:epic66": "tsx scripts/epic66_profitability_report.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",

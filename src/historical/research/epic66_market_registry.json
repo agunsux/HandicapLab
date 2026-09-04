@@ -1,0 +1,66 @@
+{
+  "version": "epic66-v1.0",
+  "generated_at": "2026-09-05T00:00:00Z",
+  "markets": {
+    "asian_handicap": {
+      "name": "Asian Handicap",
+      "code": "AH",
+      "lines": [
+        { "line": -2.00, "label": "AH -2.00", "type": "INTEGER" },
+        { "line": -1.75, "label": "AH -1.75", "type": "QUARTER" },
+        { "line": -1.50, "label": "AH -1.50", "type": "HALF" },
+        { "line": -1.25, "label": "AH -1.25", "type": "QUARTER" },
+        { "line": -1.00, "label": "AH -1.00", "type": "INTEGER" },
+        { "line": -0.75, "label": "AH -0.75", "type": "QUARTER" },
+        { "line": -0.50, "label": "AH -0.50", "type": "HALF" },
+        { "line": -0.25, "label": "AH -0.25", "type": "QUARTER" },
+        { "line": 0.00, "label": "AH 0.00 / DNB", "type": "INTEGER" },
+        { "line": 0.25, "label": "AH +0.25", "type": "QUARTER" },
+        { "line": 0.50, "label": "AH +0.50", "type": "HALF" },
+        { "line": 0.75, "label": "AH +0.75", "type": "QUARTER" },
+        { "line": 1.00, "label": "AH +1.00", "type": "INTEGER" },
+        { "line": 1.25, "label": "AH +1.25", "type": "QUARTER" },
+        { "line": 1.50, "label": "AH +1.50", "type": "HALF" },
+        { "line": 1.75, "label": "AH +1.75", "type": "QUARTER" },
+        { "line": 2.00, "label": "AH +2.00", "type": "INTEGER" }
+      ],
+      "sides": ["home", "away"],
+      "segments": [
+        { "id": "DEEP_FAVORITE", "name": "Deep Favorite", "minLine": -3.0, "maxLine": -1.5 },
+        { "id": "CLEAR_FAVORITE", "name": "Clear Favorite", "minLine": -1.25, "maxLine": -0.75 },
+        { "id": "SLIGHT_FAVORITE", "name": "Slight Favorite", "minLine": -0.5, "maxLine": -0.25 },
+        { "id": "PICKEM", "name": "Pick'em / DNB", "minLine": 0.0, "maxLine": 0.0 },
+        { "id": "SLIGHT_UNDERDOG", "name": "Slight Underdog", "minLine": 0.25, "maxLine": 0.5 },
+        { "id": "CLEAR_UNDERDOG", "name": "Clear Underdog", "minLine": 0.75, "maxLine": 1.25 },
+        { "id": "DEEP_UNDERDOG", "name": "Deep Underdog", "minLine": 1.5, "maxLine": 3.0 }
+      ]
+    },
+    "over_under": {
+      "name": "Over / Under Asian Total",
+      "code": "OU",
+      "lines": [
+        { "line": 0.50, "label": "OU 0.50", "type": "HALF" },
+        { "line": 0.75, "label": "OU 0.75", "type": "QUARTER" },
+        { "line": 1.00, "label": "OU 1.00", "type": "INTEGER" },
+        { "line": 1.25, "label": "OU 1.25", "type": "QUARTER" },
+        { "line": 1.50, "label": "OU 1.50", "type": "HALF" },
+        { "line": 1.75, "label": "OU 1.75", "type": "QUARTER" },
+        { "line": 2.00, "label": "OU 2.00", "type": "INTEGER" },
+        { "line": 2.25, "label": "OU 2.25", "type": "QUARTER" },
+        { "line": 2.50, "label": "OU 2.50", "type": "HALF" },
+        { "line": 2.75, "label": "OU 2.75", "type": "QUARTER" },
+        { "line": 3.00, "label": "OU 3.00", "type": "INTEGER" },
+        { "line": 3.25, "label": "OU 3.25", "type": "QUARTER" },
+        { "line": 3.50, "label": "OU 3.50", "type": "HALF" },
+        { "line": 3.75, "label": "OU 3.75", "type": "QUARTER" },
+        { "line": 4.00, "label": "OU 4.00", "type": "INTEGER" }
+      ],
+      "sides": ["over", "under"]
+    },
+    "btts": {
+      "name": "Both Teams To Score",
+      "code": "BTTS",
+      "sides": ["yes", "no"]
+    }
+  }
+}
