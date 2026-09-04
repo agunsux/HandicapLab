@@ -95,3 +95,8 @@ scratch_*.js
 # NOTE: The two large JSONL files below are explicitly included for prod LOAD by goldLoad endpoint
 !data/golden/europe/canonical_matches.jsonl
 !data/golden/europe/market_odds.jsonl
+
+data/golden/epic65/
+data/cache/
+artifacts/forensic_raw_summary.json
+.cursor/

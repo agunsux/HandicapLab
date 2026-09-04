@@ -59,7 +59,8 @@
     "pipeline": "tsx src/pipeline/cli/run-pipeline.ts",
     "research:epl-ah": "tsx scripts/run-epl-ah-research.ts",
     "verify:oddspapi-production": "node scripts/verify-oddspapi-production.mjs",
-    "verify:providers": "node scripts/canonical_provider_probe.mjs"
+    "verify:providers": "node scripts/canonical_provider_probe.mjs",
+    "backtest:epic65": "tsx scripts/epic65_backtest_runner.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",

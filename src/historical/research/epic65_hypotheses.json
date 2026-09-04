@@ -1,0 +1,75 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.0.0",
+  "epic": 65,
+  "title": "Pre-Locked Hypotheses for Asian Handicap Segment Profitability Audit",
+  "lockedAt": "2026-09-04T16:15:00Z",
+  "author": "HandicapLab Research Core",
+  "antiPHackingGuarantee": "These segments, sample thresholds, and statistical correction rules are locked prior to walk-forward execution. No post-hoc line adjustment or cell boundary modification is permitted.",
+  "segments": [
+    {
+      "id": "DEEP_FAVORITE",
+      "name": "Deep Favorite",
+      "minLine": -10.0,
+      "maxLine": -1.5,
+      "description": "Handicap line <= -1.50 (e.g. -1.50, -1.75, -2.00, etc.)"
+    },
+    {
+      "id": "CLEAR_FAVORITE",
+      "name": "Clear Favorite",
+      "minLine": -1.25,
+      "maxLine": -0.75,
+      "description": "Handicap line from -0.75 to -1.25 (e.g. -0.75, -1.00, -1.25)"
+    },
+    {
+      "id": "SLIGHT_FAVORITE",
+      "name": "Slight Favorite",
+      "minLine": -0.5,
+      "maxLine": -0.25,
+      "description": "Handicap line from -0.25 to -0.50 (e.g. -0.25, -0.50)"
+    },
+    {
+      "id": "PICKEM",
+      "name": "Pick'em / Level Ball",
+      "minLine": 0.0,
+      "maxLine": 0.0,
+      "description": "Handicap line = 0.00"
+    },
+    {
+      "id": "SLIGHT_UNDERDOG",
+      "name": "Slight Underdog",
+      "minLine": 0.25,
+      "maxLine": 0.5,
+      "description": "Handicap line from +0.25 to +0.50 (e.g. +0.25, +0.50)"
+    },
+    {
+      "id": "CLEAR_UNDERDOG",
+      "name": "Clear Underdog",
+      "minLine": 0.75,
+      "maxLine": 1.25,
+      "description": "Handicap line from +0.75 to +1.25 (e.g. +0.75, +1.00, +1.25)"
+    },
+    {
+      "id": "DEEP_UNDERDOG",
+      "name": "Deep Underdog",
+      "minLine": 1.5,
+      "maxLine": 10.0,
+      "description": "Handicap line >= +1.50 (e.g. +1.50, +1.75, +2.00, etc.)"
+    }
+  ],
+  "leagues": [
+    { "code": "ENG-PL", "name": "English Premier League" },
+    { "code": "ESP-LALIGA", "name": "Spanish La Liga" },
+    { "code": "ITA-SERIEA", "name": "Italian Serie A" },
+    { "code": "DEU-BUNDESLIGA", "name": "German Bundesliga" },
+    { "code": "FRA-LIGUE1", "name": "French Ligue 1" }
+  ],
+  "poolingRule": "STRICTLY_DISALLOWED_NEVER_POOL_LEAGUES",
+  "minSampleSize": 30,
+  "confidenceLevel": 0.95,
+  "fdrCorrection": {
+    "method": "Benjamini-Hochberg",
+    "qValue": 0.05
+  },
+  "benchmarkBookmaker": "Pinnacle Closing Line"
+}
