@@ -7,6 +7,7 @@ import {
   TrendingDown, Award, ArrowRight, CheckCircle2, Circle, AlertTriangle, XCircle, ChevronDown,
 } from 'lucide-react';
 import { SearchBar } from '@/components/ui/SearchBar';
+import { HistoricalMarketExplorer } from '@/components/historical/HistoricalMarketExplorer';
 import type { HistoricalStatusPayload, LeagueRow } from '@/lib/historical/historicalResearchService';
 
 type StatusLevel = HistoricalStatusPayload['pipeline'][number]['status'];
@@ -181,6 +182,11 @@ export default function HistoricalResearchDashboard() {
             </div>
           ))}
         </div>
+      </div>
+
+      {/* ── Historical Market Explorer (EPIC-66 Empirical Discovery) ── */}
+      <div>
+        <HistoricalMarketExplorer />
       </div>
 
       {/* ── League coverage table ── */}
