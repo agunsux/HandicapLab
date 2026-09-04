@@ -8,26 +8,6 @@ import {
   MarketType,
 } from '@/types';
 
-import {
-  generateMockMatches,
-  generateMockOdds,
-  generateMockSignals,
-  generateMockPerformance,
-  generateMockMatchStats,
-  generateMockPredictions,
-  generateMockMarketDepth,
-} from './mockEngine';
-
-// Re-export mock functions for components or tests importing directly from api.ts
-export {
-  generateMockMatches,
-  generateMockOdds,
-  generateMockSignals,
-  generateMockPerformance,
-  generateMockMatchStats,
-  generateMockPredictions,
-  generateMockMarketDepth,
-};
 
 // ==========================================
 // 1. API CLIENT DEFINITIONS (5 EXTERNAL PROVIDERS)

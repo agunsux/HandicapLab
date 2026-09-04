@@ -105,14 +105,13 @@ export async function getMarketSignals(
     }
   }
 
-  // 2. Query Live Database (daily_picks) — Strict zero-dummy filter
+  // 2. Query Live Database via Sanctioned View (active_daily_picks)
+  // Structurally excludes any archived, rejected, or past-kickoff records
   try {
     const { data: dbPicks, error } = await supabase
-      .from('daily_picks')
+      .from('active_daily_picks')
       .select('*')
       .eq('market_type', normalizedMarket)
-      .is('rejection_reason', null)
-      .gt('kickoff_utc', nowUtc.toISOString())
       .order('kickoff_utc', { ascending: true })
       .limit(50);
 

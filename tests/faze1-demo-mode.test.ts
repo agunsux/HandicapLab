@@ -6,7 +6,7 @@ import {
   generateMockPerformance,
   generateMockMatchStats,
   generateMockPredictions,
-} from '../src/services/mockEngine';
+} from '../deprecated/mockEngine';
 import { fetchMatches, fetchOdds, fetchSignals } from '../src/services/api';
 import { proxyFetchFixtures, proxyFetchOdds } from '../src/services/proxy';
 

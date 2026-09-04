@@ -9,9 +9,9 @@ export async function GET(req: NextRequest) {
     const leagueParam = searchParams.get('league') || undefined;
     const timestamp = searchParams.get('timestamp') || undefined; // For REPLAY support
 
-    // Base query on the materialized daily_picks view
+    // Base query on the sanctioned active_daily_picks view
     let query = supabase
-      .from('daily_picks')
+      .from('active_daily_picks')
       .select('*')
       .eq('status', 'PENDING');
       

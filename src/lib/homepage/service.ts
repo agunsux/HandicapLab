@@ -90,7 +90,7 @@ export class HomepageService {
       .eq('status', 'upcoming');
 
     const { count: pendingPicks } = await supabase
-      .from('daily_picks')
+      .from('active_daily_picks')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'PENDING');
 

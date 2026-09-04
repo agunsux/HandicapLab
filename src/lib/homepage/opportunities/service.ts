@@ -172,7 +172,7 @@ export class OpportunitiesService {
     let picks: Array<any> = [];
     try {
       const { data: picksData } = await supabase
-        .from('daily_picks')
+        .from('active_daily_picks')
         .select('*')
         .in('fixture_id', fixtureIds)
         .eq('status', 'PENDING');

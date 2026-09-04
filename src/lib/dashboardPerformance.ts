@@ -74,7 +74,7 @@ export async function getDashboardPerformance(): Promise<UserDashboardPerformanc
 
   try {
     const { data: dbSettled, error } = await supabase
-      .from('daily_picks')
+      .from('archived_daily_picks')
       .select('*')
       .in('status', ['WON', 'LOST', 'PUSH'])
       .order('settled_at', { ascending: false })
