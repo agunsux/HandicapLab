@@ -1,0 +1,186 @@
+[
+  {
+    "league": "Brasileirão Série A",
+    "country": "Brazil",
+    "footballData": {
+      "urlChecked": "https://www.football-data.co.uk/new/BRA.csv",
+      "exists": true,
+      "hasPinnacleAhClosing": false,
+      "hasPinnacleOuClosing": false,
+      "columnsFound": [
+        "Country",
+        "League",
+        "Season",
+        "Date",
+        "Time",
+        "Home",
+        "Away",
+        "HG",
+        "AG",
+        "Res",
+        "PSCH",
+        "PSCD",
+        "PSCA",
+        "MaxCH",
+        "MaxCD"
+      ],
+      "notes": "HTTP 200. 25 columns. Has AH: false, Has OU: false"
+    },
+    "apiFootball": {
+      "endpointChecked": "https://v3.football.api-sports.io/fixtures?league=71&season=2024",
+      "fixturesAvailable": true,
+      "hasSharpAhClosing": false,
+      "notes": "Fixtures/scores available (league=71), but API-Football DOES NOT track Pinnacle AH/OU closing odds (retail 1X2 only)."
+    },
+    "oddsPapi": {
+      "endpointChecked": "https://api.oddspapi.io/v4/historical-odds?fixtureId={id}&bookmakers=pinnacle",
+      "twoSeasonClosingOddsExist": false,
+      "notes": "Tournament ID 325 exists, but free plan has 250 req/mo cap and does not provide bulk 2-season historical archives. Historical odds endpoint returns 404 for older seasons."
+    },
+    "verdict": "REJECTED_NO_SHARP_CLOSING_ODDS"
+  },
+  {
+    "league": "Liga MX",
+    "country": "Mexico",
+    "footballData": {
+      "urlChecked": "https://www.football-data.co.uk/new/MEX.csv",
+      "exists": true,
+      "hasPinnacleAhClosing": false,
+      "hasPinnacleOuClosing": false,
+      "columnsFound": [
+        "Country",
+        "League",
+        "Season",
+        "Date",
+        "Time",
+        "Home",
+        "Away",
+        "HG",
+        "AG",
+        "Res",
+        "PSCH",
+        "PSCD",
+        "PSCA",
+        "MaxCH",
+        "MaxCD"
+      ],
+      "notes": "HTTP 200. 25 columns. Has AH: false, Has OU: false"
+    },
+    "apiFootball": {
+      "endpointChecked": "https://v3.football.api-sports.io/fixtures?league=262&season=2024",
+      "fixturesAvailable": true,
+      "hasSharpAhClosing": false,
+      "notes": "Fixtures/scores available (league=262), but API-Football DOES NOT track Pinnacle AH/OU closing odds (retail 1X2 only)."
+    },
+    "oddsPapi": {
+      "endpointChecked": "https://api.oddspapi.io/v4/historical-odds?fixtureId={id}&bookmakers=pinnacle",
+      "twoSeasonClosingOddsExist": false,
+      "notes": "Tournament ID 352 exists, but free plan has 250 req/mo cap and does not provide bulk 2-season historical archives. Historical odds endpoint returns 404 for older seasons."
+    },
+    "verdict": "REJECTED_NO_SHARP_CLOSING_ODDS"
+  },
+  {
+    "league": "Major League Soccer (MLS)",
+    "country": "USA",
+    "footballData": {
+      "urlChecked": "https://www.football-data.co.uk/new/USA.csv",
+      "exists": true,
+      "hasPinnacleAhClosing": false,
+      "hasPinnacleOuClosing": false,
+      "columnsFound": [
+        "Country",
+        "League",
+        "Season",
+        "Date",
+        "Time",
+        "Home",
+        "Away",
+        "HG",
+        "AG",
+        "Res",
+        "PSCH",
+        "PSCD",
+        "PSCA",
+        "MaxCH",
+        "MaxCD"
+      ],
+      "notes": "HTTP 200. 25 columns. Has AH: false, Has OU: false"
+    },
+    "apiFootball": {
+      "endpointChecked": "https://v3.football.api-sports.io/fixtures?league=253&season=2024",
+      "fixturesAvailable": true,
+      "hasSharpAhClosing": false,
+      "notes": "Fixtures/scores available (league=253), but API-Football DOES NOT track Pinnacle AH/OU closing odds (retail 1X2 only)."
+    },
+    "oddsPapi": {
+      "endpointChecked": "https://api.oddspapi.io/v4/historical-odds?fixtureId={id}&bookmakers=pinnacle",
+      "twoSeasonClosingOddsExist": false,
+      "notes": "Tournament ID 242 exists, but free plan has 250 req/mo cap and does not provide bulk 2-season historical archives. Historical odds endpoint returns 404 for older seasons."
+    },
+    "verdict": "REJECTED_NO_SHARP_CLOSING_ODDS"
+  },
+  {
+    "league": "Saudi Pro League",
+    "country": "Saudi Arabia",
+    "footballData": {
+      "urlChecked": "https://www.football-data.co.uk/new/SAU.csv",
+      "exists": false,
+      "hasPinnacleAhClosing": false,
+      "hasPinnacleOuClosing": false,
+      "columnsFound": [],
+      "notes": "HTTP 404: File not found at https://www.football-data.co.uk/new/SAU.csv"
+    },
+    "apiFootball": {
+      "endpointChecked": "https://v3.football.api-sports.io/fixtures?league=307&season=2024",
+      "fixturesAvailable": true,
+      "hasSharpAhClosing": false,
+      "notes": "Fixtures/scores available (league=307), but API-Football DOES NOT track Pinnacle AH/OU closing odds (retail 1X2 only)."
+    },
+    "oddsPapi": {
+      "endpointChecked": "N/A",
+      "twoSeasonClosingOddsExist": false,
+      "notes": "No tournament mapped. No historical closing line archive available."
+    },
+    "verdict": "REJECTED_NO_SHARP_CLOSING_ODDS"
+  },
+  {
+    "league": "Argentina Liga Profesional",
+    "country": "Argentina",
+    "footballData": {
+      "urlChecked": "https://www.football-data.co.uk/new/ARG.csv",
+      "exists": true,
+      "hasPinnacleAhClosing": false,
+      "hasPinnacleOuClosing": false,
+      "columnsFound": [
+        "Country",
+        "League",
+        "Season",
+        "Date",
+        "Time",
+        "Home",
+        "Away",
+        "HG",
+        "AG",
+        "Res",
+        "PSCH",
+        "PSCD",
+        "PSCA",
+        "MaxCH",
+        "MaxCD"
+      ],
+      "notes": "HTTP 200. 25 columns. Has AH: false, Has OU: false"
+    },
+    "apiFootball": {
+      "endpointChecked": "https://v3.football.api-sports.io/fixtures?league=128&season=2024",
+      "fixturesAvailable": true,
+      "hasSharpAhClosing": false,
+      "notes": "Fixtures/scores available (league=128), but API-Football DOES NOT track Pinnacle AH/OU closing odds (retail 1X2 only)."
+    },
+    "oddsPapi": {
+      "endpointChecked": "https://api.oddspapi.io/v4/historical-odds?fixtureId={id}&bookmakers=pinnacle",
+      "twoSeasonClosingOddsExist": false,
+      "notes": "Tournament ID 323 exists, but free plan has 250 req/mo cap and does not provide bulk 2-season historical archives. Historical odds endpoint returns 404 for older seasons."
+    },
+    "verdict": "REJECTED_NO_SHARP_CLOSING_ODDS"
+  }
+]

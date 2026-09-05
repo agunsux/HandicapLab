@@ -1,6 +1,6 @@
 # EPIC 65: Comprehensive Model Validation & Segment Profitability Report
 
-**Execution Timestamp**: `2026-09-04T16:14:56.972Z`  
+**Execution Timestamp**: `2026-09-05T11:06:08.452Z`  
 **Target Scope**: 2 Completed Seasons (`2024-2025` & `2025-2026`) across Top 5 European Leagues  
 **Ground Truth Benchmark**: Pinnacle Closing Odds (`100% Verified`)  
 **Anti-p-Hacking Status**: **Pre-Locked Hypotheses Enforced** (Benjamini-Hochberg FDR $q = 0.05$, $N \ge 30$)  
