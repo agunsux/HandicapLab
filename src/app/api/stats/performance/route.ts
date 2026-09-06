@@ -9,12 +9,24 @@ export async function GET(request?: Request) {
       marketParam = searchParams.get('market');
     }
 
-    // 1. Fetch all settled signals from the database
-    const { data: signals, error } = await supabase
+    // 1. Fetch all settled signals from the database with resilient fallback
+    let { data: signals, error } = await supabase
       .from('signals')
       .select('*, signal_metrics(*)')
       .not('settled_at', 'is', null)
       .order('settled_at', { ascending: false });
+
+    if (error && error.message?.includes('signal_metrics')) {
+      const fb = await supabase
+        .from('signals')
+        .select('*')
+        .not('settled_at', 'is', null)
+        .order('settled_at', { ascending: false });
+      if (!fb.error) {
+        signals = fb.data || [];
+        error = null;
+      }
+    }
 
     if (error) {
       console.error('[Performance API] Error querying signals:', error);

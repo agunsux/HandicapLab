@@ -32,7 +32,7 @@ export async function GET(request: Request) {
       dbMarketCategory = 'btts';
     }
 
-    // Query signals
+    // Query signals with resilient schema fallback
     let query = supabase
       .from('signals')
       .select('*, signal_metrics(*)');
@@ -47,7 +47,49 @@ export async function GET(request: Request) {
       query = query.in('status', ['OPEN', 'LOCKED', 'pending', 'ACTIVE', 'LIVE', 'STALE']);
     }
 
-    const { data: signals, error } = await query;
+    let { data: signals, error } = await query;
+
+    if (error && error.message?.includes('signal_metrics')) {
+      let fallbackQuery = supabase
+        .from('signals')
+        .select('*');
+
+      if (dbMarketCategory) {
+        fallbackQuery = fallbackQuery.eq('market_category', dbMarketCategory);
+      }
+
+      if (statusParam === 'SETTLED') {
+        fallbackQuery = fallbackQuery.not('status', 'in', '("OPEN", "LOCKED", "DRAFT", "pending", "settling", "LIVE")');
+      } else {
+        fallbackQuery = fallbackQuery.in('status', ['OPEN', 'LOCKED', 'pending', 'ACTIVE', 'LIVE', 'STALE']);
+      }
+
+      const fbRes = await fallbackQuery;
+      if (!fbRes.error) {
+        signals = fbRes.data || [];
+        error = null;
+        if (signals.length > 0) {
+          try {
+            const sigIds = signals.map((s: any) => s.id);
+            const { data: metrics } = await supabase
+              .from('signal_metrics')
+              .select('*')
+              .in('signal_id', sigIds);
+            if (metrics && metrics.length > 0) {
+              const metricsMap = new Map<string, any>();
+              metrics.forEach((m: any) => metricsMap.set(m.signal_id, m));
+              signals.forEach((s: any) => {
+                if (metricsMap.has(s.id)) {
+                  s.signal_metrics = [metricsMap.get(s.id)];
+                }
+              });
+            }
+          } catch {
+            // Metrics join is optional
+          }
+        }
+      }
+    }
 
     if (error) {
       console.error('[Feed API] Database error:', error);
