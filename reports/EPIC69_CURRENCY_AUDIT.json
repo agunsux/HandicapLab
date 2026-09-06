@@ -1,0 +1,982 @@
+[
+  {
+    "file": "src/app/(marketing)/_components/Pricing.tsx",
+    "line": 11,
+    "content": "price: '$0',",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/app/(marketing)/_components/Pricing.tsx",
+    "line": 25,
+    "content": "price: '$9',",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/app/(marketing)/_components/Pricing.tsx",
+    "line": 39,
+    "content": "price: '$29',",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/app/(marketing)/_components/Pricing.tsx",
+    "line": 54,
+    "content": "price: '$99',",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/app/(marketing)/_components/Pricing.tsx",
+    "line": 69,
+    "content": "price: '$199',",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/app/api/checkout/route.ts",
+    "line": 63,
+    "content": "// Strip dollar signs to get numeric value",
+    "category": "DOLLAR_WORD",
+    "requiredChange": "Replace with Units if performance related"
+  },
+  {
+    "file": "src/app/api/checkout/route.ts",
+    "line": 75,
+    "content": "currency: 'USD',",
+    "category": "USD_MENTION",
+    "requiredChange": "Replace with Units if performance related"
+  },
+  {
+    "file": "src/app/api/cron/biweekly-model-report/route.ts",
+    "line": 133,
+    "content": "reportText += `Period: <b>${periodStr}</b>\\n`;",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/app/api/cron/daily-digest/route.ts",
+    "line": 48,
+    "content": "<strong>${s.home_team} vs ${s.away_team}</strong> (${s.league})<br/>",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/app/api/cron/daily-digest/route.ts",
+    "line": 60,
+    "content": "<p>HandicapLab quantitative models identified <strong>${signals?.length || 0}</strong> positive EV market edges today.</p>",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/app/api/cron/daily-summary/route.ts",
+    "line": 155,
+    "content": "$${bankroll.toFixed(2)}",
+    "category": "CURRENCY_FORMATTING_TEMPLATE",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/app/app/profile/page.tsx",
+    "line": 120,
+    "content": "? 'Pro Plan ($29/mo)'",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/app/app/profile/page.tsx",
+    "line": 122,
+    "content": "? 'Quant Plan ($99/mo)'",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/app/page.tsx",
+    "line": 128,
+    "content": "We compare market prices against historical distributions and bivariate Poisson models, validating statistically whether an asymmetry exists ($p &lt; 0.05$).",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/app/pricing/PricingCards.tsx",
+    "line": 193,
+    "content": "<div className=\"text-2xl font-mono font-bold text-[#F0FDF4] mb-2\">${pack.price}</div>",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/app/track-record/page.tsx",
+    "line": 195,
+    "content": "title={`${pt.date}: ${pt.match} -> ${pt.profit}u`}",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/components/ui/PaywallBlurOverlay.tsx",
+    "line": 18,
+    "content": "ctaText = 'Upgrade to Pro — $29/mo',",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/components/UpsellModal.tsx",
+    "line": 118,
+    "content": "<span className=\"text-lg font-mono font-bold text-teal-400\">{lifetimePriceDisplay} USD</span>",
+    "category": "USD_MENTION",
+    "requiredChange": "Replace with Units if performance related"
+  },
+  {
+    "file": "src/components/UpsellModal.tsx",
+    "line": 138,
+    "content": "<span className=\"text-lg font-mono font-bold text-emerald-400\">{tierConfig.creditsPrice} USD</span>",
+    "category": "USD_MENTION",
+    "requiredChange": "Replace with Units if performance related"
+  },
+  {
+    "file": "src/components/UserSessionPanel.tsx",
+    "line": 64,
+    "content": "<option value=\"FREE\">Free Sandbox ($0)</option>",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/components/UserSessionPanel.tsx",
+    "line": 65,
+    "content": "<option value=\"STARTER\">Starter ($9/mo)</option>",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/components/UserSessionPanel.tsx",
+    "line": 66,
+    "content": "<option value=\"PRO\">Pro ($29/mo)</option>",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/components/UserSessionPanel.tsx",
+    "line": 67,
+    "content": "<option value=\"QUANT\">Quant ($99/mo)</option>",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/components/UserSessionPanel.tsx",
+    "line": 68,
+    "content": "<option value=\"LIFETIME\">Founder Lifetime ($199)</option>",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/crons/closingOddsCapture.ts",
+    "line": 234,
+    "content": "? `AND m.league = ANY($1)`",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/crons/closingOddsCapture.ts",
+    "line": 245,
+    "content": "AND m.kickoff <= NOW() + INTERVAL '1 hour' * $${params.length}",
+    "category": "CURRENCY_FORMATTING_TEMPLATE",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/crons/closingOddsCapture.ts",
+    "line": 266,
+    "content": "AND m.kickoff <= NOW() + INTERVAL '1 hour' * $1",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/historical/europe/run.ts",
+    "line": 42,
+    "content": "console.log(`ML coverage: ${l.coverage.ml} (${l.mlPct}%) -> ${l.readiness.ml}`);",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/historical/europe/run.ts",
+    "line": 43,
+    "content": "console.log(`AH coverage: ${l.coverage.ah} (${l.ahPct}%) -> ${l.readiness.ah}`);",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/historical/europe/run.ts",
+    "line": 44,
+    "content": "console.log(`OU coverage: ${l.coverage.ou} (${l.ouPct}%) -> ${l.readiness.ou}`);",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/historical/europe/run.ts",
+    "line": 45,
+    "content": "console.log(`BTTS:        ${l.coverage.btts} (${l.bttsPct}%) -> ${l.readiness.btts}`);",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/lib/closing-odds/CaptureEngine.ts",
+    "line": 339,
+    "content": "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW(), $11, $12, $13)",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/lib/closing-odds/CaptureEngine.ts",
+    "line": 371,
+    "content": "WHERE match_id = $1 AND market_type = $2 AND capture_phase = 'opening'",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/lib/closing-odds/CaptureEngine.ts",
+    "line": 393,
+    "content": "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW(), $11, $12, $13, $14, $15, $16, $17)",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/lib/closing-odds/CaptureEngine.ts",
+    "line": 436,
+    "content": "VALUES ($1, $2, $3, $4, $5, NOW(), $6, 'running', $7, 0, 0)`,",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/lib/closing-odds/CaptureEngine.ts",
+    "line": 474,
+    "content": "completed_at = $1,",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/lib/closing-odds/CaptureEngine.ts",
+    "line": 475,
+    "content": "duration_ms = $2,",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/lib/closing-odds/CaptureEngine.ts",
+    "line": 476,
+    "content": "status = $3,",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/lib/closing-odds/CaptureEngine.ts",
+    "line": 477,
+    "content": "successful_captures = $4,",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/lib/closing-odds/CaptureEngine.ts",
+    "line": 478,
+    "content": "failed_captures = $5,",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/lib/closing-odds/CaptureEngine.ts",
+    "line": 479,
+    "content": "coverage_pct = $6",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/lib/closing-odds/CaptureEngine.ts",
+    "line": 480,
+    "content": "WHERE id = $7`,",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/lib/closing-odds/CaptureEngine.ts",
+    "line": 507,
+    "content": "WHERE p.match_id = $1`,",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/lib/closing-odds/CaptureEngine.ts",
+    "line": 516,
+    "content": "WHERE co.match_id = $1 AND co.market_type = 'moneyline'",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/lib/closing-odds/CaptureEngine.ts",
+    "line": 538,
+    "content": "VALUES ($1, $2, 'moneyline', $3, $4, $5, $6, $7, $8, $9, $10, $11)",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/lib/db/migrate.ts",
+    "line": 69,
+    "content": "`INSERT INTO ${MIGRATIONS_TABLE} (name, hash) VALUES ($1, $2)`,",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/lib/db/migrate.ts",
+    "line": 79,
+    "content": "await tx(`DELETE FROM ${MIGRATIONS_TABLE} WHERE name = $1`, [file]);",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/lib/domain/shared/Money.ts",
+    "line": 26,
+    "content": "static create(amount: number, currency: string = 'USD'): Money {",
+    "category": "USD_MENTION",
+    "requiredChange": "Replace with Units if performance related"
+  },
+  {
+    "file": "src/lib/domain/shared/Money.ts",
+    "line": 30,
+    "content": "static zero(currency: string = 'USD'): Money {",
+    "category": "USD_MENTION",
+    "requiredChange": "Replace with Units if performance related"
+  },
+  {
+    "file": "src/lib/domain/__tests__/policies.test.ts",
+    "line": 13,
+    "content": "const frozen = Money.create(100, 'USD');",
+    "category": "USD_MENTION",
+    "requiredChange": "Replace with Units if performance related"
+  },
+  {
+    "file": "src/lib/domain/__tests__/shared.test.ts",
+    "line": 14,
+    "content": "const m100 = Money.create(100, 'USD'), m50 = Money.create(50, 'USD');",
+    "category": "USD_MENTION",
+    "requiredChange": "Replace with Units if performance related"
+  },
+  {
+    "file": "src/lib/domain/__tests__/shared.test.ts",
+    "line": 21,
+    "content": "assert(m100.equals(Money.create(100, 'USD')), 'Money.equals');",
+    "category": "USD_MENTION",
+    "requiredChange": "Replace with Units if performance related"
+  },
+  {
+    "file": "src/lib/feature-intelligence/governanceEngine.ts",
+    "line": 29,
+    "content": "const updated: GovernanceRecord = { ...existing, approvalStatus: status, validationHistory: [...existing.validationHistory, `status->${status}`] };",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/lib/feature-platform/docGenerator.ts",
+    "line": 27,
+    "content": "markdown += `> ${feat.description}\\n\\n`;",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/lib/monetization/gating.ts",
+    "line": 11,
+    "content": "TIER_1: { tierName: 'Standard Tier (US/EU)', lifetimePrice: '$99', founderPrice: '$79', creditsPrice: '$3.00' },",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/lib/monetization/gating.ts",
+    "line": 12,
+    "content": "TIER_2: { tierName: 'Tier 2 (ES/PL)', lifetimePrice: '$59', founderPrice: '$49', creditsPrice: '$2.00' },",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/lib/monetization/gating.ts",
+    "line": 13,
+    "content": "TIER_3: { tierName: 'Tier 3 (BR/MX)', lifetimePrice: '$29', founderPrice: '$19', creditsPrice: '$1.00' },",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/lib/monetization/gating.ts",
+    "line": 14,
+    "content": "TIER_4: { tierName: 'Tier 4 (ID/IN)', lifetimePrice: '$19', founderPrice: '$9', creditsPrice: '$0.50' }",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/lib/payments/stripe/handler.ts",
+    "line": 24,
+    "content": "const currency = (sessionObj.currency || 'usd').toUpperCase();",
+    "category": "USD_MENTION",
+    "requiredChange": "Replace with Units if performance related"
+  },
+  {
+    "file": "src/lib/pipeline/engine/index.ts",
+    "line": 709,
+    "content": "WHERE id = $1`,",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/lib/pipeline/engine/index.ts",
+    "line": 765,
+    "content": "WHERE fixture_id = $1",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/lib/pipeline/engine/index.ts",
+    "line": 895,
+    "content": "const featResult = await query('SELECT id FROM matches WHERE id = $1', [fixtureId]);",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/lib/pipeline/engine/index.ts",
+    "line": 900,
+    "content": "const predResult = await query('SELECT id FROM predictions WHERE match_id = $1 LIMIT 1', [fixtureId]);",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/lib/pipeline/engine/index.ts",
+    "line": 905,
+    "content": "const mvResult = await query('SELECT model_version FROM predictions WHERE match_id = $1 AND model_version IS NOT NULL LIMIT 1', [fixtureId]);",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/lib/pipeline/engine/index.ts",
+    "line": 912,
+    "content": "\"SELECT id FROM market_movements WHERE match_id = $1 AND capture_phase = 'opening' LIMIT 1\",",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/lib/pipeline/engine/index.ts",
+    "line": 920,
+    "content": "'SELECT id FROM closing_odds WHERE match_id = $1 LIMIT 1',",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/lib/pipeline/engine/index.ts",
+    "line": 928,
+    "content": "\"SELECT id FROM market_movements WHERE match_id = $1 AND capture_phase = 'opening' LIMIT 1\",",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/lib/pipeline/engine/index.ts",
+    "line": 936,
+    "content": "'SELECT id FROM matches WHERE id = $1 AND home_goals IS NOT NULL',",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/lib/pipeline/engine/index.ts",
+    "line": 944,
+    "content": "'SELECT id FROM prediction_results WHERE match_id = $1 LIMIT 1',",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/lib/pipeline/engine/index.ts",
+    "line": 953,
+    "content": "'SELECT id FROM closing_odds WHERE match_id = $1 LIMIT 1',",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/lib/pipeline/engine/index.ts",
+    "line": 961,
+    "content": "'SELECT id FROM clv_results WHERE match_id = $1 LIMIT 1',",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/lib/pipeline/engine/index.ts",
+    "line": 969,
+    "content": "'SELECT id FROM prediction_results WHERE match_id = $1 LIMIT 1',",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/lib/pipeline/engine/index.ts",
+    "line": 977,
+    "content": "'SELECT id FROM evidence_ledger WHERE fixture_id = $1 AND chain_hash IS NOT NULL LIMIT 1',",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/lib/pipeline/engine/index.ts",
+    "line": 1010,
+    "content": "VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/lib/pipeline/engine/index.ts",
+    "line": 1046,
+    "content": "pipeline_state = $1,",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/lib/pipeline/engine/index.ts",
+    "line": 1047,
+    "content": "pipeline_version = $2,",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/lib/pipeline/engine/index.ts",
+    "line": 1048,
+    "content": "pipeline_last_event = $3,",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/lib/pipeline/engine/index.ts",
+    "line": 1049,
+    "content": "pipeline_transition_reason = $4,",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/lib/pipeline/engine/index.ts",
+    "line": 1050,
+    "content": "pipeline_previous_state = $5,",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/lib/pipeline/engine/index.ts",
+    "line": 1051,
+    "content": "pipeline_mode = $6,",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/lib/pipeline/engine/index.ts",
+    "line": 1053,
+    "content": "WHERE id = $7`,",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/lib/pricing/ppp.ts",
+    "line": 9,
+    "content": "* - English/USD is the baseline.",
+    "category": "USD_MENTION",
+    "requiredChange": "Replace with Units if performance related"
+  },
+  {
+    "file": "src/lib/pricing/ppp.ts",
+    "line": 19,
+    "content": "/** PPP conversion factor relative to USD (1.0 = US baseline) */",
+    "category": "USD_MENTION",
+    "requiredChange": "Replace with Units if performance related"
+  },
+  {
+    "file": "src/lib/pricing/ppp.ts",
+    "line": 26,
+    "content": "* World Bank PPP conversion factors (relative to USD, 1.0 = US).",
+    "category": "USD_MENTION",
+    "requiredChange": "Replace with Units if performance related"
+  },
+  {
+    "file": "src/lib/pricing/ppp.ts",
+    "line": 88,
+    "content": "* Compute the PPP-adjusted price for a USD base price.",
+    "category": "USD_MENTION",
+    "requiredChange": "Replace with Units if performance related"
+  },
+  {
+    "file": "src/lib/pricing/ppp.ts",
+    "line": 148,
+    "content": "export function formatPrice(amount: number, currency = 'USD'): string {",
+    "category": "USD_MENTION",
+    "requiredChange": "Replace with Units if performance related"
+  },
+  {
+    "file": "src/lib/reports/generator.ts",
+    "line": 66,
+    "content": ".map(([k, v]) => `<tr><td>${k}</td><td>${typeof v === 'number' ? v.toFixed(4) : v}</td></tr>`).join('\\n') : '';",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/lib/reports/generator.ts",
+    "line": 70,
+    "content": "<head><meta charset=\"UTF-8\"><title>${title}</title>",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/lib/reports/generator.ts",
+    "line": 84,
+    "content": "<h1>${title}</h1>",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/lib/reports/generator.ts",
+    "line": 86,
+    "content": "${'metrics' in data ? `<h2>Performance Metrics</h2><table><thead><tr><th>Metric</th><th>Value</th></tr></thead><tbody>${rows}</tbody></table>` : ''}",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/lib/reports/generator.ts",
+    "line": 90,
+    "content": "${data.models.map((m: any) => `<tr><td>${m.name}</td><td>${(m.roi * 100).toFixed(2)}%</td><td>${(m.accuracy * 100).toFixed(2)}%</td><td>${m.logLoss.toFixed(4)}</td><td>${m.brierScore.toFixed(4)}</td><td>${(m.ece * 100).toFixed(2)}%</td></tr>`).join('')}",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/lib/reports/generator.ts",
+    "line": 95,
+    "content": "${data.buckets.map((b: any) => `<tr><td>${b.range}</td><td>${(b.expected * 100).toFixed(1)}%</td><td>${(b.actual * 100).toFixed(1)}%</td><td>${b.count}</td></tr>`).join('')}",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/lib/reports/generator.ts",
+    "line": 98,
+    "content": "${'passed' in data ? `<h2>Verdict</h2><p class=\"${data.passed ? 'pass' : 'fail'}\">${data.passed ? 'PASSED' : 'FAILED'}</p>` : ''}",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/lib/research/ah-solo/ahReportGenerator.ts",
+    "line": 66,
+    "content": "- **Date Range**: ${inventory.dateRange.earliest} -> ${inventory.dateRange.latest}",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/lib/research/ah-solo/ahReportGenerator.ts",
+    "line": 208,
+    "content": "`| **Fold ${f.foldIndex}** | ${f.trainStart} -> ${f.trainEnd} (${f.trainSeasons.join(', ')}) | ${f.valStart} -> ${f.valEnd} (${f.valSeason}) | ${f.trainMatchesCount} | ${f.valMatchesCount} | ${f.valAhObservationsCount} |`",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/lib/research/ah-solo/ahReportGenerator.ts",
+    "line": 403,
+    "content": "- **${inventory.dateRange.earliest} -> ${inventory.dateRange.latest}** (11 seasons).",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/lib/settlement-core/db.ts",
+    "line": 42,
+    "content": "VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`,",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/lib/settlement-core/db.ts",
+    "line": 65,
+    "content": "VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`,",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/lib/settlement-core/db.ts",
+    "line": 90,
+    "content": "VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)`,",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/scripts/audit-prod.ts",
+    "line": 36,
+    "content": "ars?.forEach((f: any) => console.log(`  -> ${f.id} | ${f.home_team} vs ${f.away_team} | kickoff: ${f.kickoff}`));",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/scripts/audit-prod.ts",
+    "line": 43,
+    "content": "ars?.forEach((f: any) => console.log(`  -> ${f.id} | ${f.home_team} vs ${f.away_team} | kickoff: ${f.kickoff_time} | provider: ${f.provider_id || f.source || 'N/A'} | created: ${f.created_at}`));",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/scripts/check_mock_html.ts",
+    "line": 18,
+    "content": "found.push(`${full} -> ${p}`);",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/scripts/controlled_single_fixture_probe.ts",
+    "line": 197,
+    "content": "console.log(`Market & Selection:   ${predRow.market_type} -> ${predRow.selection}`);",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/scripts/migrate-ledger-v39.ts",
+    "line": 65,
+    "content": "'SELECT checksum FROM public.schema_migrations_meta WHERE migration_name = $1',",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/scripts/migrate-ledger-v39.ts",
+    "line": 94,
+    "content": "VALUES ($1, $2, '2.0.0')`,",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/scripts/r2-benchmark-suite.ts",
+    "line": 124,
+    "content": "// Simple value betting strategy (Flat $100)",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/scripts/run-sprint2-research.ts",
+    "line": 570,
+    "content": "<td>${ensembleLoss.toFixed(4)}</td>",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/scripts/run-sprint2-research.ts",
+    "line": 571,
+    "content": "<td>${ensembleBrier.toFixed(4)}</td>",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/scripts/run-sprint2-research.ts",
+    "line": 572,
+    "content": "<td>${ensembleEce.toFixed(4)}</td>",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/scripts/run-sprint2-research.ts",
+    "line": 576,
+    "content": "<td>${gbtLoss.toFixed(4)}</td>",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/scripts/run-sprint2-research.ts",
+    "line": 577,
+    "content": "<td>${gbtBrier.toFixed(4)}</td>",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/scripts/run-sprint2-research.ts",
+    "line": 578,
+    "content": "<td>${gbtEce.toFixed(4)}</td>",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/scripts/run-sprint3-research.ts",
+    "line": 205,
+    "content": "*   Matches are sorted strictly by date: $T_{match_i} \\le T_{match_{i+1}}$.",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/scripts/run-sprint3-research.ts",
+    "line": 244,
+    "content": "| **API-Football** | 98% | 350ms | 97.5% | Low ($39/mo) | **Excellent** |",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/scripts/run-sprint3-research.ts",
+    "line": 245,
+    "content": "| **Pinnacle XML Feed** | 100% | 50ms | 99.8% | Medium ($100/mo) | **Excellent** |",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/scripts/run-sprint3-research.ts",
+    "line": 247,
+    "content": "| **OpenWeatherMap** | 99% | 800ms | 99.0% | Low ($0/mo tier) | **Moderate** |",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/scripts/run-sprint3-research.ts",
+    "line": 256,
+    "content": "*   **Premium ($29/mo)**:",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/scripts/run-sprint3-research.ts",
+    "line": 260,
+    "content": "*   **Enterprise ($99/mo)**:",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/scripts/stabilityTest.ts",
+    "line": 182,
+    "content": "- Strong Weights in 3+ states: ${strongWeightsSeeds}/${totalSeeds} seeds (Required: >= 8) -> ${criteria1 ? 'PASS' : 'FAIL'}",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/scripts/stabilityTest.ts",
+    "line": 183,
+    "content": "- Pressure Pattern (strengthens as goals increase): ${pressurePatternSeeds}/${totalSeeds} seeds (Required: >= 8) -> ${criteria2 ? 'PASS' : 'FAIL'}",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/scripts/stabilityTest.ts",
+    "line": 184,
+    "content": "- Conditional ECE < 5%: ${eceSeeds}/${totalSeeds} seeds (Required: >= 8) -> ${criteria3 ? 'PASS' : 'FAIL'}",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/scripts/stabilityTest.ts",
+    "line": 185,
+    "content": "- Brier Improvement > 0.01: ${brierSeeds}/${totalSeeds} seeds (Required: >= 8) -> ${criteria4 ? 'PASS' : 'FAIL'}",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/scripts/stabilityTest.ts",
+    "line": 186,
+    "content": "- Fallback Frequency < 10%: ${fallbackSeeds}/${totalSeeds} seeds (Required: 10/10) -> ${criteria5 ? 'PASS' : 'FAIL'}",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/scripts/validate-prediction-engine.ts",
+    "line": 637,
+    "content": "<td>${m.id}</td>",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/scripts/validate-prediction-engine.ts",
+    "line": 638,
+    "content": "<td>${m.name}</td>",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/scripts/validate-prediction-engine.ts",
+    "line": 639,
+    "content": "<td>${m.brier.toFixed(4)}</td>",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/scripts/validate-prediction-engine.ts",
+    "line": 640,
+    "content": "<td>${m.logLoss.toFixed(4)}</td>",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/scripts/validate-prediction-engine.ts",
+    "line": 641,
+    "content": "<td>${m.ece.toFixed(4)}</td>",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/scripts/validate-prediction-engine.ts",
+    "line": 642,
+    "content": "<td>${(m.roi * 100).toFixed(2)}%</td>",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/scripts/validate-prediction-engine.ts",
+    "line": 643,
+    "content": "<td>${(m.maxDrawdown * 100).toFixed(1)}%</td>",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/scripts/validate-prediction-engine.ts",
+    "line": 644,
+    "content": "<td>${m.sharpe.toFixed(2)}</td>",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  },
+  {
+    "file": "src/scripts/verify-immutability.ts",
+    "line": 35,
+    "content": "$1, $1, 'test-match-immutability', 'test_immutability_hash', 'verify-immutability-script'",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/scripts/verify-immutability.ts",
+    "line": 46,
+    "content": "WHERE id = $1;",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/scripts/verify-ledger.ts",
+    "line": 51,
+    "content": "WHERE schemaname = 'public' AND tablename = ANY($1)",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/scripts/verify-ledger.ts",
+    "line": 81,
+    "content": "WHERE schemaname = 'public' AND indexname = ANY($1)",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/scripts/verify-ledger.ts",
+    "line": 108,
+    "content": "AND t.tgname = ANY($1)",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/scripts/verify-ledger.ts",
+    "line": 159,
+    "content": "WHERE schemaname = 'public' AND matviewname = ANY($1)",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/scripts/verify-ledger.ts",
+    "line": 213,
+    "content": "$1, $1, 'test-match-id', NOW(), NOW(), 'test_hash_val', 'verification_script'",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/scripts/verify-ledger.ts",
+    "line": 224,
+    "content": "WHERE id = $1",
+    "category": "LITERAL_DOLLAR",
+    "requiredChange": "Inspect context"
+  },
+  {
+    "file": "src/scripts/verify-stage-consistency.ts",
+    "line": 90,
+    "content": "console.log(`${orig} -> ${info.expected}\\tcount: ${info.count}`);",
+    "category": "JSX_CURRENCY_SYMBOL",
+    "requiredChange": "Replace `$` with Units `u`"
+  }
+]

@@ -85,7 +85,7 @@ export default async function PublicLedgerPage() {
             <div className="bg-card border border-border rounded-xl p-6 text-center space-y-2">
               <div className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Cumulative P&L</div>
               <div className={`text-4xl font-bold ${cumulativePnL >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                {cumulativePnL >= 0 ? '+' : '-'}${Math.abs(cumulativePnL).toFixed(2)}
+                {cumulativePnL >= 0 ? '+' : '-'}{Math.abs(cumulativePnL).toFixed(2)} u
               </div>
             </div>
           </div>

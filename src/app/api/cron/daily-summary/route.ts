@@ -152,7 +152,7 @@ ROI: ${roi.toFixed(2)}%
 CLV: ${clv.toFixed(2)}%
 
 Bankroll [PAPER]:
-$${bankroll.toFixed(2)}
+${bankroll.toFixed(2)} u
 
 Drawdown:
 ${drawdown.toFixed(2)}%
