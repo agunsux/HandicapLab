@@ -9,22 +9,39 @@ export async function GET(request?: Request) {
       marketParam = searchParams.get('market');
     }
 
-    // 1. Fetch all settled signals from the database with resilient fallback
-    let { data: signals, error } = await supabase
+    // 1. Fetch all settled signals from the database
+    const { data: rawSignals, error } = await supabase
       .from('signals')
-      .select('*, signal_metrics(*)')
+      .select('*')
       .not('settled_at', 'is', null)
       .order('settled_at', { ascending: false });
 
-    if (error && error.message?.includes('signal_metrics')) {
-      const fb = await supabase
-        .from('signals')
-        .select('*')
-        .not('settled_at', 'is', null)
-        .order('settled_at', { ascending: false });
-      if (!fb.error) {
-        signals = fb.data || [];
-        error = null;
+    if (error) {
+      console.error('[Performance API] Error querying signals:', error);
+      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    }
+
+    let signals = rawSignals || [];
+
+    // Optionally batch attach signal_metrics
+    if (signals.length > 0) {
+      try {
+        const sigIds = signals.map((s: any) => s.id);
+        const { data: metrics } = await supabase
+          .from('signal_metrics')
+          .select('*')
+          .in('signal_id', sigIds);
+        if (metrics && metrics.length > 0) {
+          const metricsMap = new Map<string, any>();
+          metrics.forEach((m: any) => metricsMap.set(m.signal_id, m));
+          signals.forEach((s: any) => {
+            if (metricsMap.has(s.id)) {
+              s.signal_metrics = [metricsMap.get(s.id)];
+            }
+          });
+        }
+      } catch {
+        // Optional
       }
     }
 

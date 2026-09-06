@@ -19,38 +19,12 @@ export async function GET(
     // Determine user access policy
     const { isPremium } = await determineUserAccess(userId);
 
-    // Fetch signal from database with resilient fallback
-    let { data: signal, error } = await supabase
+    // Fetch signal from database
+    const { data: signal, error } = await supabase
       .from('signals')
-      .select('*, signal_metrics(*)')
+      .select('*')
       .eq('id', id)
       .maybeSingle();
-
-    if (error && error.message?.includes('signal_metrics')) {
-      const fb = await supabase
-        .from('signals')
-        .select('*')
-        .eq('id', id)
-        .maybeSingle();
-      if (!fb.error) {
-        signal = fb.data;
-        error = null;
-        if (signal) {
-          try {
-            const { data: metrics } = await supabase
-              .from('signal_metrics')
-              .select('*')
-              .eq('signal_id', id)
-              .maybeSingle();
-            if (metrics) {
-              signal.signal_metrics = [metrics];
-            }
-          } catch {
-            // Optional
-          }
-        }
-      }
-    }
 
     if (error) {
       console.error(`[Detail API] Database error for signal ${id}:`, error);
@@ -59,6 +33,19 @@ export async function GET(
 
     if (!signal) {
       return NextResponse.json({ success: false, error: 'Signal not found' }, { status: 404 });
+    }
+
+    try {
+      const { data: metrics } = await supabase
+        .from('signal_metrics')
+        .select('*')
+        .eq('signal_id', id)
+        .maybeSingle();
+      if (metrics) {
+        signal.signal_metrics = [metrics];
+      }
+    } catch {
+      // Metrics are optional
     }
 
     // Fetch non-sensitive audit events to display in the lifecycle visual timeline
