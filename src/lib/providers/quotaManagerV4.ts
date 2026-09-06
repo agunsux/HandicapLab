@@ -15,6 +15,13 @@ export const API_COST_REGISTRY: EndpointCost[] = [
   { provider: 'apifootball', endpoint: 'fixtures', cost: 1 },
   { provider: 'apifootball', endpoint: 'fixtures/historical', cost: 1 },
   { provider: 'apifootball', endpoint: 'fixtures/postmatch', cost: 1 },
+  { provider: 'apifootball', endpoint: 'fixtures/statistics', cost: 1 },
+  { provider: 'apifootball', endpoint: 'teams/statistics', cost: 1 },
+  { provider: 'apifootball', endpoint: 'odds', cost: 1 },
+  { provider: 'apifootball', endpoint: 'odds/bookmakers', cost: 1 },
+  { provider: 'apifootball', endpoint: 'odds/bets', cost: 1 },
+  { provider: 'apifootball', endpoint: 'odds/live', cost: 1 },
+  { provider: 'apifootball', endpoint: 'standings', cost: 1 },
   { provider: 'apifootball', endpoint: 'leagues', cost: 1 },
   { provider: 'apifootball', endpoint: 'injuries', cost: 1 },
   { provider: 'apifootball', endpoint: 'lineups', cost: 1 },
@@ -105,13 +112,13 @@ export async function reserveQuota(
   const reserved = result.reserved;
   const safeRemaining = result.safe_remaining;
 
-  // Determine mode
+  // Determine mode based on allocation (Remaining > 20%: NORMAL; 5%-20%: ECONOMY; < 5%: CRITICAL)
   const totalAllocated = consumed + reserved;
   const pct = safeLimit > 0 ? (totalAllocated / safeLimit) * 100 : 0;
   
   let mode: QuotaMode = 'NORMAL';
-  if (pct >= 90) mode = 'CRITICAL';
-  else if (pct >= 75) mode = 'ECONOMY';
+  if (pct >= 95) mode = 'CRITICAL';
+  else if (pct >= 80) mode = 'ECONOMY';
 
   // Economy Mode check (priority < 60 rejected)
   if (mode === 'ECONOMY' && priority < 60) {

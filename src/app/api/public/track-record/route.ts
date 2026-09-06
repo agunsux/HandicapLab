@@ -1,40 +1,29 @@
 import { NextResponse } from 'next/server';
-import { DailyAhShadowPipeline } from '@/lib/pipeline/dailyAhShadowPipeline';
+import { supabase } from '@/lib/supabase.server';
 
 export const revalidate = 300;
 
 export async function GET() {
   try {
-    let records: any[] = [];
-    const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    // Strictly query canonical production picks from Day 0 onward (2026-09-06)
+    const { data: dbData, error } = await supabase
+      .from('daily_picks')
+      .select('id, status, profit_loss, clv_percentage, kickoff_utc, actual_score, published_at')
+      .gte('kickoff_utc', '2026-09-06T00:00:00Z')
+      .order('kickoff_utc', { ascending: false })
+      .limit(500);
 
-    if (supabaseUrl && supabaseKey) {
-      try {
-        const { createClient } = await import('@supabase/supabase-js');
-        const supabase = createClient(supabaseUrl, supabaseKey);
-        const { data, error } = await supabase.from('public_predictions').select('*');
-        if (!error && data && data.length > 0) {
-          records = data;
-        }
-      } catch (err) {
-        console.warn('[Track Record API] Supabase fetch fallback to local ledger:', err);
-      }
+    if (error) {
+      console.warn('[Track Record API] Supabase query error:', error);
     }
 
-    if (records.length === 0) {
-      const localLedger = DailyAhShadowPipeline.loadLedger();
-      records = localLedger.map((r) => ({
-        id: r.id,
-        settlement_status: r.settlementStatus,
-        actual_outcome: r.actualOutcome,
-        profit_loss: r.profitLoss,
-        clv: r.clv,
-        kickoff_at: r.kickoffAt,
-      }));
-    }
+    const records = dbData || [];
 
-    const settled = records.filter((r) => r.settlement_status === 'SETTLED');
+    const settled = records.filter(
+      (r) =>
+        r.status === 'SETTLED' ||
+        ['WON', 'LOST', 'PUSH', 'HALF_WIN', 'HALF_LOSS'].includes(r.status)
+    );
     const wins = settled.filter((r) => (r.profit_loss || 0) > 0).length;
     const hitRate = settled.length > 0 ? Number(((wins / settled.length) * 100).toFixed(2)) : 0;
 
@@ -42,8 +31,8 @@ export async function GET() {
     const roi = settled.length > 0 ? Number(((totalProfit / settled.length) * 100).toFixed(2)) : 0;
 
     const clvValues = settled
-      .map((r) => r.clv)
-      .filter((c): c is number => c !== undefined && c !== null && !isNaN(c));
+      .map((r) => r.clv_percentage !== undefined && r.clv_percentage !== null ? Number(r.clv_percentage) : null)
+      .filter((c): c is number => c !== null && !isNaN(c));
     const clvMean =
       clvValues.length > 0
         ? Number((clvValues.reduce((a, b) => a + b, 0) / clvValues.length).toFixed(4))

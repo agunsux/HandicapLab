@@ -58,7 +58,25 @@ export const CANONICAL_TEAMS_SEED: CanonicalTeam[] = [
   { id: 'tm-bundesliga-002', canonicalName: 'Borussia Dortmund', shortName: 'Dortmund', countryCode: 'DE', primaryCompetitionCode: 'BUNDESLIGA' },
   { id: 'tm-bundesliga-003', canonicalName: 'Bayer 04 Leverkusen', shortName: 'Leverkusen', countryCode: 'DE', primaryCompetitionCode: 'BUNDESLIGA' },
   { id: 'tm-bundesliga-004', canonicalName: 'RB Leipzig', shortName: 'RB Leipzig', countryCode: 'DE', primaryCompetitionCode: 'BUNDESLIGA' },
+  // Ligue 1
+  { id: 'tm-ligue1-001', canonicalName: 'Paris Saint-Germain FC', shortName: 'PSG', countryCode: 'FR', primaryCompetitionCode: 'LIGUE1' },
+  { id: 'tm-ligue1-002', canonicalName: 'Olympique de Marseille', shortName: 'Marseille', countryCode: 'FR', primaryCompetitionCode: 'LIGUE1' },
+  { id: 'tm-ligue1-003', canonicalName: 'AS Monaco FC', shortName: 'Monaco', countryCode: 'FR', primaryCompetitionCode: 'LIGUE1' },
+  // Eredivisie
+  { id: 'tm-eredivisie-001', canonicalName: 'AFC Ajax', shortName: 'Ajax', countryCode: 'NL', primaryCompetitionCode: 'EREDIVISIE' },
+  { id: 'tm-eredivisie-002', canonicalName: 'PSV Eindhoven', shortName: 'PSV', countryCode: 'NL', primaryCompetitionCode: 'EREDIVISIE' },
+  { id: 'tm-eredivisie-003', canonicalName: 'Feyenoord Rotterdam', shortName: 'Feyenoord', countryCode: 'NL', primaryCompetitionCode: 'EREDIVISIE' },
 ];
+
+import { EXPANDED_CANONICAL_TEAMS, EXPANDED_TEAM_ALIASES } from './canonicalTeamCatalog';
+
+export interface MappingAuditReport {
+  totalTeams: number;
+  canonicalTeams: number;
+  unmappedTeams: string[];
+  ambiguousTeams: string[];
+  mappingCoveragePct: number;
+}
 
 export class CanonicalEntityResolver {
   private aliasMap: Map<string, string> = new Map();
@@ -69,14 +87,23 @@ export class CanonicalEntityResolver {
   }
 
   private seedDefaults(): void {
+    // 1. Seed base canonical teams
     CANONICAL_TEAMS_SEED.forEach((t) => {
       this.teamCatalog.set(t.id, t);
-      // Self mapping for canonical name and short name
       this.registerAlias(t.id, 'canonical', t.canonicalName);
       this.registerAlias(t.id, 'canonical', t.shortName);
     });
 
-    // Seed common provider variations
+    // 2. Seed expanded European league canonical teams
+    EXPANDED_CANONICAL_TEAMS.forEach((t) => {
+      if (!this.teamCatalog.has(t.id)) {
+        this.teamCatalog.set(t.id, t);
+      }
+      this.registerAlias(t.id, 'canonical', t.canonicalName);
+      this.registerAlias(t.id, 'canonical', t.shortName);
+    });
+
+    // 3. Seed common provider variations
     const mappings: [string, string, string][] = [
       // [Canonical ID, Provider ID, Raw Provider Team Name]
       ['tm-epl-001', 'football_data', 'Man City'],
@@ -127,6 +154,8 @@ export class CanonicalEntityResolver {
       ['tm-seriea-001', 'api_football', 'Inter'],
       ['tm-seriea-001', 'oddspapi', 'Inter'],
       ['tm-seriea-001', 'api_football', 'Inter Milan'],
+      ['tm-seriea-001', 'historical', 'FC Internazionale'],
+      ['tm-seriea-001', 'api_football', 'FC Internazionale'],
       ['tm-seriea-002', 'api_football', 'Juventus'],
       ['tm-seriea-002', 'oddspapi', 'Juventus'],
       ['tm-seriea-003', 'api_football', 'AC Milan'],
@@ -140,6 +169,9 @@ export class CanonicalEntityResolver {
       // Bundesliga
       ['tm-bundesliga-001', 'api_football', 'Bayern Munich'],
       ['tm-bundesliga-001', 'oddspapi', 'Bayern Munich'],
+      ['tm-bundesliga-001', 'historical', 'FC Bayern Munchen'],
+      ['tm-bundesliga-001', 'api_football', 'FC Bayern Munchen'],
+      ['tm-bundesliga-001', 'canonical', 'FC Bayern Munchen'],
       ['tm-bundesliga-002', 'api_football', 'Borussia Dortmund'],
       ['tm-bundesliga-002', 'oddspapi', 'Borussia Dortmund'],
       ['tm-bundesliga-002', 'oddspapi', 'Dortmund'],
@@ -148,9 +180,30 @@ export class CanonicalEntityResolver {
       ['tm-bundesliga-003', 'oddspapi', 'Leverkusen'],
       ['tm-bundesliga-004', 'api_football', 'RB Leipzig'],
       ['tm-bundesliga-004', 'oddspapi', 'RB Leipzig'],
+      // Ligue 1
+      ['tm-ligue1-001', 'api_football', 'Paris Saint-Germain'],
+      ['tm-ligue1-001', 'oddspapi', 'Paris Saint-Germain'],
+      ['tm-ligue1-001', 'historical', 'Paris Saint-Germain'],
+      ['tm-ligue1-001', 'canonical', 'Paris Saint-Germain'],
+      ['tm-ligue1-001', 'api_football', 'PSG'],
+      ['tm-ligue1-001', 'oddspapi', 'PSG'],
+      ['tm-ligue1-001', 'historical', 'PSG'],
+      // Eredivisie
+      ['tm-eredivisie-001', 'api_football', 'Ajax Amsterdam'],
+      ['tm-eredivisie-001', 'oddspapi', 'Ajax Amsterdam'],
+      ['tm-eredivisie-001', 'historical', 'Ajax Amsterdam'],
+      ['tm-eredivisie-001', 'canonical', 'Ajax Amsterdam'],
+      ['tm-eredivisie-001', 'canonical', 'Ajax'],
+      ['tm-eredivisie-002', 'canonical', 'PSV Eindhoven'],
+      ['tm-eredivisie-003', 'canonical', 'Feyenoord Rotterdam'],
     ];
 
     mappings.forEach(([teamId, providerId, name]) => {
+      this.registerAlias(teamId, providerId, name);
+    });
+
+    // 4. Register expanded aliases
+    EXPANDED_TEAM_ALIASES.forEach(([teamId, providerId, name]) => {
       this.registerAlias(teamId, providerId, name);
     });
   }
@@ -183,9 +236,40 @@ export class CanonicalEntityResolver {
     return `tm-auto-${hash.substring(0, 12)}`;
   }
 
+  public isCanonicalTeam(teamId: string): boolean {
+    return this.teamCatalog.has(teamId) && !teamId.startsWith('tm-auto-');
+  }
+
   public getCanonicalTeam(teamId: string): CanonicalTeam | undefined {
     return this.teamCatalog.get(teamId);
+  }
+
+  public getMappingAuditReport(providerId: string, teamNames: string[]): MappingAuditReport {
+    const uniqueTeams = Array.from(new Set(teamNames));
+    let canonicalCount = 0;
+    const unmapped: string[] = [];
+    const ambiguous: string[] = [];
+
+    uniqueTeams.forEach((name) => {
+      const resolvedId = this.resolveTeamId(providerId, name);
+      if (this.isCanonicalTeam(resolvedId)) {
+        canonicalCount++;
+      } else {
+        unmapped.push(name);
+      }
+    });
+
+    return {
+      totalTeams: uniqueTeams.length,
+      canonicalTeams: canonicalCount,
+      unmappedTeams: unmapped,
+      ambiguousTeams: ambiguous,
+      mappingCoveragePct: uniqueTeams.length > 0 
+        ? Number(((canonicalCount / uniqueTeams.length) * 100).toFixed(2)) 
+        : 100,
+    };
   }
 }
 
 export const canonicalEntityResolver = new CanonicalEntityResolver();
+

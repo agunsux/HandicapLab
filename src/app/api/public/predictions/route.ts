@@ -1,7 +1,10 @@
 import { NextResponse } from 'next/server';
-import { DailyAhShadowPipeline, RESEARCH_HONESTY_BANNER } from '@/lib/pipeline/dailyAhShadowPipeline';
+import { supabase } from '@/lib/supabase.server';
 
 export const revalidate = 300; // 5 minutes cache
+
+export const RESEARCH_HONESTY_BANNER =
+  'HandicapLab quantitative model evaluations benchmarked against Pinnacle closing lines. Production ledger active since 2026-09-06.';
 
 export const SEEDED_MODELS = [
   {
@@ -61,56 +64,40 @@ export const SEEDED_MODELS = [
 export async function GET() {
   try {
     let predictions: any[] = [];
-    const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-    if (supabaseUrl && supabaseKey) {
-      try {
-        const { createClient } = await import('@supabase/supabase-js');
-        const supabase = createClient(supabaseUrl, supabaseKey);
-        const { data, error } = await supabase
-          .from('public_predictions')
-          .select('*')
-          .order('kickoff_at', { ascending: false })
-          .limit(100);
+    const { data, error } = await supabase
+      .from('active_daily_picks')
+      .select('*')
+      .order('kickoff_utc', { ascending: true })
+      .limit(100);
 
-        if (!error && data && data.length > 0) {
-          predictions = data;
-        }
-      } catch (err) {
-        console.warn('[Public Predictions API] Supabase fetch fallback to local ledger:', err);
-      }
-    }
-
-    // Fallback to local ledger
-    if (predictions.length === 0) {
-      const localLedger = DailyAhShadowPipeline.loadLedger();
-      predictions = localLedger.map((r) => ({
-        id: r.id,
-        fixture_id: r.fixtureId,
-        league_id: r.leagueId,
-        league_name: r.leagueName,
-        country: r.leagueName,
-        kickoff_at: r.kickoffAt,
-        home_team: r.homeTeam,
-        away_team: r.awayTeam,
-        model_version: r.modelVersion,
-        line: r.line,
-        side: r.side,
-        fair_probability: r.fairProbability,
-        fair_odds: r.fairOdds,
-        devig_market_probability: r.devigMarketProbability,
-        taken_odds: r.takenOdds,
-        closing_odds: r.closingOdds || null,
-        edge: r.edge,
-        ev: r.ev,
-        clv: r.clv || null,
-        settlement_status: r.settlementStatus,
-        actual_outcome: r.actualOutcome || null,
-        profit_loss: r.profitLoss || null,
-        settled_at: r.settledAt || null,
-        created_at: r.createdAt,
-        updated_at: r.updatedAt,
+    if (!error && data && data.length > 0) {
+      predictions = data.map((p) => ({
+        id: p.id,
+        fixture_id: p.fixture_id,
+        league_id: p.league_id,
+        league_name: p.league,
+        country: p.country || p.league,
+        kickoff_at: p.kickoff_utc,
+        home_team: p.home_team,
+        away_team: p.away_team,
+        model_version: p.model_version || 'AH-dixoncoles-v1.0.0',
+        line: p.line,
+        side: p.prediction,
+        fair_probability: p.model_probability,
+        fair_odds: p.fair_odds,
+        devig_market_probability: p.market_probability || null,
+        taken_odds: p.market_odds,
+        closing_odds: p.closing_odds || null,
+        edge: p.edge_pct ? p.edge_pct / 100 : 0,
+        ev: p.expected_value || null,
+        clv: p.clv_percentage || null,
+        settlement_status: p.status,
+        actual_outcome: p.actual_score || null,
+        profit_loss: p.profit_loss || null,
+        settled_at: p.settled_at || null,
+        created_at: p.created_at,
+        updated_at: p.updated_at,
       }));
     }
 

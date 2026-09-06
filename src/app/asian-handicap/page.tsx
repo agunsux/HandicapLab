@@ -46,12 +46,12 @@ export default async function AsianHandicapRoutePage() {
           </p>
 
           {/* Quick Stats Banner */}
-          <div className="mt-6 flex flex-wrap items-center gap-4 text-xs font-mono">
+          <div className="flex flex-wrap items-center gap-3 mt-6 text-xs font-mono">
             <span className="px-3 py-1.5 rounded-lg bg-[#111827] border border-[#1F2937] text-neutral-300">
-              Evaluated Lines: <strong className="text-white">17 (-2.00 to +2.00)</strong>
+              Evaluated Lines: <strong className="text-white">Quarter &amp; Half Lines (-2.00 to +2.00)</strong>
             </span>
             <span className="px-3 py-1.5 rounded-lg bg-[#111827] border border-[#1F2937] text-neutral-300">
-              Most Robust: <strong className="text-[#10B981]">AH +0.25 Away (+28.4% ROI)</strong>
+              Model Calibration: <strong className="text-[#10B981]">Dixon-Coles &bull; Pinnacle Ground Truth</strong>
             </span>
             <span className="px-3 py-1.5 rounded-lg bg-[#111827] border border-[#1F2937] text-neutral-300">
               Benchmark: <strong className="text-[#10B981]">Pinnacle CLV</strong>
@@ -184,28 +184,38 @@ export default async function AsianHandicapRoutePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {upcomingResult.fixtures.map((f) => (
-              <div
-                key={f.id}
-                className="p-4 rounded-xl bg-[#111827]/70 border border-[#1F2937] text-xs font-mono space-y-3"
-              >
-                <div className="flex items-center justify-between text-[#9CA3AF] text-[11px] pb-2 border-b border-[#1F2937]">
-                  <span className="font-bold text-white truncate">{f.leagueName}</span>
-                  <span className="text-[#10B981]">{f.kickoffTime} UTC</span>
-                </div>
-
-                <div className="space-y-1">
-                  <div className="font-bold text-white text-sm">{f.homeTeam}</div>
-                  <div className="text-[11px] text-[#6B7280]">vs</div>
-                  <div className="font-bold text-white text-sm">{f.awayTeam}</div>
-                </div>
-
-                <div className="pt-2 border-t border-[#1F2937] flex items-center justify-between text-[11px]">
-                  <span className="text-neutral-400">Market: Asian Handicap</span>
-                  <span className="text-[#10B981] font-bold">Odds unavailable</span>
-                </div>
+            {upcomingResult.fixtures.length === 0 ? (
+              <div className="col-span-full py-8 text-center rounded-xl bg-[#111827]/40 border border-[#1F2937] text-xs font-mono text-[#9CA3AF]">
+                No upcoming Asian Handicap matches discovered for this target horizon. Next scheduled matchday will appear automatically.
               </div>
-            ))}
+            ) : (
+              upcomingResult.fixtures.map((f) => (
+                <div
+                  key={f.id}
+                  className="p-4 rounded-xl bg-[#111827]/70 border border-[#1F2937] text-xs font-mono space-y-3"
+                >
+                  <div className="flex items-center justify-between text-[#9CA3AF] text-[11px] pb-2 border-b border-[#1F2937]">
+                    <span className="font-bold text-white truncate">{f.leagueName}</span>
+                    <span className="text-[#10B981]">{f.kickoffTime} UTC</span>
+                  </div>
+
+                  <div className="space-y-1">
+                    <div className="font-bold text-white text-sm">{f.homeTeam}</div>
+                    <div className="text-[11px] text-[#6B7280]">vs</div>
+                    <div className="font-bold text-white text-sm">{f.awayTeam}</div>
+                  </div>
+
+                  <div className="pt-2 border-t border-[#1F2937] flex items-center justify-between text-[11px]">
+                    <span className="text-neutral-400">Market: Asian Handicap</span>
+                    <span className="text-[#10B981] font-bold">
+                      {f.markets?.asianHandicap?.available
+                        ? `${f.markets.asianHandicap.line ?? 0} (${f.markets.asianHandicap.homeOdds?.toFixed(2) ?? '—'})`
+                        : 'Pre-match line pending'}
+                    </span>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </section>
 

@@ -46,13 +46,13 @@ export default async function BttsRoutePage() {
 
           <div className="mt-6 flex flex-wrap items-center gap-4 text-xs font-mono">
             <span className="px-3 py-1.5 rounded-lg bg-[#111827] border border-[#1F2937] text-neutral-300">
-              Evaluated Leagues: <strong className="text-white">30 Global Competitions</strong>
+              Evaluated Leagues: <strong className="text-white">Covered Global Competitions</strong>
             </span>
             <span className="px-3 py-1.5 rounded-lg bg-[#111827] border border-[#1F2937] text-neutral-300">
-              Highest Rate: <strong className="text-[#10B981]">CHE-SUPER (63.0% &bull; +19.8% ROI)</strong>
+              Scoring Model: <strong className="text-[#10B981]">Joint Poisson &bull; Mutual Expectancy</strong>
             </span>
             <span className="px-3 py-1.5 rounded-lg bg-[#111827] border border-[#1F2937] text-neutral-300">
-              Lowest Rate: <strong className="text-amber-400">ARG-PRIMERA (39.5% &bull; BTTS NO: 60.5%)</strong>
+              Benchmark: <strong className="text-[#10B981]">Pinnacle Consensus</strong>
             </span>
           </div>
         </div>
@@ -145,28 +145,38 @@ export default async function BttsRoutePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {upcomingResult.fixtures.map((f) => (
-              <div
-                key={f.id}
-                className="p-4 rounded-xl bg-[#111827]/70 border border-[#1F2937] text-xs font-mono space-y-3"
-              >
-                <div className="flex items-center justify-between text-[#9CA3AF] text-[11px] pb-2 border-b border-[#1F2937]">
-                  <span className="font-bold text-white truncate">{f.leagueName}</span>
-                  <span className="text-[#10B981]">{f.kickoffTime} UTC</span>
-                </div>
-
-                <div className="space-y-1">
-                  <div className="font-bold text-white text-sm">{f.homeTeam}</div>
-                  <div className="text-[11px] text-[#6B7280]">vs</div>
-                  <div className="font-bold text-white text-sm">{f.awayTeam}</div>
-                </div>
-
-                <div className="pt-2 border-t border-[#1F2937] flex items-center justify-between text-[11px]">
-                  <span className="text-neutral-400">Market: BTTS Yes/No</span>
-                  <span className="text-[#10B981] font-bold">Odds unavailable</span>
-                </div>
+            {upcomingResult.fixtures.length === 0 ? (
+              <div className="col-span-full py-8 text-center rounded-xl bg-[#111827]/40 border border-[#1F2937] text-xs font-mono text-[#9CA3AF]">
+                No upcoming Both Teams To Score fixtures discovered for this target horizon. Next scheduled matchday will appear automatically.
               </div>
-            ))}
+            ) : (
+              upcomingResult.fixtures.map((f) => (
+                <div
+                  key={f.id}
+                  className="p-4 rounded-xl bg-[#111827]/70 border border-[#1F2937] text-xs font-mono space-y-3"
+                >
+                  <div className="flex items-center justify-between text-[#9CA3AF] text-[11px] pb-2 border-b border-[#1F2937]">
+                    <span className="font-bold text-white truncate">{f.leagueName}</span>
+                    <span className="text-[#10B981]">{f.kickoffTime} UTC</span>
+                  </div>
+
+                  <div className="space-y-1">
+                    <div className="font-bold text-white text-sm">{f.homeTeam}</div>
+                    <div className="text-[11px] text-[#6B7280]">vs</div>
+                    <div className="font-bold text-white text-sm">{f.awayTeam}</div>
+                  </div>
+
+                  <div className="pt-2 border-t border-[#1F2937] flex items-center justify-between text-[11px]">
+                    <span className="text-neutral-400">Market: BTTS Yes/No</span>
+                    <span className="text-[#10B981] font-bold">
+                      {f.markets?.btts?.available
+                        ? `Yes: ${f.markets.btts.yesOdds?.toFixed(2) ?? '—'} / No: ${f.markets.btts.noOdds?.toFixed(2) ?? '—'}`
+                        : 'Pre-match line pending'}
+                    </span>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </section>
 

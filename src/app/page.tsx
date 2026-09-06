@@ -39,7 +39,7 @@ export default async function HomePage() {
         <div className="max-w-5xl mx-auto text-center space-y-6">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#111827] border border-[#1F2937] text-xs font-mono text-[#10B981]">
             <span className="h-2 w-2 rounded-full bg-[#10B981] animate-pulse" />
-            30 GLOBAL LEAGUES &bull; 17,738 MATCHES &bull; PINNACLE CLOSING BENCHMARKS
+            {historicalSummary.leaguesCount} GLOBAL LEAGUES &bull; {historicalSummary.completedMatches.toLocaleString()} MATCHES &bull; PINNACLE CLOSING BENCHMARKS
           </div>
 
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-display font-black text-white tracking-tight leading-[1.08]">
@@ -55,11 +55,11 @@ export default async function HomePage() {
           <div className="pt-2 flex flex-wrap items-center justify-center gap-4 text-xs font-mono text-neutral-300">
             <span className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#111827] border border-[#1F2937]">
               <Database className="h-3.5 w-3.5 text-[#10B981]" />
-              <strong>17,738</strong> Completed Matches
+              <strong>{historicalSummary.completedMatches.toLocaleString()}</strong> Completed Matches
             </span>
             <span className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#111827] border border-[#1F2937]">
               <Target className="h-3.5 w-3.5 text-[#10B981]" />
-              <strong>110,394</strong> Pinnacle Odds
+              <strong>{historicalSummary.pinnacleOddsRecords.toLocaleString()}</strong> Pinnacle Odds
             </span>
             <span className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#111827] border border-[#1F2937]">
               <ShieldCheck className="h-3.5 w-3.5 text-[#10B981]" />

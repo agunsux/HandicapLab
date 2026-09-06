@@ -148,6 +148,7 @@ export function MarketSignalsFeed({
               <thead>
                 <tr className="border-b border-[#1F2937] text-[#9CA3AF] bg-[#0B0F0E]/50">
                   <th className="py-3 px-4">Match</th>
+                  <th className="py-3 px-4">Signal</th>
                   <th className="py-3 px-4">Data Status</th>
                   <th className="py-3 px-4">Time (UTC)</th>
                   <th className="py-3 px-4">Market</th>
@@ -179,6 +180,21 @@ export function MarketSignalsFeed({
                           <span className="text-[#9CA3AF] font-normal text-[11px]">vs</span>{' '}
                           {sig.awayTeam}
                           <div className="text-[10px] text-[#9CA3AF] font-normal">{sig.league}</div>
+                        </td>
+                        <td className="py-3.5 px-4 whitespace-nowrap">
+                          {sig.signalColor === 'green' ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
+                              🟢 GREEN
+                            </span>
+                          ) : sig.signalColor === 'yellow' ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-yellow-500/20 text-yellow-400 border border-yellow-500/40">
+                              🟡 YELLOW
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/40">
+                              🔴 RED
+                            </span>
+                          )}
                         </td>
                         <td className="py-3.5 px-4 whitespace-nowrap">
                           {sig.dataStatus === 'LIVE' ? (

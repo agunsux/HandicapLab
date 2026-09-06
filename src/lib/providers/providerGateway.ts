@@ -101,8 +101,8 @@ export class ProviderGateway {
     let limitTotal: number | undefined;
 
     if (provider === 'apifootball') {
-      const hTotal = response.headers.get('x-ratelimit-limit');
-      const hRem = response.headers.get('x-ratelimit-remaining');
+      const hTotal = response.headers.get('x-ratelimit-requests-limit') || response.headers.get('x-ratelimit-limit');
+      const hRem = response.headers.get('x-ratelimit-requests-remaining') || response.headers.get('x-ratelimit-remaining');
       if (hTotal) limitTotal = parseInt(hTotal, 10);
       if (hRem) limitRemaining = parseInt(hRem, 10);
     }

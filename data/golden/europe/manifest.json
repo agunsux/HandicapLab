@@ -1,6 +1,6 @@
 {
   "dataset_version": "europe-dataset-v1",
-  "generated_at": "2026-08-30T17:39:27.275Z",
+  "generated_at": "2026-09-06T10:36:46.950Z",
   "source": "football-data.co.uk CSVs (data/bronze/football_data + research/quant/data/bronze/football_data_co_uk)",
   "schema_version": "europe-match-v1",
   "normalization_version": "europe-v1",

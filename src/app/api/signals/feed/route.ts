@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { supabase } from '../../../../lib/supabase.server';
 import { determineUserAccess, enforceFeedPolicy } from '../../../../lib/signals/visibility';
 import { LEAGUE_REGISTRY } from '../../../../lib/crons/leagueRegistry';
+import { isPriorityLeague } from '../../../../lib/signals/signalClassifier';
 
 export async function GET(request: Request) {
   try {
@@ -163,6 +164,11 @@ export async function GET(request: Request) {
         edge_percentage: Number(sig.edge_pct || 0.0),
         confidence_score: confidence,
         confidence_label: confidenceLabel,
+        signal_color: (Number(sig.edge_pct || 0) >= 5.0 && (metricsObj?.sample_size || 35) >= 30 && confidence >= 0.60)
+          ? 'GREEN'
+          : (Number(sig.edge_pct || 0) >= 0.0 && (metricsObj?.sample_size || 35) >= 10)
+          ? 'YELLOW'
+          : 'RED',
         sample_size: metricsObj?.sample_size || 45,
         model_version: sig.model_version || 'rule_v1',
         status: dynamicStatus,
@@ -209,6 +215,15 @@ export async function GET(request: Request) {
       } else if (val.toLowerCase() === 'low') {
         feed = feed.filter(item => (item.confidence_score * 100) < 40);
       }
+    }
+
+    // Public Surface Filtering:
+    // Global public feed shows GREEN signals only, PLUS all signals for Priority Leagues (ENG, ESP, ITA, GER, FRA, NED)
+    if (!isPremium) {
+      feed = feed.filter((item) => {
+        if (item.signal_color === 'GREEN') return true;
+        return isPriorityLeague(undefined, item.league);
+      });
     }
 
     // Sort by sort_score DESC, then priority score DESC, then confidence DESC, then latest odds update DESC

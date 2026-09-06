@@ -52,7 +52,7 @@ export async function getDashboardPerformance(): Promise<UserDashboardPerformanc
   }> = [];
 
   try {
-    const terminalPredictions = getTerminalPredictions();
+    const terminalPredictions = await getTerminalPredictions();
     const settledTerminal = terminalPredictions.filter((p) => p.settlement_status === 'SETTLED');
 
     for (const p of settledTerminal) {

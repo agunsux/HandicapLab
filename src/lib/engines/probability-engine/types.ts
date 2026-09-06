@@ -44,6 +44,13 @@ export interface ProbabilityOutput {
     recommendationStatus: 'Recommended' | 'Consider' | 'Neutral' | 'Caution' | 'Skip';
     reasons: string[];
   };
+
+  // Coverage Rate Integration (Module 3)
+  coverageProfile?: any;
+  coverageValidation?: {
+    isDivergent: boolean;
+    divergenceReason: string | null;
+  };
 }
 
 export interface RawProbabilities {

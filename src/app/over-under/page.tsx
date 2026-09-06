@@ -46,13 +46,13 @@ export default async function OverUnderRoutePage() {
 
           <div className="mt-6 flex flex-wrap items-center gap-4 text-xs font-mono">
             <span className="px-3 py-1.5 rounded-lg bg-[#111827] border border-[#1F2937] text-neutral-300">
-              Evaluated Totals: <strong className="text-white">15 Lines (0.5 to 4.0)</strong>
+              Evaluated Totals: <strong className="text-white">Quarter &amp; Half Totals (0.5 to 4.5)</strong>
             </span>
             <span className="px-3 py-1.5 rounded-lg bg-[#111827] border border-[#1F2937] text-neutral-300">
-              Over 2.5 Baseline: <strong className="text-neutral-400">{baselineOver25RoiPct}% (Bookmaker Vig)</strong>
+              Over 2.5 Baseline Vig: <strong className="text-neutral-400">{baselineOver25RoiPct}%</strong>
             </span>
             <span className="px-3 py-1.5 rounded-lg bg-[#111827] border border-[#1F2937] text-neutral-300">
-              Scoring Regime: <strong className="text-[#10B981]">League-Dependent Clustering</strong>
+              Scoring Regime: <strong className="text-[#10B981]">Bivariate Goal Distribution</strong>
             </span>
           </div>
         </div>
@@ -124,28 +124,38 @@ export default async function OverUnderRoutePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {upcomingResult.fixtures.map((f) => (
-              <div
-                key={f.id}
-                className="p-4 rounded-xl bg-[#111827]/70 border border-[#1F2937] text-xs font-mono space-y-3"
-              >
-                <div className="flex items-center justify-between text-[#9CA3AF] text-[11px] pb-2 border-b border-[#1F2937]">
-                  <span className="font-bold text-white truncate">{f.leagueName}</span>
-                  <span className="text-[#10B981]">{f.kickoffTime} UTC</span>
-                </div>
-
-                <div className="space-y-1">
-                  <div className="font-bold text-white text-sm">{f.homeTeam}</div>
-                  <div className="text-[11px] text-[#6B7280]">vs</div>
-                  <div className="font-bold text-white text-sm">{f.awayTeam}</div>
-                </div>
-
-                <div className="pt-2 border-t border-[#1F2937] flex items-center justify-between text-[11px]">
-                  <span className="text-neutral-400">Total Line: 2.5</span>
-                  <span className="text-[#10B981] font-bold">Odds unavailable</span>
-                </div>
+            {upcomingResult.fixtures.length === 0 ? (
+              <div className="col-span-full py-8 text-center rounded-xl bg-[#111827]/40 border border-[#1F2937] text-xs font-mono text-[#9CA3AF]">
+                No upcoming Over / Under fixtures discovered for this target horizon. Next scheduled matchday will appear automatically.
               </div>
-            ))}
+            ) : (
+              upcomingResult.fixtures.map((f) => (
+                <div
+                  key={f.id}
+                  className="p-4 rounded-xl bg-[#111827]/70 border border-[#1F2937] text-xs font-mono space-y-3"
+                >
+                  <div className="flex items-center justify-between text-[#9CA3AF] text-[11px] pb-2 border-b border-[#1F2937]">
+                    <span className="font-bold text-white truncate">{f.leagueName}</span>
+                    <span className="text-[#10B981]">{f.kickoffTime} UTC</span>
+                  </div>
+
+                  <div className="space-y-1">
+                    <div className="font-bold text-white text-sm">{f.homeTeam}</div>
+                    <div className="text-[11px] text-[#6B7280]">vs</div>
+                    <div className="font-bold text-white text-sm">{f.awayTeam}</div>
+                  </div>
+
+                  <div className="pt-2 border-t border-[#1F2937] flex items-center justify-between text-[11px]">
+                    <span className="text-neutral-400">Total Line: 2.5</span>
+                    <span className="text-[#10B981] font-bold">
+                      {f.markets?.overUnder?.available
+                        ? `Over: ${f.markets.overUnder.overOdds?.toFixed(2) ?? '—'} / Under: ${f.markets.overUnder.underOdds?.toFixed(2) ?? '—'}`
+                        : 'Pre-match line pending'}
+                    </span>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </section>
 

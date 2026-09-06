@@ -4,10 +4,11 @@ import { LedgerTable } from './_components/LedgerTable';
 export const revalidate = 0; // Disable static cache to ensure absolute transparency of fresh signals
 
 export default async function LedgerPage() {
-  // 1. Fetch raw ledger entries
+  // 1. Fetch raw ledger entries starting strictly from Day 0 (2026-09-06T00:00:00Z)
   const { data: ledgerEntries, error: ledgerErr } = await supabase
     .from('prediction_ledger')
     .select('*')
+    .gte('published_at', '2026-09-06T00:00:00Z')
     .order('published_at', { ascending: false });
 
   if (ledgerErr) {

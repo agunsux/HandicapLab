@@ -10,6 +10,7 @@ import { DixonColesModel } from './dixon-coles';
 import { MarketOdds } from '../edge-scanner/types';
 import { PredictionFeatures } from '../../market-intelligence/types';
 import { MatchInput, generatePrediction } from '../../../services/probability.engine';
+import { coverageCalculator, MatchupCoverageProfile } from '../../services/coverageCalculator';
 
 
 export class ProbabilityEngine {
@@ -27,6 +28,13 @@ export class ProbabilityEngine {
       rho?: number;
       oddsSnapshot?: MarketOdds;
       marketFeatures?: PredictionFeatures;
+      coverageProfile?: MatchupCoverageProfile;
+      coverageEnabled?: boolean;
+      asOfTimestamp?: string | Date;
+      homeTeamId?: number;
+      awayTeamId?: number;
+      homeTeam?: string;
+      awayTeam?: string;
     } = {}
   ): Promise<ProbabilityOutput> {
     const profile = CompetitionProfileEngine.getProfileForLeague(features.leagueId || 'EPL');
@@ -63,9 +71,39 @@ export class ProbabilityEngine {
     // 2. Resolve adaptive weights
     const weights = options.weights || await AdaptiveWeightsEngine.getWeights(features.leagueId);
 
+    // Coverage Rates Feature Layer Integration (Module 3 - Guarded by coverageEnabled)
+    const coverageEnabled = options.coverageEnabled ?? false;
+    let covProfile = options.coverageProfile;
+
+    if (coverageEnabled) {
+      if (!covProfile && (options.homeTeam || options.homeTeamId) && (options.awayTeam || options.awayTeamId)) {
+        covProfile = await coverageCalculator.getMatchupCoverageRates(
+          options.homeTeam || options.homeTeamId!,
+          options.awayTeam || options.awayTeamId!,
+          undefined,
+          options.asOfTimestamp
+        );
+      }
+
+      // Bayesian prior adjustment for Over/Under lambda from matchup ouTendency
+      if (covProfile && (covProfile.confidence?.ou ?? 0) >= 40) {
+        const ouDeviation = covProfile.ouTendency - 0.50;
+        const lambdaMultiplier = Math.max(0.90, Math.min(1.12, 1.0 + ouDeviation * 0.15));
+        adjustedFeatures.homeAttack *= lambdaMultiplier;
+        adjustedFeatures.awayAttack *= lambdaMultiplier;
+      }
+    }
+
+    // Dynamic Dixon-Coles rho parameter adjustment from bttsTendency (Guarded by coverageEnabled)
+    let effectiveRho = rho;
+    if (coverageEnabled && covProfile) {
+      const bttsDeviation = covProfile.bttsTendency - 0.50;
+      effectiveRho = Math.max(-0.15, Math.min(0.02, rho + bttsDeviation * 0.08));
+    }
+
     // 3. Compute raw Poisson & Dixon Coles outcomes
     const poissonRaw = PoissonModel.predict(adjustedFeatures);
-    const dixonColesRaw = DixonColesModel.predict(adjustedFeatures, rho);
+    const dixonColesRaw = DixonColesModel.predict(adjustedFeatures, effectiveRho);
 
     const getMlProbs = (scoreMatrix: number[][]) => {
       let pHome = 0, pDraw = 0, pAway = 0;
@@ -265,6 +303,16 @@ export class ProbabilityEngine {
       trainedOnMatches: 1250
     };
 
+    // AH edge cross-check & divergence validation (Module 3)
+    let isCoverageDivergent = false;
+    let coverageDivergenceReason: string | null = null;
+    if (coverageEnabled && covProfile) {
+      if (pHome > 0.60 && covProfile.ahEdge < -0.15) {
+        isCoverageDivergent = true;
+        coverageDivergenceReason = 'COVERAGE_RATE_DIVERGENCE_WARNING: Model favors Home (>60%) but historical cover differential is negative (< -15%).';
+      }
+    }
+
     return {
       matchId: features.matchId,
       marketType: features.marketType,
@@ -281,7 +329,12 @@ export class ProbabilityEngine {
       expectedGoals,
       modelVersion,
       calibrationApplied,
-      confidence
+      confidence,
+      coverageProfile: coverageEnabled ? covProfile : undefined,
+      coverageValidation: coverageEnabled && covProfile ? {
+        isDivergent: isCoverageDivergent,
+        divergenceReason: coverageDivergenceReason,
+      } : undefined,
     };
   }
 

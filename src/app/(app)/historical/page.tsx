@@ -134,6 +134,13 @@ export default function HistoricalResearchDashboard() {
             <span className="text-[11px] font-mono uppercase tracking-widest text-[#9CA3AF]">Dataset&nbsp;<Pill status={dataset.label === 'DB VERIFIED' ? 'VERIFIED' : 'SOURCE'} label={dataset.label} /></span>
             <span className="text-[11px] font-mono uppercase tracking-widest text-[#9CA3AF]">Gold Layer&nbsp;<Pill status={goldLayer.status as StatusLevel} label={goldLayer.status} /></span>
             <span className="text-[11px] font-mono uppercase tracking-widest text-[#9CA3AF]">Backtest&nbsp;<Pill status={backtestStatus} label={backtestStatus} /></span>
+            <a
+              href="/api/v1/export/historical"
+              download
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#10B981]/20 hover:bg-[#10B981]/30 border border-[#10B981]/50 text-[#10B981] text-[11px] font-mono font-bold transition-colors ml-auto"
+            >
+              📥 Export Dataset (CSV)
+            </a>
           </div>
 
           {goldBlocked && (

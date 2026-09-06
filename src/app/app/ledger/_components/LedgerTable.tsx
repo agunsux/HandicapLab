@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { checkUserEntitlementsAction, unlockForensicAction } from '@/app/actions/monetization';
 import UpsellModal from '@/components/UpsellModal';
 
@@ -286,7 +286,23 @@ export function LedgerTable({ initialItems }: LedgerTableProps) {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/60 text-slate-300">
-              {filteredItems.map((item, idx) => {
+              {filteredItems.length === 0 ? (
+                <tr>
+                  <td colSpan={8} className="px-6 py-16 text-center text-slate-400">
+                    <div className="max-w-md mx-auto space-y-2">
+                      <div className="text-2xl">⚖️</div>
+                      <div className="font-bold text-white text-sm font-mono">
+                        Live ledger started 6 September 2026.
+                      </div>
+                      <p className="text-xs text-slate-500 font-mono leading-relaxed">
+                        Settled production results will appear here after matches are completed.
+                        Pre-Day-0 historical data is isolated from the live public ledger.
+                      </p>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                filteredItems.map((item, idx) => {
                 const isPending = item.result_status === 'pending';
                 const datePublished = new Date(item.published_at);
                 const isExpanded = expandedId === item.id;
@@ -298,7 +314,7 @@ export function LedgerTable({ initialItems }: LedgerTableProps) {
                 const predictionDoi = `HLP-${year}-${compCode}-${doiIndex}`;
 
                 return (
-                  <>
+                  <React.Fragment key={item.id}>
                     <tr
                       key={item.id}
                       onClick={() => toggleRow(item.id)}
@@ -479,16 +495,9 @@ export function LedgerTable({ initialItems }: LedgerTableProps) {
                         </td>
                       </tr>
                     )}
-                  </>
+                  </React.Fragment>
                 );
-              })}
-              {filteredItems.length === 0 && (
-                <tr>
-                  <td colSpan={7} className="px-6 py-12 text-center text-slate-500 font-mono">
-                    No predictions found matching the active filter.
-                  </td>
-                </tr>
-              )}
+              }))}
             </tbody>
           </table>
         </div>

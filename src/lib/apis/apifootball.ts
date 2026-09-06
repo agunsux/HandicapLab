@@ -1,4 +1,4 @@
-﻿import { z } from 'zod';
+import { z } from 'zod';
 import { globalGateway } from '@/lib/providers/providerGateway';
 
 // Ensure this module is only imported/run on the server side
@@ -208,6 +208,185 @@ export const ApiFootballVenueDetailSchema = z.object({
 export const ApiFootballVenueResponseSchema = createApiFootballResponseSchema(z.array(ApiFootballVenueDetailSchema));
 
 export type ApiFootballFixtureResponseItem = z.infer<typeof ApiFootballFixtureResponseItemSchema>;
+
+// -- API-Football PRO: Fixture Statistics Schema --
+export const ApiFootballStatisticValueSchema = z.object({
+  type: z.string(),
+  value: z.union([z.string(), z.number(), z.null(), z.undefined()]),
+});
+
+export const ApiFootballFixtureStatisticsItemSchema = z.object({
+  team: z.object({
+    id: z.number(),
+    name: z.string(),
+    logo: z.string().optional(),
+  }),
+  statistics: z.array(ApiFootballStatisticValueSchema),
+});
+
+export const ApiFootballFixtureStatisticsResponseSchema = createApiFootballResponseSchema(
+  z.array(ApiFootballFixtureStatisticsItemSchema)
+);
+export type ApiFootballFixtureStatisticsItem = z.infer<typeof ApiFootballFixtureStatisticsItemSchema>;
+
+// -- API-Football PRO: Team Statistics Schema --
+export const ApiFootballTeamStatisticsDataSchema = z.object({
+  league: z.object({
+    id: z.number().optional(),
+    name: z.string().optional(),
+    country: z.string().optional(),
+    logo: z.string().optional(),
+    flag: z.string().nullable().optional(),
+    season: z.number().optional(),
+  }).optional(),
+  team: z.object({
+    id: z.number().optional(),
+    name: z.string().optional(),
+    logo: z.string().optional(),
+  }).optional(),
+  form: z.string().nullable().optional(),
+  fixtures: z.object({
+    played: z.record(z.string(), z.number().nullable().optional()).optional(),
+    wins: z.record(z.string(), z.number().nullable().optional()).optional(),
+    draws: z.record(z.string(), z.number().nullable().optional()).optional(),
+    loses: z.record(z.string(), z.number().nullable().optional()).optional(),
+  }).optional(),
+  goals: z.object({
+    for: z.record(z.string(), z.any()).optional(),
+    against: z.record(z.string(), z.any()).optional(),
+  }).optional(),
+  clean_sheet: z.record(z.string(), z.number().nullable().optional()).optional(),
+  failed_to_score: z.record(z.string(), z.number().nullable().optional()).optional(),
+  penalty: z.record(z.string(), z.any()).optional(),
+  lineups: z.array(z.object({
+    formation: z.string(),
+    played: z.number(),
+  })).optional(),
+  cards: z.record(z.string(), z.any()).optional(),
+});
+
+export const ApiFootballTeamStatisticsResponseSchema = createApiFootballResponseSchema(
+  ApiFootballTeamStatisticsDataSchema
+);
+export type ApiFootballTeamStatisticsData = z.infer<typeof ApiFootballTeamStatisticsDataSchema>;
+
+// -- API-Football PRO: Odds Schemas --
+export const ApiFootballOddValueSchema = z.object({
+  value: z.union([z.string(), z.number()]),
+  odd: z.string(),
+  handicap: z.union([z.string(), z.number(), z.null()]).optional(),
+  main: z.boolean().nullable().optional(),
+  suspended: z.boolean().nullable().optional(),
+});
+
+export const ApiFootballOddBetSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  values: z.array(ApiFootballOddValueSchema),
+});
+
+export const ApiFootballBookmakerSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  bets: z.array(ApiFootballOddBetSchema),
+});
+
+export const ApiFootballOddsItemSchema = z.object({
+  league: z.object({
+    id: z.number(),
+    name: z.string().optional(),
+    country: z.string().optional(),
+    logo: z.string().optional(),
+    flag: z.string().nullable().optional(),
+    season: z.number().optional(),
+  }).optional(),
+  fixture: z.object({
+    id: z.number(),
+    timezone: z.string().optional(),
+    date: z.string().optional(),
+    timestamp: z.number().optional(),
+  }),
+  update: z.string().optional(),
+  bookmakers: z.array(ApiFootballBookmakerSchema),
+});
+
+export const ApiFootballOddsResponseSchema = createApiFootballResponseSchema(
+  z.array(ApiFootballOddsItemSchema)
+);
+export type ApiFootballOddsItem = z.infer<typeof ApiFootballOddsItemSchema>;
+
+// -- API-Football PRO: Bookmakers List Schema --
+export const ApiFootballBookmakerMetaSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+});
+export const ApiFootballBookmakersListResponseSchema = createApiFootballResponseSchema(
+  z.array(ApiFootballBookmakerMetaSchema)
+);
+
+// -- API-Football PRO: Bets List Schema --
+export const ApiFootballBetMetaSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+});
+export const ApiFootballBetsListResponseSchema = createApiFootballResponseSchema(
+  z.array(ApiFootballBetMetaSchema)
+);
+
+// -- API-Football PRO: Standings Schema --
+export const ApiFootballStandingTeamDetailSchema = z.object({
+  rank: z.number(),
+  team: z.object({
+    id: z.number(),
+    name: z.string(),
+    logo: z.string().optional(),
+  }),
+  points: z.number(),
+  goalsDiff: z.number(),
+  group: z.string().optional(),
+  form: z.string().nullable().optional(),
+  status: z.string().nullable().optional(),
+  description: z.string().nullable().optional(),
+  all: z.object({
+    played: z.number(),
+    win: z.number(),
+    draw: z.number(),
+    lose: z.number(),
+    goals: z.object({ for: z.number(), against: z.number() }),
+  }).optional(),
+  home: z.object({
+    played: z.number(),
+    win: z.number(),
+    draw: z.number(),
+    lose: z.number(),
+    goals: z.object({ for: z.number(), against: z.number() }),
+  }).optional(),
+  away: z.object({
+    played: z.number(),
+    win: z.number(),
+    draw: z.number(),
+    lose: z.number(),
+    goals: z.object({ for: z.number(), against: z.number() }),
+  }).optional(),
+  update: z.string().optional(),
+});
+
+export const ApiFootballStandingsItemSchema = z.object({
+  league: z.object({
+    id: z.number(),
+    name: z.string(),
+    country: z.string(),
+    logo: z.string().optional(),
+    flag: z.string().nullable().optional(),
+    season: z.number(),
+    standings: z.array(z.array(ApiFootballStandingTeamDetailSchema)),
+  }),
+});
+
+export const ApiFootballStandingsResponseSchema = createApiFootballResponseSchema(
+  z.array(ApiFootballStandingsItemSchema)
+);
+export type ApiFootballStandingsItem = z.infer<typeof ApiFootballStandingsItemSchema>;
 
 interface FetchOptions {
   timeoutMs?: number;
@@ -453,13 +632,130 @@ export class ApiFootballClient {
   }
 
   /**
-   * EPIC 52 Stage B â€” Fetch venue details (for weather coordinates)
+   * EPIC 52 Stage B — Fetch venue details (for weather coordinates)
    */
   public async getVenue(
     venueId: number,
     options?: FetchOptions
   ): Promise<z.infer<typeof ApiFootballVenueResponseSchema>> {
     return this.request('venues', { id: String(venueId) }, ApiFootballVenueResponseSchema, options);
+  }
+
+  /**
+   * API-Football PRO — Fetch statistics for a specific fixture (shots, xG, possession, fouls, etc.)
+   */
+  public async getFixtureStatistics(
+    fixtureId: number,
+    teamId?: number,
+    options?: FetchOptions
+  ): Promise<z.infer<typeof ApiFootballFixtureStatisticsResponseSchema>> {
+    const params: Record<string, string> = { fixture: String(fixtureId) };
+    if (teamId) params.team = String(teamId);
+    return this.request('fixtures/statistics', params, ApiFootballFixtureStatisticsResponseSchema, {
+      timeoutMs: 12000,
+      ...options,
+    });
+  }
+
+  /**
+   * API-Football PRO — Fetch comprehensive season statistics for a team
+   */
+  public async getTeamStatistics(
+    params: { league: number; season: number; team: number; date?: string },
+    options?: FetchOptions
+  ): Promise<z.infer<typeof ApiFootballTeamStatisticsResponseSchema>> {
+    const query: Record<string, string> = {
+      league: String(params.league),
+      season: String(params.season),
+      team: String(params.team),
+    };
+    if (params.date) query.date = params.date;
+    return this.request('teams/statistics', query, ApiFootballTeamStatisticsResponseSchema, {
+      timeoutMs: 15000,
+      ...options,
+    });
+  }
+
+  /**
+   * API-Football PRO — Fetch pre-match odds (Asian Handicap, Over/Under, BTTS, 1X2, Bookmakers)
+   * Recommended to filter by bookmaker (e.g. 4 for Pinnacle) and bet type to conserve payload size.
+   */
+  public async getOdds(
+    params: {
+      fixture?: number;
+      league?: number;
+      season?: number;
+      date?: string;
+      bookmaker?: number;
+      bet?: number;
+      page?: number;
+    },
+    options?: FetchOptions
+  ): Promise<z.infer<typeof ApiFootballOddsResponseSchema>> {
+    const query: Record<string, string> = {};
+    if (params.fixture) query.fixture = String(params.fixture);
+    if (params.league) query.league = String(params.league);
+    if (params.season) query.season = String(params.season);
+    if (params.date) query.date = params.date;
+    if (params.bookmaker) query.bookmaker = String(params.bookmaker);
+    if (params.bet) query.bet = String(params.bet);
+    if (params.page) query.page = String(params.page);
+
+    return this.request('odds', query, ApiFootballOddsResponseSchema, {
+      timeoutMs: 15000,
+      ...options,
+    });
+  }
+
+  /**
+   * API-Football PRO — Get list of supported bookmakers (Pinnacle = 4, Bet365 = 8, etc.)
+   */
+  public async getBookmakers(
+    options?: FetchOptions
+  ): Promise<z.infer<typeof ApiFootballBookmakersListResponseSchema>> {
+    return this.request('odds/bookmakers', {}, ApiFootballBookmakersListResponseSchema, options);
+  }
+
+  /**
+   * API-Football PRO — Get list of supported bet market types (Asian Handicap = 4, Over/Under = 5, BTTS = 8)
+   */
+  public async getBets(
+    options?: FetchOptions
+  ): Promise<z.infer<typeof ApiFootballBetsListResponseSchema>> {
+    return this.request('odds/bets', {}, ApiFootballBetsListResponseSchema, options);
+  }
+
+  /**
+   * API-Football PRO — Fetch live/in-play odds
+   */
+  public async getLiveOdds(
+    params: { fixture?: number; league?: number; bet?: number } = {},
+    options?: FetchOptions
+  ): Promise<z.infer<typeof ApiFootballOddsResponseSchema>> {
+    const query: Record<string, string> = {};
+    if (params.fixture) query.fixture = String(params.fixture);
+    if (params.league) query.league = String(params.league);
+    if (params.bet) query.bet = String(params.bet);
+
+    return this.request('odds/live', query, ApiFootballOddsResponseSchema, {
+      timeoutMs: 10000,
+      ...options,
+    });
+  }
+
+  /**
+   * API-Football PRO — Fetch standings for a league and season
+   */
+  public async getStandings(
+    params: { league: number; season: number; team?: number },
+    options?: FetchOptions
+  ): Promise<z.infer<typeof ApiFootballStandingsResponseSchema>> {
+    const query: Record<string, string> = {
+      league: String(params.league),
+      season: String(params.season),
+    };
+    if (params.team) query.team = String(params.team);
+    return this.request('standings', query, ApiFootballStandingsResponseSchema, options);
   }
 }
 

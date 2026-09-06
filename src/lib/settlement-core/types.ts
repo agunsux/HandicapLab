@@ -2,7 +2,7 @@
 // This package EXTENDS the existing live pipeline (fixtures / odds_snapshots /
 // prediction_snapshots / settlements) without modifying or rewriting it.
 
-export type MarketType = 'moneyline' | 'asian_handicap' | 'over_under';
+export type MarketType = 'moneyline' | 'asian_handicap' | 'over_under' | 'btts';
 
 // Canonical settlement outcomes required by Epic 31A D.
 export type SettlementOutcome =
@@ -18,7 +18,9 @@ export type Selection =
   | 'draw'
   | 'away'
   | 'over'
-  | 'under';
+  | 'under'
+  | 'yes'
+  | 'no';
 
 export interface SettlementInput {
   homeGoals: number;

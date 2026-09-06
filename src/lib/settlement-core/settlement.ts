@@ -104,6 +104,24 @@ export function settleOverUnder(
   return outcomeFromMargin(effectiveMargin(homeGoals, awayGoals, line, selection), odds);
 }
 
+export function settleBtts(
+  homeGoals: number,
+  awayGoals: number,
+  selection: 'yes' | 'no',
+  odds: number,
+  voided = false
+): SettlementResult {
+  if (voided) return { outcome: 'VOID', profitUnits: 0 };
+  if (homeGoals < 0 || awayGoals < 0 || odds < 1) return { outcome: 'VOID', profitUnits: 0 };
+
+  const bothScored = homeGoals >= 1 && awayGoals >= 1;
+  const won = (selection === 'yes' && bothScored) || (selection === 'no' && !bothScored);
+  return {
+    outcome: won ? 'WIN' : 'LOSS',
+    profitUnits: won ? round4(odds - 1) : -1,
+  };
+}
+
 export function settle(input: SettlementInput, market: MarketType): SettlementResult {
   const { homeGoals, awayGoals, line, selection, odds, voided } = input;
   switch (market) {
@@ -113,6 +131,8 @@ export function settle(input: SettlementInput, market: MarketType): SettlementRe
       return settleAsianHandicap(homeGoals, awayGoals, line, selection as 'home' | 'away', odds, voided);
     case 'over_under':
       return settleOverUnder(homeGoals, awayGoals, line, selection as 'over' | 'under', odds, voided);
+    case 'btts':
+      return settleBtts(homeGoals, awayGoals, selection as 'yes' | 'no', odds, voided);
   }
 }
 
