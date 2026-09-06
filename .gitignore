@@ -100,3 +100,5 @@ data/golden/epic65/
 data/cache/
 artifacts/forensic_raw_summary.json
 .cursor/
+__pycache__/
+*.pyc
