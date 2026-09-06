@@ -21,15 +21,17 @@ export async function GET(request: Request) {
     // Determine user access
     const { isPremium } = await determineUserAccess(userId);
 
-    // Map market code to DB category name
-    let dbMarketCategory = '';
+    // Map market code to supported market strings
+    let targetMarkets: string[] = [];
     const normMarket = marketParam.toUpperCase();
     if (normMarket === 'AH') {
-      dbMarketCategory = 'asian_handicap';
+      targetMarkets = ['asian_handicap', 'AH', 'ah'];
     } else if (normMarket === 'OU') {
-      dbMarketCategory = 'over_under';
+      targetMarkets = ['over_under', 'OU', 'ou'];
     } else if (normMarket === 'BTTS') {
-      dbMarketCategory = 'btts';
+      targetMarkets = ['btts', 'BTTS'];
+    } else if (marketParam && marketParam !== 'all' && marketParam !== 'ALL') {
+      targetMarkets = [marketParam, marketParam.toLowerCase(), marketParam.toUpperCase()];
     }
 
     // Query signals
@@ -37,8 +39,8 @@ export async function GET(request: Request) {
       .from('signals')
       .select('*');
 
-    if (dbMarketCategory) {
-      query = query.eq('market_category', dbMarketCategory);
+    if (targetMarkets.length > 0) {
+      query = query.in('market', targetMarkets);
     }
 
     if (statusParam === 'SETTLED') {
