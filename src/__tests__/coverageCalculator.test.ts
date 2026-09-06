@@ -71,6 +71,7 @@ describe('Coverage Calculator Service Unit Tests', () => {
     const homeRates: TeamMarketRates = {
       teamId: 33,
       teamName: 'Arsenal',
+      canonicalId: 'tm-epl-002',
       leagueId: 39,
       season: 2025,
       venue: 'home',
@@ -84,22 +85,32 @@ describe('Coverage Calculator Service Unit Tests', () => {
         minus100: 0.50,
         minus150: 0.40,
       },
+      ahProbabilities: {},
       ouRates: {
         over15: 0.85,
+        under15: 0.15,
         over25: 0.65,
-        ouOver35: 0.35,
-      } as any,
+        under25: 0.35,
+        over35: 0.35,
+        under35: 0.65,
+      },
+      bttsRates: {
+        yes: 0.55,
+        no: 0.45,
+      },
       bttsYesRate: 0.55,
       cleanSheetRate: 0.45,
       failedToScoreRate: 0.05,
       firstHalfGoalsAvg: 1.1,
       secondHalfGoalsAvg: 1.9,
+      sampleConfidenceTier: '10<=N<20',
       sampleSize: 19,
     };
 
     const awayRates: TeamMarketRates = {
       teamId: 40,
       teamName: 'Chelsea',
+      canonicalId: 'tm-epl-006',
       leagueId: 39,
       season: 2025,
       venue: 'away',
@@ -113,16 +124,25 @@ describe('Coverage Calculator Service Unit Tests', () => {
         minus100: 0.30,
         minus150: 0.20,
       },
+      ahProbabilities: {},
       ouRates: {
         over15: 0.80,
+        under15: 0.20,
         over25: 0.55,
+        under25: 0.45,
         over35: 0.30,
+        under35: 0.70,
+      },
+      bttsRates: {
+        yes: 0.60,
+        no: 0.40,
       },
       bttsYesRate: 0.60,
       cleanSheetRate: 0.20,
       failedToScoreRate: 0.25,
       firstHalfGoalsAvg: 0.9,
       secondHalfGoalsAvg: 2.1,
+      sampleConfidenceTier: '10<=N<20',
       sampleSize: 18,
     };
 

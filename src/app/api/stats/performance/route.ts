@@ -45,11 +45,6 @@ export async function GET(request?: Request) {
       }
     }
 
-    if (error) {
-      console.error('[Performance API] Error querying signals:', error);
-      return NextResponse.json({ success: false, error: error.message }, { status: 500 });
-    }
-
     let filteredSignals = signals || [];
     if (marketParam) {
       filteredSignals = filteredSignals.filter(

@@ -391,7 +391,7 @@ describe('COVERAGE LAYER FORENSIC VALIDATION & AUDIT TEST SUITE', () => {
       awayRestDays: 7,
       homeTravelKm: 0,
       awayTravelKm: 15,
-      competitionType: 'domestic',
+      competitionType: 'club',
     };
 
     it('produces bit-exact identical predictions when coverageEnabled is omitted vs false', async () => {
