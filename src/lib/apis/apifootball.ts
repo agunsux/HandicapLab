@@ -44,7 +44,7 @@ const ApiFootballErrorsSchema = z.union([
 function createApiFootballResponseSchema<T extends z.ZodTypeAny>(responseItemSchema: T) {
   return z.object({
     get: z.string(),
-    parameters: z.record(z.string(), z.any()),
+    parameters: z.union([z.record(z.string(), z.any()), z.array(z.any())]).optional(),
     errors: ApiFootballErrorsSchema,
     results: z.number(),
     paging: ApiFootballPagingSchema,
@@ -103,6 +103,22 @@ export const ApiFootballLeagueItemSchema = z.object({
     start: z.string().nullable().optional(),
     end: z.string().nullable().optional(),
     current: z.boolean().optional(),
+    coverage: z.object({
+      fixtures: z.object({
+        events: z.boolean().optional(),
+        lineups: z.boolean().optional(),
+        statistics_fixtures: z.boolean().optional(),
+        statistics_players: z.boolean().optional(),
+      }).optional(),
+      standings: z.boolean().optional(),
+      players: z.boolean().optional(),
+      top_scorers: z.boolean().optional(),
+      top_assists: z.boolean().optional(),
+      top_cards: z.boolean().optional(),
+      injuries: z.boolean().optional(),
+      predictions: z.boolean().optional(),
+      odds: z.boolean().optional(),
+    }).optional(),
   })).optional(),
 });
 

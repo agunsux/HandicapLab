@@ -8,8 +8,8 @@
 //   - softLimit  = application operating ceiling. At/above this only
 //                  prediction-critical (P0) work may continue.
 //
-// API-Football PRO  : hard 7,500/day  | soft 6,000/day
-// OddsPapi          : hard   250/month | soft   200/month
+// API-Football Custom1500 : hard 1,500,000/day | soft 1,350,000/day
+// OddsPapi          : hard       250/month | soft       200/month
 //   (/v4/historical-odds and /v4/account are unmetered — see UNMETERED_ENDPOINTS)
 //
 // The soft limit is application policy; the hard limit is the provider contract.
@@ -97,11 +97,15 @@ function envInt(names: string[]): number | undefined {
   return undefined;
 }
 
+export const CUSTOM1500_DAILY_HARD_LIMIT = 1500000;
+export const CUSTOM1500_DAILY_SOFT_LIMIT = 1350000;
+export const CUSTOM1500_SAFETY_RESERVE = 150000;
+
 const DEFAULT_POLICIES: Record<Provider, Omit<ProviderQuotaPolicy, 'provider'>> = {
   apifootball: {
     period: 'DAILY',
-    hardLimit: 7500,
-    softLimit: 6000,
+    hardLimit: CUSTOM1500_DAILY_HARD_LIMIT,
+    softLimit: CUSTOM1500_DAILY_SOFT_LIMIT,
     economyAtPctOfSoft: 80,
   },
   oddspapi: {
@@ -121,7 +125,7 @@ const DEFAULT_POLICIES: Record<Provider, Omit<ProviderQuotaPolicy, 'provider'>> 
 const ENV_KEYS: Record<Provider, { hard: string[]; soft: string[] }> = {
   apifootball: {
     hard: ['API_FOOTBALL_DAILY_HARD_LIMIT', 'QUOTA_APIFOOTBALL_DAILY'],
-    soft: ['API_FOOTBALL_DAILY_SOFT_LIMIT'],
+    soft: ['API_FOOTBALL_DAILY_SOFT_LIMIT', 'API_FOOTBALL_OPERATIONAL_BUDGET'],
   },
   oddspapi: {
     hard: ['ODDSPAPI_HARD_LIMIT', 'QUOTA_ODDSPAPI_MONTHLY'],

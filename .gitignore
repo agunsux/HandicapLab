@@ -106,6 +106,7 @@ __pycache__/
 # OddsPapi historical odds raw/ingested artifacts (reproducible via
 # scripts/verify/historical-odds-sample-ingest.ts; 40MB+ of provider payloads)
 data/historical/oddspapi/
+data/lakehouse/
 
 # Stray shell redirect artifact (captured CLI deprecation notice)
 0.26.0
