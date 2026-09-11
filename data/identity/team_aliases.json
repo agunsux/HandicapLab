@@ -1,0 +1,30 @@
+{
+  "_meta": {
+    "purpose": "Explicit, auditable provider team-name aliases. Keys are normalized provider names (lowercase, diacritics stripped, '&' -> 'and', punctuation removed). Values are canonical display names used by the historical canonical dataset.",
+    "source": "Derived from real OddsPapi /v4/fixtures participant names (data/cache/oddspapi_pl_fixtures.json) and real canonical matches (data/golden/europe/canonical_matches.jsonl). No fuzzy or automatic alias generation.",
+    "policy": "Only genuine presentation differences (club suffixes, abbreviations, punctuation) may be aliased. Ambiguous names must stay unmapped.",
+    "version": "2026-09-11"
+  },
+  "ENG-PL": {
+    "afc bournemouth": "Bournemouth",
+    "arsenal fc": "Arsenal",
+    "aston villa": "Aston Villa",
+    "brentford fc": "Brentford",
+    "brighton and hove albion": "Brighton",
+    "burnley fc": "Burnley",
+    "chelsea fc": "Chelsea",
+    "crystal palace": "Crystal Palace",
+    "everton fc": "Everton",
+    "fulham fc": "Fulham",
+    "leeds united": "Leeds",
+    "liverpool fc": "Liverpool",
+    "manchester city": "Man City",
+    "manchester united": "Man United",
+    "newcastle united": "Newcastle",
+    "nottingham forest": "Nott'm Forest",
+    "sunderland afc": "Sunderland",
+    "tottenham hotspur": "Tottenham",
+    "west ham united": "West Ham",
+    "wolverhampton wanderers": "Wolves"
+  }
+}

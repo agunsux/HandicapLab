@@ -1,0 +1,11 @@
+{
+  "_meta": {
+    "purpose": "Explicit provider tournament-id to canonical league-key mapping. Provider ids are external identifiers; canonical league keys are internal.",
+    "source": "OddsPapi /v4/fixtures tournamentId=17 confirmed as 'Premier League' (tournamentSlug=premier-league, categoryName=England) from real cached provider data.",
+    "policy": "Never guess a league mapping. Unknown ids stay unmapped.",
+    "version": "2026-09-11"
+  },
+  "oddspapi": {
+    "17": "ENG-PL"
+  }
+}

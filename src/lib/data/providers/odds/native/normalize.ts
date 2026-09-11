@@ -19,6 +19,8 @@ import type {
   NativeBookmakerOdds,
   NativeBookmakerMarket,
   NativeOutcomePlayer,
+  NativeHistoricalOddsResponse,
+  NativeHistoricalOddEntry,
 } from './schemas';
 import type { DiscoveredMarket } from './discovery';
 
@@ -318,4 +320,92 @@ function sideNameFor(marketType: MarketType): string {
     case 'btts': return 'Yes';
     case 'asian_handicap': return 'Home';
   }
+}
+
+// ─── Historical odds normalization (GET /v4/historical-odds) ─────────
+// Produces a flat, chronological price series per bookmaker/market/outcome.
+// This is UNMETERED research data: no quota accounting here, and no
+// interpolation — missing points are simply absent.
+
+export interface HistoricalOddPoint {
+  fixtureId: string;
+  bookmaker: string;
+  marketId: number;
+  outcomeId: number;
+  playerKey: string;
+  createdAt: string;
+  price: number;
+  limit: number | null;
+  active: boolean;
+  exchangeMeta: unknown;
+}
+
+export function normalizeHistoricalOdds(response: NativeHistoricalOddsResponse): HistoricalOddPoint[] {
+  const points: HistoricalOddPoint[] = [];
+  const bookmakers = response.bookmakers ?? {};
+
+  for (const [bookmaker, book] of Object.entries(bookmakers)) {
+    for (const [marketKey, market] of Object.entries(book.markets ?? {})) {
+      for (const [outcomeKey, outcome] of Object.entries(market.outcomes ?? {})) {
+        for (const [playerKey, entriesRaw] of Object.entries(outcome.players ?? {})) {
+          const entries: NativeHistoricalOddEntry[] = Array.isArray(entriesRaw)
+            ? entriesRaw
+            : Object.values(entriesRaw as Record<string, NativeHistoricalOddEntry>);
+          for (const entry of entries) {
+            if (!entry || typeof entry.price !== 'number' || entry.price <= 1) continue;
+            if (!entry.createdAt || typeof entry.createdAt !== 'string') continue;
+            points.push({
+              fixtureId: response.fixtureId,
+              bookmaker,
+              marketId: Number(marketKey),
+              outcomeId: Number(outcomeKey),
+              playerKey,
+              createdAt: entry.createdAt,
+              price: entry.price,
+              limit: entry.limit ?? null,
+              active: entry.active ?? true,
+              exchangeMeta: entry.exchangeMeta ?? null,
+            });
+          }
+        }
+      }
+    }
+  }
+
+  return points.sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+}
+
+export interface EntryClosingSelection {
+  entry: HistoricalOddPoint | null;
+  closing: HistoricalOddPoint | null;
+}
+
+/**
+ * Select entry and closing observations for a price series relative to
+ * kickoff. Closing = last observation at/before kickoff. Entry = last
+ * observation at/before (kickoff - entryLeadMs). Returns null when the data
+ * does not exist — never fabricates a price or timestamp.
+ */
+export function selectEntryAndClosing(
+  points: HistoricalOddPoint[],
+  kickoffIso: string,
+  entryLeadMs = 60 * 60 * 1000
+): EntryClosingSelection {
+  const kickoffMs = new Date(kickoffIso).getTime();
+  if (!Number.isFinite(kickoffMs)) return { entry: null, closing: null };
+
+  const sorted = [...points].sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+  const entryCutoff = kickoffMs - entryLeadMs;
+
+  let closing: HistoricalOddPoint | null = null;
+  let entry: HistoricalOddPoint | null = null;
+
+  for (const point of sorted) {
+    const t = new Date(point.createdAt).getTime();
+    if (!Number.isFinite(t)) continue;
+    if (t <= kickoffMs) closing = point;
+    if (t <= entryCutoff) entry = point;
+  }
+
+  return { entry, closing };
 }

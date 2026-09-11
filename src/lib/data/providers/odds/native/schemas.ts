@@ -122,6 +122,52 @@ export const NativeTournamentsResponseSchema = z.array(NativeTournamentSchema);
 export const NativeBookmakersResponseSchema = z.array(NativeBookmakerSchema);
 export const NativeMarketsResponseSchema = z.array(NativeMarketSchema);
 
+// ─── Historical odds schemas (GET /v4/historical-odds) ────────────────
+// Documented response: { fixtureId, bookmakers: { <slug>: { markets: {
+//   <marketId>: { outcomes: { <outcomeId>: { players: { <playerId>:
+//   <entry | entry[]> } } } } } } } }
+// `players` is an array in the documented example but an object in the live
+// odds shape, so both forms are accepted defensively.
+
+// Entry-level fields are intentionally tolerant: individual invalid
+// observations are rejected and counted during normalization, instead of
+// failing the whole provider payload. Envelope shape stays strict.
+export const NativeHistoricalOddEntrySchema = z.object({
+  id: z.number().nullable().optional(),
+  createdAt: z.string().nullable().optional(),
+  price: z.number().nullable().optional(),
+  limit: z.number().nullable().optional(),
+  active: z.boolean().nullable().optional(),
+  exchangeMeta: z.unknown().nullable().optional(),
+});
+
+export const NativeHistoricalOutcomeSchema = z.object({
+  players: z.union([
+    z.array(NativeHistoricalOddEntrySchema),
+    // Documented historical shape: players is a map of playerId -> entries.
+    z.record(
+      z.string(),
+      z.union([NativeHistoricalOddEntrySchema, z.array(NativeHistoricalOddEntrySchema)])
+    ),
+  ]),
+});
+
+export const NativeHistoricalBookmakerMarketSchema = z.object({
+  outcomes: z.record(z.string(), NativeHistoricalOutcomeSchema),
+});
+
+export const NativeHistoricalBookmakerSchema = z.object({
+  markets: z.record(z.string(), NativeHistoricalBookmakerMarketSchema),
+});
+
+export const NativeHistoricalOddsResponseSchema = z.object({
+  fixtureId: z.string(),
+  bookmakers: z.record(z.string(), NativeHistoricalBookmakerSchema),
+});
+
+export type NativeHistoricalOddEntry = z.infer<typeof NativeHistoricalOddEntrySchema>;
+export type NativeHistoricalOddsResponse = z.infer<typeof NativeHistoricalOddsResponseSchema>;
+
 // ─── Derived types ───────────────────────────────────────────────────
 
 export type NativeSport = z.infer<typeof NativeSportSchema>;
