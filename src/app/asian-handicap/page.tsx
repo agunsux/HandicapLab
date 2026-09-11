@@ -61,6 +61,24 @@ export default async function AsianHandicapRoutePage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16 w-full">
+        {/* 0. AH YIELD RESEARCH (real historical odds → settlement → P&L → ROI) */}
+        <Link
+          href="/asian-handicap/research"
+          className="flex items-center justify-between gap-4 p-5 rounded-xl bg-[#111827]/70 border border-[#1F2937] hover:border-[#10B981]/50 transition-colors group"
+        >
+          <div className="flex items-start gap-3">
+            <TrendingUp className="h-5 w-5 text-[#10B981] mt-0.5 shrink-0" />
+            <div>
+              <div className="text-sm font-bold text-white font-display">AH Yield Research Engine</div>
+              <p className="text-xs text-[#9CA3AF] mt-1 leading-relaxed max-w-2xl">
+                Realized yield/ROI per line and side from verified historical odds, settlement-aware fair odds and
+                model EV, sample-size protection, and season walk-forward validation.
+              </p>
+            </div>
+          </div>
+          <ArrowRight className="h-4 w-4 text-[#10B981] group-hover:translate-x-1 transition-transform shrink-0" />
+        </Link>
+
         {/* 1. EDUCATIONAL GUIDE: HOW ASIAN HANDICAP WORKS */}
         <section className="space-y-6">
           <div className="flex items-center gap-2">

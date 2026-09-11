@@ -61,7 +61,11 @@
     "verify:oddspapi-production": "node scripts/verify-oddspapi-production.mjs",
     "verify:providers": "node scripts/canonical_provider_probe.mjs",
     "backtest:epic65": "tsx scripts/epic65_backtest_runner.ts",
-    "research:epic66": "tsx scripts/epic66_profitability_report.ts"
+    "research:epic66": "tsx scripts/epic66_profitability_report.ts",
+    "ah:yield": "tsx scripts/ah-yield-validation.ts",
+    "test:ah-yield": "vitest run tests/ah-yield/",
+    "ah:edge": "tsx scripts/ah-edge-validation.ts",
+    "test:ah-edge": "vitest run tests/ah-edge/"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
