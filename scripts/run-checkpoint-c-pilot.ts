@@ -63,11 +63,11 @@ async function main() {
   const quotaBefore = await getQuotaSnapshot('apifootball');
   console.log('\n[Step 2] Initial Quota State:');
   console.log({
-    provider: quotaBefore.provider,
-    mode: quotaBefore.mode,
-    allocatedDaily: quotaBefore.allocatedDaily,
-    consumedToday: quotaBefore.consumedToday,
-    remaining: quotaBefore.remaining,
+    provider: quotaBefore?.provider ?? 'apifootball',
+    mode: quotaBefore?.mode ?? 'NORMAL',
+    allocatedDaily: quotaBefore?.allocatedDaily,
+    consumedToday: quotaBefore?.consumedToday,
+    remaining: quotaBefore?.remaining,
   });
 
   // Step 4: Execute Controlled Ingestion
@@ -98,8 +98,8 @@ async function main() {
   console.log(`Upcoming Matches: ${pilotResult.upcomingMatches}`);
   console.log(`Quarantined Fixtures: ${pilotResult.quarantinedCount}`);
   console.log(`API Requests Consumed: ${pilotResult.requestsConsumed}`);
-  console.log(`Quota Remaining: ${quotaAfter.remaining}`);
-  console.log(`Quota Mode: ${quotaAfter.mode}`);
+  console.log(`Quota Remaining: ${quotaAfter?.remaining ?? 'N/A'}`);
+  console.log(`Quota Mode: ${quotaAfter?.mode ?? 'NORMAL'}`);
 
   console.log('\n--- PER-LEAGUE SUMMARY ---');
   console.table(
