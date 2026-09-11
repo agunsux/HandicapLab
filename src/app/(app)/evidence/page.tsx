@@ -11,18 +11,21 @@ interface EvidenceData {
     syncStatus: string;
     lastUpdated: string;
   };
+  dataState?: string;
+  minSample?: number;
   heroMetrics: {
     totalPredictions: number;
-    paperRoiPct: number;
-    meanClvPct: number;
-    brierScore: number;
-    ece: number;
-    calibrationScorePct: number;
-    ci95LowerPct: number;
-    ci95UpperPct: number;
-    maxDrawdownPct: number;
-    unitsWon: number;
-    historicalSeasonsCount: number;
+    settledPredictions?: number;
+    paperRoiPct: number | null;
+    meanClvPct: number | null;
+    brierScore: number | null;
+    ece: number | null;
+    calibrationScorePct: number | null;
+    ci95LowerPct: number | null;
+    ci95UpperPct: number | null;
+    maxDrawdownPct: number | null;
+    unitsWon: number | null;
+    historicalSeasonsCount: number | null;
   };
   calibrationCurve: Array<{
     bucket: string;
@@ -31,24 +34,34 @@ interface EvidenceData {
     count: number;
   }>;
   subgroupBreakdown: {
-    leagues: Array<{ name: string; bets: number; winRatePct: number; roiPct: number; clvPct: number }>;
-    markets: Array<{ name: string; bets: number; winRatePct: number; roiPct: number; clvPct: number }>;
-    bookmakers: Array<{ name: string; bets: number; winRatePct: number; roiPct: number; clvPct: number }>;
-    oddsRanges: Array<{ range: string; bets: number; winRatePct: number; roiPct: number; clvPct: number }>;
-    confidenceBuckets: Array<{ bucket: string; bets: number; winRatePct: number; roiPct: number; clvPct: number }>;
+    leagues: Array<{ name: string; bets: number; winRatePct: number | null; roiPct: number | null; clvPct: number | null }>;
+    markets: Array<{ name: string; bets: number; winRatePct: number | null; roiPct: number | null; clvPct: number | null }>;
+    bookmakers: Array<{ name: string; bets: number; winRatePct: number | null; roiPct: number | null; clvPct: number | null }>;
+    oddsRanges: Array<{ range: string; bets: number; winRatePct: number | null; roiPct: number | null; clvPct: number | null }>;
+    confidenceBuckets: Array<{ bucket: string; bets: number; winRatePct: number | null; roiPct: number | null; clvPct: number | null }>;
   };
   auditLedgerLogs: Array<{
     id: string;
     fixture: string;
-    kickoff: string;
-    market: string;
-    prob: number;
-    fairOdds: number;
-    bookOdds: number;
+    kickoff: string | null;
+    market: string | null;
+    prob: number | null;
+    fairOdds: number | null;
+    bookOdds: number | null;
     status: string;
-    roi: number;
-    clv: number;
+    roi: number | null;
+    clv: number | null;
   }>;
+}
+
+function fmtPct(value: number | null | undefined, digits = 2): string {
+  if (value == null || Number.isNaN(value)) return '—';
+  return `${value > 0 ? '+' : ''}${value.toFixed(digits)}%`;
+}
+
+function fmtNum(value: number | null | undefined, digits = 2): string {
+  if (value == null || Number.isNaN(value)) return '—';
+  return value.toFixed(digits);
 }
 
 export default function ScientificEvidencePage() {
@@ -85,6 +98,11 @@ export default function ScientificEvidencePage() {
 
   const { systemInfo, heroMetrics, calibrationCurve, subgroupBreakdown, auditLedgerLogs } = data;
   const hasSample = heroMetrics.totalPredictions > 0;
+  const settledCount = heroMetrics.settledPredictions ?? 0;
+  const hasRoi = heroMetrics.paperRoiPct != null;
+  const hasClv = heroMetrics.meanClvPct != null;
+  const hasCalibration = heroMetrics.brierScore != null;
+  const minSample = data.minSample ?? 30;
 
   return (
     <div className="space-y-8 animate-fade-in text-slate-100 font-mono">
@@ -122,23 +140,29 @@ export default function ScientificEvidencePage() {
         <div className="bg-slate-950 border border-slate-850 p-4 rounded-xl space-y-1">
           <span className="text-[10px] text-slate-500 uppercase block font-bold">Total Verified Predictions</span>
           <div className="text-2xl font-black text-white">{heroMetrics.totalPredictions.toLocaleString()}</div>
-          <span className="text-[10px] text-slate-400">{heroMetrics.historicalSeasonsCount} Active Seasons</span>
+          <span className="text-[10px] text-slate-400">
+            {heroMetrics.historicalSeasonsCount != null
+              ? `${heroMetrics.historicalSeasonsCount} Active Seasons`
+              : `${settledCount} settled`}
+          </span>
         </div>
 
         <div className="bg-slate-950 border border-slate-850 p-4 rounded-xl space-y-1">
           <span className="text-[10px] text-slate-500 uppercase block font-bold">Paper Trading ROI</span>
-          <div className={`text-2xl font-black ${hasSample ? (heroMetrics.paperRoiPct >= 0 ? 'text-emerald-400' : 'text-rose-400') : 'text-slate-400'}`}>
-            {hasSample ? `${heroMetrics.paperRoiPct >= 0 ? '+' : ''}${heroMetrics.paperRoiPct}%` : '—'}
+          <div className={`text-2xl font-black ${hasRoi ? (heroMetrics.paperRoiPct! >= 0 ? 'text-emerald-400' : 'text-rose-400') : 'text-slate-400'}`}>
+            {hasRoi ? fmtPct(heroMetrics.paperRoiPct) : '—'}
           </div>
           <span className="text-[10px] text-emerald-500/80 font-bold">
-            {hasSample ? `95% CI: [${heroMetrics.ci95LowerPct}%, +${heroMetrics.ci95UpperPct}%]` : 'CI: Pending Sample'}
+            {heroMetrics.ci95LowerPct != null && heroMetrics.ci95UpperPct != null
+              ? `95% CI: [${fmtPct(heroMetrics.ci95LowerPct)}, ${fmtPct(heroMetrics.ci95UpperPct)}]`
+              : `CI: pending (min ${minSample} settled)`}
           </span>
         </div>
 
         <div className="bg-slate-950 border border-slate-850 p-4 rounded-xl space-y-1">
           <span className="text-[10px] text-slate-500 uppercase block font-bold">Mean Closing Line Value (CLV)</span>
-          <div className={`text-2xl font-black ${hasSample ? 'text-emerald-400' : 'text-slate-400'}`}>
-            {hasSample ? `+${heroMetrics.meanClvPct}%` : '—'}
+          <div className={`text-2xl font-black ${hasClv ? (heroMetrics.meanClvPct! >= 0 ? 'text-emerald-400' : 'text-rose-400') : 'text-slate-400'}`}>
+            {hasClv ? fmtPct(heroMetrics.meanClvPct) : '—'}
           </div>
           <span className="text-[10px] text-slate-400">Pinnacle Sharp Benchmark</span>
         </div>
@@ -146,10 +170,12 @@ export default function ScientificEvidencePage() {
         <div className="bg-slate-950 border border-slate-850 p-4 rounded-xl space-y-1">
           <span className="text-[10px] text-slate-500 uppercase block font-bold">Brier Score & Calibration</span>
           <div className="text-2xl font-black text-white">
-            {hasSample ? heroMetrics.brierScore.toFixed(4) : '—'}
+            {hasCalibration ? heroMetrics.brierScore!.toFixed(4) : '—'}
           </div>
           <span className="text-[10px] text-emerald-400 font-bold">
-            {hasSample ? `Calibration Rate: ${heroMetrics.calibrationScorePct}% (ECE ${heroMetrics.ece})` : 'Awaiting Settlement'}
+            {hasCalibration && heroMetrics.calibrationScorePct != null
+              ? `Calibration Rate: ${heroMetrics.calibrationScorePct}% (ECE ${fmtNum(heroMetrics.ece, 4)})`
+              : `Awaiting minimum sample (${minSample})`}
           </span>
         </div>
       </div>
@@ -158,11 +184,11 @@ export default function ScientificEvidencePage() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-slate-900/60 border border-slate-850 p-4 rounded-xl text-xs">
         <div>
           <span className="text-slate-500 block text-[10px] uppercase font-bold">Units Won</span>
-          <span className="text-white font-bold text-base">{hasSample ? `${heroMetrics.unitsWon >= 0 ? '+' : ''}${heroMetrics.unitsWon}u` : '0.0u'}</span>
+          <span className="text-white font-bold text-base">{heroMetrics.unitsWon != null ? `${heroMetrics.unitsWon >= 0 ? '+' : ''}${heroMetrics.unitsWon}u` : '—'}</span>
         </div>
         <div>
           <span className="text-slate-500 block text-[10px] uppercase font-bold">Max Drawdown</span>
-          <span className="text-amber-400 font-bold text-base">{heroMetrics.maxDrawdownPct}%</span>
+          <span className="text-amber-400 font-bold text-base">{heroMetrics.maxDrawdownPct != null ? `${heroMetrics.maxDrawdownPct}u` : '—'}</span>
         </div>
         <div>
           <span className="text-slate-500 block text-[10px] uppercase font-bold">Expected Value Threshold</span>
@@ -209,7 +235,7 @@ export default function ScientificEvidencePage() {
             <div className="bg-slate-950 border border-slate-850 p-6 rounded-xl space-y-4">
               <div className="flex justify-between items-center text-xs">
                 <span className="text-slate-400 font-bold">
-                  Bankroll Trajectory & CLV Benchmark ({hasSample ? `${heroMetrics.paperRoiPct >= 0 ? '+' : ''}${heroMetrics.paperRoiPct}% ROI / +${heroMetrics.meanClvPct}% CLV` : 'Pending Data'})
+                  Bankroll Trajectory & CLV Benchmark ({hasRoi ? `${fmtPct(heroMetrics.paperRoiPct)} ROI / ${fmtPct(heroMetrics.meanClvPct)} CLV` : 'Pending Data'})
                 </span>
                 <span className="text-emerald-400 font-bold">{heroMetrics.totalPredictions.toLocaleString()} Sample Bets</span>
               </div>
@@ -218,8 +244,8 @@ export default function ScientificEvidencePage() {
                 <div className="space-y-3 pt-2">
                   <div>
                     <div className="flex justify-between text-[11px] mb-1">
-                      <span className="text-slate-300">Cumulative Paper ROI ({heroMetrics.paperRoiPct >= 0 ? '+' : ''}{heroMetrics.paperRoiPct}%)</span>
-                      <span className="text-emerald-400 font-bold">{heroMetrics.unitsWon >= 0 ? '+' : ''}{heroMetrics.unitsWon} Units</span>
+                      <span className="text-slate-300">Cumulative Paper ROI ({fmtPct(heroMetrics.paperRoiPct)})</span>
+                      <span className="text-emerald-400 font-bold">{heroMetrics.unitsWon != null ? `${heroMetrics.unitsWon >= 0 ? '+' : ''}${heroMetrics.unitsWon} Units` : '—'}</span>
                     </div>
                     <div className="h-3 w-full bg-slate-900 rounded-full overflow-hidden border border-slate-800">
                       <div className="bg-gradient-to-r from-emerald-600 to-emerald-400 h-full w-[75%]" />
@@ -228,8 +254,8 @@ export default function ScientificEvidencePage() {
 
                   <div>
                     <div className="flex justify-between text-[11px] mb-1">
-                      <span className="text-slate-300">Pinnacle Closing Line Value (+{heroMetrics.meanClvPct}%)</span>
-                      <span className="text-emerald-400 font-bold">+{heroMetrics.meanClvPct}% CLV</span>
+                      <span className="text-slate-300">Pinnacle Closing Line Value ({fmtPct(heroMetrics.meanClvPct)})</span>
+                      <span className="text-emerald-400 font-bold">{fmtPct(heroMetrics.meanClvPct)} CLV</span>
                     </div>
                     <div className="h-3 w-full bg-slate-900 rounded-full overflow-hidden border border-slate-800">
                       <div className="bg-gradient-to-r from-blue-600 to-blue-400 h-full w-[60%]" />
@@ -254,10 +280,10 @@ export default function ScientificEvidencePage() {
               <div className="bg-slate-950 border border-slate-850 p-4 rounded-xl space-y-2">
                 <h4 className="text-white font-bold uppercase tracking-wider text-[11px]">Variance Guard & Confidence Interval</h4>
                 <p className="text-slate-400 leading-relaxed">
-                  {hasSample ? (
-                    <>With {heroMetrics.totalPredictions.toLocaleString()} verified predictions, the 95% Confidence Interval for expected ROI is bounded between <span className="text-emerald-400 font-bold">{heroMetrics.ci95LowerPct}% and +{heroMetrics.ci95UpperPct}%</span>.</>
+                  {heroMetrics.ci95LowerPct != null && heroMetrics.ci95UpperPct != null ? (
+                    <>With {heroMetrics.totalPredictions.toLocaleString()} verified predictions, the 95% Confidence Interval for expected ROI is bounded between <span className="text-emerald-400 font-bold">{fmtPct(heroMetrics.ci95LowerPct)} and {fmtPct(heroMetrics.ci95UpperPct)}</span>.</>
                   ) : (
-                    <>Confidence intervals will be computed once sample predictions are settled against bookmaker closing lines.</>
+                    <>Confidence intervals will be computed once at least {minSample} predictions are settled against bookmaker closing lines.</>
                   )}
                 </p>
               </div>
@@ -365,9 +391,9 @@ export default function ScientificEvidencePage() {
                     <TableRow key={idx} className="border-slate-850 hover:bg-slate-850/30">
                       <TableCell className="py-3 pl-3 font-bold text-white">{row.name || row.range || row.bucket}</TableCell>
                       <TableCell className="text-center py-3 text-slate-300">{row.bets.toLocaleString()}</TableCell>
-                      <TableCell className="text-center py-3 font-bold text-white">{row.winRatePct}%</TableCell>
-                      <TableCell className="text-center py-3 font-bold text-emerald-400">+{row.roiPct}%</TableCell>
-                      <TableCell className="text-center py-3 font-bold text-emerald-400 pr-3">+{row.clvPct}%</TableCell>
+                      <TableCell className="text-center py-3 text-slate-300">{row.winRatePct != null ? `${row.winRatePct}%` : '—'}</TableCell>
+                      <TableCell className={`text-center py-3 font-bold ${row.roiPct != null && row.roiPct < 0 ? 'text-rose-400' : 'text-emerald-400'}`}>{fmtPct(row.roiPct)}</TableCell>
+                      <TableCell className={`text-center py-3 font-bold pr-3 ${row.clvPct != null && row.clvPct < 0 ? 'text-rose-400' : 'text-emerald-400'}`}>{fmtPct(row.clvPct)}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -409,15 +435,15 @@ export default function ScientificEvidencePage() {
                     <TableRow key={log.id} className="border-slate-850 hover:bg-slate-850/30">
                       <TableCell className="py-3 pl-3 text-slate-400 font-mono text-[11px]">{log.id.slice(0, 12)}...</TableCell>
                       <TableCell className="py-3 font-bold text-white">{log.fixture}</TableCell>
-                      <TableCell className="text-center py-3 text-emerald-400 font-bold">{log.market}</TableCell>
-                      <TableCell className="text-center py-3 text-white">{(log.prob * 100).toFixed(1)}%</TableCell>
-                      <TableCell className="text-center py-3 text-slate-300">{log.fairOdds} / {log.bookOdds}</TableCell>
+                      <TableCell className="text-center py-3 text-emerald-400 font-bold">{log.market ?? '—'}</TableCell>
+                      <TableCell className="text-center py-3 text-white">{log.prob != null ? `${(log.prob * 100).toFixed(1)}%` : '—'}</TableCell>
+                      <TableCell className="text-center py-3 text-slate-300">{log.fairOdds ?? '—'} / {log.bookOdds ?? '—'}</TableCell>
                       <TableCell className="text-center py-3">
                         <Badge className="bg-emerald-500/20 text-emerald-300 border-emerald-500/40 text-[10px] font-bold">
                           {log.status}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-center py-3 font-bold text-emerald-400 pr-3">+{log.clv}%</TableCell>
+                      <TableCell className="text-center py-3 font-bold text-emerald-400 pr-3">{fmtPct(log.clv)}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

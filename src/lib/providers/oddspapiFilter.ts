@@ -1,4 +1,8 @@
-export const ALLOWED_BOOKMAKERS = ['pinnacle', 'sbo', 'sbobet'];
+import { ENABLED_SHARP_BOOK_KEYS } from '@/lib/config/sharpBooks';
+
+// Single source of truth: enabled sharp books from the Sharp Market Reference
+// Policy config (S1 + S2). Do not maintain a second allowlist here.
+export const ALLOWED_BOOKMAKERS = ENABLED_SHARP_BOOK_KEYS;
 
 export function filterOddsPapiBookmakers(response: any): any {
   if (!response || typeof response !== 'object') return response;

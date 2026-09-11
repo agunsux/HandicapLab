@@ -87,39 +87,49 @@ export default async function BttsRoutePage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#1F2937]">
-                {bttsRankings.map((b) => (
-                  <tr key={b.id} className="hover:bg-[#111827]">
-                    <td className="py-3.5 px-4 font-bold text-white whitespace-nowrap">
-                      {b.leagueId}
-                    </td>
-                    <td className="py-3.5 px-4 text-neutral-300">{b.bets} matches</td>
-                    <td className="py-3.5 px-4 font-bold text-white">
-                      {b.hitRatePct}%
-                    </td>
-                    <td
-                      className={`py-3.5 px-4 font-bold ${
-                        b.roiPct > 0 ? 'text-[#10B981]' : 'text-red-400'
-                      }`}
-                    >
-                      {b.roiPct > 0 ? `+${b.roiPct}%` : `${b.roiPct}%`}
-                    </td>
-                    <td className="py-3.5 px-4">
-                      <span
-                        className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                          b.tier === 'GOLD'
-                            ? 'bg-[#10B981]/15 text-[#10B981] border border-[#10B981]/30'
-                            : b.tier === 'GREEN'
-                            ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
-                            : b.tier === 'YELLOW'
-                            ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
-                            : 'bg-red-500/15 text-red-400 border border-red-500/30'
-                        }`}
-                      >
-                        {b.tier}
-                      </span>
+                {bttsRankings.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="py-8 px-4 text-center text-[#9CA3AF] leading-relaxed">
+                      BTTS historical odds have not been ingested (0 priced rows in the gold
+                      dataset). BTTS remains calibration-only: no ROI, EV or staking claim is made
+                      until real market prices exist.
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  bttsRankings.map((b) => (
+                    <tr key={b.id} className="hover:bg-[#111827]">
+                      <td className="py-3.5 px-4 font-bold text-white whitespace-nowrap">
+                        {b.leagueId}
+                      </td>
+                      <td className="py-3.5 px-4 text-neutral-300">{b.bets} matches</td>
+                      <td className="py-3.5 px-4 font-bold text-white">
+                        {b.hitRatePct.toFixed(1)}%
+                      </td>
+                      <td
+                        className={`py-3.5 px-4 font-bold ${
+                          b.roiPct > 0 ? 'text-[#10B981]' : 'text-red-400'
+                        }`}
+                      >
+                        {b.roiPct > 0 ? `+${b.roiPct}%` : `${b.roiPct}%`}
+                      </td>
+                      <td className="py-3.5 px-4">
+                        <span
+                          className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                            b.tier === 'GOLD'
+                              ? 'bg-[#10B981]/15 text-[#10B981] border border-[#10B981]/30'
+                              : b.tier === 'GREEN'
+                              ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                              : b.tier === 'YELLOW'
+                              ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
+                              : 'bg-neutral-800 text-neutral-300 border border-neutral-700'
+                          }`}
+                        >
+                          {b.tier}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

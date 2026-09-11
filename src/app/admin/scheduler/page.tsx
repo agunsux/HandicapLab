@@ -5,11 +5,16 @@ import Link from 'next/link';
 
 interface ProviderHealth {
   provider: string;
-  isHealthy: boolean;
-  dailyRemaining: number;
-  monthlyRemaining: number;
+  healthy: boolean;
   quotaPct: number;
+  quotaUsed: number;
+  quotaLimit: number;
+  quotaRemaining: number;
+  softLimit: number;
+  hardLimit: number;
+  softRemaining: number;
   mode: string;
+  statusLabel?: string;
 }
 
 interface League {
@@ -124,25 +129,32 @@ export default function SchedulerDashboard() {
         <section className="space-y-4">
           <h2 className="text-lg font-semibold text-gray-200">Provider Quota & Health</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {data.providers.map(p => (
+            {data.providers.map(p => {
+              const isMonthly = p.provider === 'oddspapi';
+              const periodLabel = isMonthly ? 'Monthly' : 'Daily';
+              const planLabel = p.provider === 'apifootball' ? 'PRO' : isMonthly ? 'Standard' : '—';
+              return (
               <div key={p.provider} className="bg-gray-800 rounded-xl p-6 border border-gray-700 shadow-lg">
                 <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-xl font-bold text-white capitalize">{p.provider}</h3>
+                  <div>
+                    <h3 className="text-xl font-bold text-white capitalize">{p.provider}</h3>
+                    <span className="text-xs text-gray-500 font-mono">Plan: {planLabel}</span>
+                  </div>
                   <div className={`px-3 py-1 rounded-full text-xs font-bold ${
                     p.mode === 'NORMAL' ? 'bg-green-900/50 text-green-400 border border-green-800' :
                     p.mode === 'ECONOMY' ? 'bg-yellow-900/50 text-yellow-400 border border-yellow-800' :
                     'bg-red-900/50 text-red-400 border border-red-800'
                   }`}>
-                    {p.mode} MODE
+                    {p.statusLabel || p.mode}
                   </div>
                 </div>
 
                 <div className="space-y-6">
                   <div>
                     <div className="flex justify-between text-sm mb-2">
-                      <span className="text-gray-400">Daily Quota Usage</span>
+                      <span className="text-gray-400">{periodLabel} Quota Usage (hard limit)</span>
                       <span className="font-mono text-gray-300">
-                        {p.quotaPct.toFixed(1)}% Used
+                        {p.quotaUsed.toLocaleString()} / {p.quotaLimit.toLocaleString()} ({p.quotaPct.toFixed(1)}%)
                       </span>
                     </div>
                     <div className="w-full bg-gray-900 rounded-full h-3">
@@ -155,23 +167,30 @@ export default function SchedulerDashboard() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-700">
+                  <div className="grid grid-cols-3 gap-4 pt-4 border-t border-gray-700">
                     <div>
-                      <div className="text-xs text-gray-400">Daily Remaining</div>
+                      <div className="text-xs text-gray-400">Remaining (soft)</div>
                       <div className="text-lg font-bold text-white mt-1">
-                        {p.dailyRemaining.toLocaleString()}
+                        {p.softRemaining.toLocaleString()}
                       </div>
                     </div>
                     <div>
-                      <div className="text-xs text-gray-400">Monthly Remaining</div>
+                      <div className="text-xs text-gray-400">Soft Limit</div>
+                      <div className="text-lg font-bold text-amber-400 mt-1">
+                        {p.softLimit.toLocaleString()}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-xs text-gray-400">Hard Limit</div>
                       <div className="text-lg font-bold text-white mt-1">
-                        {p.monthlyRemaining.toLocaleString()}
+                        {p.hardLimit.toLocaleString()}
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         </section>
 

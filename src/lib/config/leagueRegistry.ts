@@ -38,37 +38,25 @@ export async function syncLeaguesFromProvider(): Promise<{
   }
 
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 15000);
-    const response = await fetch(
-      'https://v3.football.api-sports.io/leagues',
-      {
-        headers: {
-          'x-apisports-key': process.env.APIFOOTBALL_KEY || process.env.API_FOOTBALL_KEY || '',
-        },
-        signal: controller.signal,
-      }
-    );
-    clearTimeout(timeout);
+    // All provider access goes through the canonical quota-aware client.
+    const envelope = await apiFootballClient.getLeagues();
 
-    if (!response.ok) {
-      console.error(`[LeagueRegistry] Provider returned ${response.status}`);
-      return { registered: 0, total: 0 };
-    }
+    const leagues: ProviderLeague[] = envelope.response
+      .filter((l) => l.league?.type === 'league')
+      .map((l) => {
+        const seasons = l.seasons ?? [];
+        const currentSeason = seasons.find((s) => s.current) ?? seasons[seasons.length - 1];
+        return {
+          id: l.league.id,
+          name: l.league.name,
+          country: l.country?.name ?? 'Unknown',
+          type: 'league' as const,
+          season: currentSeason?.year ?? new Date().getFullYear(),
+          logo: l.league.logo,
+        };
+      });
 
-    const data = await response.json();
-    const leagues: ProviderLeague[] = (data.response ?? [])
-      .filter((l: any) => l.league?.type === 'league')
-      .map((l: any) => ({
-        id: l.league?.id,
-        name: l.league?.name,
-        country: l.country?.name ?? 'Unknown',
-        type: l.league?.type ?? 'league',
-        season: l.seasons?.[0]?.year ?? new Date().getFullYear(),
-        logo: l.league?.logo,
-      }));
-
-    await logCall('apifootball', 'leagues', 0, response.status, { count: leagues.length });
+    await logCall('apifootball', 'leagues', 0, 200, { count: leagues.length });
 
     let registered = 0;
     for (const league of leagues) {

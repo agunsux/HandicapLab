@@ -26,17 +26,24 @@ export default async function AdminSystemPage() {
               <div className="flex justify-between">
                 <span className="text-gray-500">Mode</span>
                 <span className={`font-medium ${
-                  provider.mode === 'CRITICAL' ? 'text-red-600' : 
+                  provider.mode === 'CRITICAL' || provider.mode === 'QUOTA_EXHAUSTED' ? 'text-red-600' :
                   provider.mode === 'ECONOMY' ? 'text-amber-500' : 'text-green-600'
                 }`}>
-                  {provider.mode}
+                  {provider.statusLabel || provider.mode}
                 </span>
               </div>
 
               <div className="flex justify-between">
-                <span className="text-gray-500">Quota Used</span>
+                <span className="text-gray-500">Quota Used (hard)</span>
                 <span className="font-mono">
                   {provider.quotaUsed} / {provider.quotaLimit} ({provider.quotaPct}%)
+                </span>
+              </div>
+
+              <div className="flex justify-between">
+                <span className="text-gray-500">Soft Limit</span>
+                <span className="font-mono">
+                  {provider.softLimit} ({provider.softRemaining} remaining)
                 </span>
               </div>
 

@@ -22,7 +22,7 @@ export default async function HomePage() {
   const [upcomingData, historicalSummary, marketSummary, predictions] = await Promise.all([
     UpcomingFixturesService.getUpcomingFixtures({ daysAhead: 1, limit: 12 }).catch((err) => {
       console.error('[HomePage] Upcoming fixtures fetch error:', err);
-      return { fixtures: [], totalMatchesAvailable: 0, generatedAt: new Date().toISOString(), source: 'api-football' as const, coverage: { leagues: 0, fixtures: 0 } };
+      return { fixtures: [], totalMatchesAvailable: 0, generatedAt: new Date().toISOString(), source: 'api-football' as const, dataState: 'DATA_UNAVAILABLE' as const, coverage: { leagues: 0, fixtures: 0 } };
     }),
     Promise.resolve(HistoricalDataService.getHistoricalSummary()),
     Promise.resolve(MarketIntelligenceService.getIntelligenceSummary()),
@@ -39,7 +39,7 @@ export default async function HomePage() {
         <div className="max-w-5xl mx-auto text-center space-y-6">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#111827] border border-[#1F2937] text-xs font-mono text-[#10B981]">
             <span className="h-2 w-2 rounded-full bg-[#10B981] animate-pulse" />
-            {historicalSummary.leaguesCount} GLOBAL LEAGUES &bull; {historicalSummary.completedMatches.toLocaleString()} MATCHES &bull; PINNACLE CLOSING BENCHMARKS
+            {historicalSummary.leaguesCount ?? '—'} TRACKED LEAGUES &bull; {historicalSummary.completedMatches?.toLocaleString() ?? '—'} MATCHES &bull; WALK-FORWARD EVIDENCE
           </div>
 
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-display font-black text-white tracking-tight leading-[1.08]">
@@ -55,16 +55,19 @@ export default async function HomePage() {
           <div className="pt-2 flex flex-wrap items-center justify-center gap-4 text-xs font-mono text-neutral-300">
             <span className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#111827] border border-[#1F2937]">
               <Database className="h-3.5 w-3.5 text-[#10B981]" />
-              <strong>{historicalSummary.completedMatches.toLocaleString()}</strong> Completed Matches
+              <strong>{historicalSummary.completedMatches?.toLocaleString() ?? '—'}</strong> Completed Matches
             </span>
             <span className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#111827] border border-[#1F2937]">
               <Target className="h-3.5 w-3.5 text-[#10B981]" />
-              <strong>{historicalSummary.pinnacleOddsRecords.toLocaleString()}</strong> Pinnacle Odds
+              <strong>{historicalSummary.pinnacleOddsRecords?.toLocaleString() ?? '—'}</strong> Pinnacle Odds Rows
             </span>
-            <span className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#111827] border border-[#1F2937]">
+            <Link
+              href="/track-record"
+              className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#111827] border border-[#1F2937] hover:border-[#10B981]/50 transition-colors"
+            >
               <ShieldCheck className="h-3.5 w-3.5 text-[#10B981]" />
-              <strong>0</strong> Synthetic Data
-            </span>
+              Walk-Forward Backtest: <strong>{historicalSummary.backtest?.totalBets?.toLocaleString() ?? '—'}</strong> bets
+            </Link>
           </div>
 
           {/* Primary & Secondary CTAs */}
@@ -91,6 +94,7 @@ export default async function HomePage() {
       <UpcomingFixturesSection
         initialFixtures={upcomingData.fixtures}
         totalAvailable={upcomingData.totalMatchesAvailable || upcomingData.fixtures.length}
+        dataState={upcomingData.dataState}
       />
 
       {/* SECTION 3 — MARKET INTELLIGENCE (AH, OU, BTTS) */}
@@ -231,7 +235,8 @@ export default async function HomePage() {
           </h2>
 
           <p className="text-sm text-[#9CA3AF] max-w-xl mx-auto">
-            Explore our verified historical datasets, inspect real model calibration curves, and evaluate closing line value performance across 30 global football leagues.
+            Explore persisted historical datasets, inspect model calibration, and evaluate closing
+            line value performance. Evidence is shown as computed — including negative results.
           </p>
 
           <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">

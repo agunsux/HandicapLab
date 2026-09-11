@@ -23,18 +23,19 @@ export const footballDataClient = {
   }
 };
 
-// API 2: API-Football (API-Sports DIRECT)
+// API 2: API-Football (API-Sports DIRECT) — SERVER ONLY
 export const apiFootball = {
   async get(url: string, config?: any) {
+    if (typeof window !== 'undefined') {
+      throw new Error('PROVIDER_ACCESS_DENIED: browser must not call providers directly.');
+    }
     const baseURL = 'https://v3.football.api-sports.io';
     const params = new URLSearchParams(config?.params || {});
     const fullUrl = `${baseURL}${url}${params.toString() ? '?' + params.toString() : ''}`;
     const headers = {
-      'x-apisports-key':
-        process.env.VITE_APIFOOTBALL_KEY ||
-        process.env.NEXT_PUBLIC_APIFOOTBALL_KEY ||
-        process.env.API_FOOTBALL_KEY ||
-        '',
+      // Server-only env. Never read NEXT_PUBLIC_*/VITE_* provider keys here:
+      // they would be inlined into the client bundle.
+      'x-apisports-key': process.env.API_FOOTBALL_KEY || process.env.APIFOOTBALL_KEY || '',
     };
 
     const response = await globalGateway.fetch('apifootball', url, fullUrl, {
@@ -65,9 +66,12 @@ export const oddsApiClient = {
   }
 };
 
-// API 5: OddsPAPI.io (Canonical Bookmaker Odds)
+// API 5: OddsPAPI.io (Canonical Bookmaker Odds) — SERVER ONLY
 export const oddsPapi = {
   async get(url: string, config?: any) {
+    if (typeof window !== 'undefined') {
+      throw new Error('PROVIDER_ACCESS_DENIED: browser must not call providers directly.');
+    }
     const baseURL = 'https://api.oddspapi.io/v4';
     const params = new URLSearchParams(config?.params || {});
     const apiKey = process.env.ODDS_PAPI_KEY || '';
@@ -96,10 +100,7 @@ export const oddsPapi = {
 
 // Internal Value Engine Client
 export const valueEngineClient = axios.create({
-  baseURL:
-    process.env.VITE_VALUE_ENGINE_URL ||
-    process.env.NEXT_PUBLIC_VALUE_ENGINE_URL ||
-    '/api/v1',
+  baseURL: '/api/v1',
   timeout: 8000,
 });
 
@@ -253,7 +254,7 @@ export function transformApiFootballOdds(data: any[]): MatchOdds[] {
 
 export async function fetchMatches(dateFrom?: string, dateTo?: string): Promise<Match[]> {
   // Try 1: football-data.org
-  const fdKey = process.env.VITE_FOOTBALL_DATA_API_KEY || process.env.NEXT_PUBLIC_FOOTBALL_DATA_API_KEY;
+  const fdKey = undefined;
   if (isKeyValid(fdKey)) {
     try {
       const res = await footballDataClient.get('/matches', { params: { dateFrom, dateTo } });
@@ -266,9 +267,7 @@ export async function fetchMatches(dateFrom?: string, dateTo?: string): Promise<
 
   // Try 2: API-Football (Direct API-Sports)
   const afKey =
-    process.env.VITE_APIFOOTBALL_KEY ||
-    process.env.NEXT_PUBLIC_APIFOOTBALL_KEY ||
-    process.env.API_FOOTBALL_KEY;
+    process.env.API_FOOTBALL_KEY || process.env.APIFOOTBALL_KEY;
   if (isKeyValid(afKey)) {
     try {
       const res = await apiFootball.get('/fixtures', {
@@ -282,7 +281,7 @@ export async function fetchMatches(dateFrom?: string, dateTo?: string): Promise<
   }
 
   // Try 3: TheStatsAPI
-  const tsKey = process.env.VITE_THESTATS_API_KEY || process.env.NEXT_PUBLIC_THESTATS_API_KEY;
+  const tsKey = undefined;
   if (isKeyValid(tsKey)) {
     try {
       const res = await theStatsApi.get('/football/matches', {
@@ -301,7 +300,7 @@ export async function fetchMatches(dateFrom?: string, dateTo?: string): Promise<
 
 export async function fetchLiveMatches(): Promise<Match[]> {
   // Try 1: football-data.org LIVE
-  const fdKey = process.env.VITE_FOOTBALL_DATA_API_KEY || process.env.NEXT_PUBLIC_FOOTBALL_DATA_API_KEY;
+  const fdKey = undefined;
   if (isKeyValid(fdKey)) {
     try {
       const res = await footballDataClient.get('/matches', { params: { status: 'LIVE,IN_PLAY' } });
@@ -313,7 +312,7 @@ export async function fetchLiveMatches(): Promise<Match[]> {
   }
 
   // Try 2: API-Football live
-  const afKey = process.env.VITE_APIFOOTBALL_KEY || process.env.NEXT_PUBLIC_APIFOOTBALL_KEY || process.env.API_FOOTBALL_KEY;
+  const afKey = process.env.API_FOOTBALL_KEY || process.env.APIFOOTBALL_KEY;
   if (isKeyValid(afKey)) {
     try {
       const res = await apiFootball.get('/fixtures', { params: { live: 'all' } });
@@ -340,7 +339,7 @@ export async function fetchLiveMatches(): Promise<Match[]> {
 }
 
 export async function fetchCompetitions(): Promise<any[]> {
-  const fdKey = process.env.VITE_FOOTBALL_DATA_API_KEY || process.env.NEXT_PUBLIC_FOOTBALL_DATA_API_KEY;
+  const fdKey = undefined;
   if (isKeyValid(fdKey)) {
     try {
       const res = await footballDataClient.get('/competitions');
@@ -353,7 +352,7 @@ export async function fetchCompetitions(): Promise<any[]> {
 }
 
 export async function fetchMatchStats(fixtureId: number | string): Promise<any> {
-  const afKey = process.env.VITE_APIFOOTBALL_KEY || process.env.NEXT_PUBLIC_APIFOOTBALL_KEY || process.env.API_FOOTBALL_KEY;
+  const afKey = process.env.API_FOOTBALL_KEY || process.env.APIFOOTBALL_KEY;
   if (isKeyValid(afKey)) {
     try {
       const res = await apiFootball.get('/fixtures/statistics', { params: { fixture: fixtureId } });
@@ -363,7 +362,7 @@ export async function fetchMatchStats(fixtureId: number | string): Promise<any> 
     }
   }
 
-  const tsKey = process.env.VITE_THESTATS_API_KEY || process.env.NEXT_PUBLIC_THESTATS_API_KEY;
+  const tsKey = undefined;
   if (isKeyValid(tsKey)) {
     try {
       const res = await theStatsApi.get(`/football/matches/${fixtureId}/stats`);
@@ -377,7 +376,7 @@ export async function fetchMatchStats(fixtureId: number | string): Promise<any> 
 }
 
 export async function fetchTeamForm(teamId: number | string, last: number = 5): Promise<any> {
-  const afKey = process.env.VITE_APIFOOTBALL_KEY || process.env.NEXT_PUBLIC_APIFOOTBALL_KEY || process.env.API_FOOTBALL_KEY;
+  const afKey = process.env.API_FOOTBALL_KEY || process.env.APIFOOTBALL_KEY;
   if (isKeyValid(afKey)) {
     try {
       const res = await apiFootball.get('/teams/statistics', { params: { team: teamId, last, season: 2025 } });
@@ -387,7 +386,7 @@ export async function fetchTeamForm(teamId: number | string, last: number = 5): 
     }
   }
 
-  const tsKey = process.env.VITE_THESTATS_API_KEY || process.env.NEXT_PUBLIC_THESTATS_API_KEY;
+  const tsKey = undefined;
   if (isKeyValid(tsKey)) {
     try {
       const res = await theStatsApi.get(`/football/teams/${teamId}/form`);
@@ -401,7 +400,7 @@ export async function fetchTeamForm(teamId: number | string, last: number = 5): 
 }
 
 export async function fetchPredictions(fixtureId: number | string): Promise<any> {
-  const afKey = process.env.VITE_APIFOOTBALL_KEY || process.env.NEXT_PUBLIC_APIFOOTBALL_KEY || process.env.API_FOOTBALL_KEY;
+  const afKey = process.env.API_FOOTBALL_KEY || process.env.APIFOOTBALL_KEY;
   if (isKeyValid(afKey)) {
     try {
       const res = await apiFootball.get('/predictions', { params: { fixture: fixtureId } });
@@ -411,7 +410,7 @@ export async function fetchPredictions(fixtureId: number | string): Promise<any>
     }
   }
 
-  const tsKey = process.env.VITE_THESTATS_API_KEY || process.env.NEXT_PUBLIC_THESTATS_API_KEY;
+  const tsKey = undefined;
   if (isKeyValid(tsKey)) {
     try {
       const res = await theStatsApi.get('/football/predictions', { params: { match_id: fixtureId } });

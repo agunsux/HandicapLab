@@ -18,11 +18,13 @@ describe('oddspapiFilter', () => {
 
     const filtered = filterOddsPapiBookmakers(response);
     
-    expect(filtered.data.bookmakers).toHaveLength(3);
+    // Enabled sharp books are sourced from the Sharp Market Reference Policy
+    // config: pinnacle, sbobet, betfair_ex_eu, singbet, marathonbet.
+    expect(filtered.data.bookmakers).toHaveLength(2);
     const names = filtered.data.bookmakers.map((b: any) => b.name.trim().toLowerCase());
     expect(names).toContain('pinnacle');
     expect(names).toContain('sbobet');
-    expect(names).toContain('sbo');
+    expect(names).not.toContain('sbo');
     expect(names).not.toContain('bet365');
   });
 

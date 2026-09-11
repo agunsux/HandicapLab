@@ -2,18 +2,20 @@
 
 import React, { useState, useTransition } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
-import { Calendar, Clock, MapPin, ArrowRight, ShieldCheck, Filter } from 'lucide-react';
+import { Calendar, Clock, MapPin, ArrowRight } from 'lucide-react';
 import type { PublicUpcomingFixture } from '@/lib/services/upcomingFixturesService';
+import { DATA_STATE_LABEL, type DataState } from '@/lib/data/dataState';
 
 interface UpcomingFixturesSectionProps {
   initialFixtures: PublicUpcomingFixture[];
   totalAvailable: number;
+  dataState?: DataState;
 }
 
 export function UpcomingFixturesSection({
   initialFixtures,
   totalAvailable,
+  dataState = 'REAL',
 }: UpcomingFixturesSectionProps) {
   const [windowFilter, setWindowFilter] = useState<'today' | 'tomorrow' | '3days' | '7days'>('today');
   const [fixtures, setFixtures] = useState<PublicUpcomingFixture[]>(initialFixtures);
@@ -45,13 +47,14 @@ export function UpcomingFixturesSection({
         <div>
           <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-[#111827] border border-[#1F2937] text-xs font-mono text-[#10B981] mb-2">
             <span className="h-2 w-2 rounded-full bg-[#10B981] animate-pulse" />
-            LIVE FIXTURE FEED &bull; API-FOOTBALL VERIFIED
+            FIXTURE FEED &bull; API-FOOTBALL &bull; {DATA_STATE_LABEL[dataState]}
           </div>
           <h2 className="text-2xl sm:text-4xl font-display font-black text-white tracking-tight">
             Upcoming Fixtures
           </h2>
           <p className="text-sm text-[#9CA3AF] mt-1 max-w-xl">
-            Upcoming matches available for HandicapLab market analysis across 30 global target leagues.
+            Real upcoming matches available for HandicapLab market analysis. Odds are shown only
+            when a real market price has been ingested.
           </p>
         </div>
 
@@ -95,10 +98,14 @@ export function UpcomingFixturesSection({
         <div className="rounded-2xl border border-[#1F2937] bg-[#111827]/30 p-12 text-center">
           <Calendar className="h-10 w-10 text-[#9CA3AF]/40 mx-auto mb-3" />
           <h3 className="text-base font-bold text-white font-mono">
-            No upcoming fixtures available right now.
+            {dataState === 'DATA_UPDATE_PAUSED'
+              ? 'Fixture updates are paused by quota protection.'
+              : 'No upcoming fixtures available right now.'}
           </h3>
           <p className="text-xs text-[#9CA3AF] mt-2 max-w-md mx-auto leading-relaxed">
-            Data will appear automatically when the fixture feed is updated for this time window.
+            {dataState === 'DATA_UPDATE_PAUSED'
+              ? 'The quota manager has paused provider updates. Cached database data will appear when available; no synthetic fixtures are generated.'
+              : 'Data will appear automatically when the fixture feed is updated for this time window.'}
           </p>
         </div>
       ) : (
@@ -197,23 +204,25 @@ export function UpcomingFixturesSection({
                     <div className="grid grid-cols-3 gap-1.5 text-center font-mono text-[11px]">
                       <div className="p-1.5 rounded-lg bg-[#0B0F0E] border border-[#1F2937]">
                         <div className="text-[#9CA3AF] text-[9px]">AH</div>
-                        <div className="text-[#10B981] font-bold text-[10px]">
-                          {fixture.markets.asianHandicap.line != null
+                        <div className="text-[#9CA3AF] font-bold text-[10px]">
+                          {fixture.markets.asianHandicap.available && fixture.markets.asianHandicap.line != null
                             ? `${fixture.markets.asianHandicap.line > 0 ? '+' : ''}${fixture.markets.asianHandicap.line}`
-                            : 'Active'}
+                            : '—'}
                         </div>
                       </div>
                       <div className="p-1.5 rounded-lg bg-[#0B0F0E] border border-[#1F2937]">
                         <div className="text-[#9CA3AF] text-[9px]">O/U</div>
-                        <div className="text-[#10B981] font-bold text-[10px]">
-                          {fixture.markets.overUnder.line != null
+                        <div className="text-[#9CA3AF] font-bold text-[10px]">
+                          {fixture.markets.overUnder.available && fixture.markets.overUnder.line != null
                             ? fixture.markets.overUnder.line
-                            : 'Active'}
+                            : '—'}
                         </div>
                       </div>
                       <div className="p-1.5 rounded-lg bg-[#0B0F0E] border border-[#1F2937]">
                         <div className="text-[#9CA3AF] text-[9px]">BTTS</div>
-                        <div className="text-[#10B981] font-bold text-[10px]">Active</div>
+                        <div className="text-[#9CA3AF] font-bold text-[10px]">
+                          {fixture.markets.btts.available ? 'Yes/No' : '—'}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -243,7 +252,7 @@ export function UpcomingFixturesSection({
       <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-xl bg-[#111827]/40 border border-[#1F2937] text-xs font-mono">
         <div className="text-[#9CA3AF]">
           Showing <span className="text-white font-bold">{fixtures.length}</span> of{' '}
-          <span className="text-white font-bold">{totalAvailable}</span> verified upcoming fixtures across 30 leagues.
+          <span className="text-white font-bold">{totalAvailable}</span> upcoming fixtures from tracked leagues.
         </div>
         <div className="flex items-center gap-3">
           <Link

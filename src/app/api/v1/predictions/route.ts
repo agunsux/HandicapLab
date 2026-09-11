@@ -31,9 +31,20 @@ export async function GET(request: Request) {
       return ApiHelper.response(false, null, 'Rate limit exceeded.', 429);
     }
 
-    const result = await FootballIntelligenceService.getMatchIntelligence('match-1001');
+    const url = new URL(request.url);
+    const matchId = url.searchParams.get('matchId');
+    if (!matchId) {
+      return ApiHelper.response(
+        false,
+        null,
+        'matchId query parameter is required. This endpoint no longer serves a hardcoded fixture.',
+        400
+      );
+    }
+
+    const result = await FootballIntelligenceService.getMatchIntelligence(matchId);
     if (!result) {
-      return ApiHelper.response(false, null, 'Failed to fetch predictions.', 500);
+      return ApiHelper.response(false, null, 'No real prediction exists for this fixture.', 404);
     }
 
     const predictionsData = result.data.map(r => ({

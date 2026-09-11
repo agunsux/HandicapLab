@@ -1,12 +1,26 @@
-// EPIC 56 — Quota Manager (v3)
+// EPIC 56 — Quota Manager (v3 compatibility facade)
 // Single gate for ALL external API requests.
-// Implements Priority-based throttling (NORMAL, ECONOMY, CRITICAL modes).
-// Limits are configurable via environment variables.
+//
+// Rewired to the canonical quota policy:
+//   - Reads usage from the atomic quota_state table (QuotaManager V4) when
+//     available, falling back to provider_logs only if quota_state is empty.
+//   - Limits come from quotaPolicy (API-Football PRO: hard 7,500 / soft 6,000;
+//     OddsPapi: hard 250 / soft 200). No more hardcoded 100/day.
+//   - Priority gating uses the same modes as V4 (NORMAL/ECONOMY/CRITICAL/
+//     QUOTA_EXHAUSTED) so both managers cannot disagree.
 
 import { supabase } from '@/lib/supabase.server';
+import {
+  type Provider,
+  type QuotaMode,
+  evaluateQuotaPressure,
+  getProviderQuotaPolicy,
+  isPriorityAllowed,
+  quotaStatusLabel,
+} from './quotaPolicy';
+import { getQuotaSnapshot } from './quotaManagerV4';
 
-// ─── API Cost Registry ──────────────────────────────────────────────
-export type Provider = 'apifootball' | 'oddspapi' | 'thestatsapi';
+export type { Provider } from './quotaPolicy';
 
 export interface EndpointCost {
   provider: Provider;
@@ -26,6 +40,9 @@ export const API_COST_REGISTRY: EndpointCost[] = [
   { provider: 'apifootball', endpoint: 'health',          cost: 1 },
   // OddsPapi endpoints
   { provider: 'oddspapi',    endpoint: 'odds',            cost: 1 },
+  { provider: 'oddspapi',    endpoint: 'odds-by-tournaments', cost: 1 },
+  { provider: 'oddspapi',    endpoint: 'historical-odds', cost: 0 },
+  { provider: 'oddspapi',    endpoint: 'account',         cost: 0 },
   { provider: 'oddspapi',    endpoint: 'health',          cost: 1 },
   // TheStatsAPI endpoints
   { provider: 'thestatsapi', endpoint: 'fixtures',        cost: 1 },
@@ -35,17 +52,6 @@ export const API_COST_REGISTRY: EndpointCost[] = [
 
 function getCost(provider: Provider, endpoint: string): number {
   return API_COST_REGISTRY.find((e) => e.provider === provider && e.endpoint === endpoint)?.cost ?? 1;
-}
-
-// ─── Quota Limits ───────────────────────────────────────────────────
-function getProviderLimit(provider: Provider): number {
-  if (provider === 'apifootball') {
-    return parseInt(process.env.QUOTA_APIFOOTBALL_DAILY || '100', 10);
-  }
-  if (provider === 'thestatsapi') {
-    return parseInt(process.env.QUOTA_THESTATSAPI_DAILY || '1000', 10);
-  }
-  return parseInt(process.env.QUOTA_ODDSPAPI_MONTHLY || '250', 10);
 }
 
 // ─── Types ──────────────────────────────────────────────────────────
@@ -58,7 +64,10 @@ export interface AcquireReceipt {
   quotaRemaining: number;
   quotaUsed: number;
   quotaPct: number;
-  mode: 'NORMAL' | 'ECONOMY' | 'CRITICAL';
+  mode: QuotaMode;
+  softLimit: number;
+  hardLimit: number;
+  statusLabel: string;
 }
 
 export interface ProviderHealth {
@@ -71,7 +80,11 @@ export interface ProviderHealth {
   avgLatencyMs: number;
   successRate: number;
   resetTime: string;
-  mode: 'NORMAL' | 'ECONOMY' | 'CRITICAL';
+  mode: QuotaMode;
+  softLimit: number;
+  hardLimit: number;
+  softRemaining: number;
+  statusLabel: string;
 }
 
 export type Priority = number; // 0-100 (100 is highest)
@@ -79,20 +92,35 @@ export type Priority = number; // 0-100 (100 is highest)
 // ─── Internals ──────────────────────────────────────────────────────
 function getResetPeriod(provider: Provider): { startOf: Date } {
   const now = new Date();
-  if (provider === 'apifootball' || provider === 'thestatsapi') {
-    // Daily reset (midnight UTC)
-    const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-    return { startOf: start };
+  if (provider === 'oddspapi') {
+    return { startOf: new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)) };
   }
-  // oddspapi: calendar month reset
-  const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
-  return { startOf: start };
+  return { startOf: new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())) };
 }
 
-async function loadQuotaData(provider: Provider): Promise<{ used: number; limit: number; startOf: Date }> {
+async function loadQuotaData(
+  provider: Provider
+): Promise<{ used: number; limit: number; softLimit: number; mode: QuotaMode; startOf: Date }> {
+  const policy = getProviderQuotaPolicy(provider);
   const { startOf } = getResetPeriod(provider);
-  const limit = getProviderLimit(provider);
 
+  // 1. Preferred source: atomic quota_state (V4).
+  try {
+    const snapshot = await getQuotaSnapshot(provider);
+    if (snapshot) {
+      return {
+        used: snapshot.used,
+        limit: snapshot.hardLimit,
+        softLimit: snapshot.softLimit,
+        mode: snapshot.mode,
+        startOf,
+      };
+    }
+  } catch {
+    // fall through to provider_logs below
+  }
+
+  // 2. Fallback: count provider_logs INFO rows (legacy advisory accounting).
   try {
     const { data, error } = await supabase
       .from('provider_logs')
@@ -103,13 +131,15 @@ async function loadQuotaData(provider: Provider): Promise<{ used: number; limit:
 
     if (error) {
       console.warn(`[QuotaManager] Query error for ${provider}:`, error.message);
-      return { used: 0, limit, startOf };
+      return { used: 0, limit: policy.hardLimit, softLimit: policy.softLimit, mode: 'NORMAL', startOf };
     }
 
-    return { used: data?.length ?? 0, limit, startOf };
+    const used = data?.length ?? 0;
+    const pressure = evaluateQuotaPressure(policy, used);
+    return { used, limit: policy.hardLimit, softLimit: policy.softLimit, mode: pressure.mode, startOf };
   } catch (err) {
     console.warn(`[QuotaManager] Error for ${provider}:`, err);
-    return { used: 0, limit, startOf };
+    return { used: 0, limit: policy.hardLimit, softLimit: policy.softLimit, mode: 'NORMAL', startOf };
   }
 }
 
@@ -121,38 +151,33 @@ export async function acquire(
   endpoint: string,
   priority: Priority
 ): Promise<AcquireReceipt> {
-  const { used, limit, startOf } = await loadQuotaData(provider);
+  const { used, limit, softLimit, mode } = await loadQuotaData(provider);
   const cost = getCost(provider, endpoint);
   const pct = limit > 0 ? (used / limit) * 100 : 0;
-  
-  let mode: 'NORMAL' | 'ECONOMY' | 'CRITICAL' = 'NORMAL';
-  if (pct >= 90) mode = 'CRITICAL';
-  else if (pct >= 75) mode = 'ECONOMY';
+  const statusLabel = quotaStatusLabel(provider, mode);
 
   const receiptBase = {
     cost, provider, endpoint,
-    quotaRemaining: limit - used,
+    quotaRemaining: Math.max(0, limit - used),
     quotaUsed: used,
     quotaPct: Math.round(pct * 100) / 100,
-    mode
+    mode,
+    softLimit,
+    hardLimit: limit,
+    statusLabel,
   };
 
-  // Hard block at 100%
+  // Hard block at the provider limit.
   if (used >= limit || used + cost > limit) {
-    return { ...receiptBase, ok: false, reason: `QUOTA_EXHAUSTED: ${provider} needs ${cost} but ${limit - used} remain.` };
+    return { ...receiptBase, ok: false, reason: `QUOTA_EXHAUSTED: ${provider} needs ${cost} but ${Math.max(0, limit - used)} remain.` };
   }
 
-  // ECONOMY MODE: Reject priority < 60 (Discovery, Historical, Metadata)
-  if (mode === 'ECONOMY' && priority < 60) {
-    return { ...receiptBase, ok: false, reason: `ECONOMY_MODE: priority ${priority} < 60 rejected.` };
+  // Soft-limit priority rationing (shared policy with V4).
+  if (!isPriorityAllowed(mode, priority)) {
+    return { ...receiptBase, ok: false, reason: `${statusLabel}: priority ${priority} rejected.` };
   }
 
-  // CRITICAL MODE: Reject priority < 90 (Only Settlement, Live, Prediction T-60 allowed)
-  if (mode === 'CRITICAL' && priority < 90) {
-    return { ...receiptBase, ok: false, reason: `CRITICAL_MODE: priority ${priority} < 90 rejected.` };
-  }
-
-  // Reserve slot
+  // Audit trail: reservation marker (advisory; V4 remains the atomic gate).
   void supabase.from('provider_logs').insert({
     provider,
     endpoint,
@@ -168,7 +193,7 @@ export async function acquire(
     ...receiptBase,
     ok: true,
     reason: 'ok',
-    quotaRemaining: limit - used - cost,
+    quotaRemaining: Math.max(0, limit - used - cost),
     quotaUsed: used + cost,
     quotaPct: Math.round(((used + cost) / limit) * 100 * 100) / 100,
   };
@@ -202,12 +227,9 @@ export async function getProviderHealth(): Promise<ProviderHealth[]> {
   const results: ProviderHealth[] = [];
 
   for (const provider of providers) {
-    const { used, limit, startOf } = await loadQuotaData(provider);
+    const { used, limit, softLimit, mode, startOf } = await loadQuotaData(provider);
     const pct = limit > 0 ? (used / limit) * 100 : 0;
-    
-    let mode: 'NORMAL' | 'ECONOMY' | 'CRITICAL' = 'NORMAL';
-    if (pct >= 90) mode = 'CRITICAL';
-    else if (pct >= 75) mode = 'ECONOMY';
+    const statusLabel = quotaStatusLabel(provider, mode);
 
     let avgLatencyMs = 0;
     let successRate = 100;
@@ -233,7 +255,7 @@ export async function getProviderHealth(): Promise<ProviderHealth[]> {
 
     results.push({
       provider,
-      healthy: pct < 100 && successRate >= 80,
+      healthy: mode !== 'QUOTA_EXHAUSTED' && successRate >= 80,
       quotaPct: Math.round(pct * 100) / 100,
       quotaUsed: used,
       quotaLimit: limit,
@@ -242,9 +264,12 @@ export async function getProviderHealth(): Promise<ProviderHealth[]> {
       successRate,
       resetTime: startOf.toISOString(),
       mode,
+      softLimit,
+      hardLimit: limit,
+      softRemaining: Math.max(0, softLimit - used),
+      statusLabel,
     });
   }
 
   return results;
 }
-

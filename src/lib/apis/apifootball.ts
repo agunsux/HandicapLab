@@ -84,6 +84,33 @@ export const ApiFootballLeagueSchema = z.object({
   round: z.string().optional(),
 });
 
+// -- API-Football PRO: League catalog (/leagues) --
+export const ApiFootballLeagueItemSchema = z.object({
+  league: z.object({
+    id: z.number(),
+    name: z.string(),
+    type: z.string(),
+    logo: z.string().optional(),
+  }),
+  country: z.object({
+    name: z.string(),
+    code: z.string().nullable().optional(),
+    flag: z.string().nullable().optional(),
+    logo: z.string().nullable().optional(),
+  }).optional(),
+  seasons: z.array(z.object({
+    year: z.number(),
+    start: z.string().nullable().optional(),
+    end: z.string().nullable().optional(),
+    current: z.boolean().optional(),
+  })).optional(),
+});
+
+export const ApiFootballLeaguesResponseSchema = createApiFootballResponseSchema(
+  z.array(ApiFootballLeagueItemSchema)
+);
+export type ApiFootballLeagueItem = z.infer<typeof ApiFootballLeagueItemSchema>;
+
 export const ApiFootballFixtureSchema = z.object({
   id: z.number(),
   referee: z.string().nullable().optional(),
@@ -590,6 +617,32 @@ export class ApiFootballClient {
       ApiFootballFixturesResponseSchema,
       options
     );
+  }
+
+  /**
+   * Fetch fixtures for a date range (YYYY-MM-DD inclusive).
+   * Single request — preferred over per-date loops for quota efficiency.
+   */
+  public async getFixturesRange(
+    from: string,
+    to: string,
+    options?: FetchOptions
+  ): Promise<z.infer<typeof ApiFootballFixturesResponseSchema>> {
+    return this.request(
+      'fixtures',
+      { from, to },
+      ApiFootballFixturesResponseSchema,
+      options
+    );
+  }
+
+  /**
+   * Fetch the league catalog (single source for LeagueRegistry sync).
+   */
+  public async getLeagues(
+    options?: FetchOptions
+  ): Promise<z.infer<typeof ApiFootballLeaguesResponseSchema>> {
+    return this.request('leagues', {}, ApiFootballLeaguesResponseSchema, options);
   }
 
   /**

@@ -32,7 +32,10 @@ describe('P0-A Persistent Quota Manager', () => {
     const result = await reserveQuota('apifootball', 'fixtures', 100);
     expect(result.ok).toBe(true);
     expect(result.reservationId).toBe('res-123');
-    expect(result.quotaRemaining).toBe(7024);
+    // hard limit 7500 - (consumed 100 + reserved 1) = 7399
+    expect(result.quotaRemaining).toBe(7399);
+    expect(result.hardLimit).toBe(7500);
+    expect(result.softLimit).toBe(6000);
   });
 
   it('should reject reservation if over limit', async () => {
@@ -49,16 +52,16 @@ describe('P0-A Persistent Quota Manager', () => {
     expect(result.reason).toBe('QUOTA_EXHAUSTED');
   });
 
-  it('should reject ECONOMY mode if priority is < 60', async () => {
-    // Return a response that indicates economy mode (pct > 75%)
+  it('should reject ECONOMY mode if priority is < 40', async () => {
+    // 5000 consumed >= 80% of the 6000 soft limit -> ECONOMY mode
     vi.mocked(supabase.rpc).mockResolvedValueOnce({
       data: {
         ok: true,
         reservation_id: 'res-456',
-        safe_limit: 100,
-        consumed: 80, // 80% consumed -> ECONOMY mode
+        safe_limit: 7500,
+        consumed: 5000,
         reserved: 1,
-        safe_remaining: 19,
+        safe_remaining: 2499,
       },
       error: null,
     } as any);
@@ -68,10 +71,10 @@ describe('P0-A Persistent Quota Manager', () => {
       error: null,
     } as any);
 
-    const result = await reserveQuota('apifootball', 'fixtures', 50); // Low priority
+    const result = await reserveQuota('apifootball', 'fixtures', 30); // P3 metadata priority
     expect(result.ok).toBe(false);
     expect(result.mode).toBe('ECONOMY');
-    expect(result.reason).toContain('ECONOMY_MODE');
+    expect(result.reason).toContain('ECONOMY');
     
     // Should have called rollback
     expect(supabase.rpc).toHaveBeenCalledTimes(2);
@@ -114,12 +117,12 @@ describe('P0-A Persistent Quota Manager', () => {
 
     await reserveQuota('oddspapi', 'odds', 100);
     
-    // OddsPAPI is monthly with 20% safety reserve (limit 250 -> safe 200)
+    // OddsPAPI is monthly: hard 250 (provider contract), soft 200 (app policy).
     expect(supabase.rpc).toHaveBeenCalledWith('reserve_quota', expect.objectContaining({
       p_provider: 'oddspapi',
       p_quota_type: 'MONTHLY',
       p_default_limit: 250,
-      p_safety_reserve_pct: 20
+      p_safety_reserve_pct: 0
     }));
   });
 

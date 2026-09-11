@@ -185,65 +185,12 @@ describe('New API Endpoints', () => {
     expect(json.data.avg_brier_score).toBe(0.09);
   });
 
-  it('/api/dashboard should return unified dashboard data', async () => {
-    const mockMatches = [
-      { id: 'match_d1', home_team: 'Chelsea', away_team: 'Arsenal', kickoff: '2026-07-04T12:00:00Z', status: 'upcoming', league: 'EPL', competition_type: 'club' }
-    ];
-    const mockPredictions = [
-      {
-        id: 'pred_d1',
-        match_id: 'match_d1',
-        market_type: 'ML',
-        selection: 'home',
-        entry_odds: 1.95,
-        model_probability: 0.55,
-        edge_pct: 2.25,
-        expected_value: 0.0725,
-        confidence: 82,
-        prediction: {
-          confidence: {
-            confidenceScore: 82,
-            dataQualityScore: 88,
-            recommendationStatus: 'Recommended',
-            reasons: ['Confirmed starting lineup', 'High historical calibration']
-          }
-        }
-      }
-    ];
-
-    vi.mocked(supabase.from).mockImplementation((table: string) => {
-      const mockTableChain = {
-        select: vi.fn().mockReturnThis(),
-        in: vi.fn().mockReturnThis(),
-        eq: vi.fn().mockReturnThis(),
-        not: vi.fn().mockReturnThis(),
-        order: vi.fn().mockReturnThis(),
-        limit: vi.fn().mockReturnThis(),
-        maybeSingle: vi.fn(),
-        single: vi.fn()
-      };
-      
-      if (table === 'matches') {
-        mockTableChain.in.mockReturnThis();
-        mockTableChain.order.mockReturnThis();
-        mockTableChain.limit.mockResolvedValue({ data: mockMatches, error: null } as any);
-      } else if (table === 'predictions') {
-        mockTableChain.in.mockResolvedValue({ data: mockPredictions, error: null } as any);
-      }
-      
-      return mockTableChain as any;
-    });
-
-    const req = new Request('http://localhost/api/dashboard');
-    const res = await dashboardGET(req as any);
+  it('/api/dashboard is deprecated and fails closed (no fabricated metrics)', async () => {
+    const res = await dashboardGET();
     const json = await res.json();
 
-    expect(json.success).toBe(true);
-    expect(json.data.todayMatches.length).toBe(1);
-    expect(json.data.todayMatches[0].home_team).toBe('Chelsea');
-    expect(json.data.todayMatches[0].recommendation_status).toBe('High Conviction');
-    expect(json.data.valueBets.length).toBe(1);
-    expect(json.data.valueBets[0].market).toBe('ML');
-    expect(json.data.valueBets[0].ev).toBe(0.0725);
+    expect(res.status).toBe(410);
+    expect(json.error).toBe('ENDPOINT_DEPRECATED');
+    expect(json.data).toBeUndefined();
   });
 });

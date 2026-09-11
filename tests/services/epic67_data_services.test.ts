@@ -1,27 +1,72 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, afterAll } from 'vitest';
+import * as fs from 'fs';
+import * as path from 'path';
+
 import { UpcomingFixturesService } from '@/lib/services/upcomingFixturesService';
 import { HistoricalDataService } from '@/lib/services/historicalDataService';
 import { MarketIntelligenceService } from '@/lib/services/marketIntelligenceService';
 
-describe('EPIC-67: Data Services Unit Tests', () => {
+// Deterministic provider stub: one upcoming ENG-PL fixture. No network calls.
+vi.mock('@/lib/apis/apifootball', () => {
+  const kickoff = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+  return {
+    apiFootballClient: {
+      getFixturesRange: vi.fn().mockResolvedValue({
+        response: [
+          {
+            fixture: {
+              id: 999001,
+              date: kickoff,
+              status: { short: 'NS' },
+              venue: { name: 'Test Stadium', city: 'London' },
+            },
+            league: { id: 39, name: 'Premier League', logo: '' },
+            teams: {
+              home: { id: 1, name: 'Home FC', logo: '' },
+              away: { id: 2, name: 'Away FC', logo: '' },
+            },
+          },
+        ],
+      }),
+    },
+  };
+});
+
+const DATA_STATES = [
+  'REAL',
+  'CACHED',
+  'STALE',
+  'INSUFFICIENT_DATA',
+  'DATA_UNAVAILABLE',
+  'DATA_UPDATE_PAUSED',
+];
+
+afterAll(() => {
+  try {
+    const cacheFile = path.resolve('data/cache/upcoming_fixtures.json');
+    if (fs.existsSync(cacheFile)) fs.unlinkSync(cacheFile);
+  } catch {
+    // best-effort cleanup
+  }
+});
+
+describe('Data Services — real-data-only contracts', () => {
   describe('UpcomingFixturesService', () => {
-    it('should return fixtures from cache or provider without throwing', async () => {
-      const result = await UpcomingFixturesService.getUpcomingFixtures({ daysAhead: 3, limit: 10 });
+    it('never advertises market availability without real odds', async () => {
+      const result = await UpcomingFixturesService.getUpcomingFixtures({
+        daysAhead: 3,
+        limit: 10,
+        forceRefresh: true,
+      });
       expect(result).toBeDefined();
       expect(result.source).toBe('api-football');
       expect(Array.isArray(result.fixtures)).toBe(true);
-      expect(typeof result.coverage.leagues).toBe('number');
-      expect(typeof result.coverage.fixtures).toBe('number');
+      expect(DATA_STATES).toContain(result.dataState);
 
-      if (result.fixtures.length > 0) {
-        const first = result.fixtures[0];
-        expect(first.homeTeam).toBeDefined();
-        expect(first.awayTeam).toBeDefined();
-        expect(first.kickoff).toBeDefined();
-        expect(first.markets).toBeDefined();
-        expect(first.markets.asianHandicap.available).toBe(true);
-        expect(first.markets.overUnder.available).toBe(true);
-        expect(first.markets.btts.available).toBe(true);
+      for (const f of result.fixtures) {
+        expect(f.markets.asianHandicap.available).toBe(false);
+        expect(f.markets.overUnder.available).toBe(false);
+        expect(f.markets.btts.available).toBe(false);
       }
     });
 
@@ -43,46 +88,39 @@ describe('EPIC-67: Data Services Unit Tests', () => {
   });
 
   describe('HistoricalDataService', () => {
-    it('should return real aggregate metrics without synthetic numbers', () => {
+    it('returns persisted-artifact metrics with honest nulls (no fabricated fallbacks)', () => {
       const summary = HistoricalDataService.getHistoricalSummary();
-      expect(summary.completedMatches).toBeGreaterThanOrEqual(17000);
-      expect(summary.leaguesCount).toBeGreaterThanOrEqual(30);
-      expect(summary.pinnacleOddsRecords).toBeGreaterThanOrEqual(100000);
-      expect(summary.pinnacleCoveragePct).toBe(100);
-      expect(summary.marketCoverage.asianHandicap.available).toBe(true);
-      expect(summary.marketCoverage.asianHandicap.linesEvaluated).toBe(17);
-      expect(summary.marketCoverage.btts.available).toBe(true);
-      expect(summary.marketCoverage.btts.leaguesEvaluated).toBe(30);
-      expect(summary.regionalBreakdown.europe.matches).toBeGreaterThan(0);
-      expect(summary.regionalBreakdown.americas.matches).toBeGreaterThan(0);
-      expect(summary.regionalBreakdown.asia.matches).toBeGreaterThan(0);
+
+      // The persisted walk-forward artifact exists in the repo and must load.
+      expect(summary.backtest).not.toBeNull();
+      expect(summary.backtest!.totalBets).toBeGreaterThan(0);
+      expect(summary.backtest!.roiPct).not.toBeNull();
+
+      // The old hardcoded fabrication (110,394 Pinnacle rows / 100% coverage /
+      // +77.96% best strategy) must never appear.
+      expect(summary.marketCoverage.asianHandicap.bestStrategyRoiPct).toBeNull();
+      expect(summary.pinnacleCoveragePct).not.toBe(100);
+
+      expect(DATA_STATES).toContain(summary.dataState);
     });
   });
 
   describe('MarketIntelligenceService', () => {
-    it('should load EPIC-66 discovery rankings correctly', () => {
+    it('serves only walk-forward evidence and quarantines EPIC-66 rankings', () => {
       const summary = MarketIntelligenceService.getIntelligenceSummary();
-      expect(summary.totalEvaluated).toBeGreaterThan(0);
-      expect(summary.version).toBe('epic66-v1.0');
+
+      expect(summary.discoveryStatus).toBe('QUARANTINED_PENDING_AUDIT');
+      expect(summary.version).toBe('walkforward-v1');
       expect(summary.topRankings.length).toBeGreaterThan(0);
 
-      // Verify AH best line is present
-      const ahItems = MarketIntelligenceService.getMarketDiscovery({ market: 'AH', tier: 'GOLD' });
-      expect(ahItems.length).toBeGreaterThan(0);
-      const ah025 = ahItems.find((i) => i.identifier === 'AH +0.25 Away');
-      expect(ah025).toBeDefined();
-      if (ah025) {
-        expect(ah025.roiPct).toBeGreaterThan(20);
-        expect(ah025.bets).toBeGreaterThanOrEqual(1000);
-        expect(ah025.tier).toBe('GOLD');
-      }
-    });
+      // Nothing from the quarantined discovery is promoted.
+      expect(summary.asianHandicap.promotedLines).toHaveLength(0);
+      expect(summary.overUnder.highScoringLeagues).toHaveLength(0);
+      expect(summary.btts.topLeagues).toHaveLength(0);
 
-    it('should return correct high scoring and BTTS league facts', () => {
-      const summary = MarketIntelligenceService.getIntelligenceSummary();
-      expect(summary.overUnder.highScoringLeagues.length).toBeGreaterThan(0);
-      expect(summary.btts.topLeagues.length).toBeGreaterThan(0);
-      expect(summary.btts.topLeagues[0].ratePct).toBeGreaterThan(60);
+      // Real backtest rows are marked inconclusive (no market-level CI).
+      const ah = summary.topRankings.find((r) => r.market === 'AH');
+      if (ah) expect(ah.tier).toBe('GREY');
     });
   });
 });

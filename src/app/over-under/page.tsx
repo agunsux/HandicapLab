@@ -49,7 +49,10 @@ export default async function OverUnderRoutePage() {
               Evaluated Totals: <strong className="text-white">Quarter &amp; Half Totals (0.5 to 4.5)</strong>
             </span>
             <span className="px-3 py-1.5 rounded-lg bg-[#111827] border border-[#1F2937] text-neutral-300">
-              Over 2.5 Baseline Vig: <strong className="text-neutral-400">{baselineOver25RoiPct}%</strong>
+              Over 2.5 Walk-Forward ROI:{' '}
+              <strong className={baselineOver25RoiPct != null && baselineOver25RoiPct < 0 ? 'text-red-400' : 'text-neutral-400'}>
+                {baselineOver25RoiPct != null ? `${baselineOver25RoiPct.toFixed(2)}%` : '—'}
+              </strong>
             </span>
             <span className="px-3 py-1.5 rounded-lg bg-[#111827] border border-[#1F2937] text-neutral-300">
               Scoring Regime: <strong className="text-[#10B981]">Bivariate Goal Distribution</strong>
@@ -76,30 +79,38 @@ export default async function OverUnderRoutePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-xs font-mono">
-            {highScoringLeagues.map((lg) => (
-              <div key={lg.league} className="p-4 rounded-xl bg-[#111827]/70 border border-[#1F2937]">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-bold text-white text-sm">{lg.league}</span>
-                  <span className="text-[#10B981] font-bold text-[11px]">HIGH OVER</span>
-                </div>
-                <div className="space-y-1 text-[#9CA3AF]">
-                  <div className="flex items-center justify-between">
-                    <span>Average Goals:</span>
-                    <strong className="text-white">{lg.avgGoals} / match</strong>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span>BTTS Frequency:</span>
-                    <strong className="text-[#10B981]">{lg.bttsRatePct}%</strong>
-                  </div>
-                </div>
+            {highScoringLeagues.length === 0 ? (
+              <div className="col-span-full p-4 rounded-xl bg-[#111827]/40 border border-[#1F2937] text-[#9CA3AF] leading-relaxed">
+                Per-league goal-tendency metrics are not present in the verified artifact. They will
+                appear only after being computed from real match data — no estimated values are shown.
               </div>
-            ))}
+            ) : (
+              highScoringLeagues.map((lg) => (
+                <div key={lg.league} className="p-4 rounded-xl bg-[#111827]/70 border border-[#1F2937]">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-bold text-white text-sm">{lg.league}</span>
+                    <span className="text-[#10B981] font-bold text-[11px]">HIGH OVER</span>
+                  </div>
+                  <div className="space-y-1 text-[#9CA3AF]">
+                    <div className="flex items-center justify-between">
+                      <span>Average Goals:</span>
+                      <strong className="text-white">{lg.avgGoals} / match</strong>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span>BTTS Frequency:</span>
+                      <strong className="text-[#10B981]">{lg.bttsRatePct}%</strong>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
 
           <div className="p-4 rounded-xl bg-[#111827]/40 border border-[#1F2937] text-xs font-mono text-[#9CA3AF] flex items-start gap-2.5">
             <Info className="h-4 w-4 text-[#10B981] flex-shrink-0 mt-0.5" />
             <p className="leading-relaxed">
-              Global football totals are highly polarized: German Bundesliga and Swiss Super League average over 3.15 goals per match, while Argentine Primera Division averages under 2.00 goals per match with a 60.5% Under 2.5 rate. Edge detection requires adjusting baseline Poisson rates per league cluster.
+              Realized out-of-sample OU performance is negative in the current walk-forward run.
+              League-cluster adjustments remain research workstreams and are not presented as edges.
             </p>
           </div>
         </section>

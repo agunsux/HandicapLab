@@ -1,10 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { LEAGUE_REGISTRY, getLeagueConfig } from '../src/lib/crons/leagueRegistry';
 import { ApiFootballProvider } from '../src/lib/api/providers/apiFootball';
-import { apiFootballClient } from '../src/lib/api/apiFootball';
+import { apiFootballClient } from '../src/lib/apis/apifootball';
 
-// Mock apiFootballClient
-vi.mock('../src/lib/api/apiFootball', () => {
+// Mock the canonical quota-aware API-Football client.
+vi.mock('../src/lib/apis/apifootball', () => {
   return {
     apiFootballClient: {
       getFixtures: vi.fn()
@@ -78,7 +78,9 @@ describe('Phase 8.6: Competition Coverage & World Cup Validation Feed', () => {
         }
       ];
 
-      vi.mocked(apiFootballClient.getFixtures).mockResolvedValue(mockApiResponse);
+      vi.mocked(apiFootballClient.getFixtures).mockResolvedValue({
+        response: mockApiResponse
+      } as any);
 
       const provider = new ApiFootballProvider();
       const wcConfig = getLeagueConfig(1)!;

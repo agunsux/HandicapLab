@@ -138,27 +138,39 @@ export default async function AsianHandicapRoutePage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#1F2937]">
-                {goldLines.map((row) => (
-                  <tr key={row.id} className="hover:bg-[#111827]">
-                    <td className="py-3.5 px-4 font-bold text-white whitespace-nowrap">
-                      {row.identifier}
-                    </td>
-                    <td className="py-3.5 px-4 text-neutral-300">{row.bets} bets</td>
-                    <td className="py-3.5 px-4 text-neutral-300">{row.hitRatePct}%</td>
-                    <td className="py-3.5 px-4 font-bold text-[#10B981]">
-                      +{row.roiPct}%
-                    </td>
-                    <td className="py-3.5 px-4 text-neutral-400">{row.maxDrawdown} units</td>
-                    <td className="py-3.5 px-4 text-neutral-300">
-                      {row.clvPct ? `+${row.clvPct}%` : '+28.1%'}
-                    </td>
-                    <td className="py-3.5 px-4">
-                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-[#10B981]/15 text-[#10B981] border border-[#10B981]/30">
-                        {row.tier}
-                      </span>
+                {goldLines.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="py-8 px-4 text-center text-[#9CA3AF] leading-relaxed">
+                      No AH configuration is currently promoted. Walk-forward evidence is
+                      inconclusive (market-level confidence intervals not yet computed), so nothing is
+                      presented as an edge. See the track record for realized out-of-sample results.
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  goldLines.map((row) => (
+                    <tr key={row.id} className="hover:bg-[#111827]">
+                      <td className="py-3.5 px-4 font-bold text-white whitespace-nowrap">
+                        {row.identifier}
+                      </td>
+                      <td className="py-3.5 px-4 text-neutral-300">{row.bets} bets</td>
+                      <td className="py-3.5 px-4 text-neutral-300">{row.hitRatePct.toFixed(1)}%</td>
+                      <td className={`py-3.5 px-4 font-bold ${row.roiPct > 0 ? 'text-[#10B981]' : 'text-red-400'}`}>
+                        {row.roiPct > 0 ? '+' : ''}{row.roiPct.toFixed(2)}%
+                      </td>
+                      <td className="py-3.5 px-4 text-neutral-400">
+                        {row.maxDrawdown != null ? `${row.maxDrawdown} units` : '—'}
+                      </td>
+                      <td className="py-3.5 px-4 text-neutral-300">
+                        {row.clvPct != null ? `${row.clvPct > 0 ? '+' : ''}${row.clvPct.toFixed(2)}%` : '—'}
+                      </td>
+                      <td className="py-3.5 px-4">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-neutral-800 text-neutral-300 border border-neutral-700">
+                          {row.tier}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

@@ -1,9 +1,28 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
+import { type DataState } from '@/lib/data/dataState';
+
+// ============================================================================
+// Market intelligence service — REAL EVIDENCE ONLY.
+// ============================================================================
+// Source of truth: data/reports/homepage_backtest_latest.json, the persisted
+// walk-forward backtest (expanding window, real closing odds).
+//
+// The previous EPIC-66 "market discovery" artifact
+// (data/reports/epic66_market_discovery.json) is QUARANTINED: its own coverage
+// matrix reports 0 Pinnacle odds rows while the discovery rankings claim
+// triple-digit ROI with p=0. Per the no-extraordinary-result-without-audit
+// invariant, those rankings are not served as product claims.
+//
+// Metrics that are not present in the verified artifact are returned as null
+// and labelled with a data state. Never fabricated.
+
+export type DiscoveryMarket = 'AH' | 'OU' | 'BTTS' | 'ML';
+
 export interface MarketDiscoveryItem {
   id: string;
-  market: 'AH' | 'OU' | 'BTTS';
+  market: DiscoveryMarket;
   dimension: string;
   identifier: string;
   leagueId: string;
@@ -20,21 +39,25 @@ export interface MarketDiscoveryItem {
   totalStaked: number;
   totalProfit: number;
   roiPct: number;
-  avgOdds: number;
-  maxDrawdown: number;
-  maxLosingStreak: number;
-  tStat: number;
-  pValue: number;
-  fdrQValue?: number;
+  avgOdds: number | null;
+  maxDrawdown: number | null;
+  maxLosingStreak: number | null;
+  tStat: number | null;
+  pValue: number | null;
+  fdrQValue?: number | null;
   tier: 'RED' | 'GREY' | 'YELLOW' | 'GREEN' | 'GOLD';
-  clvPct?: number;
-  outOfSampleRoiPct?: number;
-  outOfSampleBets?: number;
+  clvPct?: number | null;
+  brierScore?: number | null;
+  outOfSampleRoiPct?: number | null;
+  outOfSampleBets?: number | null;
 }
 
 export interface MarketIntelligenceSummary {
   version: string;
   totalEvaluated: number;
+  /** EPIC-66 discovery data is withheld from product claims pending audit. */
+  discoveryStatus: 'QUARANTINED_PENDING_AUDIT' | 'VERIFIED';
+  discoveryNote: string;
   topRankings: MarketDiscoveryItem[];
   bottomRankings: MarketDiscoveryItem[];
   asianHandicap: {
@@ -43,8 +66,8 @@ export interface MarketIntelligenceSummary {
     promotedLines: MarketDiscoveryItem[];
   };
   overUnder: {
-    baselineOver25RoiPct: number;
-    baselineUnder25RoiPct: number;
+    baselineOver25RoiPct: number | null;
+    baselineUnder25RoiPct: number | null;
     highScoringLeagues: Array<{ league: string; avgGoals: number; bttsRatePct: number }>;
   };
   btts: {
@@ -52,15 +75,66 @@ export interface MarketIntelligenceSummary {
     bottomLeagues: Array<{ league: string; ratePct: number; bets: number; roiPct: number }>;
   };
   generatedAt: string;
+  dataState: DataState;
+  sourceFile: string | null;
 }
 
 let cachedIntelligence: { data: MarketIntelligenceSummary; timestamp: number } | null = null;
 const CACHE_TTL_MS = 60 * 60 * 1000;
 
+const BACKTEST_FILE = 'data/reports/homepage_backtest_latest.json';
+
+function loadBacktest(): any | null {
+  try {
+    const file = path.resolve(BACKTEST_FILE);
+    if (!fs.existsSync(file)) return null;
+    return JSON.parse(fs.readFileSync(file, 'utf-8'));
+  } catch (err) {
+    console.warn('[MarketIntelligenceService] Failed to read backtest artifact:', err);
+    return null;
+  }
+}
+
+function toDiscoveryItem(raw: any, windowStart: string, windowEnd: string): MarketDiscoveryItem {
+  const bets = Number(raw.totalBets ?? 0);
+  const winRatePct = Number(raw.winRate ?? 0);
+  const wins = Math.round((winRatePct / 100) * bets);
+
+  return {
+    id: `walkforward-${String(raw.market ?? 'UNKNOWN').toLowerCase()}`,
+    market: raw.market as DiscoveryMarket,
+    dimension: 'WALK_FORWARD',
+    identifier: `${raw.market} walk-forward`,
+    leagueId: 'TOP5_EUROPE',
+    season: `${windowStart}..${windowEnd}`,
+    side: 'ALL',
+    bets,
+    wins,
+    halfWins: 0,
+    pushes: 0,
+    halfLosses: 0,
+    losses: Math.max(0, bets - wins),
+    hitRatePct: winRatePct,
+    totalStaked: Number(raw.totalStaked ?? bets),
+    totalProfit: Number(raw.profitUnits ?? 0),
+    roiPct: Number(raw.roiPct ?? 0),
+    avgOdds: raw.avgOdds != null ? Number(raw.avgOdds) : null,
+    maxDrawdown: raw.maxDrawdown != null ? Number(raw.maxDrawdown) : null,
+    maxLosingStreak: null,
+    tStat: null,
+    pValue: null,
+    tier: 'GREY', // market-level CI not present in the artifact → inconclusive
+    clvPct: raw.avgClvPct != null ? Number(raw.avgClvPct) : null,
+    brierScore: raw.brierScore != null ? Number(raw.brierScore) : null,
+    outOfSampleRoiPct: Number(raw.roiPct ?? 0),
+    outOfSampleBets: bets,
+  };
+}
+
 export class MarketIntelligenceService {
   public static getMarketDiscovery(options: {
-    market?: 'AH' | 'OU' | 'BTTS' | 'all';
-    tier?: 'GOLD' | 'GREEN' | 'YELLOW' | 'RED' | 'all';
+    market?: DiscoveryMarket | 'all';
+    tier?: 'GOLD' | 'GREEN' | 'YELLOW' | 'RED' | 'GREY' | 'all';
     limit?: number;
   } = {}): MarketDiscoveryItem[] {
     const { market = 'all', tier = 'all', limit = 50 } = options;
@@ -82,115 +156,46 @@ export class MarketIntelligenceService {
       return cachedIntelligence.data;
     }
 
-    let rawRankings: any[] = [];
-    const clvMap = new Map<string, { clv: number; oosRoi: number; oosBets: number }>();
+    const backtest = loadBacktest();
+    const items: MarketDiscoveryItem[] = [];
+    const windowStart = String(backtest?.windowStart ?? '');
+    const windowEnd = String(backtest?.windowEnd ?? '');
 
-    try {
-      // 1. Read walk-forward CLV and OOS facts
-      const wfPath = path.resolve('data/reports/epic66_walkforward_report.json');
-      if (fs.existsSync(wfPath)) {
-        const wf = JSON.parse(fs.readFileSync(wfPath, 'utf-8'));
-        for (const s of wf.strategies || []) {
-          clvMap.set(s.strategyName.toUpperCase().trim(), {
-            clv: s.modelClvMeanPct || 0,
-            oosRoi: s.outOfSampleRoiPct || 0,
-            oosBets: s.outOfSampleBets || 0,
-          });
-        }
+    if (backtest && Array.isArray(backtest.markets)) {
+      for (const raw of backtest.markets) {
+        if (!raw || !raw.market) continue;
+        items.push(toDiscoveryItem(raw, windowStart, windowEnd));
       }
-
-      // 2. Read market discovery
-      const discoveryPath = path.resolve('data/reports/epic66_market_discovery.json');
-      if (fs.existsSync(discoveryPath)) {
-        const disc = JSON.parse(fs.readFileSync(discoveryPath, 'utf-8'));
-        rawRankings = disc.rankings || [];
-      }
-    } catch (err) {
-      console.warn('[MarketIntelligenceService] Error reading report JSON:', err);
     }
 
-    const items: MarketDiscoveryItem[] = rawRankings.map((r, idx) => {
-      const matchKey = r.identifier.toUpperCase().trim();
-      const wfMatch = clvMap.get(matchKey);
-
-      return {
-        id: `mkt-${idx + 1}`,
-        market: r.market,
-        dimension: r.dimension,
-        identifier: r.identifier,
-        leagueId: r.leagueId,
-        season: r.season,
-        side: r.side,
-        line: r.line,
-        bets: r.bets,
-        wins: r.wins,
-        halfWins: r.halfWins,
-        pushes: r.pushes,
-        halfLosses: r.halfLosses,
-        losses: r.losses,
-        hitRatePct: r.hitRatePct,
-        totalStaked: r.totalStaked,
-        totalProfit: r.totalProfit,
-        roiPct: r.roiPct,
-        avgOdds: r.avgOdds,
-        maxDrawdown: r.maxDrawdown,
-        maxLosingStreak: r.maxLosingStreak,
-        tStat: r.tStat,
-        pValue: r.pValue,
-        fdrQValue: r.fdrQValue,
-        tier: r.tier,
-        clvPct: wfMatch ? wfMatch.clv : undefined,
-        outOfSampleRoiPct: wfMatch ? wfMatch.oosRoi : undefined,
-        outOfSampleBets: wfMatch ? wfMatch.oosBets : undefined,
-      };
-    });
-
-    // Extract AH specific
-    const ahItems = items.filter((i) => i.market === 'AH');
-    const mostRobustAh = ahItems.find((i) => i.identifier === 'AH +0.25 Away') || null;
-    const bestOverallAh = ahItems.find((i) => i.identifier === 'AH +1.00 Away') || null;
-    const promotedAh = ahItems.filter((i) => i.tier === 'GOLD' || i.tier === 'GREEN');
-
-    // Extract BTTS specific
-    const bttsItems = items.filter((i) => i.market === 'BTTS');
-    const topBtts = bttsItems.slice(0, 5).map((b) => ({
-      league: b.leagueId,
-      ratePct: b.hitRatePct,
-      bets: b.bets,
-      roiPct: b.roiPct,
-    }));
-    const bottomBtts = bttsItems.slice(-3).map((b) => ({
-      league: b.leagueId,
-      ratePct: b.hitRatePct,
-      bets: b.bets,
-      roiPct: b.roiPct,
-    }));
+    const ahItem = items.find((i) => i.market === 'AH') ?? null;
+    const ouItem = items.find((i) => i.market === 'OU') ?? null;
 
     const summary: MarketIntelligenceSummary = {
-      version: 'epic66-v1.0',
+      version: 'walkforward-v1',
       totalEvaluated: items.length,
-      topRankings: items,
-      bottomRankings: items.slice(-10),
+      discoveryStatus: 'QUARANTINED_PENDING_AUDIT',
+      discoveryNote:
+        'EPIC-66 market discovery rankings are withheld pending audit: the coverage matrix reports zero Pinnacle odds rows while the rankings claim implausible ROI. Only the persisted walk-forward backtest is served.',
+      topRankings: [...items].sort((a, b) => b.roiPct - a.roiPct),
+      bottomRankings: [...items].sort((a, b) => a.roiPct - b.roiPct).slice(0, 10),
       asianHandicap: {
-        bestOverall: bestOverallAh,
-        mostRobust: mostRobustAh,
-        promotedLines: promotedAh,
+        bestOverall: ahItem,
+        mostRobust: ahItem,
+        promotedLines: [],
       },
       overUnder: {
-        baselineOver25RoiPct: -3.54,
-        baselineUnder25RoiPct: -5.89,
-        highScoringLeagues: [
-          { league: 'DEU-BUNDESLIGA', avgGoals: 3.16, bttsRatePct: 59.58 },
-          { league: 'CHE-SUPER', avgGoals: 3.22, bttsRatePct: 63.04 },
-          { league: 'NLD-EREDIVISIE', avgGoals: 3.14, bttsRatePct: 58.89 },
-          { league: 'USA-MLS', avgGoals: 3.12, bttsRatePct: 61.21 },
-        ],
+        baselineOver25RoiPct: ouItem ? ouItem.roiPct : null,
+        baselineUnder25RoiPct: null,
+        highScoringLeagues: [],
       },
       btts: {
-        topLeagues: topBtts,
-        bottomLeagues: bottomBtts,
+        topLeagues: [],
+        bottomLeagues: [],
       },
       generatedAt: new Date().toISOString(),
+      dataState: backtest ? 'REAL' : 'DATA_UNAVAILABLE',
+      sourceFile: backtest ? BACKTEST_FILE : null,
     };
 
     cachedIntelligence = { data: summary, timestamp: Date.now() };

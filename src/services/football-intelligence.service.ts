@@ -279,7 +279,8 @@ export class FootballIntelligenceService {
       const matchRes = await this.getMatchIntelligence(matchId);
       if (matchRes) {
         allRecommendations.push(...matchRes.data);
-        leagueMap[matchId] = matchId.includes('1002') ? 'La Liga' : 'EPL';
+        // League is not part of the recommendation payload; do not fabricate it.
+        leagueMap[matchId] = 'Unknown';
       }
     }
 

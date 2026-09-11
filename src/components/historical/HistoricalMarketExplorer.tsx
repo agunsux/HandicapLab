@@ -187,8 +187,8 @@ export function HistoricalMarketExplorer() {
                   >
                     {r.roiPct > 0 ? `+${r.roiPct}%` : `${r.roiPct}%`}
                   </td>
-                  <td className="py-3 px-4 text-neutral-400">{r.maxDrawdown}u</td>
-                  <td className="py-3 px-4 text-neutral-400">{r.pValue.toFixed(4)}</td>
+                  <td className="py-3 px-4 text-neutral-400">{r.maxDrawdown != null ? `${r.maxDrawdown}u` : '—'}</td>
+                  <td className="py-3 px-4 text-neutral-400">{r.pValue != null ? r.pValue.toFixed(4) : '—'}</td>
                   <td className="py-3 px-4 text-[#10B981] font-semibold">
                     {r.clvPct ? `+${r.clvPct}%` : '—'}
                   </td>
