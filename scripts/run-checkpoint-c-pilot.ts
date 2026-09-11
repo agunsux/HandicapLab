@@ -65,9 +65,10 @@ async function main() {
   console.log({
     provider: quotaBefore?.provider ?? 'apifootball',
     mode: quotaBefore?.mode ?? 'NORMAL',
-    allocatedDaily: quotaBefore?.allocatedDaily,
-    consumedToday: quotaBefore?.consumedToday,
-    remaining: quotaBefore?.remaining,
+    hardLimit: quotaBefore?.hardLimit ?? 1500000,
+    softLimit: quotaBefore?.softLimit ?? 1350000,
+    consumed: quotaBefore?.consumed ?? 0,
+    hardRemaining: quotaBefore?.hardRemaining ?? 1500000,
   });
 
   // Step 4: Execute Controlled Ingestion
@@ -98,7 +99,9 @@ async function main() {
   console.log(`Upcoming Matches: ${pilotResult.upcomingMatches}`);
   console.log(`Quarantined Fixtures: ${pilotResult.quarantinedCount}`);
   console.log(`API Requests Consumed: ${pilotResult.requestsConsumed}`);
-  console.log(`Quota Remaining: ${quotaAfter?.remaining ?? 'N/A'}`);
+  console.log(`Hard Limit: ${quotaAfter?.hardLimit ?? 1500000}`);
+  console.log(`Consumed: ${quotaAfter?.consumed ?? 'N/A'}`);
+  console.log(`Hard Remaining: ${quotaAfter?.hardRemaining ?? 'N/A'}`);
   console.log(`Quota Mode: ${quotaAfter?.mode ?? 'NORMAL'}`);
 
   console.log('\n--- PER-LEAGUE SUMMARY ---');
