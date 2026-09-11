@@ -6,8 +6,18 @@ export type { OddsProviderStatus, OddsProviderStatusDetail } from './provider';
 export { OddsPapiDiscovery, oddsPapiDiscovery } from './discovery';
 export { createNativeOddsClient, OddsPapiError } from './client';
 export type { NativeOddsClient } from './client';
-export { normalizeNativeOddsResponse, normalizeNativeFixture } from './normalize';
-export type { NormalizedSharpFixture, NormalizationStats } from './normalize';
+export {
+  normalizeNativeOddsResponse,
+  normalizeNativeFixture,
+  normalizeHistoricalOdds,
+  selectEntryAndClosing,
+} from './normalize';
+export type {
+  NormalizedSharpFixture,
+  NormalizationStats,
+  HistoricalOddPoint,
+  EntryClosingSelection,
+} from './normalize';
 export {
   NativeOddsResponseSchema,
   NativeSportsResponseSchema,
@@ -15,6 +25,7 @@ export {
   NativeBookmakersResponseSchema,
   NativeMarketsResponseSchema,
   NativeFixturesResponseSchema,
+  NativeHistoricalOddsResponseSchema,
 } from './schemas';
 export type {
   NativeSport,
@@ -22,4 +33,5 @@ export type {
   NativeBookmaker,
   NativeMarket,
   NativeOddsFixture,
+  NativeHistoricalOddsResponse,
 } from './schemas';

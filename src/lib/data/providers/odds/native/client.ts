@@ -10,6 +10,10 @@ import { logger } from '@/lib/logger';
 import { HttpClient, RateLimiter, CircuitBreaker, Cache } from '@/lib/http';
 import { getProviderConfig } from '../../core/config';
 import { reserveQuota, confirmQuota, rollbackQuota } from '@/lib/providers/quotaManagerV4';
+import {
+  NativeHistoricalOddsResponseSchema,
+  type NativeHistoricalOddsResponse,
+} from './schemas';
 
 const log = logger.child('oddsapi:native:client');
 
@@ -21,6 +25,7 @@ export type OddsPapiEndpoint =
   | 'fixtures'
   | 'odds'
   | 'odds-by-tournaments'
+  | 'historical-odds'
   | 'account';
 
 // Documented endpoint cooldowns (oddspapi.io/docs): rate limiter config
@@ -34,6 +39,7 @@ const ENDPOINT_COOLDOWN_MS: Record<OddsPapiEndpoint, number> = {
   fixtures: 2000,
   odds: 500,
   'odds-by-tournaments': 1000,
+  'historical-odds': 5000, // documented cooldown: 5000ms
   account: 0,
 };
 
@@ -46,6 +52,7 @@ const ENDPOINT_CACHE_TTL_MS: Record<OddsPapiEndpoint, number> = {
   fixtures: 30_000,
   odds: 30_000,
   'odds-by-tournaments': 30_000,
+  'historical-odds': 6 * 60 * 60 * 1000, // deterministic for finished events
   account: 60_000,
 };
 
@@ -174,44 +181,117 @@ export class NativeOddsClient {
       await confirmQuota(reservationId, receipt.cost);
       return { data: res.data, status: res.status, fromCache: res.fromCache };
     } catch (err: any) {
-      const httpStatus: number | undefined = err?.status;
-      const code: string | undefined = err?.code;
-
-      // Extract the provider error_code from the response body (e.g. 404 ->
-      // { error: { code: 'FIXTURE_NOT_FOUND' } }) so callers can distinguish
-      // data-availability 404s from genuine contract errors.
-      let providerErrorCode: string | undefined;
-      const body = typeof err?.body === 'string' ? err.body : undefined;
-      if (body) {
-        try {
-          const parsed = JSON.parse(body);
-          providerErrorCode = parsed?.error?.code ?? undefined;
-        } catch {
-          // non-JSON body; ignore
-        }
-      }
-
-      // HTTP errors are thrown by HttpClient as { status, code: 'HTTP_<status>', body }
-      if (httpStatus === 401 || code === 'HTTP_401') {
-        await rollbackQuota(reservationId);
-        throw new OddsPapiError('INVALID_KEY', endpoint, 'OddsPAPI rejected the API key (401)', 401, 'INVALID_KEY');
-      }
-      if (httpStatus === 429 || code === 'HTTP_429') {
-        await rollbackQuota(reservationId);
-        throw new OddsPapiError('RATE_LIMITED', endpoint, 'OddsPAPI rate limited (429)', 429, 'RATE_LIMITED');
-      }
-      if (httpStatus !== undefined && httpStatus >= 400 && httpStatus < 500) {
-        await rollbackQuota(reservationId);
-        throw new OddsPapiError('CONTRACT_ERROR', endpoint, `OddsPAPI HTTP ${httpStatus}: ${err?.message ?? ''}`, httpStatus, providerErrorCode ?? code);
-      }
-      if (code === 'VALIDATION_FAILED') {
-        await rollbackQuota(reservationId);
-        throw new OddsPapiError('PARSING_ERROR', endpoint, `OddsPAPI response failed schema validation: ${err?.message ?? ''}`, httpStatus, code);
-      }
-
-      await rollbackQuota(reservationId);
-      throw new OddsPapiError('NETWORK', endpoint, `OddsPAPI request failed: ${err?.message ?? ''}`, httpStatus, code);
+      throw await this.classifyError(err, endpoint, reservationId);
     }
+  }
+
+  /**
+   * Execute a GET request against an UNMETERED OddsPAPI endpoint
+   * (/v4/historical-odds, /v4/account). No quota reservation is performed
+   * because these endpoints do not consume the monthly billable allowance.
+   */
+  async getUnmetered<T extends z.ZodTypeAny>(
+    path: string,
+    params: Record<string, string | number | undefined>,
+    schema: T,
+    endpoint: OddsPapiEndpoint = 'historical-odds'
+  ): Promise<NativeOddsResponse<z.infer<T>>> {
+    await this.respectCooldown(endpoint);
+    try {
+      const res = await this.client.get<z.infer<T>>(this.resolveUrl(path), {
+        queryParams: params,
+        schema,
+        cacheTtlMs: ENDPOINT_CACHE_TTL_MS[endpoint] ?? 0,
+        maxRetries: 2, // unmetered, but still respect provider rate limits
+      });
+      return { data: res.data, status: res.status, fromCache: res.fromCache };
+    } catch (err: any) {
+      throw await this.classifyError(err, endpoint);
+    }
+  }
+
+  /**
+   * GET /v4/historical-odds — UNMETERED per OddsPapi docs (data since 2026-01).
+   * Used for historical market prices, backtesting, market movement and CLV
+   * research. This method must never be routed through the billable budget.
+   */
+  async fetchHistoricalOdds(params: {
+    fixtureId: string;
+    bookmakers?: string[]; // max 3 per documented contract
+    outcomeId?: number;
+    active?: boolean;
+  }): Promise<NativeHistoricalOddsResponse> {
+    const query: Record<string, string | number | undefined> = {
+      fixtureId: params.fixtureId,
+    };
+    if (params.bookmakers && params.bookmakers.length > 0) {
+      if (params.bookmakers.length > 3) {
+        log.warn('historical_odds_bookmaker_limit', { requested: params.bookmakers.length });
+      }
+      query.bookmakers = params.bookmakers.slice(0, 3).join(',');
+    }
+    if (params.outcomeId !== undefined) query.outcomeId = params.outcomeId;
+    if (params.active !== undefined) query.active = String(params.active);
+
+    const res = await this.getUnmetered(
+      '/historical-odds',
+      query,
+      NativeHistoricalOddsResponseSchema,
+      'historical-odds'
+    );
+    return res.data;
+  }
+
+  /**
+   * Classify an HttpClient error into the stable OddsPapiError taxonomy,
+   * rolling back the quota reservation when one was made.
+   */
+  private async classifyError(
+    err: any,
+    endpoint: OddsPapiEndpoint,
+    reservationId?: string
+  ): Promise<OddsPapiError> {
+    const httpStatus: number | undefined = err?.status;
+    const code: string | undefined = err?.code;
+
+    // Extract the provider error_code from the response body (e.g. 404 ->
+    // { error: { code: 'FIXTURE_NOT_FOUND' } }) so callers can distinguish
+    // data-availability 404s from genuine contract errors.
+    let providerErrorCode: string | undefined;
+    const body = typeof err?.body === 'string' ? err.body : undefined;
+    if (body) {
+      try {
+        const parsed = JSON.parse(body);
+        providerErrorCode = parsed?.error?.code ?? undefined;
+      } catch {
+        // non-JSON body; ignore
+      }
+    }
+
+    const rollback = async () => {
+      if (reservationId) await rollbackQuota(reservationId);
+    };
+
+    // HTTP errors are thrown by HttpClient as { status, code: 'HTTP_<status>', body }
+    if (httpStatus === 401 || code === 'HTTP_401') {
+      await rollback();
+      return new OddsPapiError('INVALID_KEY', endpoint, 'OddsPAPI rejected the API key (401)', 401, 'INVALID_KEY');
+    }
+    if (httpStatus === 429 || code === 'HTTP_429') {
+      await rollback();
+      return new OddsPapiError('RATE_LIMITED', endpoint, 'OddsPAPI rate limited (429)', 429, 'RATE_LIMITED');
+    }
+    if (httpStatus !== undefined && httpStatus >= 400 && httpStatus < 500) {
+      await rollback();
+      return new OddsPapiError('CONTRACT_ERROR', endpoint, `OddsPAPI HTTP ${httpStatus}: ${err?.message ?? ''}`, httpStatus, providerErrorCode ?? code);
+    }
+    if (code === 'VALIDATION_FAILED') {
+      await rollback();
+      return new OddsPapiError('PARSING_ERROR', endpoint, `OddsPAPI response failed schema validation: ${err?.message ?? ''}`, httpStatus, code);
+    }
+
+    await rollback();
+    return new OddsPapiError('NETWORK', endpoint, `OddsPAPI request failed: ${err?.message ?? ''}`, httpStatus, code);
   }
 
   /**

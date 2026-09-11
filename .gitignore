@@ -102,3 +102,10 @@ artifacts/forensic_raw_summary.json
 .cursor/
 __pycache__/
 *.pyc
+
+# OddsPapi historical odds raw/ingested artifacts (reproducible via
+# scripts/verify/historical-odds-sample-ingest.ts; 40MB+ of provider payloads)
+data/historical/oddspapi/
+
+# Stray shell redirect artifact (captured CLI deprecation notice)
+0.26.0
