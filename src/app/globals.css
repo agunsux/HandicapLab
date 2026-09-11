@@ -51,30 +51,30 @@
 }
 
 :root {
-  /* Midnight Emerald Surfaces — ZERO BLUE */
-  --bg-primary: #0B0F0E;
+  /* Deep Navy Surfaces — data-platform aesthetic */
+  --bg-primary: #0B1120;
   --bg-secondary: #111827;
-  --bg-tertiary: #1F2937;
-  --bg-elevated: #111827;
+  --bg-tertiary: #1E293B;
+  --bg-elevated: #131B2E;
 
-  /* Midnight Emerald Borders */
-  --border-subtle: #1F2937;
-  --border-default: #1F2937;
+  /* Navy Borders */
+  --border-subtle: #1E293B;
+  --border-default: #1E293B;
 
-  /* Midnight Emerald Text Scale */
-  --text-primary: #F0FDF4;
-  --text-secondary: #9CA3AF;
-  --text-tertiary: #9CA3AF;
+  /* Text Scale */
+  --text-primary: #F0F4F8;
+  --text-secondary: #94A3B8;
+  --text-tertiary: #94A3B8;
   --font-display: var(--font-sans);
 
-  /* Midnight Emerald Signals */
+  /* Semantic Signals — unchanged for data readability */
   --ev-positive: #10B981;
   --ev-negative: #EF4444;
   --ev-neutral: #F59E0B;
 
-  /* Brand Accent */
-  --accent-brand: #10B981;
-  --accent-brand-hover: #6EE7B7;
+  /* Brand Accent — deep navy from logo */
+  --accent-brand: #3B82F6;
+  --accent-brand-hover: #60A5FA;
 
   /* Legacy compatibility aliases */
   --signal-high: #10B981;
@@ -86,7 +86,7 @@
   --signal-medium-bg: rgba(245, 158, 11, 0.12);
 
   --status-warning: #F59E0B;
-  --status-stale: #9CA3AF;
+  --status-stale: #94A3B8;
 
   /* Shadcn Mapping (Midnight Emerald) */
   --background: var(--bg-primary);        
@@ -125,7 +125,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-[#0B0F0E] text-[#F0FDF4];
+    @apply bg-[#0B1120] text-[#F0F4F8];
     font-feature-settings: "rlig" 1, "calt" 1, "cv11" 1, "tnum" 1;
   }
   
@@ -138,10 +138,10 @@
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: #1F2937;
+    background: #1E293B;
     border-radius: 9999px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #9CA3AF;
+    background: #94A3B8;
   }
 }

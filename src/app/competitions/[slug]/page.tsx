@@ -29,15 +29,15 @@ export async function generateMetadata({ params }: PageProps) {
   }
 
   return {
-    title: `${league.name} Quant Analytics & Value Edges | HandicapLab`,
-    description: `Access Dixon-Coles goal expectations and Asian Handicap edges for ${league.name}. Compare fair probabilities with market pricing.`,
+    title: `${league.name} Statistics & Analytics | HandicapLab`,
+    description: `Football statistics, match data, and market analytics for ${league.name}. Asian Handicap records, Over/Under trends, and BTTS statistics.`,
     alternates: {
-      canonical: `https://handicap-lab.vercel.app/competitions/${slug}`,
+      canonical: `https://handicaplab.dev/competitions/${slug}`,
     },
     openGraph: {
-      title: `${league.name} Predictive Model Analytics | HandicapLab`,
-      description: `Mathematical betting market edges for ${league.name} matches. Powered by ensembled Poisson simulations.`,
-      url: `https://handicap-lab.vercel.app/competitions/${slug}`,
+      title: `${league.name} Football Statistics | HandicapLab`,
+      description: `Match statistics and market analytics for ${league.name}. Verified data from production sources.`,
+      url: `https://handicaplab.dev/competitions/${slug}`,
       type: 'website',
     }
   };
@@ -55,9 +55,9 @@ export default async function LeaguePage({ params }: PageProps) {
 
   // Generate structured data
   const breadcrumbs = [
-    { name: 'Home', item: 'https://handicap-lab.vercel.app' },
-    { name: 'Competitions', item: 'https://handicap-lab.vercel.app/competitions' },
-    { name: league.name, item: `https://handicap-lab.vercel.app/competitions/${slug}` }
+    { name: 'Home', item: 'https://handicaplab.dev' },
+    { name: 'Competitions', item: 'https://handicaplab.dev/competitions' },
+    { name: league.name, item: `https://handicaplab.dev/competitions/${slug}` }
   ];
 
   const faqs = [

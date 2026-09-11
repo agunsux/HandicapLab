@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: ['/api/', '/dashboard/', '/scanner/'],
     },
-    sitemap: 'https://handicap-lab.vercel.app/sitemap.xml',
+    sitemap: 'https://handicaplab.dev/sitemap.xml',
   };
 }

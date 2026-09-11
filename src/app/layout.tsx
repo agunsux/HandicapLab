@@ -24,8 +24,8 @@ const monoFont = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'HandicapLab — Transparent Sports Analytics Research',
-  description: 'Live model predictions with full transparency. Research terminal, not betting advice.',
+  title: 'HandicapLab — Football Data & Statistics',
+  description: 'Explore football data, team statistics, league trends, and market analytics across Asian Handicap, Over/Under, and BTTS.',
   robots: {
     index: true,
     follow: true,

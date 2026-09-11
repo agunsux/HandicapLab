@@ -5,16 +5,16 @@ import { StructuredData } from '@/components/StructuredData';
 export const revalidate = 3600; // 1-hour ISR revalidation
 
 export const metadata = {
-  title: 'Football Competitions Coverage & Predictive Analytics | HandicapLab',
-  description: 'Expose pricing value edges across global football leagues, domestic cups, and international tournaments. View ensembled Dixon-Coles goal expectations.',
+  title: 'Football Competitions & League Statistics | HandicapLab',
+  description: 'Explore football league statistics, match data, and team analytics across global competitions. Asian Handicap, Over/Under, and BTTS coverage.',
 };
 
 export default async function CompetitionsIndex() {
   const competitions = await getTopLeagues();
 
   const breadcrumbs = [
-    { name: 'Home', item: 'https://handicap-lab.vercel.app' },
-    { name: 'Competitions', item: 'https://handicap-lab.vercel.app/competitions' }
+    { name: 'Home', item: 'https://handicaplab.dev' },
+    { name: 'Competitions', item: 'https://handicaplab.dev/competitions' }
   ];
 
   return (

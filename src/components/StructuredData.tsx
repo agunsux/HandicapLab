@@ -18,9 +18,9 @@ export function StructuredData({ type, data }: StructuredDataProps) {
       '@context': 'https://schema.org',
       '@type': 'Organization',
       name: 'HandicapLab',
-      url: 'https://handicap-lab.vercel.app',
-      logo: 'https://handicap-lab.vercel.app/favicon.ico',
-      description: 'Quantitative football market intelligence powered by ensembled goal expectation models.'
+      url: 'https://handicaplab.dev',
+      logo: 'https://handicaplab.dev/favicon.ico',
+      description: 'Football data and statistics platform. Explore match data, league trends, and market analytics across Asian Handicap, Over/Under, and BTTS.'
     };
   } else if (type === 'BreadcrumbList') {
     schema = {

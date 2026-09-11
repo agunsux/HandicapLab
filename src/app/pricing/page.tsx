@@ -4,7 +4,7 @@ import { PricingCards } from './PricingCards';
 export const metadata = {
   title: 'Pricing & Plans | HandicapLab',
   description:
-    'Transparent pricing for football market intelligence. Free, Pro, and Elite plans with one-time credit options.',
+    'Transparent pricing for football data and statistics access. Free, Pro, and Elite plans.',
 };
 
 const FAQS = [

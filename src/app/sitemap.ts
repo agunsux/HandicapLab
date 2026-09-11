@@ -3,7 +3,7 @@ import { getTopLeagues } from '@/lib/data/leagues';
 import { getAllTeams } from '@/lib/data/teams';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://handicap-lab.vercel.app';
+  const baseUrl = 'https://handicaplab.dev';
 
   // Base pages
   const staticPages = [

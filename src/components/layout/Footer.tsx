@@ -3,12 +3,12 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { FOOTER_NAV } from '@/config/navigation';
-import { Moon, Sun, ArrowRight, Shield } from 'lucide-react';
+import { ArrowRight, ExternalLink } from 'lucide-react';
+import { BrandLogo } from '@/components/ui/BrandLogo';
 
 export function Footer() {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
-  const [isDark, setIsDark] = useState(true);
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,24 +19,30 @@ export function Footer() {
   };
 
   return (
-    <footer className="border-t border-[#1F2937] bg-[#0B0F0E] text-[#F0FDF4] relative z-20">
+    <footer className="border-t border-[#1E293B] bg-[#0B1120] text-[#F0F4F8] relative z-20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-14 max-w-7xl">
-        {/* Top 3-Column Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
-          {/* Column 1: Brand (30%) */}
-          <div className="md:col-span-2 lg:col-span-1 space-y-4">
-            <div className="flex items-center gap-2.5">
-              <div className="h-7 w-7 rounded-md bg-[#10B981] flex items-center justify-center text-black font-display font-bold text-xs shadow-sm">
-                HL
-              </div>
-              <span className="font-display font-semibold tracking-tight text-[#F0FDF4] text-base">
-                Handicap<span className="text-[#10B981]">Lab</span>
-              </span>
-            </div>
+        {/* Top Layout: Brand + 4 link columns */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-10">
+          {/* Column 1: Brand */}
+          <div className="sm:col-span-2 lg:col-span-1 space-y-4">
+            <BrandLogo size="md" />
 
-            <p className="text-sm text-[#9CA3AF] leading-relaxed">
-              Trade the Edge. Not the Hype. Quantitative football market intelligence for Asian Handicap, Over/Under &amp; BTTS.
+            <p className="text-sm text-[#94A3B8] leading-relaxed">
+              Football data, made easier to understand. Explore match statistics, league trends, and market analytics.
             </p>
+
+            {/* Salmo.dev — separate brand (Sports Betting Intelligence) */}
+            <div className="pt-2">
+              <p className="text-xs text-[#64748B] mb-1">Need betting intelligence?</p>
+              <a
+                href="https://salmo.dev"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1.5 text-xs text-[#94A3B8] hover:text-[#3B82F6] transition-colors"
+              >
+                Explore Salmo <ExternalLink className="h-3 w-3" />
+              </a>
+            </div>
 
             {/* Social Icons Row */}
             <div className="flex items-center gap-3 pt-2">
@@ -45,7 +51,7 @@ export function Footer() {
                 href="https://twitter.com"
                 target="_blank"
                 rel="noreferrer"
-                className="h-8 w-8 rounded-lg bg-[#111827] border border-[#1F2937] flex items-center justify-center text-[#9CA3AF] hover:text-[#10B981] hover:scale-110 transition-all duration-200"
+                className="h-8 w-8 rounded-lg bg-[#131B2E] border border-[#1E293B] flex items-center justify-center text-[#94A3B8] hover:text-[#3B82F6] hover:scale-110 transition-all duration-200"
                 aria-label="Twitter / X"
               >
                 <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
@@ -58,7 +64,7 @@ export function Footer() {
                 href="https://discord.com"
                 target="_blank"
                 rel="noreferrer"
-                className="h-8 w-8 rounded-lg bg-[#111827] border border-[#1F2937] flex items-center justify-center text-[#9CA3AF] hover:text-[#10B981] hover:scale-110 transition-all duration-200"
+                className="h-8 w-8 rounded-lg bg-[#131B2E] border border-[#1E293B] flex items-center justify-center text-[#94A3B8] hover:text-[#3B82F6] hover:scale-110 transition-all duration-200"
                 aria-label="Discord"
               >
                 <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
@@ -71,7 +77,7 @@ export function Footer() {
                 href="https://telegram.org"
                 target="_blank"
                 rel="noreferrer"
-                className="h-8 w-8 rounded-lg bg-[#111827] border border-[#1F2937] flex items-center justify-center text-[#9CA3AF] hover:text-[#10B981] hover:scale-110 transition-all duration-200"
+                className="h-8 w-8 rounded-lg bg-[#131B2E] border border-[#1E293B] flex items-center justify-center text-[#94A3B8] hover:text-[#3B82F6] hover:scale-110 transition-all duration-200"
                 aria-label="Telegram"
               >
                 <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
@@ -84,7 +90,7 @@ export function Footer() {
                 href="https://youtube.com"
                 target="_blank"
                 rel="noreferrer"
-                className="h-8 w-8 rounded-lg bg-[#111827] border border-[#1F2937] flex items-center justify-center text-[#9CA3AF] hover:text-[#10B981] hover:scale-110 transition-all duration-200"
+                className="h-8 w-8 rounded-lg bg-[#131B2E] border border-[#1E293B] flex items-center justify-center text-[#94A3B8] hover:text-[#3B82F6] hover:scale-110 transition-all duration-200"
                 aria-label="YouTube"
               >
                 <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
@@ -94,74 +100,80 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Column 2: Markets */}
+          {/* Column 2: Product */}
           <div>
-            <h3 className="text-xs uppercase tracking-widest text-[#9CA3AF]/60 font-semibold mb-4">
-              Markets
+            <h3 className="text-xs uppercase tracking-widest text-[#64748B] font-semibold mb-4">
+              Product
             </h3>
             <ul className="space-y-2.5 text-sm">
-              <li>
-                <Link href="/app/markets/asian-handicap" className="text-[#9CA3AF] hover:text-[#10B981] transition-colors">
-                  Asian Handicap
-                </Link>
-              </li>
-              <li>
-                <Link href="/app/markets/over-under" className="text-[#9CA3AF] hover:text-[#10B981] transition-colors">
-                  Over / Under
-                </Link>
-              </li>
-              <li>
-                <Link href="/app/markets/btts" className="text-[#9CA3AF] hover:text-[#10B981] transition-colors">
-                  BTTS (Both Teams To Score)
-                </Link>
-              </li>
+              {FOOTER_NAV.data.map((item) => (
+                <li key={item.label}>
+                  <Link href={item.href} className="text-[#94A3B8] hover:text-[#F0F4F8] transition-colors">
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
-          {/* Column 3: Company */}
+          {/* Column 3: Statistics */}
           <div>
-            <h3 className="text-xs uppercase tracking-widest text-[#9CA3AF]/60 font-semibold mb-4">
+            <h3 className="text-xs uppercase tracking-widest text-[#64748B] font-semibold mb-4">
+              Statistics
+            </h3>
+            <ul className="space-y-2.5 text-sm">
+              {FOOTER_NAV.statistics.map((item) => (
+                <li key={item.label}>
+                  <Link href={item.href} className="text-[#94A3B8] hover:text-[#F0F4F8] transition-colors">
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Column 4: Research */}
+          <div>
+            <h3 className="text-xs uppercase tracking-widest text-[#64748B] font-semibold mb-4">
+              Research
+            </h3>
+            <ul className="space-y-2.5 text-sm">
+              {FOOTER_NAV.resources.map((item) => (
+                <li key={item.label}>
+                  <Link href={item.href} className="text-[#94A3B8] hover:text-[#F0F4F8] transition-colors">
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Column 5: Company */}
+          <div>
+            <h3 className="text-xs uppercase tracking-widest text-[#64748B] font-semibold mb-4">
               Company
             </h3>
             <ul className="space-y-2.5 text-sm">
-              <li>
-                <Link href="/methodology" className="text-[#9CA3AF] hover:text-[#10B981] transition-colors">
-                  Methodology &amp; Math
-                </Link>
-              </li>
-              <li>
-                <Link href="/pricing" className="text-[#9CA3AF] hover:text-[#10B981] transition-colors">
-                  Pricing &amp; Plans
-                </Link>
-              </li>
-              <li>
-                <Link href="/blog" className="text-[#9CA3AF] hover:text-[#10B981] transition-colors">
-                  Research Blog
-                </Link>
-              </li>
-              <li>
-                <Link href="/trust-center" className="text-[#9CA3AF] hover:text-[#10B981] transition-colors">
-                  Trust Center
-                </Link>
-              </li>
-              <li>
-                <Link href="/validation" className="text-[#9CA3AF] hover:text-[#10B981] transition-colors">
-                  Track Record Validation
-                </Link>
-              </li>
+              {FOOTER_NAV.company.map((item) => (
+                <li key={item.label}>
+                  <Link href={item.href} className="text-[#94A3B8] hover:text-[#F0F4F8] transition-colors">
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
 
         {/* Full-width Newsletter Section */}
-        <div className="mt-12 border-t border-[#1F2937] pt-10 pb-8">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 bg-[#111827]/60 border border-[#1F2937] rounded-xl p-6">
+        <div className="mt-12 border-t border-[#1E293B] pt-10 pb-8">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 bg-[#131B2E]/60 border border-[#1E293B] rounded-xl p-6">
             <div>
-              <h4 className="text-lg font-semibold text-[#F0FDF4] flex items-center gap-2">
-                Get an edge.
+              <h4 className="text-lg font-semibold text-[#F0F4F8] flex items-center gap-2">
+                Stay updated.
               </h4>
-              <p className="text-sm text-[#9CA3AF] mt-1">
-                Weekly quantitative market insights and high-EV opportunity alerts. No spam.
+              <p className="text-sm text-[#94A3B8] mt-1">
+                Weekly football data insights, league coverage updates, and research highlights. No spam.
               </p>
             </div>
 
@@ -172,47 +184,47 @@ export function Footer() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email address"
-                className="bg-[#0B0F0E] border border-[#1F2937] rounded-lg px-4 py-2.5 text-sm text-[#F0FDF4] placeholder-[#9CA3AF]/60 focus:border-[#10B981] focus:ring-1 focus:ring-[#10B981] outline-none w-full sm:w-80"
+                className="bg-[#0B1120] border border-[#1E293B] rounded-lg px-4 py-2.5 text-sm text-[#F0F4F8] placeholder-[#64748B] focus:border-[#3B82F6] focus:ring-1 focus:ring-[#3B82F6] outline-none w-full sm:w-80"
               />
               <button
                 type="submit"
-                className="bg-[#F59E0B] hover:bg-[#F59E0B]/90 text-black font-semibold px-5 py-2.5 rounded-lg text-sm transition-colors whitespace-nowrap flex items-center justify-center gap-1.5 shadow-sm"
+                className="bg-[#3B82F6] hover:bg-[#2563EB] text-white font-semibold px-5 py-2.5 rounded-lg text-sm transition-colors whitespace-nowrap flex items-center justify-center gap-1.5 shadow-sm"
               >
                 {subscribed ? 'Subscribed ✓' : <>Subscribe <ArrowRight className="h-4 w-4" /></>}
               </button>
             </form>
           </div>
-          <p className="text-xs text-[#9CA3AF]/60 mt-3 text-center sm:text-left">
+          <p className="text-xs text-[#64748B] mt-3 text-center sm:text-left">
             We respect your privacy. Unsubscribe anytime with one click.
           </p>
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-8 border-t border-[#1F2937] pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#9CA3AF]">
+        <div className="mt-8 border-t border-[#1E293B] pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#94A3B8]">
           <div>
-            &copy; 2026 HandicapLab. Research transparency, always.
+            &copy; {new Date().getFullYear()} HandicapLab.dev. All rights reserved.
           </div>
 
           <div className="flex items-center gap-6">
-            <Link href="/methodology" className="hover:text-[#10B981] transition-colors">
+            <Link href="/methodology" className="hover:text-[#F0F4F8] transition-colors">
               Methodology
             </Link>
-            <Link href="/models" className="hover:text-[#10B981] transition-colors">
+            <Link href="/models" className="hover:text-[#F0F4F8] transition-colors">
               Models
             </Link>
-            <Link href="/track-record" className="hover:text-[#10B981] transition-colors">
+            <Link href="/track-record" className="hover:text-[#F0F4F8] transition-colors">
               Track Record
             </Link>
           </div>
         </div>
 
-        {/* Responsible Gambling Disclaimer */}
-        <div className="mt-6 pt-4 border-t border-[#1F2937]/50 space-y-2">
-          <p className="text-xs text-[#F59E0B]/90 font-medium">
-            HandicapLab is a sports analytics research project. All content is for informational purposes only. Nothing on this site constitutes betting advice.
+        {/* Disclaimer */}
+        <div className="mt-6 pt-4 border-t border-[#1E293B]/50 space-y-2">
+          <p className="text-xs text-[#94A3B8]/90 font-medium">
+            HandicapLab.dev is a football data and statistics platform. All content is for informational and research purposes only.
           </p>
-          <p className="text-[11px] text-[#9CA3AF]/70 leading-relaxed max-w-5xl">
-            If you or someone you know has a gambling problem, seek help. Gamble responsibly and only where legal. Pinnacle close prices serve as the ground truth for Closing Line Value (CLV) evaluation.
+          <p className="text-[11px] text-[#64748B] leading-relaxed max-w-5xl">
+            Statistical data is provided as-is from verified sources. Asian Handicap, Over/Under, and BTTS statistics reflect historical outcomes. Pinnacle close prices serve as the ground truth for Closing Line Value (CLV) benchmarking. If you or someone you know has a gambling problem, seek help.
           </p>
         </div>
       </div>

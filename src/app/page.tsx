@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { ArrowRight, BarChart3, ShieldCheck, Database, Target, TrendingUp, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, BarChart3, Database, Globe, Layers, ExternalLink } from 'lucide-react';
 import { UpcomingFixturesService } from '@/lib/services/upcomingFixturesService';
 import { HistoricalDataService } from '@/lib/services/historicalDataService';
 import { MarketIntelligenceService } from '@/lib/services/marketIntelligenceService';
@@ -12,9 +12,9 @@ import { HistoricalDataSection } from '@/components/home/HistoricalDataSection';
 export const dynamic = 'force-dynamic';
 
 export const metadata = {
-  title: 'HandicapLab — Football Market Intelligence for Asian Handicap, Over/Under & BTTS',
+  title: 'HandicapLab — Football Data & Statistics | Asian Handicap, Over/Under, BTTS',
   description:
-    'Real football data, historical walk-forward market analysis, and Pinnacle closing line benchmarks across Asian Handicap, Over/Under, and Both Teams To Score.',
+    'Explore football data, team statistics, league trends, and market analytics. Asian Handicap records, Over/Under trends, and BTTS statistics across global leagues.',
 };
 
 export default async function HomePage() {
@@ -33,58 +33,70 @@ export default async function HomePage() {
   const settledPreview = settled.slice(0, 5);
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#0B0F0E] font-sans text-[#F0FDF4]">
+    <div className="flex flex-col min-h-screen bg-[#0B1120] font-sans text-[#F0F4F8]">
       {/* SECTION 1 — HERO */}
-      <section className="relative pt-28 pb-20 px-4 sm:px-6 lg:px-8 border-b border-[#1F2937]/70">
+      <section className="relative pt-28 pb-20 px-4 sm:px-6 lg:px-8 border-b border-[#1E293B]/70">
         <div className="max-w-5xl mx-auto text-center space-y-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#111827] border border-[#1F2937] text-xs font-mono text-[#10B981]">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#131B2E] border border-[#1E293B] text-xs font-mono text-[#94A3B8]">
             <span className="h-2 w-2 rounded-full bg-[#10B981] animate-pulse" />
-            {historicalSummary.leaguesCount ?? '—'} TRACKED LEAGUES &bull; {historicalSummary.completedMatches?.toLocaleString() ?? '—'} MATCHES &bull; WALK-FORWARD EVIDENCE
+            {historicalSummary.leaguesCount ?? '—'} LEAGUES &bull; {historicalSummary.completedMatches?.toLocaleString() ?? '—'} MATCHES &bull; VERIFIED DATA
           </div>
 
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-display font-black text-white tracking-tight leading-[1.08]">
-            Football Market Intelligence.<br />
-            <span className="text-[#10B981]">Built Around Asian Handicap, Over/Under &amp; BTTS.</span>
+            Football Data &amp;<br />
+            <span className="text-[#3B82F6]">Statistics.</span>
           </h1>
 
-          <p className="text-base sm:text-xl text-[#9CA3AF] max-w-3xl mx-auto leading-relaxed">
-            We analyze real football fixtures using empirical historical distributions, bivariate goal expectancy models, and closing line value (CLV) evaluation. No tipster picks. No black-box hype.
+          <p className="text-base sm:text-xl text-[#94A3B8] max-w-3xl mx-auto leading-relaxed">
+            Explore match data, team performance, league trends, and market statistics across Asian Handicap, Over/Under, and BTTS. Verified sources. Transparent methodology.
           </p>
 
           {/* Core Dataset Fact Ribbon */}
-          <div className="pt-2 flex flex-wrap items-center justify-center gap-4 text-xs font-mono text-neutral-300">
-            <span className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#111827] border border-[#1F2937]">
-              <Database className="h-3.5 w-3.5 text-[#10B981]" />
-              <strong>{historicalSummary.completedMatches?.toLocaleString() ?? '—'}</strong> Completed Matches
+          <div className="pt-2 flex flex-wrap items-center justify-center gap-4 text-xs font-mono text-[#94A3B8]">
+            <span className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#131B2E] border border-[#1E293B]">
+              <Database className="h-3.5 w-3.5 text-[#3B82F6]" />
+              <strong>{historicalSummary.completedMatches?.toLocaleString() ?? '—'}</strong> Matches
             </span>
-            <span className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#111827] border border-[#1F2937]">
-              <Target className="h-3.5 w-3.5 text-[#10B981]" />
-              <strong>{historicalSummary.pinnacleOddsRecords?.toLocaleString() ?? '—'}</strong> Pinnacle Odds Rows
+            <span className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#131B2E] border border-[#1E293B]">
+              <Globe className="h-3.5 w-3.5 text-[#3B82F6]" />
+              <strong>{historicalSummary.leaguesCount ?? '—'}</strong> Leagues
             </span>
-            <Link
-              href="/track-record"
-              className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#111827] border border-[#1F2937] hover:border-[#10B981]/50 transition-colors"
-            >
-              <ShieldCheck className="h-3.5 w-3.5 text-[#10B981]" />
-              Walk-Forward Backtest: <strong>{historicalSummary.backtest?.totalBets?.toLocaleString() ?? '—'}</strong> bets
-            </Link>
+            <span className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#131B2E] border border-[#1E293B]">
+              <Layers className="h-3.5 w-3.5 text-[#3B82F6]" />
+              <strong>{historicalSummary.pinnacleOddsRecords?.toLocaleString() ?? '—'}</strong> Odds Records
+            </span>
           </div>
 
           {/* Primary & Secondary CTAs */}
           <div className="pt-6 flex flex-col sm:flex-row items-center justify-center gap-3.5">
+            <Link
+              href="/competitions"
+              className="w-full sm:w-auto px-8 py-3.5 rounded-lg bg-[#3B82F6] hover:bg-[#2563EB] text-white font-display font-bold text-sm transition-all shadow-lg hover:shadow-[#3B82F6]/20 flex items-center justify-center gap-2"
+            >
+              Explore Football Data <ArrowRight className="h-4 w-4" />
+            </Link>
+
             <a
               href="#upcoming-matches"
-              className="w-full sm:w-auto px-8 py-3.5 rounded-lg bg-[#10B981] hover:bg-[#10B981]/90 text-black font-display font-bold text-sm transition-all shadow-lg hover:shadow-[#10B981]/20 flex items-center justify-center gap-2"
+              className="w-full sm:w-auto px-8 py-3.5 rounded-lg bg-[#131B2E] hover:bg-[#1E293B] border border-[#1E293B] text-white font-medium text-sm transition-all flex items-center justify-center gap-2"
             >
-              Explore Today&apos;s Matches <ArrowRight className="h-4 w-4" />
+              Explore Matches
             </a>
+          </div>
 
-            <Link
-              href="/historical"
-              className="w-full sm:w-auto px-8 py-3.5 rounded-lg bg-[#111827] hover:bg-[#1A2436] border border-[#1F2937] text-white font-mono text-sm transition-all flex items-center justify-center gap-2"
-            >
-              <Database className="h-4 w-4 text-[#9CA3AF]" />
-              Explore Historical Data
+          {/* Contextual product pathways — intentionally secondary, no clutter */}
+          <div className="pt-3 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-[#94A3B8]">
+            <Link href="/historical" className="hover:text-[#F0F4F8] transition-colors">
+              Historical Data
+            </Link>
+            <Link href="/track-record" className="hover:text-[#F0F4F8] transition-colors">
+              Track Record
+            </Link>
+            <Link href="/models" className="hover:text-[#F0F4F8] transition-colors">
+              Model Registry
+            </Link>
+            <Link href="/pricing" className="hover:text-[#F0F4F8] transition-colors">
+              Pricing
             </Link>
           </div>
         </div>
@@ -97,47 +109,47 @@ export default async function HomePage() {
         dataState={upcomingData.dataState}
       />
 
-      {/* SECTION 3 — MARKET INTELLIGENCE (AH, OU, BTTS) */}
+      {/* SECTION 3 — MARKET STATISTICS (AH, OU, BTTS) */}
       <MarketIntelligenceSection summary={marketSummary} />
 
       {/* SECTION 4 — HISTORICAL FOOTBALL DATA */}
       <HistoricalDataSection summary={historicalSummary} />
 
       {/* SECTION 5 — HOW HANDICAPLAB WORKS */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 border-t border-[#1F2937]/70 bg-[#0E1413]">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 border-t border-[#1E293B]/70 bg-[#0D1525]">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-14 space-y-2">
-            <span className="text-xs font-mono uppercase tracking-widest text-[#10B981]">Methodology</span>
+            <span className="text-xs font-mono uppercase tracking-widest text-[#3B82F6]">Methodology</span>
             <h2 className="text-2xl sm:text-4xl font-display font-bold text-white">
               How HandicapLab Works
             </h2>
-            <p className="text-sm text-[#9CA3AF] max-w-xl mx-auto">
-              Three systematic stages from global data ingestion to audited post-match CLV settlement.
+            <p className="text-sm text-[#94A3B8] max-w-xl mx-auto">
+              Three systematic stages from global data collection to verified statistical intelligence.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="p-6 rounded-2xl bg-[#111827]/60 border border-[#1F2937]">
-              <div className="text-3xl font-mono font-bold text-[#10B981] mb-3">01</div>
-              <h3 className="text-base font-bold text-white mb-2">Target Market Selection</h3>
-              <p className="text-xs text-[#9CA3AF] leading-relaxed">
-                We restrict analysis to high-liquidity football markets: Asian Handicap, Over/Under totals, and Both Teams To Score.
+            <div className="p-6 rounded-2xl bg-[#131B2E]/60 border border-[#1E293B]">
+              <div className="text-3xl font-mono font-bold text-[#3B82F6] mb-3">01</div>
+              <h3 className="text-base font-bold text-white mb-2">Global Data Coverage</h3>
+              <p className="text-xs text-[#94A3B8] leading-relaxed">
+                We track football fixtures, results, and statistics across leagues worldwide. Every data point is sourced from verified providers with full provenance tracking.
               </p>
             </div>
 
-            <div className="p-6 rounded-2xl bg-[#111827]/60 border border-[#1F2937]">
-              <div className="text-3xl font-mono font-bold text-[#10B981] mb-3">02</div>
-              <h3 className="text-base font-bold text-white mb-2">Empirical Edge Detection</h3>
-              <p className="text-xs text-[#9CA3AF] leading-relaxed">
-                We compare market prices against historical distributions and bivariate Poisson models, validating statistically whether an asymmetry exists ($p &lt; 0.05$).
+            <div className="p-6 rounded-2xl bg-[#131B2E]/60 border border-[#1E293B]">
+              <div className="text-3xl font-mono font-bold text-[#3B82F6] mb-3">02</div>
+              <h3 className="text-base font-bold text-white mb-2">Statistical Intelligence</h3>
+              <p className="text-xs text-[#94A3B8] leading-relaxed">
+                Historical distributions, team form analysis, and market statistics across Asian Handicap, Over/Under, and BTTS. Every metric is computed from empirical data.
               </p>
             </div>
 
-            <div className="p-6 rounded-2xl bg-[#111827]/60 border border-[#1F2937]">
-              <div className="text-3xl font-mono font-bold text-[#10B981] mb-3">03</div>
-              <h3 className="text-base font-bold text-white mb-2">Pinnacle CLV Benchmark</h3>
-              <p className="text-xs text-[#9CA3AF] leading-relaxed">
-                Every settlement is benchmarked against the Pinnacle closing line. We prioritize Closing Line Value (CLV) over short-term luck.
+            <div className="p-6 rounded-2xl bg-[#131B2E]/60 border border-[#1E293B]">
+              <div className="text-3xl font-mono font-bold text-[#3B82F6] mb-3">03</div>
+              <h3 className="text-base font-bold text-white mb-2">Research Infrastructure</h3>
+              <p className="text-xs text-[#94A3B8] leading-relaxed">
+                Transparent methodology, audited data pipelines, and API access for researchers. All statistics include sample sizes and verification timestamps.
               </p>
             </div>
           </div>
@@ -148,38 +160,38 @@ export default async function HomePage() {
       <section className="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
           <div>
-            <span className="text-xs font-mono uppercase tracking-widest text-[#10B981]">
-              Transparency First
+            <span className="text-xs font-mono uppercase tracking-widest text-[#3B82F6]">
+              Verified Results
             </span>
             <h2 className="text-2xl sm:text-3xl font-display font-bold text-white mt-1">
-              Real Track Record
+              Track Record
             </h2>
-            <p className="text-xs text-[#9CA3AF] mt-1">
-              Audited out-of-sample settlements. Zero synthetic or fabricated bets.
+            <p className="text-xs text-[#94A3B8] mt-1">
+              Audited out-of-sample settlements. Zero synthetic or fabricated data.
             </p>
           </div>
 
           <Link
             href="/track-record"
-            className="text-xs font-mono text-[#10B981] hover:underline flex items-center gap-1.5 self-start sm:self-auto"
+            className="text-xs font-mono text-[#3B82F6] hover:underline flex items-center gap-1.5 self-start sm:self-auto"
           >
             View Full Track Record ({settled.length} settled) <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
 
         {settledPreview.length === 0 ? (
-          <div className="rounded-2xl border border-[#1F2937] bg-[#111827]/50 p-12 text-center">
-            <BarChart3 className="h-10 w-10 text-[#9CA3AF]/40 mx-auto mb-3" />
+          <div className="rounded-2xl border border-[#1E293B] bg-[#131B2E]/50 p-12 text-center">
+            <BarChart3 className="h-10 w-10 text-[#94A3B8]/40 mx-auto mb-3" />
             <h3 className="text-sm font-bold text-white font-mono">Track record is building.</h3>
-            <p className="text-xs text-[#9CA3AF] mt-1 max-w-md mx-auto">
-              No live picks are currently active under our strict data isolation gate. When approved candidate models promote picks, every settlement will appear here automatically.
+            <p className="text-xs text-[#94A3B8] mt-1 max-w-md mx-auto">
+              Settlement data will appear here as verified results become available. All outcomes are recorded with full provenance.
             </p>
           </div>
         ) : (
-          <div className="rounded-xl border border-[#1F2937] bg-[#111827]/60 overflow-x-auto">
+          <div className="rounded-xl border border-[#1E293B] bg-[#131B2E]/60 overflow-x-auto">
             <table className="w-full text-left text-xs font-mono">
               <thead>
-                <tr className="border-b border-[#1F2937] text-[#9CA3AF]">
+                <tr className="border-b border-[#1E293B] text-[#94A3B8]">
                   <th className="py-3 px-4">Date</th>
                   <th className="py-3 px-4">Match</th>
                   <th className="py-3 px-4">Market</th>
@@ -188,17 +200,17 @@ export default async function HomePage() {
                   <th className="py-3 px-4">Result</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#1F2937]">
+              <tbody className="divide-y divide-[#1E293B]">
                 {settledPreview.map((item) => (
-                  <tr key={item.id} className="hover:bg-[#111827]/80">
-                    <td className="py-3 px-4 text-[#9CA3AF] whitespace-nowrap">
+                  <tr key={item.id} className="hover:bg-[#131B2E]/80">
+                    <td className="py-3 px-4 text-[#94A3B8] whitespace-nowrap">
                       {item.kickoff_at.slice(0, 10)}
                     </td>
                     <td className="py-3 px-4 font-bold text-white whitespace-nowrap">
                       {item.home_team} vs {item.away_team}
                     </td>
-                    <td className="py-3 px-4 text-neutral-300">{item.market}</td>
-                    <td className="py-3 px-4 text-[#10B981] capitalize">
+                    <td className="py-3 px-4 text-[#CBD5E1]">{item.market}</td>
+                    <td className="py-3 px-4 text-[#3B82F6] capitalize">
                       {item.side} {item.line}
                     </td>
                     <td className="py-3 px-4 text-white font-bold">{item.taken_odds.toFixed(2)}</td>
@@ -223,77 +235,50 @@ export default async function HomePage() {
         )}
       </section>
 
-      {/* SECTION 7 — COMMITMENT & ACCESS CTA */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 border-t border-[#1F2937]/70">
-        <div className="max-w-4xl mx-auto text-center p-10 sm:p-14 rounded-3xl bg-[#111827] border border-[#1F2937] space-y-6">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#10B981]/10 text-[#10B981] text-xs font-mono">
-            <ShieldCheck className="h-4 w-4" /> QUANTITATIVE ACCESS
-          </div>
-
+      {/* SECTION 7 — DATA PLATFORM CTA + SALMO CROSS-PROMOTION */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 border-t border-[#1E293B]/70">
+        <div className="max-w-4xl mx-auto text-center p-10 sm:p-14 rounded-3xl bg-[#131B2E] border border-[#1E293B] space-y-6">
           <h2 className="text-3xl sm:text-5xl font-display font-black text-white tracking-tight">
-            DATA FIRST. MARKET FIRST. MODEL SECOND.
+            Football intelligence<br />you can trust.
           </h2>
 
-          <p className="text-sm text-[#9CA3AF] max-w-xl mx-auto">
-            Explore persisted historical datasets, inspect model calibration, and evaluate closing
-            line value performance. Evidence is shown as computed — including negative results.
+          <p className="text-sm text-[#94A3B8] max-w-xl mx-auto">
+            Explore verified match statistics, historical trends, and league analytics. Every data point is sourced, timestamped, and auditable.
           </p>
 
           <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link
-              href="/pricing"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-lg bg-[#10B981] hover:bg-[#10B981]/90 text-black font-display font-bold text-sm transition-all shadow-lg hover:shadow-[#10B981]/20"
+              href="/competitions"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-lg bg-[#3B82F6] hover:bg-[#2563EB] text-white font-display font-bold text-sm transition-all shadow-lg hover:shadow-[#3B82F6]/20"
             >
-              START FREE TRIAL <ArrowRight className="h-4 w-4" />
+              Explore Leagues <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
-              href="/models"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-lg bg-[#1F2937]/50 hover:bg-[#1F2937] border border-[#374151] text-white font-mono text-sm transition-all"
+              href="/methodology"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-lg bg-[#1E293B]/50 hover:bg-[#1E293B] border border-[#334155] text-white font-medium text-sm transition-all"
             >
-              View Model Registry
+              View Methodology
             </Link>
+          </div>
+
+          {/* Subtle Salmo.dev cross-promotion */}
+          <div className="pt-6 border-t border-[#1E293B]/50">
+            <p className="text-xs text-[#64748B]">
+              Want market intelligence and betting opportunities?
+            </p>
+            <a
+              href="https://salmo.dev"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-[#94A3B8] hover:text-[#3B82F6] transition-colors mt-1"
+            >
+              Explore Salmo.dev <ExternalLink className="h-3 w-3" />
+            </a>
           </div>
         </div>
       </section>
 
-      {/* SECTION 8 — FOOTER */}
-      <footer className="py-10 px-4 sm:px-6 lg:px-8 border-t border-[#1F2937] bg-[#0B0F0E]">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-xs font-mono text-[#9CA3AF]">
-          <div className="flex flex-col sm:flex-row items-center gap-3 text-center sm:text-left">
-            <span className="font-bold text-white text-sm">HandicapLab</span>
-            <span className="hidden sm:inline">&bull;</span>
-            <span>Football Market Intelligence for Asian Handicap, Over/Under &amp; BTTS.</span>
-          </div>
-
-          <div className="flex flex-wrap items-center justify-center gap-6">
-            <Link href="/asian-handicap" className="hover:text-white transition-colors">
-              Asian Handicap
-            </Link>
-            <Link href="/over-under" className="hover:text-white transition-colors">
-              Over / Under
-            </Link>
-            <Link href="/btts" className="hover:text-white transition-colors">
-              BTTS
-            </Link>
-            <Link href="/historical" className="hover:text-white transition-colors">
-              Historical
-            </Link>
-            <Link href="/models" className="hover:text-white transition-colors">
-              Models
-            </Link>
-            <Link href="/track-record" className="hover:text-white transition-colors">
-              Track Record
-            </Link>
-            <Link href="/pricing" className="hover:text-white transition-colors">
-              Pricing
-            </Link>
-          </div>
-
-          <div className="text-[11px] text-[#6B7280]">
-            &copy; {new Date().getFullYear()} HandicapLab. All rights reserved.
-          </div>
-        </div>
-      </footer>
+      {/* Footer is rendered by MarketingFooter in layout.tsx — no inline footer needed */}
     </div>
   );
 }
