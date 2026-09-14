@@ -1,3 +1,17 @@
+// Canonical env names with provider-specific legacy fallbacks. The API-Football
+// legacy alias (`API_FOOTBALL_KEY`) is resolved centrally via
+// `getApiFootballKey()` in src/lib/providers/providerKey.ts — this file keeps
+// only a declarative label for the canonical name.
+import { getApiFootballKey } from '@/lib/providers/providerKey';
+
+function resolveEnvValue(item: { canonical: string; fallbacks: string[] }): string | undefined {
+  if (item.canonical === 'APIFOOTBALL_KEY') {
+    const key = getApiFootballKey();
+    return key || undefined;
+  }
+  return process.env[item.canonical] || item.fallbacks.map((f) => process.env[f]).find(Boolean);
+}
+
 export function validateEnvironment() {
   const requiredVars = [
     { canonical: 'NEXT_PUBLIC_SUPABASE_URL', fallbacks: [] },
@@ -12,7 +26,7 @@ export function validateEnvironment() {
   const malformed: string[] = [];
 
   for (const item of requiredVars) {
-    const val = process.env[item.canonical] || item.fallbacks.map(f => process.env[f]).find(Boolean);
+    const val = resolveEnvValue(item);
     if (!val) {
       missing.push(item.canonical);
     } else if (val === 'mock' || val === 'mock_server_key' || val.includes('.mock')) {
@@ -50,7 +64,7 @@ export function checkEnvironmentStatus() {
   const malformed: string[] = [];
 
   for (const item of vars) {
-    const val = process.env[item.canonical] || item.fallbacks.map(f => process.env[f]).find(Boolean);
+    const val = resolveEnvValue(item);
     if (!val) {
       missing.push(item.canonical);
     } else if (val === 'mock' || val === 'mock_server_key' || val.includes('.mock')) {

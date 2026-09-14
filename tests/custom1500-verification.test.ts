@@ -6,6 +6,8 @@ import {
   CUSTOM1500_DAILY_HARD_LIMIT,
   CUSTOM1500_DAILY_SOFT_LIMIT,
   CUSTOM1500_SAFETY_RESERVE,
+  PRO_DAILY_HARD_LIMIT,
+  PRO_DAILY_SOFT_LIMIT,
 } from '@/lib/providers/quotaPolicy';
 import { getFootballProvider } from '@/lib/api/providers/providerFactory';
 import { ApiFootballClient } from '@/lib/api/apiFootball';
@@ -18,7 +20,7 @@ vi.mock('@/lib/supabase.server', () => ({
   },
 }));
 
-describe('CHECKPOINT A — Custom1500 Provider & Quota Verification', () => {
+describe('CHECKPOINT A — Provider & Quota Verification (API-Football Pro)', () => {
   beforeEach(() => {
     vi.resetAllMocks();
     vi.unstubAllEnvs();
@@ -28,60 +30,66 @@ describe('CHECKPOINT A — Custom1500 Provider & Quota Verification', () => {
     vi.unstubAllEnvs();
   });
 
-  describe('1. Custom1500 Policy Constants & Defaults', () => {
-    it('has theoretical daily limit of 1,500,000 with 10% safety reserve', () => {
+  describe('1. Pro Plan Policy Constants & Defaults', () => {
+    it('exposes the Pro daily contract: hard 7,500 / soft 6,000', () => {
+      expect(PRO_DAILY_HARD_LIMIT).toBe(7500);
+      expect(PRO_DAILY_SOFT_LIMIT).toBe(6000);
+      expect(PRO_DAILY_HARD_LIMIT - PRO_DAILY_SOFT_LIMIT).toBe(1500);
+    });
+
+    it('keeps the deprecated Custom1500 constants for backward-compatible imports only', () => {
       expect(CUSTOM1500_DAILY_HARD_LIMIT).toBe(1500000);
       expect(CUSTOM1500_DAILY_SOFT_LIMIT).toBe(1350000);
       expect(CUSTOM1500_SAFETY_RESERVE).toBe(150000);
       expect(CUSTOM1500_DAILY_HARD_LIMIT - CUSTOM1500_DAILY_SOFT_LIMIT).toBe(CUSTOM1500_SAFETY_RESERVE);
     });
 
-    it('returns Custom1500 defaults when no env overrides are present', () => {
+    it('returns Pro defaults when no env overrides are present', () => {
       vi.stubEnv('API_FOOTBALL_DAILY_HARD_LIMIT', '');
       vi.stubEnv('API_FOOTBALL_DAILY_SOFT_LIMIT', '');
       vi.stubEnv('QUOTA_APIFOOTBALL_DAILY', '');
 
       const policy = getProviderQuotaPolicy('apifootball');
       expect(policy.period).toBe('DAILY');
-      expect(policy.hardLimit).toBe(1500000);
-      expect(policy.softLimit).toBe(1350000);
+      expect(policy.hardLimit).toBe(7500);
+      expect(policy.softLimit).toBe(6000);
       expect(policy.economyAtPctOfSoft).toBe(80);
     });
 
     it('supports configurable environment overrides for operational budget and hard limit', () => {
-      vi.stubEnv('API_FOOTBALL_DAILY_HARD_LIMIT', '1200000');
-      vi.stubEnv('API_FOOTBALL_DAILY_SOFT_LIMIT', '1000000');
+      vi.stubEnv('API_FOOTBALL_DAILY_HARD_LIMIT', '5000');
+      vi.stubEnv('API_FOOTBALL_DAILY_SOFT_LIMIT', '4000');
 
       const policy = getProviderQuotaPolicy('apifootball');
-      expect(policy.hardLimit).toBe(1200000);
-      expect(policy.softLimit).toBe(1000000);
+      expect(policy.hardLimit).toBe(5000);
+      expect(policy.softLimit).toBe(4000);
     });
   });
 
   describe('2. Pressure Thresholds & Priority Gating', () => {
-    it('transitions through NORMAL -> ECONOMY -> CRITICAL -> QUOTA_EXHAUSTED at 1.5M scale', () => {
+    it('transitions through NORMAL -> ECONOMY -> CRITICAL -> QUOTA_EXHAUSTED at Pro scale', () => {
       const policy = getProviderQuotaPolicy('apifootball');
 
-      // 0 to < 80% of soft (80% of 1,350,000 = 1,080,000)
+      // 0 to < 80% of soft (80% of 6,000 = 4,800)
       expect(evaluateQuotaPressure(policy, 0).mode).toBe('NORMAL');
-      expect(evaluateQuotaPressure(policy, 1079999).mode).toBe('NORMAL');
+      expect(evaluateQuotaPressure(policy, 4799).mode).toBe('NORMAL');
 
-      // >= 1,080,000: ECONOMY
-      const economy = evaluateQuotaPressure(policy, 1080000);
+      // >= 4,800: ECONOMY
+      const economy = evaluateQuotaPressure(policy, 4800);
       expect(economy.mode).toBe('ECONOMY');
       expect(isPriorityAllowed(economy.mode, 30)).toBe(false); // Reject P3 metadata
       expect(isPriorityAllowed(economy.mode, 50)).toBe(true);  // Allow P2 historical
       expect(isPriorityAllowed(economy.mode, 90)).toBe(true);  // Allow P0 predictions
 
-      // >= 1,350,000: CRITICAL (only P0 allowed)
-      const critical = evaluateQuotaPressure(policy, 1350000);
+      // >= 6,000: CRITICAL (only P0 allowed)
+      const critical = evaluateQuotaPressure(policy, 6000);
       expect(critical.mode).toBe('CRITICAL');
       expect(isPriorityAllowed(critical.mode, 70)).toBe(false); // Reject P1 snapshots
       expect(isPriorityAllowed(critical.mode, 90)).toBe(true);  // Allow P0 predictions
       expect(isPriorityAllowed(critical.mode, 100)).toBe(true); // Allow P0 settlement
 
-      // >= 1,500,000: QUOTA_EXHAUSTED (hard stop)
-      const exhausted = evaluateQuotaPressure(policy, 1500000);
+      // >= 7,500: QUOTA_EXHAUSTED (hard stop)
+      const exhausted = evaluateQuotaPressure(policy, 7500);
       expect(exhausted.mode).toBe('QUOTA_EXHAUSTED');
       expect(exhausted.exhausted).toBe(true);
       expect(isPriorityAllowed(exhausted.mode, 100)).toBe(false); // All rejected
@@ -106,25 +114,25 @@ describe('CHECKPOINT A — Custom1500 Provider & Quota Verification', () => {
     });
   });
 
-  describe('4. QuotaManagerV4 Atomic Accounting with Custom1500', () => {
-    it('reserves and confirms quota accurately at Custom1500 capacity', async () => {
+  describe('4. QuotaManagerV4 Atomic Accounting at Pro scale', () => {
+    it('reserves and confirms quota accurately at Pro capacity', async () => {
       vi.mocked(supabase.rpc).mockResolvedValueOnce({
         data: {
           ok: true,
-          reservation_id: 'res-custom-1',
-          safe_limit: 1500000,
+          reservation_id: 'res-pro-1',
+          safe_limit: 7500,
           consumed: 50,
           reserved: 1,
-          safe_remaining: 1499949,
+          safe_remaining: 7449,
         },
         error: null,
       } as any);
 
       const receipt = await reserveQuota('apifootball', 'fixtures', 90);
       expect(receipt.ok).toBe(true);
-      expect(receipt.hardLimit).toBe(1500000);
-      expect(receipt.softLimit).toBe(1350000);
-      expect(receipt.quotaRemaining).toBe(1499949);
+      expect(receipt.hardLimit).toBe(7500);
+      expect(receipt.softLimit).toBe(6000);
+      expect(receipt.quotaRemaining).toBe(7449);
 
       // Confirm quota
       vi.mocked(supabase.rpc).mockResolvedValueOnce({
@@ -132,7 +140,7 @@ describe('CHECKPOINT A — Custom1500 Provider & Quota Verification', () => {
         error: null,
       } as any);
 
-      const confirm = await confirmQuota('res-custom-1', 1, 1499948);
+      const confirm = await confirmQuota('res-pro-1', 1, 7449);
       expect(confirm.ok).toBe(true);
     });
   });

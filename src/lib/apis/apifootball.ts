@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { globalGateway } from '@/lib/providers/providerGateway';
+import { getApiFootballKey } from '@/lib/providers/providerKey';
 
 // Ensure this module is only imported/run on the server side
 if (typeof window !== 'undefined') {
@@ -435,14 +436,22 @@ interface FetchOptions {
   timeoutMs?: number;
 }
 
+/** Parse an HTTP Retry-After header (seconds or HTTP-date) into milliseconds. */
+function parseRetryAfterMs(header: string | null): number | undefined {
+  if (!header) return undefined;
+  const seconds = Number(header);
+  if (Number.isFinite(seconds) && seconds >= 0) return Math.round(seconds * 1000);
+  const date = Date.parse(header);
+  if (Number.isFinite(date)) return Math.max(0, date - Date.now());
+  return undefined;
+}
+
 export class ApiFootballClient {
   private baseUrl: string;
   private apiKey: string;
-  private lastRequestTime: number = 0;
-  private rateLimitDelayMs: number = 7000;
 
   constructor() {
-    const key = process.env.APIFOOTBALL_KEY || process.env.API_FOOTBALL_KEY;
+    const key = getApiFootballKey();
     if (!key) {
       this.apiKey = '';
     } else {
@@ -451,18 +460,8 @@ export class ApiFootballClient {
     this.baseUrl = process.env.APIFOOTBALL_BASE_URL || 'https://v3.football.api-sports.io';
   }
 
-  private async enforceRateLimit(): Promise<void> {
-    const now = Date.now();
-    const elapsed = now - this.lastRequestTime;
-    if (elapsed < this.rateLimitDelayMs) {
-      const wait = this.rateLimitDelayMs - elapsed;
-      await new Promise((resolve) => setTimeout(resolve, wait));
-    }
-    this.lastRequestTime = Date.now();
-  }
-
   private ensureApiKey(): void {
-    if (!this.apiKey) { this.apiKey = (process.env.APIFOOTBALL_KEY || process.env.API_FOOTBALL_KEY || '').replace(/['"]/g, ''); }
+    if (!this.apiKey) { this.apiKey = getApiFootballKey().replace(/['"]/g, ''); }
     if (!this.apiKey) {
       console.error('[ApiFootballClient] Error: API key is not defined in environment variables.');
       throw new ApiError('API key is missing in environment variables.', 'auth', 401);
@@ -479,8 +478,6 @@ export class ApiFootballClient {
     options: FetchOptions = {}
   ): Promise<T> {
     this.ensureApiKey();
-
-    await this.enforceRateLimit();
 
     const { timeoutMs = 10000 } = options;
 
@@ -529,7 +526,7 @@ export class ApiFootballClient {
       try {
         responseData = JSON.parse(responseText);
       } catch (err: any) {
-        console.error(`[ApiFootballClient] Safe JSON parse failed for ${endpoint}. Raw: ${responseText.substring(0, 200)}`);
+        console.error(`[ApiFootballClient] Safe JSON parse failed for ${endpoint} (status ${response.status}).`);
         throw new ApiError(
           `Invalid JSON response: ${err.message}`,
           endpoint,
@@ -538,18 +535,22 @@ export class ApiFootballClient {
       }
 
       if (!response.ok) {
-        console.error(`[ApiFootballClient] API returned error status: ${response.status}`, responseData);
-        throw new ApiError(
-          `API error with status ${response.status}`,
-          endpoint,
-          response.status,
-          responseData
+        const retryAfterMs = parseRetryAfterMs(response.headers.get('retry-after'));
+        console.error(`[ApiFootballClient] API returned error status ${response.status} for endpoint ${endpoint}.`);
+        throw Object.assign(
+          new ApiError(
+            `API error with status ${response.status}`,
+            endpoint,
+            response.status,
+            responseData
+          ),
+          { retryAfterMs }
         );
       }
 
       // API-Football returns errors inside the JSON response payload under "errors"
       if (responseData.errors && (Array.isArray(responseData.errors) ? responseData.errors.length > 0 : Object.keys(responseData.errors).length > 0)) {
-        console.error(`[ApiFootballClient] API response reported errors:`, responseData.errors);
+        console.error(`[ApiFootballClient] API response reported errors for endpoint ${endpoint}: ${JSON.stringify(responseData.errors)}`);
         throw new ApiError(
           `API response error: ${JSON.stringify(responseData.errors)}`,
           endpoint,
@@ -561,10 +562,7 @@ export class ApiFootballClient {
       // Schema validation with Zod
       const validationResult = schema.safeParse(responseData);
       if (!validationResult.success) {
-        console.error(
-          `[ApiFootballClient] Zod validation failed for endpoint ${endpoint}:`,
-          validationResult.error.format()
-        );
+        console.error(`[ApiFootballClient] Zod validation failed for endpoint ${endpoint}: ${validationResult.error.message}`);
         throw new ApiError(
           `Response validation failed: ${validationResult.error.message}`,
           endpoint,
@@ -577,18 +575,52 @@ export class ApiFootballClient {
     } catch (error: any) {
       clearTimeout(timeoutId);
 
-      // Retry on 429 rate limit or 5xx server errors
-      const isRetryable = error instanceof ApiError && error.status !== undefined && (
-        error.status === 429 || (error.status >= 500 && error.status < 600)
-      );
-      if (isRetryable && attempt < 3) {
-        const backoffMs = error.status! === 429 ? 10000 * attempt : 5000 * attempt;
-        console.warn(`[ApiFootballClient] Retry ${attempt}/3 after ${backoffMs}ms (status ${error.status})`);
-        await new Promise((r) => setTimeout(r, backoffMs));
+      // The Provider Manager / Gateway is authoritative. Never bypass or retry
+      // around quota exhaustion, an open circuit, or the local rate limiter.
+      if (
+        error?.name === 'ProviderUnavailableError' ||
+        error?.name === 'QuotaExhaustionError' ||
+        error?.name === 'ProviderRateLimitedError'
+      ) {
+        throw error;
+      }
+
+      const status: number | undefined =
+        error instanceof ApiError
+          ? error.status
+          : typeof error?.status === 'number'
+            ? error.status
+            : undefined;
+
+      const isRetryable =
+        status === 429 ||
+        status === 408 ||
+        (status !== undefined && status >= 500 && status < 600) ||
+        error?.name === 'AbortError';
+
+      // Bounded retry: hard maximum of 2 retries, exponential backoff with full
+      // jitter, honouring the provider's Retry-After hint when present.
+      const maxRetries = 2;
+      if (isRetryable && attempt <= maxRetries) {
+        const configuredBase = Number(process.env.APIFOOTBALL_RETRY_BASE_MS);
+        const baseMs =
+          Number.isFinite(configuredBase) && configuredBase > 0
+            ? configuredBase
+            : status === 429
+              ? 5_000
+              : 1_000;
+        const expMs = Math.min(baseMs * Math.pow(2, attempt - 1), 30_000);
+        const jittered = Math.round(expMs * (0.5 + Math.random() * 0.5));
+        const serverHintMs = typeof error?.retryAfterMs === 'number' ? error.retryAfterMs : 0;
+        const waitMs = Math.max(jittered, serverHintMs);
+        console.warn(
+          `[ApiFootballClient] Bounded retry ${attempt}/${maxRetries} in ${waitMs}ms (status ${status ?? 'n/a'}) for endpoint ${endpoint}.`
+        );
+        await new Promise((r) => setTimeout(r, waitMs));
         continue;
       }
 
-      if (error.name === 'AbortError') {
+      if (error?.name === 'AbortError') {
         console.error(`[ApiFootballClient] Request to ${endpoint} timed out after ${timeoutMs}ms.`);
         throw new ApiError(`Request timed out after ${timeoutMs}ms`, endpoint, 408);
       }
@@ -597,8 +629,8 @@ export class ApiFootballClient {
         throw error;
       }
 
-      console.error(`[ApiFootballClient] Request to ${endpoint} failed with error:`, error);
-      throw new ApiError(error.message || 'Unknown network error', endpoint, 500, error);
+      console.error(`[ApiFootballClient] Request to ${endpoint} failed: ${error?.message || error}`);
+      throw new ApiError(error?.message || 'Unknown network error', endpoint, 500, error);
     }
   }
   return undefined as unknown as T;

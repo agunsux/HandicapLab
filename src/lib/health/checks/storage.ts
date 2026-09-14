@@ -2,13 +2,14 @@
 // Location: src/lib/health/checks/storage.ts
 
 import { HealthCheck, HealthCheckResult } from '../types';
+import { getApiFootballKey } from '../../providers/providerKey';
 
 export class StorageCheck implements HealthCheck {
   public name = 'storage';
 
   public async run(): Promise<Omit<HealthCheckResult, 'latency_ms' | 'timestamp'>> {
     try {
-      const apiFootballKey = process.env.APIFOOTBALL_KEY || process.env.API_FOOTBALL_KEY;
+      const apiFootballKey = getApiFootballKey();
       const oddsApiKey = process.env.ODDS_PAPI_KEY;
 
       const missingVars: string[] = [];

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { validateCredential } from '@/lib/auth/credentialValidator';
 import { canonicalEntityResolver } from '@/lib/warehouse/entityResolver';
+import { getApiFootballKey } from '@/lib/providers/providerKey';
 import type { ApiFootballProvider } from '@/lib/providers/apiFootballProvider';
 
 export const dynamic = 'force-dynamic';
@@ -382,7 +383,7 @@ export async function GET() {
   }
 
   try {
-    validateCredential('APIFOOTBALL_KEY', process.env.APIFOOTBALL_KEY || process.env.API_FOOTBALL_KEY, 'opaque');
+    validateCredential('APIFOOTBALL_KEY', getApiFootballKey(), 'opaque');
   } catch (err: any) {
     return fail('AUTH_FAILED', err.message);
   }

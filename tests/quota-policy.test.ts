@@ -13,15 +13,15 @@ describe('quotaPolicy — canonical provider limits', () => {
     vi.unstubAllEnvs();
   });
 
-  it('defaults to API-Football Custom1500: hard 1,500,000/day, soft 1,350,000/day', () => {
+  it('defaults to API-Football Pro: hard 7,500/day, soft 6,000/day', () => {
     vi.stubEnv('API_FOOTBALL_DAILY_HARD_LIMIT', '');
     vi.stubEnv('API_FOOTBALL_DAILY_SOFT_LIMIT', '');
     vi.stubEnv('QUOTA_APIFOOTBALL_DAILY', '');
 
     const policy = getProviderQuotaPolicy('apifootball');
     expect(policy.period).toBe('DAILY');
-    expect(policy.hardLimit).toBe(1500000);
-    expect(policy.softLimit).toBe(1350000);
+    expect(policy.hardLimit).toBe(7500);
+    expect(policy.softLimit).toBe(6000);
   });
 
   it('defaults to OddsPapi: hard 250/month, soft 200/month', () => {
@@ -44,18 +44,18 @@ describe('quotaPolicy — canonical provider limits', () => {
     expect(policy.softLimit).toBe(500);
   });
 
-  it('transitions NORMAL → ECONOMY → CRITICAL → QUOTA_EXHAUSTED for Custom1500', () => {
+  it('transitions NORMAL → ECONOMY → CRITICAL → QUOTA_EXHAUSTED for the Pro plan', () => {
     vi.stubEnv('API_FOOTBALL_DAILY_HARD_LIMIT', '');
     vi.stubEnv('API_FOOTBALL_DAILY_SOFT_LIMIT', '');
     vi.stubEnv('QUOTA_APIFOOTBALL_DAILY', '');
     const policy = getProviderQuotaPolicy('apifootball');
 
     expect(evaluateQuotaPressure(policy, 0).mode).toBe('NORMAL');
-    expect(evaluateQuotaPressure(policy, 1079999).mode).toBe('NORMAL');
-    expect(evaluateQuotaPressure(policy, 1080000).mode).toBe('ECONOMY'); // 80% of soft (1,350,000)
-    expect(evaluateQuotaPressure(policy, 1350000).mode).toBe('CRITICAL'); // soft limit
-    expect(evaluateQuotaPressure(policy, 1500000).mode).toBe('QUOTA_EXHAUSTED'); // hard limit
-    expect(evaluateQuotaPressure(policy, 1500001).exhausted).toBe(true);
+    expect(evaluateQuotaPressure(policy, 4799).mode).toBe('NORMAL');
+    expect(evaluateQuotaPressure(policy, 4800).mode).toBe('ECONOMY'); // 80% of soft (6,000)
+    expect(evaluateQuotaPressure(policy, 6000).mode).toBe('CRITICAL'); // soft limit
+    expect(evaluateQuotaPressure(policy, 7500).mode).toBe('QUOTA_EXHAUSTED'); // hard limit
+    expect(evaluateQuotaPressure(policy, 7501).exhausted).toBe(true);
   });
 
   it('applies the same soft/hard semantics to OddsPapi (200/250)', () => {

@@ -14,6 +14,29 @@ import {
 import { IngestionNormalizer } from './normalizer';
 import { HttpClient, RateLimiter, CircuitBreaker } from '@/lib/http';
 import { ProviderUnavailableError, RateLimitError, AuthenticationError, IngestionError } from './errors';
+import { globalGateway } from '@/lib/providers/providerGateway';
+import { QUOTA_PRIORITY } from '@/lib/providers/quotaPolicy';
+
+function safeHostname(rawUrl: string): string {
+  try {
+    return new URL(rawUrl).hostname.toLowerCase();
+  } catch {
+    return '';
+  }
+}
+
+function endpointFromUrl(rawUrl: string): string {
+  try {
+    return new URL(rawUrl).pathname.replace(/^\/+/, '') || 'root';
+  } catch {
+    return 'unknown';
+  }
+}
+
+/** True only for the real API-Football host; mock/injected hosts stay on the local transport. */
+function isCanonicalProviderHost(rawUrl: string): boolean {
+  return /(^|\.)api-sports\.io$/.test(safeHostname(rawUrl));
+}
 
 // Endpoint Validation Schemas
 const StatusResponseSchema = z.object({
@@ -111,6 +134,40 @@ export class ApiFootballProvider implements IDataProvider {
   constructor(config: { apiKey: string; baseUrl?: string }) {
     this.apiKey = config.apiKey;
 
+    const baseUrl = config.baseUrl || 'https://v3.football.api-sports.io';
+    const routeThroughGateway = isCanonicalProviderHost(baseUrl);
+
+    // The final production architecture routes warehouse ingestion through the
+    // canonical provider gateway (quota -> rate limit -> cache/dedup ->
+    // API-Football). No second gateway, quota system or rate limiter is created
+    // here. Injected/mock hosts (tests) keep a local transport for HTTP error
+    // mapping tests and never touch the live provider.
+    const httpConfig = {
+      baseUrl,
+      defaultHeaders: {
+        'x-apisports-key': config.apiKey,
+        'Accept': 'application/json',
+      },
+      provider: 'api-football-warehouse',
+      ...(routeThroughGateway
+        ? {
+            fetchImpl: (url: string, init: RequestInit) =>
+              globalGateway.fetch('apifootball', endpointFromUrl(url), url, {
+                method: init.method,
+                headers: init.headers as HeadersInit,
+                body: init.body as BodyInit | undefined,
+                signal: init.signal ?? undefined,
+                quotaPriority: QUOTA_PRIORITY.P2_DISCOVERY,
+              }),
+          }
+        : {}),
+    };
+
+    if (routeThroughGateway) {
+      this.client = new HttpClient(httpConfig);
+      return;
+    }
+
     const rateLimiter = new RateLimiter({
       maxRequests: 10,
       windowMs: 60000,
@@ -123,18 +180,7 @@ export class ApiFootballProvider implements IDataProvider {
       provider: 'api-football-warehouse',
     });
 
-    this.client = new HttpClient(
-      {
-        baseUrl: config.baseUrl || 'https://v3.football.api-sports.io',
-        defaultHeaders: {
-          'x-apisports-key': config.apiKey,
-          'Accept': 'application/json',
-        },
-        provider: 'api-football-warehouse',
-      },
-      rateLimiter,
-      circuitBreaker
-    );
+    this.client = new HttpClient(httpConfig, rateLimiter, circuitBreaker);
   }
 
   public getProviderName(): string {

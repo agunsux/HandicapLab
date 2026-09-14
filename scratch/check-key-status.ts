@@ -1,32 +1,42 @@
 import 'dotenv/config';
 
-async function main() {
-  const apiKey = process.env.API_FOOTBALL_KEY;
-  console.log(`Checking API-Football status with key: ${apiKey}`);
-  
-  const urls = [
-    'https://v3.football.api-sports.io/status',
-    'https://api-football-v1.p.rapidapi.com/v3/status'
-  ];
+// SECURITY: this diagnostic must NEVER print the API key (or any part of it).
+// It also must only ever talk to the official api-sports host. A second host
+// (e.g. RapidAPI) is a separate API-Football access channel and is forbidden by
+// the single-account compliance policy.
 
-  for (const url of urls) {
-    try {
-      const headers: Record<string, string> = {};
-      if (url.includes('rapidapi')) {
-        headers['x-rapidapi-key'] = apiKey || '';
-        headers['x-rapidapi-host'] = 'api-football-v1.p.rapidapi.com';
-      } else {
-        headers['x-apisports-key'] = apiKey || '';
-      }
-      
-      const res = await fetch(url, { method: 'GET', headers });
-      console.log(`URL: ${url}`);
-      console.log(`Status: ${res.status} ${res.statusText}`);
-      const data = await res.json();
-      console.log('Response:', data);
-    } catch (e) {
-      console.error(`Error for ${url}:`, e);
+async function main() {
+  const apiKey = process.env.APIFOOTBALL_KEY || process.env.API_FOOTBALL_KEY;
+  console.log(`API-Football key present: ${Boolean(apiKey)}`);
+
+  if (!apiKey) {
+    console.log('No API-Football key configured. Nothing to probe.');
+    return;
+  }
+
+  const url = 'https://v3.football.api-sports.io/status';
+
+  try {
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'x-apisports-key': apiKey,
+        'Accept': 'application/json',
+      },
+    });
+    console.log(`Status: ${res.status} ${res.statusText}`);
+    const data: any = await res.json();
+    const accountActive = data?.response?.account?.active;
+    const subscription = data?.response?.subscription;
+    console.log(`Account active: ${accountActive}`);
+    if (subscription) {
+      console.log(`Subscription plan: ${subscription.plan ?? 'unknown'} (ends ${subscription.end ?? 'n/a'})`);
     }
+    if (data?.errors && Object.keys(data.errors).length > 0) {
+      console.log(`Provider errors: ${JSON.stringify(data.errors)}`);
+    }
+  } catch (e: any) {
+    console.error(`Probe failed: ${e?.message || e}`);
   }
 }
 

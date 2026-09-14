@@ -97,6 +97,15 @@ function envInt(names: string[]): number | undefined {
   return undefined;
 }
 
+// Current production contract for the single authorized API-Football account.
+// Pro plan ($19/month) = 7,500 requests/day (hard), internal operating ceiling
+// 6,000/day (soft). This is the ONLY plan HandicapLab is authorized to use.
+export const PRO_DAILY_HARD_LIMIT = 7500;
+export const PRO_DAILY_SOFT_LIMIT = 6000;
+export const PRO_SAFETY_RESERVE = PRO_DAILY_HARD_LIMIT - PRO_DAILY_SOFT_LIMIT;
+
+// @deprecated Legacy plan constants retained for backward-compatible imports.
+// They are NOT the default. Do not reintroduce the Custom1500 plan as a default.
 export const CUSTOM1500_DAILY_HARD_LIMIT = 1500000;
 export const CUSTOM1500_DAILY_SOFT_LIMIT = 1350000;
 export const CUSTOM1500_SAFETY_RESERVE = 150000;
@@ -104,8 +113,8 @@ export const CUSTOM1500_SAFETY_RESERVE = 150000;
 const DEFAULT_POLICIES: Record<Provider, Omit<ProviderQuotaPolicy, 'provider'>> = {
   apifootball: {
     period: 'DAILY',
-    hardLimit: CUSTOM1500_DAILY_HARD_LIMIT,
-    softLimit: CUSTOM1500_DAILY_SOFT_LIMIT,
+    hardLimit: PRO_DAILY_HARD_LIMIT,
+    softLimit: PRO_DAILY_SOFT_LIMIT,
     economyAtPctOfSoft: 80,
   },
   oddspapi: {

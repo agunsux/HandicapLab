@@ -32,10 +32,10 @@ describe('P0-A Persistent Quota Manager', () => {
     const result = await reserveQuota('apifootball', 'fixtures', 100);
     expect(result.ok).toBe(true);
     expect(result.reservationId).toBe('res-123');
-    // hard limit 1500000 - (consumed 100 + reserved 1) = 1499899
-    expect(result.quotaRemaining).toBe(1499899);
-    expect(result.hardLimit).toBe(1500000);
-    expect(result.softLimit).toBe(1350000);
+    // hard limit 7500 - (consumed 100 + reserved 1) = 7399
+    expect(result.quotaRemaining).toBe(7399);
+    expect(result.hardLimit).toBe(7500);
+    expect(result.softLimit).toBe(6000);
   });
 
   it('should reject reservation if over limit', async () => {
@@ -53,15 +53,15 @@ describe('P0-A Persistent Quota Manager', () => {
   });
 
   it('should reject ECONOMY mode if priority is < 40', async () => {
-    // 1100000 consumed >= 80% of the 1350000 soft limit -> ECONOMY mode
+    // 4900 consumed >= 80% of the 6000 soft limit -> ECONOMY mode
     vi.mocked(supabase.rpc).mockResolvedValueOnce({
       data: {
         ok: true,
         reservation_id: 'res-456',
-        safe_limit: 1500000,
-        consumed: 1100000,
+        safe_limit: 7500,
+        consumed: 4900,
         reserved: 1,
-        safe_remaining: 399999,
+        safe_remaining: 2599,
       },
       error: null,
     } as any);

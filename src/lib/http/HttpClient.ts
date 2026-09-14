@@ -18,6 +18,12 @@ export interface HttpClientConfig {
   defaultRetries?: number;
   defaultQueryParams?: Record<string, string>;
   provider: string;
+  /**
+   * Optional transport override. When provided, all requests are issued via
+   * this function instead of global `fetch`. Used to route provider traffic
+   * through the canonical Provider Gateway (quota + dedup + audit).
+   */
+  fetchImpl?: (url: string, init: RequestInit) => Promise<Response>;
 }
 
 export class HttpClient {
@@ -42,6 +48,7 @@ export class HttpClient {
       defaultRetries: config.defaultRetries ?? 2,
       defaultQueryParams: config.defaultQueryParams ?? {},
       provider: config.provider,
+      fetchImpl: config.fetchImpl ?? ((url, init) => fetch(url, init)),
     };
     this.rateLimiter = rateLimiter;
     this.circuitBreaker = circuitBreaker;
@@ -145,7 +152,7 @@ export class HttpClient {
 
     try {
       const response = await retry(async () => {
-        const res = await fetch(url.toString(), fetchOptions);
+        const res = await this.config.fetchImpl(url.toString(), fetchOptions);
          if (!res.ok) {
           const errorBody = typeof res.text === 'function' ? await res.text().catch(() => '') : '';
           throw Object.assign(new Error(`HTTP ${res.status}: ${errorBody || res.statusText || 'Response error'}`), {

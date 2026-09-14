@@ -16,6 +16,7 @@ import { AhValueEngine, computeActualSampleSize } from '../research/ah-solo/ahVa
 import { settleAsianHandicap } from '../research/ah-solo/ahSettlementEngine';
 import { apiFootballClient } from '../apis/apifootball';
 import { oddsApiClient } from '../apis/oddspapi';
+import { hasApiFootballKey } from '../providers/providerKey';
 
 export interface OddsPapiV4Fixture {
   fixtureId: string;
@@ -193,7 +194,7 @@ export class DailyAhShadowPipeline {
     const tomorrow = new Date(Date.now() + 24 * 3600 * 1000).toISOString().slice(0, 10);
     const candidates: DailyFixtureCandidate[] = [];
 
-    const hasApiKey = !!(process.env.APIFOOTBALL_KEY || process.env.API_FOOTBALL_KEY);
+    const hasApiKey = hasApiFootballKey();
     if (!hasApiKey) {
       console.warn('[DailyAhShadowPipeline] No APIFOOTBALL_KEY available.');
       return [];
@@ -302,7 +303,7 @@ export class DailyAhShadowPipeline {
     const yesterday = new Date(Date.now() - 24 * 3600 * 1000).toISOString().slice(0, 10);
     const finished: DailyFixtureCandidate[] = [];
 
-    const hasApiKey = !!(process.env.APIFOOTBALL_KEY || process.env.API_FOOTBALL_KEY);
+    const hasApiKey = hasApiFootballKey();
     if (!hasApiKey) return [];
 
     try {

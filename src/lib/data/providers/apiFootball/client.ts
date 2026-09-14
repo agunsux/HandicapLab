@@ -1,29 +1,27 @@
-// API-Football HTTP Client — Preconfigured HttpClient for API-Football
+// API-Football HTTP Client — routed through the canonical Provider Gateway.
 // Location: src/lib/data/providers/apiFootball/client.ts
 // API-Football base: https://v3.football.api-sports.io
-// Rate limit: 100 requests/day on free tier, 10 requests/minute
+//
+// This client no longer performs its own fetch/rate-limit/cache/quota. All
+// provider traffic is issued via `globalGateway` so quota reservation,
+// deduplication, rate limiting, circuit breaking and audit logging happen in
+// exactly one place. Local caching/limiting here would create a second,
+// competing control system.
 
-import { HttpClient, RateLimiter, CircuitBreaker, Cache } from '@/lib/http';
+import { HttpClient } from '@/lib/http';
 import { getProviderConfig } from '../core/config';
+import { globalGateway } from '@/lib/providers/providerGateway';
+
+function endpointFromUrl(rawUrl: string): string {
+  try {
+    return new URL(rawUrl).pathname.replace(/^\/+/, '') || 'root';
+  } catch {
+    return 'unknown';
+  }
+}
 
 export function createApiFootballClient(): HttpClient {
   const config = getProviderConfig().apiFootball;
-  const rateLimiter = new RateLimiter({
-    maxRequests: config.rateLimitRequests,
-    windowMs: config.rateLimitWindowMs,
-    provider: 'api-football',
-  });
-  const circuitBreaker = new CircuitBreaker({
-    failureThreshold: 5,
-    cooldownMs: 60_000,
-    halfOpenSuccessThreshold: 2,
-    provider: 'api-football',
-  });
-  const cache = new Cache({
-    defaultTtlMs: 30_000,
-    maxEntries: 200,
-    provider: 'api-football',
-  });
 
   return new HttpClient(
     {
@@ -35,9 +33,15 @@ export function createApiFootballClient(): HttpClient {
       defaultTimeoutMs: 15_000,
       defaultRetries: 2,
       provider: 'api-football',
-    },
-    rateLimiter,
-    circuitBreaker,
-    cache
+      fetchImpl: (url, init) =>
+        globalGateway.fetch('apifootball', endpointFromUrl(url), url, {
+          method: init.method,
+          headers: init.headers as HeadersInit,
+          body: init.body as BodyInit | undefined,
+          signal: init.signal ?? undefined,
+          // Fixture/team retrieval for closing-line capture is P1 work.
+          quotaPriority: 80,
+        }),
+    }
   );
 }

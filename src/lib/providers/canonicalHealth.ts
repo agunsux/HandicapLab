@@ -1,6 +1,9 @@
 ﻿// Canonical Provider Health Evaluator
 // Location: src/lib/providers/canonicalHealth.ts
 
+import { getApiFootballKey } from './providerKey';
+
+
 export type ProviderHealthStatusEnum =
   | 'NOT_CONFIGURED'
   | 'CONFIGURED'
@@ -29,7 +32,7 @@ export async function evaluateCanonicalProviderHealth(timeoutMs: number = 5000):
   const timestamp = new Date().toISOString();
 
   // 1. API-Football
-  const afKey = (process.env.APIFOOTBALL_KEY || process.env.API_FOOTBALL_KEY || '').trim();
+  const afKey = getApiFootballKey().trim();
   const afBaseUrl = 'https://v3.football.api-sports.io';
   let afDiagnostic: ProviderDiagnostic = {
     configured: !!afKey,

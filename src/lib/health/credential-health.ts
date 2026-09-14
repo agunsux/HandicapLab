@@ -2,6 +2,7 @@
 // Location: src/lib/health/credential-health.ts
 
 import { HealthCheck, HealthStatus } from './types';
+import { getApiFootballKey } from '../providers/providerKey';
 
 export class ProviderCredentialCheck implements HealthCheck {
   public name = 'provider_credentials';
@@ -12,7 +13,7 @@ export class ProviderCredentialCheck implements HealthCheck {
     details?: Record<string, any>;
   }> {
     const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production';
-    const apiFootballKey = process.env.APIFOOTBALL_KEY || process.env.API_FOOTBALL_KEY;
+    const apiFootballKey = getApiFootballKey();
     const oddsApiKey = process.env.ODDS_PAPI_KEY;
 
     const hasApiFootball = !!(apiFootballKey && apiFootballKey.trim().length > 0);

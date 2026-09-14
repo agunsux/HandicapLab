@@ -28,6 +28,10 @@
     {
       "path": "/api/cron/ah-shadow-pipeline",
       "schedule": "0 4 * * *"
+    },
+    {
+      "path": "/api/cron/quota-cleanup",
+      "schedule": "*/5 * * * *"
     }
   ]
 }

@@ -37,6 +37,7 @@ export interface ProviderApiConfig {
 }
 
 import { validateCredential } from '../../../auth/credentialValidator';
+import { getApiFootballKey } from '../../../providers/providerKey';
 
 const DEFAULT_CONFIG: ProviderApiConfig = {
   theStatsApi: {
@@ -53,7 +54,7 @@ const DEFAULT_CONFIG: ProviderApiConfig = {
   },
   apiFootball: {
     baseUrl: 'https://v3.football.api-sports.io',
-    apiKey: process.env.APIFOOTBALL_KEY || process.env.API_FOOTBALL_KEY || '',
+    apiKey: getApiFootballKey(),
     rateLimitRequests: 10,
     rateLimitWindowMs: 60_000,
   },

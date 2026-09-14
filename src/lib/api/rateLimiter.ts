@@ -1,12 +1,20 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { getProviderQuotaPolicy } from '@/lib/providers/quotaPolicy';
 
+// @deprecated Legacy file-based daily counter. It is NOT the authoritative quota
+// system (that is quotaManagerV4 + ProviderGateway). It remains only as a
+// local session guard for research/ingestion scripts. The daily ceiling is
+// sourced from the canonical policy (API-Football Pro: soft 6,000/day) instead
+// of a hardcoded free-tier value.
 export class RateLimiter {
   private limitFile: string;
-  private maxRequestsPerDay = 100;
-  private requestDelayMs = 1500; // 1.5 seconds delay between requests
+  private maxRequestsPerDay: number;
+  private requestDelayMs: number;
 
   constructor() {
+    this.maxRequestsPerDay = getProviderQuotaPolicy('apifootball').softLimit;
+    this.requestDelayMs = Number(process.env.APIFOOTBALL_LEGACY_REQUEST_DELAY_MS ?? 0);
     const isServerless = !!(process.env.VERCEL || process.env.LAMBDA_TASK_ROOT);
     const cacheDir = isServerless
       ? path.join('/tmp', 'cache', 'api-football')
