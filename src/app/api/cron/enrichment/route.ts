@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { ProviderOrchestrator } from '@/lib/providers/orchestrator';
+import { shouldDeferProviderWork } from '@/lib/crons/egressMode';
+import { enqueueEgressJob, utcHourKey } from '@/lib/crons/egressQueue';
 
 // Vercel Cron Job C - Every 30 mins
 export async function GET(request: Request) {
@@ -7,6 +9,12 @@ export async function GET(request: Request) {
     const authHeader = request.headers.get('authorization');
     if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Worker mode: never call API-Football from Vercel. Enqueue an idempotent job.
+    if (shouldDeferProviderWork(request)) {
+      const eventId = await enqueueEgressJob({ job: 'enrichment', scope: utcHourKey() });
+      return NextResponse.json({ success: true, mode: 'worker', job: 'enrichment', enqueued: eventId });
     }
 
     const orchestrator = new ProviderOrchestrator();

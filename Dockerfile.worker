@@ -1,0 +1,30 @@
+# Controlled API-Football Egress Worker — image definition
+# Location: Dockerfile.worker
+#
+# NOT built or deployed by the P0.3 change. Provided for review/approval.
+# Runs exactly one long-lived worker process; no inbound port is required (health
+# is published via Supabase heartbeat and read by /api/ops/egress-worker/status).
+#
+# The worker egresses from this host. Configure a DEDICATED/static outbound IPv4
+# for the running machine and set EGRESS_EXPECTED_IP so drift self-pauses.
+
+FROM node:20-slim
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+# Install full dependencies: the worker reuses existing app modules (Next route
+# handlers, provider gateway) so runtime deps and tsx are both required.
+COPY package.json package-lock.json* ./
+RUN npm ci || npm install
+
+COPY tsconfig.json next-env.d.ts ./
+COPY src ./src
+COPY worker ./worker
+
+# Concurrency is enforced by the worker itself (default 1, hard max 2).
+ENV APIFOOTBALL_EGRESS_MODE=worker
+ENV EGRESS_WORKER_CONCURRENCY=1
+
+CMD ["npx", "tsx", "worker/index.ts"]

@@ -4,6 +4,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { DailyAhShadowPipeline, RESEARCH_HONESTY_BANNER } from '@/lib/pipeline/dailyAhShadowPipeline';
 import { AhDataLoader } from '@/lib/research/ah-solo/ahDataLoader';
+import { shouldDeferProviderWork } from '@/lib/crons/egressMode';
+import { enqueueEgressJob, utcDayKey } from '@/lib/crons/egressQueue';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,6 +26,12 @@ async function handleShadowPipeline(req: NextRequest) {
     const cronSecret = process.env.CRON_SECRET;
     if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Worker mode: never call API-Football from Vercel. Enqueue an idempotent job.
+    if (shouldDeferProviderWork(req)) {
+      const eventId = await enqueueEgressJob({ job: 'ah_shadow', scope: utcDayKey() });
+      return NextResponse.json({ success: true, mode: 'worker', job: 'ah_shadow', enqueued: eventId });
     }
 
     // 2. Load historical matches for point-in-time rating calculation

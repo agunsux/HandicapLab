@@ -93,3 +93,29 @@ Backfills must use the canonical client (never raw fetch) so quota/dedup apply.
 
 - Primary: Principal Engineer (production reliability).
 - Escalation: provider support via the single existing account.
+
+## 11. Controlled egress worker (P0.3)
+
+Provider work can run either in Vercel (`serverless`, default) or in the single
+controlled worker (`worker`). The mode is `APIFOOTBALL_EGRESS_MODE`; `worker`
+must be set explicitly — it is never enabled implicitly.
+
+- Worker start: `npm run worker:start` (Fly: single Machine, `shared-cpu-1x`,
+  1 instance, dedicated egress IP). See `docs/APIFOOTBALL_CONTROLLED_EGRESS_PLAN.md`.
+- Enqueue-only crons: `discovery`, `enrichment`, `t60-snapshot`,
+  `ah-shadow-pipeline`, `generate-signals`, `settle` enqueue an idempotent
+  `apifootball_job` when in worker mode (they never call API-Football from Vercel).
+- Worker status: `GET /api/ops/egress-worker/status` (Bearer `CRON_SECRET`) reads
+  the `provider_worker_health` heartbeat and `apifootball_job` queue depth.
+- Egress IP drift: set `EGRESS_EXPECTED_IP` to the dedicated worker IP; the
+  worker self-pauses and reports `PAUSED` on drift.
+- Rollback: set `APIFOOTBALL_EGRESS_MODE=serverless` and stop the worker. No
+  schema rollback required (queue changes are additive).
+- Before enabling `worker`: apply the `20260914000000_controlled_egress_queue.sql`
+  migration and run the controlled smoke test (still gated on approval).
+
+### Stale leases
+
+`recover_expired_event_leases()` returns expired `processing` leases to
+`pending`. It runs automatically at worker boot; run it manually after an
+unclean worker shutdown.

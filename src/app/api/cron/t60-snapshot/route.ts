@@ -4,11 +4,19 @@
 
 import { NextResponse } from 'next/server';
 import { runT60Snapshot } from '@/lib/crons/t60Snapshot';
+import { shouldDeferProviderWork } from '@/lib/crons/egressMode';
+import { enqueueEgressJob, utcFiveMinKey } from '@/lib/crons/egressQueue';
 
 export async function GET(request: Request) {
   const authHeader = request.headers.get('authorization');
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  // Worker mode: never call API-Football from Vercel. Enqueue an idempotent job.
+  if (shouldDeferProviderWork(request)) {
+    const eventId = await enqueueEgressJob({ job: 't60_snapshot', scope: utcFiveMinKey() });
+    return NextResponse.json({ success: true, mode: 'worker', job: 't60_snapshot', enqueued: eventId });
   }
 
   try {

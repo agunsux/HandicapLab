@@ -1,0 +1,39 @@
+# Controlled API-Football Egress Worker — Fly.io app definition
+# Location: fly.toml
+#
+# NOT deployed by the P0.3 change. Provided for review/approval.
+#
+# Requirements enforced operationally (not by this file alone):
+#   * exactly ONE running Machine (fly scale count 1; no autoscaling)
+#   * shared-cpu-1x, 256–512 MB
+#   * a DEDICATED/static outbound IPv4 for egress (allocate via Fly; set the
+#     resulting IP as the EGRESS_EXPECTED_IP secret so drift self-pauses)
+#   * outbound-only: no public services/http_service block
+#
+# Secrets (set with `fly secrets set`, never committed):
+#   APIFOOTBALL_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, CRON_SECRET,
+#   EGRESS_EXPECTED_IP
+
+app = "handicap-lab-egress-worker"
+primary_region = "sin"
+
+[build]
+  dockerfile = "Dockerfile.worker"
+
+[env]
+  NODE_ENV = "production"
+  APIFOOTBALL_EGRESS_MODE = "worker"
+  EGRESS_WORKER_CONCURRENCY = "1"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"
+
+kill_signal = "SIGTERM"
+kill_timeout = 30
+
+# No [http_service]/[services]: the worker has no public inbound endpoint.
+# Health is exposed through Supabase (provider_worker_health) via the
+# authenticated application route /api/ops/egress-worker/status.
+[machine]
+  auto_stop = false

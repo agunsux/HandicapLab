@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server';
+import { shouldDeferProviderWork } from '@/lib/crons/egressMode';
+import { enqueueEgressJob, utcHourKey } from '@/lib/crons/egressQueue';
 import crypto from 'crypto';
 import { supabase } from '../../../../lib/supabase.server';
 import { LedgerV2Service } from '@/services/ledger-v2';
@@ -75,6 +77,12 @@ async function handleSettle(request: Request) {
   const authHeader = request.headers.get('authorization');
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  // Worker mode: never call API-Football from Vercel. Enqueue an idempotent job.
+  if (shouldDeferProviderWork(request)) {
+    const eventId = await enqueueEgressJob({ job: 'settle', scope: utcHourKey() });
+    return NextResponse.json({ success: true, mode: 'worker', job: 'settle', enqueued: eventId });
   }
 
   const logId = await CronLogger.start('settle');
