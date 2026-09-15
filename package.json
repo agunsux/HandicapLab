@@ -27,6 +27,7 @@
     "historical:three-regime": "tsx src/historical/regime/analyze.ts",
     "historical:odds-250-299": "tsx src/historical/odds250/validate.ts",
     "phase2b:research": "tsx src/historical/research/phase2b/runner.ts",
+    "research:ah:gate1": "tsx scripts/research-ah-gate1.ts",
     "test": "vitest run",
     "worker:start": "tsx worker/index.ts",
     "worker:dev": "tsx watch worker/index.ts",
