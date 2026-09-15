@@ -76,7 +76,7 @@ export interface Gate1ValidationResult {
     max_odds: number;
     invalid_odds_count: number;
     missing_odds_count: number;
-    inventory_verdict: 'PASS' | 'FAIL';
+    inventory_verdict: 'PASS' | 'PASS WITH WARNINGS' | 'FAIL';
   };
   gate1d_linkage: {
     matched_observations: number;
@@ -88,7 +88,7 @@ export interface Gate1ValidationResult {
     obs_per_match_max: number;
     obs_per_match_avg: number;
     linkage_anomalies: string[];
-    linkage_verdict: 'PASS' | 'FAIL';
+    linkage_verdict: 'PASS' | 'PASS WITH WARNINGS' | 'FAIL';
   };
   gate1e_temporal: {
     valid_prematch_count: number;
@@ -98,15 +98,16 @@ export interface Gate1ValidationResult {
     date_aligned_count: number;
     date_mismatched_count: number;
     temporal_notes: string;
-    temporal_verdict: 'PASS' | 'PASS_WITH_WARNINGS' | 'FAIL';
+    temporal_verdict: 'PASS' | 'PASS WITH WARNINGS' | 'PASS_WITH_WARNINGS' | 'FAIL';
   };
   gate1f_line_normalization: {
     all_lines_canonical_quarter: boolean;
     non_canonical_lines: number[];
+    null_line_count: number;
     distinct_lines_count: number;
     min_line: number;
     max_line: number;
-    normalization_verdict: 'PASS' | 'FAIL';
+    normalization_verdict: 'PASS' | 'PASS WITH WARNINGS' | 'FAIL';
   };
   gate1g_odds_sanity: {
     all_odds_positive: boolean;
@@ -116,7 +117,7 @@ export interface Gate1ValidationResult {
     extreme_odds_count: number;
     pinnacle_mean_home_odds: number;
     pinnacle_mean_away_odds: number;
-    sanity_verdict: 'PASS' | 'FAIL';
+    sanity_verdict: 'PASS' | 'PASS WITH WARNINGS' | 'FAIL';
   };
   gate1h_settlement_compatibility: {
     total_ah_simulated: number;
@@ -126,14 +127,14 @@ export interface Gate1ValidationResult {
     outcome_distribution: Record<AhOutcome, number>;
     symmetry_test_passed: boolean;
     representative_lines_tested: number[];
-    settlement_verdict: 'PASS' | 'FAIL';
+    settlement_verdict: 'PASS' | 'PASS WITH WARNINGS' | 'FAIL';
   };
   gate1i_leakage_precheck: {
     future_leakage_violations: number;
     closing_odds_in_opening_records: number;
-    precheck_verdict: 'PASS' | 'FAIL';
+    precheck_verdict: 'PASS' | 'PASS WITH WARNINGS' | 'FAIL';
   };
-  overall_verdict: 'PASS' | 'PASS_WITH_WARNINGS' | 'FAIL' | 'BLOCKED';
+  overall_verdict: 'PASS' | 'PASS WITH WARNINGS' | 'FAIL' | 'BLOCKED';
 }
 
 export function runGate1Validation(): Gate1ValidationResult {
