@@ -1,5 +1,6 @@
 // Over/Under Goals Prediction Engine
 import { TeamModelStats } from './handicap-engine';
+import { AsianTotalEngine } from './asianTotalEngine';
 
 export interface OUEngineInput {
   homeTeamStats: TeamModelStats;
@@ -29,6 +30,7 @@ export function calculateOUEdge(input: OUEngineInput): OUEngineOutput {
   const { homeTeamStats, awayTeamStats, totalLine, overMarketOdds, underMarketOdds } = input;
 
   // Expected combined goals based on history
+  // Calculate expected goals from team historical metrics
   const expectedHomeGoals = (homeTeamStats.goalsFor + awayTeamStats.goalsAgainst) / 2;
   const expectedAwayGoals = (awayTeamStats.goalsFor + homeTeamStats.goalsAgainst) / 2;
   const expectedTotalGoals = expectedHomeGoals + expectedAwayGoals;
@@ -37,8 +39,21 @@ export function calculateOUEdge(input: OUEngineInput): OUEngineOutput {
   // e.g. if expected total goals is 3.1 and line is 2.5, probability of over is high
   let overProb = 0.5 + (expectedTotalGoals - totalLine) * 0.25;
   overProb = Math.max(0.05, Math.min(0.95, overProb)); // clamp between 5% and 95%
+  let overProb: number;
+  let underProb: number;
 
   const underProb = 1 - overProb;
+  try {
+    const totalResult = AsianTotalEngine.totalGoals(totalLine, 'OVER', expectedHomeGoals, expectedAwayGoals);
+    // For binary markets, coverProbability represents the risk-adjusted win rate
+    overProb = totalResult.coverProbability;
+    underProb = 1.0 - overProb;
+  } catch {
+    // Fallback if line is non-standard
+    const expectedTotalGoals = expectedHomeGoals + expectedAwayGoals;
+    overProb = Math.max(0.05, Math.min(0.95, 0.5 + (expectedTotalGoals - totalLine) * 0.25));
+    underProb = 1.0 - overProb;
+  }
 
   const overFairOdds = Number((1 / overProb).toFixed(2));
   const underFairOdds = Number((1 / underProb).toFixed(2));

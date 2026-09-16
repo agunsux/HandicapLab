@@ -211,32 +211,60 @@ export class DailyAhShadowPipeline {
     // 2. Fetch API-Football fixtures
     for (const [leagueIdStr, meta] of Object.entries(CONFIRMED_LEAGUES)) {
       const leagueId = Number(leagueIdStr);
+    // 2. Fetch API-Football fixtures (once per date, filtered in-memory across confirmed leagues)
+    for (const date of [today, tomorrow]) {
+      try {
+        const res = await apiFootballClient.getFixturesByDate(date);
+        const items = Array.isArray(res) ? res : res?.response || [];
 
       for (const date of [today, tomorrow]) {
         try {
           const res = await apiFootballClient.getFixturesByDate(date);
           const items = Array.isArray(res) ? res : res?.response || [];
+        for (const item of items) {
+          if (!item?.fixture || item.fixture.status?.short !== 'NS' || !item.league?.id) continue;
+          const leagueId = Number(item.league.id);
+          const meta = CONFIRMED_LEAGUES[leagueId];
+          if (!meta) continue;
 
           for (const item of items) {
             if (!item?.fixture || item.fixture.status.short !== 'NS' || item.league?.id !== leagueId) continue;
+          const fixtureId = `LIVE-${meta.name.replace(/\s+/g, '-').toUpperCase()}-${item.fixture.id}`;
+          const homeName = item.teams.home.name;
+          const awayName = item.teams.away.name;
+          const kickoffTime = item.fixture.date;
+          const fixTimeMs = new Date(kickoffTime).getTime();
 
             const fixtureId = `LIVE-${meta.name.replace(/\s+/g, '-').toUpperCase()}-${item.fixture.id}`;
             const homeName = item.teams.home.name;
             const awayName = item.teams.away.name;
             const kickoffTime = item.fixture.date;
             const fixTimeMs = new Date(kickoffTime).getTime();
+          const openingOdds: Array<{ line: number; homeOdds: number; awayOdds: number; bookmaker?: string; timestamp?: string }> = [];
 
             const openingOdds: Array<{ line: number; homeOdds: number; awayOdds: number; bookmaker?: string; timestamp?: string }> = [];
+          // Match with OddsPapi V4 fixture
+          const hNorm = normalizeTeamName(homeName);
+          const aNorm = normalizeTeamName(awayName);
 
             // Match with OddsPapi V4 fixture
             const hNorm = normalizeTeamName(homeName);
             const aNorm = normalizeTeamName(awayName);
+          const matchedOddsFixture = oddsFixtures.find((of) => {
+            const ofHNorm = normalizeTeamName(of.participant1Name);
+            const ofANorm = normalizeTeamName(of.participant2Name);
+            const ofTimeMs = new Date(of.startTime).getTime();
+            const diffHours = Math.abs(fixTimeMs - ofTimeMs) / (3600 * 1000);
 
             const matchedOddsFixture = oddsFixtures.find((of) => {
               const ofHNorm = normalizeTeamName(of.participant1Name);
               const ofANorm = normalizeTeamName(of.participant2Name);
               const ofTimeMs = new Date(of.startTime).getTime();
               const diffHours = Math.abs(fixTimeMs - ofTimeMs) / (3600 * 1000);
+            const isHome = ofHNorm.includes(hNorm) || hNorm.includes(ofHNorm);
+            const isAway = ofANorm.includes(aNorm) || aNorm.includes(ofANorm);
+            return isHome && isAway && diffHours <= 3.0;
+          });
 
               const isHome = ofHNorm.includes(hNorm) || hNorm.includes(ofHNorm);
               const isAway = ofANorm.includes(aNorm) || aNorm.includes(ofANorm);
@@ -268,6 +296,30 @@ export class DailyAhShadowPipeline {
                               timestamp: new Date().toISOString(),
                             });
                           }
+          // If matched and has odds, fetch real odds from OddsPapi V4
+          if (matchedOddsFixture && matchedOddsFixture.hasOdds) {
+            try {
+              const oddsResp: any = await (oddsApiClient as any).getOddsByFixtureId?.(matchedOddsFixture.fixtureId);
+              if (oddsResp && oddsResp.bookmakerOdds) {
+                const bks = Object.entries(oddsResp.bookmakerOdds);
+                for (const [bkName, bkData] of bks) {
+                  const bk = bkData as any;
+                  if (!bk.markets) continue;
+                  for (const [mId, mData] of Object.entries(bk.markets)) {
+                    const m = mData as any;
+                    if (m.outcomes && typeof m.outcomes === 'object') {
+                      const outcomesArr = Array.isArray(m.outcomes) ? m.outcomes : Object.values(m.outcomes);
+                      if (outcomesArr.length >= 2) {
+                        const o1 = outcomesArr[0] as any;
+                        const o2 = outcomesArr[1] as any;
+                        if (typeof o1.point === 'number' && typeof o1.price === 'number' && typeof o2.price === 'number') {
+                          openingOdds.push({
+                            line: o1.point,
+                            homeOdds: o1.price,
+                            awayOdds: o2.price,
+                            bookmaker: bkName,
+                            timestamp: new Date().toISOString(),
+                          });
                         }
                       }
                     }
@@ -276,7 +328,10 @@ export class DailyAhShadowPipeline {
               } catch (err: any) {
                 console.warn(`[DailyAhShadowPipeline] Odds fetch error for ${fixtureId}:`, err.message);
               }
+            } catch (err: any) {
+              console.warn(`[DailyAhShadowPipeline] Odds fetch error for ${fixtureId}:`, err.message);
             }
+          }
 
             candidates.push({
               fixtureId,
@@ -292,7 +347,20 @@ export class DailyAhShadowPipeline {
           }
         } catch (err: any) {
           console.warn(`[DailyAhShadowPipeline] Live fetch error for ${meta.name} (${date}):`, err.message);
+          candidates.push({
+            fixtureId,
+            leagueId: String(leagueId),
+            leagueName: meta.name,
+            country: meta.country,
+            homeTeam: homeName,
+            awayTeam: awayName,
+            kickoffTime,
+            status: 'NS',
+            openingOdds: openingOdds.length > 0 ? openingOdds : undefined,
+          });
         }
+      } catch (err: any) {
+        console.warn(`[DailyAhShadowPipeline] Live fetch error for date ${date}:`, err.message);
       }
     }
 

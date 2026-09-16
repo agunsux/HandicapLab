@@ -31,9 +31,14 @@ export class ProviderHealthMonitor {
   readonly provider: string;
   private readonly breaker: CircuitBreaker;
   private disabled = false;
+  private paused = false;
 
   constructor(config: ProviderHealthConfig) {
     this.provider = config.provider;
+    // P0.2 Invariant: API-Football MUST default to PAUSED on cold start
+    if (this.provider === 'apifootball') {
+      this.paused = true;
+    }
     this.breaker = new CircuitBreaker({
       provider: config.provider,
       failureThreshold: config.failureThreshold ?? DEFAULT_FAILURE_THRESHOLD,
@@ -57,12 +62,29 @@ export class ProviderHealthMonitor {
 
   getState(): ProviderHealthState {
     if (this.disabled) return 'DISABLED';
+    if (this.paused) return 'PAUSED';
     return ProviderHealthMonitor.mapCircuitState(this.breaker.getStatus().state);
   }
 
   async allowRequest(): Promise<boolean> {
     if (this.disabled) return false;
+    if (this.paused) return false; // Fail-closed when paused
     return this.breaker.allowRequest();
+  }
+
+  pause(): void {
+    this.paused = true;
+  }
+
+  resume(): void {
+    this.paused = false;
+    this.disabled = false;
+  }
+
+  activateForTest(): void {
+    this.paused = false;
+    this.disabled = false;
+    this.breaker.reset();
   }
 
   onSuccess(): void {

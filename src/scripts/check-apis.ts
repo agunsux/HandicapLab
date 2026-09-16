@@ -6,6 +6,17 @@ dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 const apiFootballKey = process.env.API_FOOTBALL_KEY;
 const oddsPapiKey = process.env.ODDSPAPI_KEY;
 
+/**
+ * [NON-PRODUCTION / QUARANTINED SCRIPT]
+ * P0 Invariant: Direct manual probes are strictly quarantined to prevent unmetered API calls.
+ * Must NOT be run in automated workflows, CI, or production.
+ */
+if (!process.argv.includes('--allow-manual-probe')) {
+  console.error('[GATEWAY_SAFETY_ERROR] Direct provider probes are quarantined per P0 safety policy.');
+  console.error('To run explicitly for diagnostic inspection, provide: --allow-manual-probe');
+  process.exit(1);
+}
+
 async function checkApis() {
   console.log('--- API HEALTH ---');
   if (apiFootballKey) {

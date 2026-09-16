@@ -88,6 +88,7 @@ describe('API-Football P0 compliance', () => {
       globalMemoryCache.clear();
       providerAuditLog.reset();
       gateway = new ProviderGateway(memoryCache);
+      gateway.getHealthMonitor('apifootball').activateForTest();
     });
 
     afterAll(() => {
@@ -174,7 +175,16 @@ describe('API-Football P0 compliance', () => {
 
   describe('provider health states (Phase 8)', () => {
     it('maps circuit transitions to ACTIVE/PAUSED/FAILED/DISABLED', () => {
+    it('defaults apifootball to PAUSED on cold start per P0 requirement', async () => {
+      const monitor = new ProviderHealthMonitor({ provider: 'apifootball' });
+      expect(monitor.getState()).toBe('PAUSED');
+      await expect(monitor.allowRequest()).resolves.toBe(false);
+    });
+
+    it('maps circuit transitions to ACTIVE/PAUSED/FAILED/DISABLED once activated', () => {
       const monitor = new ProviderHealthMonitor({ provider: 'apifootball', failureThreshold: 2, cooldownMs: 1 });
+      expect(monitor.getState()).toBe('PAUSED');
+      monitor.activateForTest();
       expect(monitor.getState()).toBe('ACTIVE');
       monitor.onFailure();
       monitor.onFailure();

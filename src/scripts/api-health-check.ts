@@ -1,6 +1,17 @@
 import { createClient } from '@supabase/supabase-js';
 import 'dotenv/config';
 
+/**
+ * [NON-PRODUCTION / QUARANTINED SCRIPT]
+ * P0 Invariant: Direct manual probes are strictly quarantined to prevent unmetered API calls.
+ * Must NOT be run in automated workflows, CI, or test suites.
+ */
+if (!process.argv.includes('--allow-manual-probe')) {
+  console.error('[GATEWAY_SAFETY_ERROR] Direct provider probes are quarantined per P0 safety policy.');
+  console.error('To run explicitly for diagnostic inspection, provide: --allow-manual-probe');
+  process.exit(1);
+}
+
 async function checkSupabase() {
   try {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL!;

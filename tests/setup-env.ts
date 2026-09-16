@@ -17,3 +17,45 @@ for (const [key, value] of Object.entries(STRUCTURALLY_VALID_FAKE_CREDENTIALS)) 
     process.env[key] = value;
   }
 }
+
+// ---------------------------------------------------------------------------
+// P0.1 Test Network Firewall — ZERO Network Requests to External Providers
+// ---------------------------------------------------------------------------
+const BLOCKED_PROVIDER_DOMAINS = [
+  'api-sports.io',
+  'football.api-sports.io',
+  'v3.football.api-sports.io',
+  'api-football.com',
+  'oddspapi.io',
+  'the-odds-api.com',
+  'footystats.org',
+  'football-data-api.com',
+  'football-data.org',
+];
+
+export function isBlockedProviderUrl(url: string | URL | Request): boolean {
+  const urlStr = typeof url === 'string' ? url : url instanceof URL ? url.toString() : url.url;
+  return BLOCKED_PROVIDER_DOMAINS.some((domain) => urlStr.includes(domain));
+}
+
+let blockedRequestCount = 0;
+export function getBlockedRequestCount(): number {
+  return blockedRequestCount;
+}
+
+export function resetBlockedRequestCount(): void {
+  blockedRequestCount = 0;
+}
+
+const originalGlobalFetch = globalThis.fetch;
+
+globalThis.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+  if (isBlockedProviderUrl(input)) {
+    blockedRequestCount++;
+    const targetUrl = typeof input === 'string' ? input : input instanceof URL ? input.toString() : (input as Request).url;
+    throw new Error(
+      `[TEST_FIREWALL_BLOCKED] Real provider outbound HTTP request blocked in test environment: ${targetUrl}`
+    );
+  }
+  return originalGlobalFetch(input, init);
+};

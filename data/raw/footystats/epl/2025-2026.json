@@ -1,0 +1,19 @@
+{
+  "success": false,
+  "httpStatus": 417,
+  "pager": {
+    "current_page": 1,
+    "max_page": 1,
+    "results_per_page": 50,
+    "total_results": 1
+  },
+  "metadata": {
+    "request_limit": null,
+    "request_remaining": null,
+    "request_reset_message": "Request limit is refreshed every hour.",
+    "request_limit_refresh_next": null
+  },
+  "data": [],
+  "message": "League is not chosen by the user (this might be delayed by cache if you chose the league recently, wait 1 hour). League may not exist, or is not available to this user."
+}
+
