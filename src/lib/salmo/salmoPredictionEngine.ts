@@ -307,7 +307,7 @@ export class SalmoPredictionEngine {
         }
       }
 
-      const ahDeriv = calculateAsianHandicapProbability(homeXG, awayXG, ahLine, rho);
+      const ahDeriv = calculateAsianHandicapProbability(scoreGrid, ahLine);
       const ahDevig = this.devigTwoWay(ahHomeOdds, ahAwayOdds);
       const ahFair = fairOdds(ahDeriv.cover);
       const ahEdge = (ahDeriv.cover - ahDevig.pA) * 100;
@@ -557,3 +557,4 @@ export class SalmoPredictionEngine {
     return filePath;
   }
 }
+
