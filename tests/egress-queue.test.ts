@@ -158,6 +158,7 @@ describe('P0.3 controlled egress — queue RPCs', () => {
 
 describe('P0.3 controlled egress — worker config', () => {
   const baseEnv = () => ({
+    NODE_ENV: 'test' as const,
     SUPABASE_URL: 'https://project.supabase.co',
     SUPABASE_SERVICE_ROLE_KEY: VALID_JWT,
     CRON_SECRET: 'cron-secret-value',

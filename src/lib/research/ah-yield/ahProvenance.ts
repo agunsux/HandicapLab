@@ -64,7 +64,7 @@ export function resolveSourceFilePath(sourceFile: string): string | null {
   const idx = normalized.indexOf(marker);
   if (idx >= 0) {
     const rel = normalized.slice(idx + marker.length);
-    const candidate = path.join(process.cwd(), ...rel.split('/'));
+    const candidate = path.join(/*turbopackIgnore: true*/ process.cwd(), ...rel.split('/'));
     if (fs.existsSync(candidate)) return candidate;
   }
   return null;

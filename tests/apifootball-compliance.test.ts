@@ -174,7 +174,6 @@ describe('API-Football P0 compliance', () => {
   });
 
   describe('provider health states (Phase 8)', () => {
-    it('maps circuit transitions to ACTIVE/PAUSED/FAILED/DISABLED', () => {
     it('defaults apifootball to PAUSED on cold start per P0 requirement', async () => {
       const monitor = new ProviderHealthMonitor({ provider: 'apifootball' });
       expect(monitor.getState()).toBe('PAUSED');

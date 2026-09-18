@@ -4,14 +4,15 @@
 import { getApiFootballKey } from './providerKey';
 import { globalGateway } from './providerGateway';
 
-
 export type ProviderHealthStatusEnum =
   | 'NOT_CONFIGURED'
   | 'CONFIGURED'
   | 'AUTH_FAILED'
   | 'API_UNAVAILABLE'
   | 'AUTHENTICATED'
-  | 'DATA_AVAILABLE';
+  | 'DATA_AVAILABLE'
+  | 'PAUSED'
+  | 'DISABLED';
 
 export interface ProviderDiagnostic {
   configured: boolean;
@@ -19,10 +20,8 @@ export interface ProviderDiagnostic {
   dataAvailable: boolean;
   baseUrl: string;
   status: ProviderHealthStatusEnum;
-  status: 'CONFIGURED' | 'NOT_CONFIGURED' | 'DATA_AVAILABLE' | 'AUTH_FAILED' | 'API_UNAVAILABLE' | 'PAUSED' | 'DISABLED';
   latencyMs: number;
   error?: string | null;
-  error: string | null;
 }
 
 export interface CanonicalProviderHealthReport {
@@ -30,8 +29,6 @@ export interface CanonicalProviderHealthReport {
   apiFootball: ProviderDiagnostic;
   oddsPapi: ProviderDiagnostic;
 }
-
-import { globalGateway } from './providerGateway';
 
 export async function evaluateCanonicalProviderHealth(timeoutMs: number = 5000): Promise<CanonicalProviderHealthReport> {
   const timestamp = new Date().toISOString();
@@ -50,26 +47,9 @@ export async function evaluateCanonicalProviderHealth(timeoutMs: number = 5000):
   };
 
   if (afKey) {
-    const start = Date.now();
-    try {
-      const controller = new AbortController();
-      const id = setTimeout(() => controller.abort(), timeoutMs);
-      const res = await fetch(`${afBaseUrl}/status`, {
-        headers: {
-          'x-apisports-key': afKey,
-          'Accept': 'application/json',
-        },
-        signal: controller.signal,
-      });
-      clearTimeout(id);
-      afDiagnostic.latencyMs = Date.now() - start;
     const afMonitor = globalGateway.getHealthMonitor('apifootball');
     const afState = afMonitor.getState();
 
-      if (res.status === 200) {
-        const body = await res.json().catch(() => null);
-        if (body?.errors && Object.keys(body.errors).length > 0 && !Array.isArray(body.errors)) {
-    // P0.2 / P0.3 Invariant: When PAUSED, zero network requests are issued.
     // P0.2 / P0.3 Invariant: When PAUSED or DISABLED, zero network requests are issued.
     if (afState === 'PAUSED' || afState === 'DISABLED') {
       afDiagnostic.status = afState;
@@ -103,29 +83,16 @@ export async function evaluateCanonicalProviderHealth(timeoutMs: number = 5000):
           }
         } else if (res.status === 401 || res.status === 403) {
           afDiagnostic.status = 'AUTH_FAILED';
-          afDiagnostic.error = JSON.stringify(body.errors);
           afDiagnostic.error = `HTTP ${res.status}: Unauthorized`;
         } else {
-          afDiagnostic.authenticated = true;
-          afDiagnostic.dataAvailable = true;
-          afDiagnostic.status = 'DATA_AVAILABLE';
           afDiagnostic.status = 'API_UNAVAILABLE';
           afDiagnostic.error = `HTTP ${res.status}`;
         }
-      } else if (res.status === 401 || res.status === 403) {
-        afDiagnostic.status = 'AUTH_FAILED';
-        afDiagnostic.error = `HTTP ${res.status}: Unauthorized`;
-      } else {
       } catch (err: any) {
         afDiagnostic.latencyMs = Date.now() - start;
         afDiagnostic.status = 'API_UNAVAILABLE';
-        afDiagnostic.error = `HTTP ${res.status}`;
         afDiagnostic.error = err.message || String(err);
       }
-    } catch (err: any) {
-      afDiagnostic.latencyMs = Date.now() - start;
-      afDiagnostic.status = 'API_UNAVAILABLE';
-      afDiagnostic.error = err.message || String(err);
     }
   }
 
@@ -143,29 +110,9 @@ export async function evaluateCanonicalProviderHealth(timeoutMs: number = 5000):
   };
 
   if (opKey) {
-    const start = Date.now();
-    try {
-      const controller = new AbortController();
-      const id = setTimeout(() => controller.abort(), timeoutMs);
-      const res = await fetch(`${opBaseUrl}/v4/sports?apiKey=${encodeURIComponent(opKey)}`, {
-        headers: {
-          'Accept': 'application/json',
-        },
-        signal: controller.signal,
-      });
-      clearTimeout(id);
-      opDiagnostic.latencyMs = Date.now() - start;
     const opMonitor = globalGateway.getHealthMonitor('oddspapi');
     const opState = opMonitor.getState();
 
-      if (res.status === 200) {
-        opDiagnostic.authenticated = true;
-        opDiagnostic.dataAvailable = true;
-        opDiagnostic.status = 'DATA_AVAILABLE';
-      } else if (res.status === 401 || res.status === 403) {
-        opDiagnostic.status = 'AUTH_FAILED';
-        opDiagnostic.error = `HTTP ${res.status}: Invalid API key`;
-      } else {
     if (opState === 'PAUSED' || opState === 'DISABLED') {
       opDiagnostic.status = opState;
       opDiagnostic.error = `Provider is ${opState} (Safe state)`;
@@ -204,13 +151,8 @@ export async function evaluateCanonicalProviderHealth(timeoutMs: number = 5000):
       } catch (err: any) {
         opDiagnostic.latencyMs = Date.now() - start;
         opDiagnostic.status = 'API_UNAVAILABLE';
-        opDiagnostic.error = `HTTP ${res.status}`;
         opDiagnostic.error = err.message || String(err);
       }
-    } catch (err: any) {
-      opDiagnostic.latencyMs = Date.now() - start;
-      opDiagnostic.status = 'API_UNAVAILABLE';
-      opDiagnostic.error = err.message || String(err);
     }
   }
 

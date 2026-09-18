@@ -12,6 +12,7 @@ dotenv.config({ path: path.resolve(process.cwd(), '.env') });
  * - Key is redacted in all outputs.
  * - API-Football: 0 requests.
  * - OddsPapi: 0 requests.
+ */
 if (!process.argv.includes('--allow-manual-probe')) {
   console.error('[GATEWAY_SAFETY_ERROR] Direct provider probes are quarantined per P0 safety policy.');
   console.error('To run explicitly for diagnostic inspection, provide: --allow-manual-probe');

@@ -35,14 +35,9 @@ export function calculateOUEdge(input: OUEngineInput): OUEngineOutput {
   const expectedAwayGoals = (awayTeamStats.goalsFor + homeTeamStats.goalsAgainst) / 2;
   const expectedTotalGoals = expectedHomeGoals + expectedAwayGoals;
 
-  // Rough estimation of probability using expected totals vs line:
-  // e.g. if expected total goals is 3.1 and line is 2.5, probability of over is high
-  let overProb = 0.5 + (expectedTotalGoals - totalLine) * 0.25;
-  overProb = Math.max(0.05, Math.min(0.95, overProb)); // clamp between 5% and 95%
   let overProb: number;
   let underProb: number;
 
-  const underProb = 1 - overProb;
   try {
     const totalResult = AsianTotalEngine.totalGoals(totalLine, 'OVER', expectedHomeGoals, expectedAwayGoals);
     // For binary markets, coverProbability represents the risk-adjusted win rate
@@ -50,7 +45,6 @@ export function calculateOUEdge(input: OUEngineInput): OUEngineOutput {
     underProb = 1.0 - overProb;
   } catch {
     // Fallback if line is non-standard
-    const expectedTotalGoals = expectedHomeGoals + expectedAwayGoals;
     overProb = Math.max(0.05, Math.min(0.95, 0.5 + (expectedTotalGoals - totalLine) * 0.25));
     underProb = 1.0 - overProb;
   }

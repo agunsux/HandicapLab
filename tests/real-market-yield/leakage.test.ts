@@ -14,7 +14,6 @@ describe('Real Market Yield — Strict Anti-Leakage & Temporal Invariants', () =
       awayTeam: 'Newcastle',
       homeGoals: 1,
       awayGoals: 0,
-      odds: {} as any,
     };
 
     // Construct contaminated match list with a future match
@@ -28,8 +27,7 @@ describe('Real Market Yield — Strict Anti-Leakage & Temporal Invariants', () =
         awayTeam: 'West Ham',
         homeGoals: 2,
         awayGoals: 0,
-        odds: {} as any,
-      },
+        },
       {
         canonicalId: 'ENG-PL|2019-2020|2019-10-20|man-utd|liverpool', // FUTURE MATCH!
         leagueId: 'ENG-PL',
@@ -39,8 +37,7 @@ describe('Real Market Yield — Strict Anti-Leakage & Temporal Invariants', () =
         awayTeam: 'Liverpool',
         homeGoals: 1,
         awayGoals: 1,
-        odds: {} as any,
-      },
+        },
     ];
 
     // Attempting to fit Dixon Coles directly with future match must throw
@@ -63,8 +60,7 @@ describe('Real Market Yield — Strict Anti-Leakage & Temporal Invariants', () =
         awayTeam: 'Watford',
         homeGoals: 1,
         awayGoals: 1,
-        odds: {} as any,
-      },
+        },
     ];
 
     expect(() => {

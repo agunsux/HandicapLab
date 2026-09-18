@@ -373,11 +373,8 @@ describe('COVERAGE LAYER FORENSIC VALIDATION & AUDIT TEST SUITE', () => {
     });
   });
 
-  // ==========================================================================
-  // GATE 7: PROBABILITY ENGINE BASELINE INVARIANCE TEST
-  // ==========================================================================
   describe('Gate 7: ProbabilityEngine Baseline Output Invariance', () => {
-    const mockFeatures: MatchFeatures = {
+    const mockFeatures: any = {
       matchId: 'fixture-test-001',
       homeTeam: 'Arsenal FC',
       awayTeam: 'Chelsea FC',

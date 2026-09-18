@@ -169,8 +169,8 @@ describe('EPIC 61 DATA INTEGRITY GATE — Real-Data-Only Lock & Market Governanc
   // Phase 3 — Zero Mock Data in Production & Empty-State Invariant
   // --------------------------------------------------------------------------
   describe('Phase 3: Zero Mock Data in Production & Empty State Behavior', () => {
-    it('getTerminalPredictions() should return empty array when ledger is empty, not fake mock fixtures', () => {
-      const predictions = getTerminalPredictions();
+    it('getTerminalPredictions() should return empty array when ledger is empty, not fake mock fixtures', async () => {
+      const predictions = await getTerminalPredictions();
       expect(Array.isArray(predictions)).toBe(true);
       for (const p of predictions) {
         expect(p.home_team).not.toBe('Liverpool vs Everton Sample');
