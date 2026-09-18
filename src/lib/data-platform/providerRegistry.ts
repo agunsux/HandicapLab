@@ -9,8 +9,10 @@ export class ProviderRegistry {
   private static registry = new Map<string, OddsProvider>();
 
   static {
-    // Register default core adapters
-    this.register('mock', new MockOddsProvider());
+    // Zero mock provider in production. Only available in explicit test runs.
+    if (process.env.NODE_ENV === 'test') {
+      this.register('mock', new MockOddsProvider());
+    }
     this.register('file', new FileOddsProvider());
   }
 

@@ -6,6 +6,7 @@ import { DependencyRegistry } from '@/lib/health/registry';
 import { ReliabilityEvaluator } from '@/lib/reliability/evaluator';
 
 export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export async function GET() {
   const registry = DependencyRegistry.getInstance();
@@ -13,14 +14,16 @@ export async function GET() {
   
   const report = ReliabilityEvaluator.evaluate(healthResult.timestamp, healthResult.services);
 
-  const dbCheck = report.services.database;
-  const storageCheck = report.services.storage;
+  const dbCheck = report.services.database || { status: 'unhealthy' };
+  const storageCheck = report.services.storage || { status: 'unhealthy' };
+  const predictionCheck = report.services.prediction;
 
   const isHealthy = dbCheck.status === 'healthy' && storageCheck.status === 'healthy';
   const status = isHealthy ? 200 : 500;
 
   const responseBody = {
     status: isHealthy ? 'healthy' : 'unhealthy',
+    canonicalDomain: 'salmo.dev',
     score: report.score,
     timestamp: report.timestamp,
     services: report.services,
@@ -28,6 +31,7 @@ export async function GET() {
     // Maintain backward compatibility for older tooling/deployment checks
     checks: {
       database: dbCheck.status === 'healthy' ? 'healthy' : 'unhealthy',
+      prediction: predictionCheck?.status || 'unknown',
       environment: {
         missing: storageCheck.status === 'unhealthy' ? [storageCheck.message || ''] : [],
         malformed: []
@@ -36,5 +40,12 @@ export async function GET() {
     }
   };
 
-  return NextResponse.json(responseBody, { status });
+  return NextResponse.json(responseBody, {
+    status,
+    headers: {
+      'Cache-Control': 'no-store, no-cache, must-revalidate',
+      'X-Data-Source': 'live-production',
+      'X-Canonical-Domain': 'salmo.dev',
+    }
+  });
 }

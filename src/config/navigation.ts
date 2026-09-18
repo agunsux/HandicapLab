@@ -14,6 +14,7 @@ export const ROUTES = {
   home: '/',
   leagues: '/competitions',
   statistics: '/asian-handicap',
+  dailyPicks: '/daily-picks',
   // Market statistics
   asianHandicap: '/asian-handicap',
   overUnder: '/over-under',
@@ -39,6 +40,7 @@ export const ROUTES = {
 
 /** Primary navigation — data-first structure */
 export const PRIMARY_NAV = [
+  { label: 'Daily Picks', href: ROUTES.dailyPicks, shortLabel: 'Picks' },
   { label: 'Matches', href: '/#upcoming-matches', shortLabel: 'Matches' },
   { label: 'Leagues', href: ROUTES.leagues, shortLabel: 'Leagues' },
   { label: 'Statistics', href: ROUTES.statistics, shortLabel: 'Stats' },

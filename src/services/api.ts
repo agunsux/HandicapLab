@@ -464,7 +464,7 @@ export async function fetchSignals(filters?: any): Promise<Signal[]> {
       const oppsResponse = await OpportunitiesService.getOpportunities();
       const opps = oppsResponse.opportunities || [];
       return opps.map((o: any) => ({
-        id: o.id || o.fixtureId || String(Math.random()),
+        id: o.id || (o.fixtureId ? `${o.fixtureId}_${o.market || 'mkt'}_${o.selection || 'sel'}` : 'sig_unknown'),
         matchId: o.fixtureId,
         type: (o.signal || 'value').toLowerCase(),
         market: o.market?.toLowerCase() || 'asian_handicap',
@@ -496,7 +496,7 @@ export async function fetchSignals(filters?: any): Promise<Signal[]> {
     const opps = json.data?.opportunities || json.opportunities || [];
     if (Array.isArray(opps)) {
       return opps.map((o: any) => ({
-        id: o.id || o.fixtureId || String(Math.random()),
+        id: o.id || (o.fixtureId ? `${o.fixtureId}_${o.market || 'mkt'}_${o.selection || 'sel'}` : 'sig_unknown'),
         matchId: o.fixtureId,
         type: (o.signal || 'value').toLowerCase(),
         market: o.market?.toLowerCase() || 'asian_handicap',
