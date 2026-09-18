@@ -16,7 +16,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { supabase } from '@/lib/supabase.server';
-import { PredictionLedgerRepository } from '@/lib/data/predictionLedgerRepository';
+import crypto from 'crypto';
 import { buildScoreGrid, calculateAsianHandicapProbability, calculateOverUnderProbability, fairOdds } from '@/lib/engine/probability';
 import { calculateBttsFromGrid, type BttsEngineResult } from '@/lib/research/bttsEngine';
 import {
@@ -79,6 +79,40 @@ export class DailyPicksEngine {
       pB: rawB / overround,
       overround,
     };
+  }
+
+  private static async appendLedgerPrediction(record: any): Promise<string | null> {
+    try {
+      let priorHash: string | null = null;
+      try {
+        const { data } = await supabase
+          .from('prediction_ledger_v3')
+          .select('prediction_hash')
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (data?.prediction_hash) priorHash = data.prediction_hash;
+      } catch {}
+
+      const hashInput = JSON.stringify({
+        match_id: record.match_id,
+        model_id: record.model_id,
+        market_type: record.market_type,
+        selection: record.selection,
+        raw_probability: record.raw_probability,
+        calibrated_probability: record.calibrated_probability,
+        feature_vector_snapshot: record.feature_vector_snapshot,
+        prior_hash: priorHash,
+      });
+
+      const hash = crypto.createHash('sha256').update(hashInput).digest('hex');
+      const dbRecord = { ...record, prediction_hash: hash, prior_hash: priorHash };
+
+      await supabase.from('prediction_ledger_v3').insert(dbRecord);
+      return hash;
+    } catch {
+      return null;
+    }
   }
 
   private static cachedOddsPapiQuota: {
@@ -499,7 +533,7 @@ export class DailyPicksEngine {
         // Supabase Persistence: prediction_ledger_v3 & predictions table
         if (matchUuid) {
           try {
-            await PredictionLedgerRepository.appendPrediction({
+            await this.appendLedgerPrediction({
               match_id: matchUuid,
               model_id: 'prematch-v1',
               market_type: 'AH',
@@ -626,7 +660,7 @@ export class DailyPicksEngine {
 
         if (matchUuid) {
           try {
-            await PredictionLedgerRepository.appendPrediction({
+            await this.appendLedgerPrediction({
               match_id: matchUuid,
               model_id: 'prematch-v1',
               market_type: 'OU',
@@ -753,7 +787,7 @@ export class DailyPicksEngine {
 
         if (matchUuid) {
           try {
-            await PredictionLedgerRepository.appendPrediction({
+            await this.appendLedgerPrediction({
               match_id: matchUuid,
               model_id: 'prematch-v1',
               market_type: 'BTTS',

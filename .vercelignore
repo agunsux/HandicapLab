@@ -1,0 +1,12 @@
+# Vercel Ignore File
+data/
+artifacts/
+docs/
+archive/
+tests/
+.git/
+.gemini/
+scratch/
+coverage/
+*.log
+*.tsbuildinfo

@@ -6,6 +6,17 @@ const nextConfig: NextConfig = {
     root: __dirname,
   },
   serverExternalPackages: ['duckdb'],
+  outputFileTracingExcludes: {
+    '*': [
+      'data/**/*',
+      'artifacts/**/*',
+      'docs/**/*',
+      'archive/**/*',
+      'tests/**/*',
+      '.gemini/**/*',
+      'node_modules/@next/swc*/**/*',
+    ],
+  },
   async redirects() {
     return [
       {
