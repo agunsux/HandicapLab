@@ -8,7 +8,6 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ['duckdb'],
   outputFileTracingExcludes: {
     '*': [
-      'data/**/*',
       'artifacts/**/*',
       'docs/**/*',
       'archive/**/*',
