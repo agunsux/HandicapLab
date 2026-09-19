@@ -42,6 +42,7 @@ describe('SALMO.DEV Real-Time Production Daily Picks Pipeline Invariants', () =>
       providerSources: {
         fixtures: 'api-football-pro',
         odds: 'oddspapi-pinnacle',
+        statistics: 'apifootball',
       },
       modelProbability: 0.55,
       marketProbability: 0.50,
@@ -54,6 +55,8 @@ describe('SALMO.DEV Real-Time Production Daily Picks Pipeline Invariants', () =>
       dataQuality: 92,
       providerHealth: 'HEALTHY',
       status: 'ACTIVE',
+      apiFootballFixtureTimestamp: predictionTimestampUtc,
+      oddsPapiSnapshotTimestamp: oddsTimestampUtc,
     };
 
     const oddsTime = new Date(mockRecord.oddsTimestampUtc).getTime();

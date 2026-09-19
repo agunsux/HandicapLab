@@ -9,6 +9,8 @@ import * as path from 'path';
 import { buildScoreGrid, calculateAsianHandicapProbability, calculateOverUnderProbability, fairOdds } from '../engine/probability';
 import { calculateBttsFromGrid, BttsEngineResult } from '../research/bttsEngine';
 import { CLVCalculator, ClvResult } from '../settlement/clv-calculator';
+import { CanonicalOrchestrator } from '../pipeline/canonicalOrchestrator';
+import { CompetitionProfileEngine } from '../engines/feature-engine/competition-profile';
 
 export type SupportedMarket = 'AH' | 'OU' | 'BTTS';
 export type SignalState = 'NO_SIGNAL' | 'WATCH' | 'VALUE_CANDIDATE' | 'PROVISIONAL' | 'VALIDATED';
@@ -253,6 +255,7 @@ export class SalmoPredictionEngine {
       const homeTeam = raw.teams.home.name;
       const awayTeam = raw.teams.away.name;
       const season = String(raw.league.season);
+      const league = raw.league?.name || 'Premier League';
 
       // Reconcile with OddsPapi fixture matching start time (within 10 minutes)
       const targetTime = new Date(kickoffUtc).getTime();
@@ -275,12 +278,30 @@ export class SalmoPredictionEngine {
         continue; // Drop if match already kicked off (anti-leakage invariant)
       }
 
-      // Model features & intensity calculation:
-      // Independent Poisson / Flat Dixon-Coles parameters
-      // Calibrated baseline using team offensive/defensive form
-      const homeXG = 1.35; // Default calibrated EPL home intensity
-      const awayXG = 1.50; // Default calibrated EPL away intensity
-      const rho = -0.08;
+      // Dynamic Dixon-Coles parameters resolved via CanonicalOrchestrator
+      const { homeRating, awayRating, isSufficient } = await CanonicalOrchestrator.resolveTeamRatings(
+        homeTeam,
+        awayTeam,
+        league,
+        predictionTimestamp
+      );
+
+      let homeXG: number;
+      let awayXG: number;
+      const rho = -0.06;
+
+      if (isSufficient && homeRating && awayRating) {
+        const profile = CompetitionProfileEngine.getProfileForLeague(league || 'EPL');
+        const leagueAvgGoals = profile.goalEnvironment || 2.65;
+        const homeBase = leagueAvgGoals * 0.55;
+        const awayBase = leagueAvgGoals * 0.45;
+        homeXG = Number(Math.max(0.20, homeRating.attack_strength * awayRating.defense_strength * homeBase).toFixed(4));
+        awayXG = Number(Math.max(0.20, awayRating.attack_strength * homeRating.defense_strength * awayBase).toFixed(4));
+      } else {
+        // Fail-closed fallback baseline: strictly gated as INSUFFICIENT_MODEL
+        homeXG = 1.35;
+        awayXG = 1.20;
+      }
 
       const scoreGrid = buildScoreGrid(homeXG, awayXG, rho);
 
@@ -310,8 +331,10 @@ export class SalmoPredictionEngine {
       const ahDeriv = calculateAsianHandicapProbability(homeXG, awayXG, ahLine, rho);
       const ahDevig = this.devigTwoWay(ahHomeOdds, ahAwayOdds);
       const ahFair = fairOdds(ahDeriv.cover);
-      const ahEdge = (ahDeriv.cover - ahDevig.pA) * 100;
-      const ahEV = (ahDeriv.win * (ahHomeOdds - 1) + ahDeriv.halfWin * ((ahHomeOdds - 1) / 2) - ahDeriv.halfLoss * 0.5 - ahDeriv.loss * 1.0) * 100;
+      const rawAhEdge = (ahDeriv.cover - ahDevig.pA) * 100;
+      const rawAhEV = (ahDeriv.win * (ahHomeOdds - 1) + ahDeriv.halfWin * ((ahHomeOdds - 1) / 2) - ahDeriv.halfLoss * 0.5 - ahDeriv.loss * 1.0) * 100;
+      const ahEdge = isSufficient ? rawAhEdge : 0;
+      const ahEV = isSufficient ? rawAhEV : 0;
       if (ahHomeOdds > 1.0) ahCovered++;
 
       const ahQuote: SalmoMarketQuote = {
@@ -325,7 +348,7 @@ export class SalmoPredictionEngine {
         devigProbPct: Number((ahDevig.pA * 100).toFixed(1)),
         edgePct: Number(ahEdge.toFixed(2)),
         expectedValuePct: Number(ahEV.toFixed(2)),
-        signalState: this.classifySignal(ahEdge, ahEV),
+        signalState: !isSufficient ? 'NO_SIGNAL' : this.classifySignal(ahEdge, ahEV),
         bookmaker: 'pinnacle',
         oddsCapturedAt: ahCapturedAt,
       };
@@ -347,8 +370,10 @@ export class SalmoPredictionEngine {
       const ouDeriv = calculateOverUnderProbability(homeXG, awayXG, ouLine, rho);
       const ouDevig = this.devigTwoWay(ouOverOdds, ouUnderOdds);
       const ouFair = fairOdds(ouDeriv.over);
-      const ouEdge = (ouDeriv.over - ouDevig.pA) * 100;
-      const ouEV = (ouDeriv.over * ouOverOdds - 1) * 100;
+      const rawOuEdge = (ouDeriv.over - ouDevig.pA) * 100;
+      const rawOuEV = (ouDeriv.over * ouOverOdds - 1) * 100;
+      const ouEdge = isSufficient ? rawOuEdge : 0;
+      const ouEV = isSufficient ? rawOuEV : 0;
       if (ouOverOdds > 1.0) ouCovered++;
 
       const ouQuote: SalmoMarketQuote = {
@@ -362,7 +387,7 @@ export class SalmoPredictionEngine {
         devigProbPct: Number((ouDevig.pA * 100).toFixed(1)),
         edgePct: Number(ouEdge.toFixed(2)),
         expectedValuePct: Number(ouEV.toFixed(2)),
-        signalState: this.classifySignal(ouEdge, ouEV),
+        signalState: !isSufficient ? 'NO_SIGNAL' : this.classifySignal(ouEdge, ouEV),
         bookmaker: 'pinnacle',
         oddsCapturedAt: ouCapturedAt,
       };
@@ -383,8 +408,10 @@ export class SalmoPredictionEngine {
       const bttsDeriv: BttsEngineResult = calculateBttsFromGrid(scoreGrid, { homeXG, awayXG, rho });
       const bttsDevig = this.devigTwoWay(bttsYesOdds, bttsNoOdds);
       const bttsFair = fairOdds(bttsDeriv.probabilities.yes);
-      const bttsEdge = (bttsDeriv.probabilities.yes - bttsDevig.pA) * 100;
-      const bttsEV = (bttsDeriv.probabilities.yes * bttsYesOdds - 1) * 100;
+      const rawBttsEdge = (bttsDeriv.probabilities.yes - bttsDevig.pA) * 100;
+      const rawBttsEV = (bttsDeriv.probabilities.yes * bttsYesOdds - 1) * 100;
+      const bttsEdge = isSufficient ? rawBttsEdge : 0;
+      const bttsEV = isSufficient ? rawBttsEV : 0;
       if (bttsYesOdds > 1.0) bttsCovered++;
 
       const bttsQuote: SalmoMarketQuote = {
@@ -398,7 +425,7 @@ export class SalmoPredictionEngine {
         devigProbPct: Number((bttsDevig.pA * 100).toFixed(1)),
         edgePct: Number(bttsEdge.toFixed(2)),
         expectedValuePct: Number(bttsEV.toFixed(2)),
-        signalState: this.classifySignal(bttsEdge, bttsEV),
+        signalState: !isSufficient ? 'NO_SIGNAL' : this.classifySignal(bttsEdge, bttsEV),
         bookmaker: 'pinnacle',
         oddsCapturedAt: bttsCapturedAt,
       };

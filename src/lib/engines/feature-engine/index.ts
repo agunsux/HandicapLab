@@ -8,6 +8,7 @@ import { XgExtractor } from './xg';
 import { CompetitionProfileEngine } from './competition-profile';
 import { InternationalContextExtractor } from './international-context';
 import { LEAGUE_REGISTRY } from '../../crons/leagueRegistry';
+import { CanonicalOrchestrator } from '../../pipeline/canonicalOrchestrator';
 
 export class FeatureEngine {
   /**
@@ -49,11 +50,12 @@ export class FeatureEngine {
     const kickoffTime = new Date(match.kickoff);
 
     // 3. Trigger extractors in parallel
-    const [form, fatigue, strength, xg] = await Promise.all([
+    const [form, fatigue, strength, xg, ratings] = await Promise.all([
       FormExtractor.extract(homeTeam, awayTeam, kickoffAt, match.league),
       FatigueExtractor.extract(homeTeam, awayTeam, kickoffAt),
       StrengthExtractor.extract(homeTeam, awayTeam, kickoffAt, match.league),
-      XgExtractor.extract(homeTeam, awayTeam, kickoffAt, match.league)
+      XgExtractor.extract(homeTeam, awayTeam, kickoffAt, match.league),
+      CanonicalOrchestrator.resolveTeamRatings(homeTeam, awayTeam, match.league, kickoffAt.toISOString()),
     ]);
 
     // Determine competition profile and type
@@ -77,6 +79,13 @@ export class FeatureEngine {
       .lt('kickoff', kickoffTime.toISOString());
     const historicalMatchesCount = countErr ? 0 : (historicalCount ?? 0);
 
+    // Dynamic ratings preference: use converged team_ratings when sufficient, otherwise fallback to xg
+    const hasDynamicRatings = ratings.isSufficient && ratings.homeRating && ratings.awayRating;
+    const finalHomeAttack = hasDynamicRatings ? ratings.homeRating!.attack_strength : xg.homeAttack;
+    const finalHomeDefense = hasDynamicRatings ? ratings.homeRating!.defense_strength : xg.homeDefense;
+    const finalAwayAttack = hasDynamicRatings ? ratings.awayRating!.attack_strength : xg.awayAttack;
+    const finalAwayDefense = hasDynamicRatings ? ratings.awayRating!.defense_strength : xg.awayDefense;
+
     // 4. Map to unified MatchFeatures interface
     return {
       matchId,
@@ -92,10 +101,10 @@ export class FeatureEngine {
       homeElo: strength.homeElo,
       awayElo: strength.awayElo,
       eloDelta: strength.eloDelta,
-      homeAttack: xg.homeAttack,
-      homeDefense: xg.homeDefense,
-      awayAttack: xg.awayAttack,
-      awayDefense: xg.awayDefense,
+      homeAttack: finalHomeAttack,
+      homeDefense: finalHomeDefense,
+      awayAttack: finalAwayAttack,
+      awayDefense: finalAwayDefense,
       leagueAvgGoals: profile.goalEnvironment, // Integrate profile goals environment
       isHomeAdvantage: profile.homeAdvantageModifier > 1.0, 
       leagueId: config?.id || match.league || 'EPL',

@@ -10,8 +10,12 @@
       "schedule": "20 0 * * *"
     },
     {
-      "path": "/api/cron/enrichment",
+      "path": "/api/cron/update-ratings",
       "schedule": "30 0 * * *"
+    },
+    {
+      "path": "/api/cron/enrichment",
+      "schedule": "35 0 * * *"
     },
     {
       "path": "/api/cron/settlement",

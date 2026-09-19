@@ -18,10 +18,13 @@ import * as path from 'path';
 import { supabase } from '@/lib/supabase.server';
 import crypto from 'crypto';
 import { buildScoreGrid, calculateAsianHandicapProbability, calculateOverUnderProbability, fairOdds } from '@/lib/engine/probability';
+import { ValueEngine } from '@/lib/engine/valueEngine';
 import { calculateBttsFromGrid, type BttsEngineResult } from '@/lib/research/bttsEngine';
 import { CanonicalFixtureRegistry, type CanonicalFixture, type FixtureDataState } from '@/lib/services/canonicalFixtureRegistry';
 import { normalizeTeamName } from '@/lib/identity/fixtureMapping';
 import { globalGateway } from '@/lib/providers/providerGateway';
+import { CanonicalOrchestrator } from '@/lib/pipeline/canonicalOrchestrator';
+import { CompetitionProfileEngine } from '@/lib/engines/feature-engine/competition-profile';
 import {
   type CanonicalMarket,
   type DailyPickRecord,
@@ -471,10 +474,31 @@ export class DailyPicksEngine {
         continue; // Reject temporal violation
       }
 
-      // Dixon-Coles model baseline
-      const homeXG = 1.35;
-      const awayXG = 1.50;
-      const rho = -0.08;
+      // Dynamic Dixon-Coles parameters resolved via CanonicalOrchestrator
+      const { homeRating, awayRating, isSufficient, reason } = await CanonicalOrchestrator.resolveTeamRatings(
+        homeTeam,
+        awayTeam,
+        competition,
+        predictionTimestamp
+      );
+
+      let homeXG: number;
+      let awayXG: number;
+      const rho = -0.06;
+
+      if (isSufficient && homeRating && awayRating) {
+        const profile = CompetitionProfileEngine.getProfileForLeague(competition || 'EPL');
+        const leagueAvgGoals = profile.goalEnvironment || 2.65;
+        const homeBase = leagueAvgGoals * 0.55;
+        const awayBase = leagueAvgGoals * 0.45;
+        homeXG = Number(Math.max(0.20, homeRating.attack_strength * awayRating.defense_strength * homeBase).toFixed(4));
+        awayXG = Number(Math.max(0.20, awayRating.attack_strength * homeRating.defense_strength * awayBase).toFixed(4));
+      } else {
+        // Fail-closed fallback baseline: strictly gated as INSUFFICIENT_MODEL
+        homeXG = 1.35;
+        awayXG = 1.20;
+      }
+
       const scoreGrid = buildScoreGrid(homeXG, awayXG, rho);
 
       // ─── 1. Asian Handicap Market ─────────────────────────────────────────
@@ -499,13 +523,35 @@ export class DailyPicksEngine {
       if (ahHomeOdds > 1.0) {
         ahCovered++;
         const ahDeriv = calculateAsianHandicapProbability(homeXG, awayXG, ahLine, rho);
-        const ahDevig = this.devigTwoWay(ahHomeOdds, ahAwayOdds);
-        const ahFair = fairOdds(ahDeriv.cover);
-        const ahEdge = (ahDeriv.cover - ahDevig.pA);
-        const ahEV = (ahDeriv.win * (ahHomeOdds - 1) + ahDeriv.halfWin * ((ahHomeOdds - 1) / 2) - ahDeriv.halfLoss * 0.5 - ahDeriv.loss * 1.0);
-
-        const validationStatus: ValidationStatus = (ahEdge > 0.005 && ahEV > 0) ? 'PROVISIONAL_EDGE' : 'NO_EDGE';
         const selection = `${homeTeam} ${ahLine >= 0 ? '+' : ''}${ahLine}`;
+
+        const ahVal = ValueEngine.evaluateSelection({
+          selection,
+          market: 'AH',
+          line: ahLine,
+          modelProbability: ahDeriv.cover,
+          ahBreakdown: {
+            win: ahDeriv.win,
+            halfWin: ahDeriv.halfWin,
+            push: ahDeriv.push,
+            halfLoss: ahDeriv.halfLoss,
+            loss: ahDeriv.loss,
+          },
+          pinnacleOdds: {
+            sideOdds: ahHomeOdds,
+            oppositeOdds: ahAwayOdds,
+          },
+          sampleSizeHome: homeRating?.matches_played ?? (isSufficient ? 10 : 0),
+          sampleSizeAway: awayRating?.matches_played ?? (isSufficient ? 10 : 0),
+          oddsTimestampUtc,
+          predictionTimestampUtc: predictionTimestamp,
+          kickoffUtc,
+          fixtureId,
+          homeTeam,
+          awayTeam,
+          league: competition,
+          modelStatus: isSufficient ? 'FIXTURE_SPECIFIC' : 'INSUFFICIENT_MODEL',
+        });
 
         const ahPick: DailyPickRecord = {
           predictionId: `pred_${fixtureId}_AH_${ahLine}`,
@@ -526,15 +572,18 @@ export class DailyPicksEngine {
             odds: 'oddspapi-pinnacle',
             statistics: footystatsData ? 'footystats-epl' : 'apifootball-baseline',
           },
-          modelProbability: Number(ahDeriv.cover.toFixed(4)),
-          marketProbability: Number(ahDevig.pA.toFixed(4)),
-          fairOdds: Number(ahFair.toFixed(3)),
-          marketOdds: Number(ahHomeOdds.toFixed(3)),
-          edge: Number(ahEdge.toFixed(4)),
-          expectedValue: Number(ahEV.toFixed(4)),
-          confidence: 78,
-          validationStatus,
-          dataQuality: 92,
+          modelProbability: ahVal.modelProbability,
+          marketProbability: ahVal.marketProbability,
+          fairOdds: ahVal.fairOdds,
+          marketOdds: ahVal.marketOdds,
+          edge: ahVal.edge,
+          expectedValue: ahVal.expectedValue,
+          confidence: ahVal.confidence,
+          validationStatus: ahVal.validationStatus,
+          dataQuality: Math.round(
+            (ahVal.confidenceBreakdown.sampleSupport / 35) * 50 +
+            (ahVal.confidenceBreakdown.freshness / 25) * 50
+          ),
           providerHealth: 'HEALTHY',
           status: 'ACTIVE',
           apiFootballFixtureTimestamp: footballStateTimestamp,
@@ -558,11 +607,14 @@ export class DailyPicksEngine {
             fair_odds: ahPick.fairOdds,
             market_odds: ahPick.marketOdds,
             market_bookmaker: 'Pinnacle',
-            edge_pct: Number((ahEdge * 100).toFixed(2)),
+            edge_pct: Number((ahPick.edge * 100).toFixed(2)),
             confidence: ahPick.confidence,
-            verdict: ahEV > 0 ? 'LAYAK' : 'PANTAU',
-            reasoning: `Model fair ${ahFair.toFixed(2)} vs Pinnacle ${ahHomeOdds.toFixed(2)}. Edge: ${(ahEdge * 100).toFixed(1)}%, EV: ${(ahEV * 100).toFixed(1)}%.`,
-            status: 'PENDING',
+            verdict: ahVal.verdict,
+            reasoning: ahVal.rejectionReason
+              ? `${ahVal.validationStatus}: ${ahVal.rejectionReason}`
+              : `Model fair ${ahPick.fairOdds.toFixed(2)} vs Pinnacle ${ahPick.marketOdds.toFixed(2)}. Edge: ${(ahPick.edge * 100).toFixed(1)}%, EV: ${(ahPick.expectedValue * 100).toFixed(1)}%, Confidence: ${ahPick.confidence}/100.`,
+            status: ahVal.validationStatus === 'INSUFFICIENT_MODEL' ? 'VOID' : 'PENDING',
+            rejection_reason: ahVal.rejectionReason,
             source: 'live'
           };
 
@@ -585,11 +637,16 @@ export class DailyPicksEngine {
               calibrated_probability: ahPick.modelProbability,
               market_odds: ahPick.marketOdds,
               expected_value: ahPick.expectedValue,
-              kelly_fraction: Math.max(0, Number(((ahDeriv.cover * ahHomeOdds - 1) / (ahHomeOdds - 1)).toFixed(4))),
-              risk_adjusted_stake: 0.02,
+              kelly_fraction: ahVal.kellyFraction,
+              risk_adjusted_stake: ahVal.actionable ? 0.02 : 0,
               feature_version: 'prematch-features-v1.0',
               feature_vector_snapshot: { homeXG, awayXG, rho, ahLine },
-              explainability_json: { devigProb: ahDevig.pA, edgePct: (ahEdge * 100).toFixed(2) },
+              explainability_json: {
+                devigProb: ahVal.marketProbability,
+                edgePct: (ahPick.edge * 100).toFixed(2),
+                confidenceBreakdown: ahVal.confidenceBreakdown,
+                passedGates: ahVal.passedGates,
+              },
               prediction_timestamp: predictionTimestamp,
             });
           } catch {}
@@ -608,8 +665,8 @@ export class DailyPicksEngine {
               model_probability: ahPick.modelProbability,
               fair_odds: ahPick.fairOdds,
               market_odds: ahPick.marketOdds,
-              edge_pct: Number((ahEdge * 100).toFixed(2)),
-              expected_value: Number((ahEV * 100).toFixed(2)),
+              edge_pct: Number((ahPick.edge * 100).toFixed(2)),
+              expected_value: Number((ahPick.expectedValue * 100).toFixed(2)),
               confidence: Number((ahPick.confidence / 100).toFixed(4)),
               source_type: 'live'
             }, { onConflict: 'match_id, market_type' });
@@ -630,13 +687,28 @@ export class DailyPicksEngine {
       if (ouOverOdds > 1.0) {
         ouCovered++;
         const ouDeriv = calculateOverUnderProbability(homeXG, awayXG, 2.5, rho);
-        const ouDevig = this.devigTwoWay(ouOverOdds, ouUnderOdds);
-        const ouFair = fairOdds(ouDeriv.over);
-        const ouEdge = (ouDeriv.over - ouDevig.pA);
-        const ouEV = (ouDeriv.over * ouOverOdds - 1);
-
-        const validationStatus: ValidationStatus = (ouEdge > 0.005 && ouEV > 0) ? 'PROVISIONAL_EDGE' : 'NO_EDGE';
         const selection = 'Over 2.5';
+
+        const ouVal = ValueEngine.evaluateSelection({
+          selection,
+          market: 'OU',
+          line: 2.5,
+          modelProbability: ouDeriv.over,
+          pinnacleOdds: {
+            sideOdds: ouOverOdds,
+            oppositeOdds: ouUnderOdds,
+          },
+          sampleSizeHome: homeRating?.matches_played ?? (isSufficient ? 10 : 0),
+          sampleSizeAway: awayRating?.matches_played ?? (isSufficient ? 10 : 0),
+          oddsTimestampUtc,
+          predictionTimestampUtc: predictionTimestamp,
+          kickoffUtc,
+          fixtureId,
+          homeTeam,
+          awayTeam,
+          league: competition,
+          modelStatus: isSufficient ? 'FIXTURE_SPECIFIC' : 'INSUFFICIENT_MODEL',
+        });
 
         const ouPick: DailyPickRecord = {
           predictionId: `pred_${fixtureId}_OU_2.5`,
@@ -657,15 +729,18 @@ export class DailyPicksEngine {
             odds: 'oddspapi-pinnacle',
             statistics: footystatsData ? 'footystats-epl' : 'apifootball-baseline',
           },
-          modelProbability: Number(ouDeriv.over.toFixed(4)),
-          marketProbability: Number(ouDevig.pA.toFixed(4)),
-          fairOdds: Number(ouFair.toFixed(3)),
-          marketOdds: Number(ouOverOdds.toFixed(3)),
-          edge: Number(ouEdge.toFixed(4)),
-          expectedValue: Number(ouEV.toFixed(4)),
-          confidence: 75,
-          validationStatus,
-          dataQuality: 90,
+          modelProbability: ouVal.modelProbability,
+          marketProbability: ouVal.marketProbability,
+          fairOdds: ouVal.fairOdds,
+          marketOdds: ouVal.marketOdds,
+          edge: ouVal.edge,
+          expectedValue: ouVal.expectedValue,
+          confidence: ouVal.confidence,
+          validationStatus: ouVal.validationStatus,
+          dataQuality: Math.round(
+            (ouVal.confidenceBreakdown.sampleSupport / 35) * 50 +
+            (ouVal.confidenceBreakdown.freshness / 25) * 50
+          ),
           providerHealth: 'HEALTHY',
           status: 'ACTIVE',
           apiFootballFixtureTimestamp: footballStateTimestamp,
@@ -688,11 +763,14 @@ export class DailyPicksEngine {
             fair_odds: ouPick.fairOdds,
             market_odds: ouPick.marketOdds,
             market_bookmaker: 'Pinnacle',
-            edge_pct: Number((ouEdge * 100).toFixed(2)),
+            edge_pct: Number((ouPick.edge * 100).toFixed(2)),
             confidence: ouPick.confidence,
-            verdict: ouEV > 0 ? 'LAYAK' : 'PANTAU',
-            reasoning: `Model fair ${ouFair.toFixed(2)} vs Pinnacle ${ouOverOdds.toFixed(2)}. Edge: ${(ouEdge * 100).toFixed(1)}%, EV: ${(ouEV * 100).toFixed(1)}%.`,
-            status: 'PENDING',
+            verdict: ouVal.verdict,
+            reasoning: ouVal.rejectionReason
+              ? `${ouVal.validationStatus}: ${ouVal.rejectionReason}`
+              : `Model fair ${ouPick.fairOdds.toFixed(2)} vs Pinnacle ${ouPick.marketOdds.toFixed(2)}. Edge: ${(ouPick.edge * 100).toFixed(1)}%, EV: ${(ouPick.expectedValue * 100).toFixed(1)}%, Confidence: ${ouPick.confidence}/100.`,
+            status: ouVal.validationStatus === 'INSUFFICIENT_MODEL' ? 'VOID' : 'PENDING',
+            rejection_reason: ouVal.rejectionReason,
             source: 'live'
           }, { onConflict: 'fixture_id, market_type, source' });
           persistedCount++;
@@ -712,11 +790,16 @@ export class DailyPicksEngine {
               calibrated_probability: ouPick.modelProbability,
               market_odds: ouPick.marketOdds,
               expected_value: ouPick.expectedValue,
-              kelly_fraction: Math.max(0, Number(((ouDeriv.over * ouOverOdds - 1) / (ouOverOdds - 1)).toFixed(4))),
-              risk_adjusted_stake: 0.02,
+              kelly_fraction: ouVal.kellyFraction,
+              risk_adjusted_stake: ouVal.actionable ? 0.02 : 0,
               feature_version: 'prematch-features-v1.0',
               feature_vector_snapshot: { homeXG, awayXG, rho, ouLine: 2.5 },
-              explainability_json: { devigProb: ouDevig.pA, edgePct: (ouEdge * 100).toFixed(2) },
+              explainability_json: {
+                devigProb: ouVal.marketProbability,
+                edgePct: (ouPick.edge * 100).toFixed(2),
+                confidenceBreakdown: ouVal.confidenceBreakdown,
+                passedGates: ouVal.passedGates,
+              },
               prediction_timestamp: predictionTimestamp,
             });
           } catch {}
@@ -735,8 +818,8 @@ export class DailyPicksEngine {
               model_probability: ouPick.modelProbability,
               fair_odds: ouPick.fairOdds,
               market_odds: ouPick.marketOdds,
-              edge_pct: Number((ouEdge * 100).toFixed(2)),
-              expected_value: Number((ouEV * 100).toFixed(2)),
+              edge_pct: Number((ouPick.edge * 100).toFixed(2)),
+              expected_value: Number((ouPick.expectedValue * 100).toFixed(2)),
               confidence: Number((ouPick.confidence / 100).toFixed(4)),
               source_type: 'live'
             }, { onConflict: 'match_id, market_type' });
@@ -757,13 +840,28 @@ export class DailyPicksEngine {
       if (bttsYesOdds > 1.0) {
         bttsCovered++;
         const bttsDeriv: BttsEngineResult = calculateBttsFromGrid(scoreGrid, { homeXG, awayXG, rho });
-        const bttsDevig = this.devigTwoWay(bttsYesOdds, bttsNoOdds);
-        const bttsFair = fairOdds(bttsDeriv.probabilities.yes);
-        const bttsEdge = (bttsDeriv.probabilities.yes - bttsDevig.pA);
-        const bttsEV = (bttsDeriv.probabilities.yes * bttsYesOdds - 1);
-
-        const validationStatus: ValidationStatus = (bttsEdge > 0.005 && bttsEV > 0) ? 'PROVISIONAL_EDGE' : 'NO_EDGE';
         const selection = 'BTTS YES';
+
+        const bttsVal = ValueEngine.evaluateSelection({
+          selection,
+          market: 'BTTS',
+          line: 0,
+          modelProbability: bttsDeriv.probabilities.yes,
+          pinnacleOdds: {
+            sideOdds: bttsYesOdds,
+            oppositeOdds: bttsNoOdds,
+          },
+          sampleSizeHome: homeRating?.matches_played ?? (isSufficient ? 10 : 0),
+          sampleSizeAway: awayRating?.matches_played ?? (isSufficient ? 10 : 0),
+          oddsTimestampUtc,
+          predictionTimestampUtc: predictionTimestamp,
+          kickoffUtc,
+          fixtureId,
+          homeTeam,
+          awayTeam,
+          league: competition,
+          modelStatus: isSufficient ? 'FIXTURE_SPECIFIC' : 'INSUFFICIENT_MODEL',
+        });
 
         const bttsPick: DailyPickRecord = {
           predictionId: `pred_${fixtureId}_BTTS_YES`,
@@ -784,15 +882,18 @@ export class DailyPicksEngine {
             odds: 'oddspapi-pinnacle',
             statistics: footystatsData ? 'footystats-epl' : 'apifootball-baseline',
           },
-          modelProbability: Number(bttsDeriv.probabilities.yes.toFixed(4)),
-          marketProbability: Number(bttsDevig.pA.toFixed(4)),
-          fairOdds: Number(bttsFair.toFixed(3)),
-          marketOdds: Number(bttsYesOdds.toFixed(3)),
-          edge: Number(bttsEdge.toFixed(4)),
-          expectedValue: Number(bttsEV.toFixed(4)),
-          confidence: 72,
-          validationStatus,
-          dataQuality: 88,
+          modelProbability: bttsVal.modelProbability,
+          marketProbability: bttsVal.marketProbability,
+          fairOdds: bttsVal.fairOdds,
+          marketOdds: bttsVal.marketOdds,
+          edge: bttsVal.edge,
+          expectedValue: bttsVal.expectedValue,
+          confidence: bttsVal.confidence,
+          validationStatus: bttsVal.validationStatus,
+          dataQuality: Math.round(
+            (bttsVal.confidenceBreakdown.sampleSupport / 35) * 50 +
+            (bttsVal.confidenceBreakdown.freshness / 25) * 50
+          ),
           providerHealth: 'HEALTHY',
           status: 'ACTIVE',
           apiFootballFixtureTimestamp: footballStateTimestamp,
@@ -815,11 +916,14 @@ export class DailyPicksEngine {
             fair_odds: bttsPick.fairOdds,
             market_odds: bttsPick.marketOdds,
             market_bookmaker: 'Pinnacle',
-            edge_pct: Number((bttsEdge * 100).toFixed(2)),
+            edge_pct: Number((bttsPick.edge * 100).toFixed(2)),
             confidence: bttsPick.confidence,
-            verdict: bttsEV > 0 ? 'LAYAK' : 'PANTAU',
-            reasoning: `Model fair ${bttsFair.toFixed(2)} vs Pinnacle ${bttsYesOdds.toFixed(2)}. Edge: ${(bttsEdge * 100).toFixed(1)}%, EV: ${(bttsEV * 100).toFixed(1)}%.`,
-            status: 'PENDING',
+            verdict: bttsVal.verdict,
+            reasoning: bttsVal.rejectionReason
+              ? `${bttsVal.validationStatus}: ${bttsVal.rejectionReason}`
+              : `Model fair ${bttsPick.fairOdds.toFixed(2)} vs Pinnacle ${bttsPick.marketOdds.toFixed(2)}. Edge: ${(bttsPick.edge * 100).toFixed(1)}%, EV: ${(bttsPick.expectedValue * 100).toFixed(1)}%, Confidence: ${bttsPick.confidence}/100.`,
+            status: bttsVal.validationStatus === 'INSUFFICIENT_MODEL' ? 'VOID' : 'PENDING',
+            rejection_reason: bttsVal.rejectionReason,
             source: 'live'
           }, { onConflict: 'fixture_id, market_type, source' });
           persistedCount++;
@@ -839,11 +943,16 @@ export class DailyPicksEngine {
               calibrated_probability: bttsPick.modelProbability,
               market_odds: bttsPick.marketOdds,
               expected_value: bttsPick.expectedValue,
-              kelly_fraction: Math.max(0, Number(((bttsDeriv.probabilities.yes * bttsYesOdds - 1) / (bttsYesOdds - 1)).toFixed(4))),
-              risk_adjusted_stake: 0.02,
+              kelly_fraction: bttsVal.kellyFraction,
+              risk_adjusted_stake: bttsVal.actionable ? 0.02 : 0,
               feature_version: 'prematch-features-v1.0',
               feature_vector_snapshot: { homeXG, awayXG, rho, btts: true },
-              explainability_json: { devigProb: bttsDevig.pA, edgePct: (bttsEdge * 100).toFixed(2) },
+              explainability_json: {
+                devigProb: bttsVal.marketProbability,
+                edgePct: (bttsPick.edge * 100).toFixed(2),
+                confidenceBreakdown: bttsVal.confidenceBreakdown,
+                passedGates: bttsVal.passedGates,
+              },
               prediction_timestamp: predictionTimestamp,
             });
           } catch {}
@@ -862,8 +971,8 @@ export class DailyPicksEngine {
               model_probability: bttsPick.modelProbability,
               fair_odds: bttsPick.fairOdds,
               market_odds: bttsPick.marketOdds,
-              edge_pct: Number((bttsEdge * 100).toFixed(2)),
-              expected_value: Number((bttsEV * 100).toFixed(2)),
+              edge_pct: Number((bttsPick.edge * 100).toFixed(2)),
+              expected_value: Number((bttsPick.expectedValue * 100).toFixed(2)),
               confidence: Number((bttsPick.confidence / 100).toFixed(4)),
               source_type: 'live'
             }, { onConflict: 'match_id, market_type' });

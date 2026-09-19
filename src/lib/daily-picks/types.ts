@@ -8,10 +8,18 @@
 export type CanonicalMarket = 'AH' | 'OU' | 'BTTS';
 
 export type ValidationStatus =
+  | 'VALUE_CANDIDATE'
   | 'VALIDATED_EDGE'
   | 'PROVISIONAL_EDGE'
   | 'NO_EDGE'
+  | 'MARGINAL_EV'
   | 'INSUFFICIENT_DATA'
+  | 'INSUFFICIENT_MODEL'
+  | 'STALE_ODDS'
+  | 'INVALID_MARKET_SPREAD'
+  | 'INCOMPLETE_METADATA'
+  | 'CIRCULARITY_VIOLATION'
+  | 'TEMPORAL_LEAKAGE'
   | 'BLOCKED';
 
 export type PredictionStatus = 'ACTIVE' | 'SETTLED' | 'VOID';
