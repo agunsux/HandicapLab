@@ -20,7 +20,7 @@ export const metadata = {
 export default async function HomePage() {
   // Fetch real data server-side in parallel with graceful fallbacks
   const [upcomingData, historicalSummary, marketSummary, predictions] = await Promise.all([
-    UpcomingFixturesService.getUpcomingFixtures({ daysAhead: 1, limit: 12 }).catch((err) => {
+    UpcomingFixturesService.getUpcomingFixtures({ daysAhead: 7, limit: 12 }).catch((err) => {
       console.error('[HomePage] Upcoming fixtures fetch error:', err);
       return { fixtures: [], totalMatchesAvailable: 0, generatedAt: new Date().toISOString(), source: 'api-football' as const, dataState: 'DATA_UNAVAILABLE' as const, coverage: { leagues: 0, fixtures: 0 } };
     }),

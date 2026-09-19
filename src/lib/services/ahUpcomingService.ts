@@ -254,6 +254,7 @@ export class AhUpcomingService {
         if (Array.isArray(raw)) {
           return raw.slice(0, 10).map((r: any, idx: number) => ({
             id: Number(r.fixtureId?.replace(/\D/g, '') || idx + 1000),
+            fixtureId: String(r.fixtureId || 'pl_' + idx),
             leagueId: 39,
             leagueCode: 'ENG-PL',
             leagueName: r.tournamentName || 'Premier League',

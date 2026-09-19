@@ -173,17 +173,21 @@ describe('API-Football P0 compliance', () => {
     });
   });
 
-  describe('provider health states (Phase 8)', () => {
-    it('defaults apifootball to PAUSED on cold start per P0 requirement', async () => {
+  describe('provider health states (Epic 2 deterministic state machine)', () => {
+    it('defaults apifootball to ACTIVE on clean cold start and allows requests', async () => {
       const monitor = new ProviderHealthMonitor({ provider: 'apifootball' });
-      expect(monitor.getState()).toBe('PAUSED');
-      await expect(monitor.allowRequest()).resolves.toBe(false);
+      monitor.reset(); // ensure clean test state
+      expect(monitor.getState()).toBe('ACTIVE');
+      await expect(monitor.allowRequest()).resolves.toBe(true);
     });
 
-    it('maps circuit transitions to ACTIVE/PAUSED/FAILED/DISABLED once activated', () => {
+    it('honors pause and maps circuit transitions to ACTIVE/PAUSED/FAILED/DISABLED', () => {
       const monitor = new ProviderHealthMonitor({ provider: 'apifootball', failureThreshold: 2, cooldownMs: 1 });
+      monitor.reset();
+      expect(monitor.getState()).toBe('ACTIVE');
+      monitor.pause();
       expect(monitor.getState()).toBe('PAUSED');
-      monitor.activateForTest();
+      monitor.resume();
       expect(monitor.getState()).toBe('ACTIVE');
       monitor.onFailure();
       monitor.onFailure();

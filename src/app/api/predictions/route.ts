@@ -58,11 +58,15 @@ export async function GET(request: Request) {
       );
     }
 
-    // 2. Fetch upcoming matches
+    // 2. Fetch upcoming matches strictly within the 7-day future horizon (UTC)
+    const nowUtc = new Date().toISOString();
+    const maxHorizonUtc = new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString();
     const { data: matches, error: matchesError } = await supabase
       .from('matches')
       .select('*')
-      .in('status', ['upcoming', 'live'])
+      .in('status', ['upcoming', 'live', 'scheduled'])
+      .gt('kickoff', nowUtc)
+      .lte('kickoff', maxHorizonUtc)
       .order('kickoff', { ascending: true })
       .range(offset, offset + limit - 1);
 

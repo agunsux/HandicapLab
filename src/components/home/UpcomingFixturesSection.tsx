@@ -5,11 +5,12 @@ import Link from 'next/link';
 import { Calendar, Clock, MapPin, ArrowRight } from 'lucide-react';
 import type { PublicUpcomingFixture } from '@/lib/services/upcomingFixturesService';
 import { DATA_STATE_LABEL, type DataState } from '@/lib/data/dataState';
+import type { FixtureDataState } from '@/lib/services/canonicalFixtureRegistry';
 
 interface UpcomingFixturesSectionProps {
   initialFixtures: PublicUpcomingFixture[];
   totalAvailable: number;
-  dataState?: DataState;
+  dataState?: DataState | FixtureDataState;
 }
 
 export function UpcomingFixturesSection({
@@ -17,7 +18,7 @@ export function UpcomingFixturesSection({
   totalAvailable,
   dataState = 'REAL',
 }: UpcomingFixturesSectionProps) {
-  const [windowFilter, setWindowFilter] = useState<'today' | 'tomorrow' | '3days' | '7days'>('today');
+  const [windowFilter, setWindowFilter] = useState<'today' | 'tomorrow' | '3days' | '7days'>('7days');
   const [fixtures, setFixtures] = useState<PublicUpcomingFixture[]>(initialFixtures);
   const [loading, setLoading] = useState(false);
   const [, startTransition] = useTransition();
@@ -47,7 +48,7 @@ export function UpcomingFixturesSection({
         <div>
           <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-[#111827] border border-[#1F2937] text-xs font-mono text-[#10B981] mb-2">
             <span className="h-2 w-2 rounded-full bg-[#10B981] animate-pulse" />
-            FIXTURE FEED &bull; API-FOOTBALL &bull; {DATA_STATE_LABEL[dataState]}
+            FIXTURE FEED &bull; API-FOOTBALL &bull; {(dataState in DATA_STATE_LABEL ? DATA_STATE_LABEL[dataState as DataState] : dataState)}
           </div>
           <h2 className="text-2xl sm:text-4xl font-display font-black text-white tracking-tight">
             Upcoming Fixtures

@@ -1,23 +1,15 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import {
+  CanonicalFixtureRegistry,
+  type CanonicalFixture,
+  type FixtureDataState,
+  type MarketOddsItem as RegistryMarketOddsItem
+} from './canonicalFixtureRegistry';
 
-import { apiFootballClient, type ApiFootballFixtureResponseItem } from '@/lib/apis/apifootball';
-import { QuotaExhaustionError } from '@/lib/providers/providerGateway';
-import { type DataState } from '@/lib/data/dataState';
-
-export interface MarketOddsItem {
-  available: boolean;
-  line?: number | null;
-  homeOdds?: number | null;
-  awayOdds?: number | null;
-  overOdds?: number | null;
-  underOdds?: number | null;
-  yesOdds?: number | null;
-  noOdds?: number | null;
-}
+export type MarketOddsItem = RegistryMarketOddsItem;
 
 export interface PublicUpcomingFixture {
-  id: number;
+  id: number | string;
+  fixtureId?: string;
   leagueId: number;
   leagueCode: string;
   leagueName: string;
@@ -44,89 +36,17 @@ export interface UpcomingFixturesResult {
   totalMatchesAvailable?: number;
   generatedAt: string;
   source: 'api-football';
-  dataState: DataState;
+  dataState: FixtureDataState;
   coverage: {
     leagues: number;
     fixtures: number;
   };
 }
 
-interface TargetLeagueMeta {
-  id: number;
-  code: string;
-  name: string;
-  country: string;
-  region: string;
-  tier: number;
-  priority: string;
-}
-
-// In-memory cache for serverless environments
-let memoryCachedResult: { data: UpcomingFixturesResult; timestamp: number } | null = null;
-const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour TTL
-
-function getTargetLeaguesMap(): Map<number, TargetLeagueMeta> {
-  const map = new Map<number, TargetLeagueMeta>();
-  try {
-    const registryPath = path.resolve('src/historical/research/epic66_league_registry.json');
-    if (fs.existsSync(registryPath)) {
-      const raw = JSON.parse(fs.readFileSync(registryPath, 'utf-8'));
-      for (const lg of raw.leagues || []) {
-        map.set(lg.id, lg);
-      }
-    }
-  } catch (err) {
-    console.warn('[UpcomingFixturesService] Error reading league registry:', err);
-  }
-  return map;
-}
-
-// No market is advertised as available unless real odds are attached.
-function unavailableMarket(): MarketOddsItem {
-  return { available: false, line: null, homeOdds: null, awayOdds: null };
-}
-
 export class UpcomingFixturesService {
-  private static getCacheFilePath(): string {
-    return path.resolve('data/cache/upcoming_fixtures.json');
-  }
-
-  private static readDiskCache(maxAgeMs = CACHE_TTL_MS): UpcomingFixturesResult | null {
-    try {
-      const cacheFile = this.getCacheFilePath();
-      if (fs.existsSync(cacheFile)) {
-        const stats = fs.statSync(cacheFile);
-        const ageMs = Date.now() - stats.mtimeMs;
-        if (ageMs < maxAgeMs) {
-          const raw = fs.readFileSync(cacheFile, 'utf-8');
-          return JSON.parse(raw);
-        }
-      }
-    } catch (e) {
-      console.warn('[UpcomingFixturesService] Cache read error:', e);
-    }
-    return null;
-  }
-
-  private static writeDiskCache(data: UpcomingFixturesResult): void {
-    try {
-      const cacheFile = this.getCacheFilePath();
-      const dir = path.dirname(cacheFile);
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-      }
-      fs.writeFileSync(cacheFile, JSON.stringify(data, null, 2), 'utf-8');
-    } catch (e) {
-      console.warn('[UpcomingFixturesService] Cache write error:', e);
-    }
-  }
-
   /**
    * Fetch upcoming fixtures for the specified date window (up to 7 days ahead).
-   *
-   * Quota-safe: all provider access goes through the canonical API-Football
-   * client (ProviderGateway + QuotaManager), a single date-range request is
-   * used, and fresh cache is served before any provider call.
+   * Strictly delegates to the canonical fixture registry (single source of truth).
    */
   public static async getUpcomingFixtures(options: {
     daysAhead?: number; // 1 to 7 days
@@ -136,125 +56,49 @@ export class UpcomingFixturesService {
   } = {}): Promise<UpcomingFixturesResult> {
     const { daysAhead = 7, forceRefresh = false, leagueCode, limit } = options;
 
-    // Check memory cache first
-    if (!forceRefresh && memoryCachedResult && Date.now() - memoryCachedResult.timestamp < CACHE_TTL_MS) {
-      return this.filterResult(
-        { ...memoryCachedResult.data, dataState: 'CACHED' },
-        daysAhead,
-        leagueCode,
-        limit
-      );
-    }
+    let horizon: 'TODAY' | 'TOMORROW' | 'NEXT_7_DAYS' = 'NEXT_7_DAYS';
+    if (daysAhead === 1) horizon = 'TODAY';
+    else if (daysAhead === 2) horizon = 'TOMORROW';
 
-    // Check disk cache
-    if (!forceRefresh) {
-      const diskCached = this.readDiskCache();
-      if (diskCached) {
-        memoryCachedResult = { data: diskCached, timestamp: Date.now() };
-        return this.filterResult({ ...diskCached, dataState: 'CACHED' }, daysAhead, leagueCode, limit);
-      }
-    }
+    const registryRes = await CanonicalFixtureRegistry.getUpcomingFixtures({
+      horizon: daysAhead >= 3 ? 'NEXT_7_DAYS' : horizon,
+      limit: limit || 50,
+      forceRefresh,
+    });
 
-    const now = new Date();
-    const from = now.toISOString().slice(0, 10);
-    const toDate = new Date(now.getTime() + (Math.min(daysAhead, 7) - 1) * 24 * 60 * 60 * 1000);
-    const to = toDate.toISOString().slice(0, 10);
+    const mappedFixtures: PublicUpcomingFixture[] = registryRes.fixtures.map((f) => ({
+      id: Number(f.providerFixtureId) || f.fixtureId,
+      fixtureId: f.fixtureId,
+      leagueId: f.competitionId,
+      leagueCode: f.leagueCode || 'ENG-PL',
+      leagueName: f.competitionName,
+      leagueCountry: f.leagueCountry || 'England',
+      leagueLogo: f.leagueLogo,
+      kickoff: f.kickoffUtc,
+      kickoffDate: f.kickoffUtc.slice(0, 10),
+      kickoffTime: f.kickoffUtc.slice(11, 16),
+      homeTeam: f.homeTeam,
+      awayTeam: f.awayTeam,
+      homeLogo: f.homeLogo,
+      awayLogo: f.awayLogo,
+      venue: f.venue,
+      status: f.status,
+      markets: f.markets,
+    }));
 
-    let responseItems: ApiFootballFixtureResponseItem[] = [];
-    try {
-      const envelope = await apiFootballClient.getFixturesRange(from, to);
-      responseItems = envelope.response;
-    } catch (err) {
-      const quotaPaused = err instanceof QuotaExhaustionError;
-      const state: DataState = quotaPaused ? 'DATA_UPDATE_PAUSED' : 'DATA_UNAVAILABLE';
-
-      // Serve the latest valid cached snapshot (marked stale) instead of fake data.
-      const staleDisk = this.readDiskCache(30 * 24 * 60 * 60 * 1000);
-      if (staleDisk) {
-        return this.filterResult(
-          { ...staleDisk, dataState: quotaPaused ? 'DATA_UPDATE_PAUSED' : 'STALE' },
-          daysAhead,
-          leagueCode,
-          limit
-        );
-      }
-
-      console.warn(
-        `[UpcomingFixturesService] Provider fetch unavailable (${state}):`,
-        err instanceof Error ? err.message : err
-      );
-      return {
-        fixtures: [],
-        generatedAt: new Date().toISOString(),
+    return this.filterResult(
+      {
+        fixtures: mappedFixtures,
+        totalMatchesAvailable: registryRes.totalMatchesAvailable,
+        generatedAt: registryRes.generatedAt,
         source: 'api-football',
-        dataState: state,
-        coverage: { leagues: 0, fixtures: 0 },
-      };
-    }
-
-    const targetLeagues = getTargetLeaguesMap();
-    const allFixtures: PublicUpcomingFixture[] = [];
-
-    for (const item of responseItems) {
-      const leagueId = item.league?.id;
-      const targetMeta = targetLeagues.get(leagueId);
-      // Only keep fixtures from our target leagues
-      if (!targetMeta) continue;
-
-      const status = item.fixture?.status?.short || 'NS';
-      // Skip matches that are already finished
-      if (['FT', 'AET', 'PEN', 'CANC', 'ABD', 'POSTP'].includes(status)) continue;
-
-      const fixtureDate = item.fixture?.date || '';
-      const kickoffDate = fixtureDate.slice(0, 10);
-      const kickoffTime = fixtureDate.slice(11, 16);
-
-      allFixtures.push({
-        id: item.fixture.id,
-        leagueId,
-        leagueCode: targetMeta.code,
-        leagueName: targetMeta.name,
-        leagueCountry: targetMeta.country,
-        leagueLogo: item.league?.logo,
-        kickoff: fixtureDate,
-        kickoffDate,
-        kickoffTime,
-        homeTeam: item.teams?.home?.name || '',
-        awayTeam: item.teams?.away?.name || '',
-        homeLogo: item.teams?.home?.logo,
-        awayLogo: item.teams?.away?.logo,
-        venue: item.fixture?.venue?.name
-          ? `${item.fixture.venue.name}, ${item.fixture.venue.city || ''}`.trim()
-          : undefined,
-        status,
-        markets: {
-          asianHandicap: unavailableMarket(),
-          overUnder: unavailableMarket(),
-          btts: { available: false, line: null, yesOdds: null, noOdds: null },
-        },
-      });
-    }
-
-    // Sort chronologically by kickoff timestamp
-    allFixtures.sort((a, b) => new Date(a.kickoff).getTime() - new Date(b.kickoff).getTime());
-
-    const distinctLeagues = new Set(allFixtures.map((f) => f.leagueId)).size;
-    const fullResult: UpcomingFixturesResult = {
-      fixtures: allFixtures,
-      generatedAt: new Date().toISOString(),
-      source: 'api-football',
-      dataState: 'REAL',
-      coverage: {
-        leagues: distinctLeagues,
-        fixtures: allFixtures.length
-      }
-    };
-
-    // Save to cache
-    this.writeDiskCache(fullResult);
-    memoryCachedResult = { data: fullResult, timestamp: Date.now() };
-
-    return this.filterResult(fullResult, daysAhead, leagueCode, limit);
+        dataState: registryRes.dataState,
+        coverage: registryRes.coverage,
+      },
+      daysAhead,
+      leagueCode,
+      limit
+    );
   }
 
   private static filterResult(

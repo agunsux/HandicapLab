@@ -76,6 +76,11 @@ export interface DailyPickRecord {
 export interface DailyPicksApiResponse {
   success: boolean;
   count: number;
+  dataState?: 'REAL' | 'CACHED' | 'STALE' | 'DATA_UNAVAILABLE' | 'NO_QUALIFIED_PICKS' | 'NO_FIXTURES';
+  providerState?: string;
+  fixtureCount?: number;
+  qualifiedPickCount?: number;
+  lastSuccessfulSync?: string | null;
   picks: DailyPickRecord[];
   meta: {
     asOfUtc: string;

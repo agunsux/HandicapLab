@@ -669,16 +669,21 @@ export class ApiFootballClient {
 
   /**
    * Fetch fixtures for a date range (YYYY-MM-DD inclusive).
-   * Single request — preferred over per-date loops for quota efficiency.
+   * Note: API-Football requires league or team parameter when using from/to.
    */
   public async getFixturesRange(
     from: string,
     to: string,
+    league?: number,
+    season?: number,
     options?: FetchOptions
   ): Promise<z.infer<typeof ApiFootballFixturesResponseSchema>> {
+    const params: Record<string, string> = { from, to };
+    if (league !== undefined) params.league = String(league);
+    if (season !== undefined) params.season = String(season);
     return this.request(
       'fixtures',
-      { from, to },
+      params,
       ApiFootballFixturesResponseSchema,
       options
     );

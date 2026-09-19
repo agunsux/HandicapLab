@@ -19,6 +19,9 @@ import { supabase } from '@/lib/supabase.server';
 import crypto from 'crypto';
 import { buildScoreGrid, calculateAsianHandicapProbability, calculateOverUnderProbability, fairOdds } from '@/lib/engine/probability';
 import { calculateBttsFromGrid, type BttsEngineResult } from '@/lib/research/bttsEngine';
+import { CanonicalFixtureRegistry, type CanonicalFixture, type FixtureDataState } from '@/lib/services/canonicalFixtureRegistry';
+import { normalizeTeamName } from '@/lib/identity/fixtureMapping';
+import { globalGateway } from '@/lib/providers/providerGateway';
 import {
   type CanonicalMarket,
   type DailyPickRecord,
@@ -215,34 +218,59 @@ export class DailyPicksEngine {
     }
   }
 
+  private static cachedParticipantMap: Map<number, string> | null = null;
+
   /**
-   * Discovers upcoming Premier League fixtures for the next 7 days from API-Football PRO.
+   * Load OddsPapi tournament participant ID -> team name map from persistent cache.
    */
-  public static async discoverUpcomingFixtures(): Promise<any[]> {
-    const apiKey = this.getEnvKey('APIFOOTBALL_KEY') || this.getEnvKey('API_FOOTBALL_KEY');
-    if (!apiKey) throw new Error('[DailyPicksEngine] APIFOOTBALL_KEY is missing');
-
-    const res = await fetch('https://v3.football.api-sports.io/fixtures?league=39&next=10', {
-      headers: { 'x-apisports-key': apiKey, 'Accept': 'application/json' },
-    });
-
-    if (!res.ok) {
-      throw new Error(`[DailyPicksEngine] API-Football HTTP ${res.status}`);
+  public static getOddsPapiParticipantMap(): Map<number, string> {
+    if (this.cachedParticipantMap) return this.cachedParticipantMap;
+    const teamMap = new Map<number, string>();
+    try {
+      const filePath = path.resolve('data/cache/oddspapi_pl_fixtures.json');
+      if (fs.existsSync(filePath)) {
+        const raw = fs.readFileSync(filePath, 'utf8');
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          for (const f of parsed) {
+            if (f.participant1Id && f.participant1Name) teamMap.set(f.participant1Id, f.participant1Name);
+            if (f.participant2Id && f.participant2Name) teamMap.set(f.participant2Id, f.participant2Name);
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('[DailyPicksEngine] Failed to load OddsPapi participant map:', e);
     }
+    this.cachedParticipantMap = teamMap;
+    return teamMap;
+  }
 
-    const data = await res.json();
-    const now = Date.now();
-    const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
+  /**
+   * Match team names robustly across API-Football and OddsPapi.
+   */
+  public static matchTeams(nameA: string, nameB: string): boolean {
+    if (!nameA || !nameB) return false;
+    const clean = (s: string) => normalizeTeamName(s).replace(/\b(fc|afc|cf|sc)\b/g, '').trim();
+    const ca = clean(nameA);
+    const cb = clean(nameB);
+    return ca === cb || ca.includes(cb) || cb.includes(ca);
+  }
 
-    // Filter strictly to next 7 days and scheduled/not started
-    return (data.response || []).filter((f: any) => {
-      const kick = new Date(f.fixture.date).getTime();
-      return kick > now && kick <= now + sevenDaysMs && f.fixture.status?.short === 'NS';
+  /**
+   * Discovers upcoming Premier League fixtures for the next 7 days strictly from CanonicalFixtureRegistry.
+   */
+  public static async discoverUpcomingFixtures(options: { forceRefresh?: boolean } = {}): Promise<CanonicalFixture[]> {
+    const res = await CanonicalFixtureRegistry.getUpcomingFixtures({
+      horizon: 'NEXT_7_DAYS',
+      limit: 50,
+      forceRefresh: options.forceRefresh,
     });
+    return res.fixtures;
   }
 
   /**
    * Fetches live Pinnacle market odds for tournament 17 (Premier League) from OddsPapi v4.
+   * Uses QuotaManager pre-flight check and caching.
    */
   public static async fetchOddsPapiPinnacle(): Promise<any[]> {
     const quota = await this.getOddsPapiQuotaStatus();
@@ -254,17 +282,19 @@ export class DailyPicksEngine {
     const apiKey = this.getEnvKey('ODDS_PAPI_KEY') || this.getEnvKey('ODDSPAPI_KEY');
     if (!apiKey) return [];
 
-    const res = await fetch(`https://api.oddspapi.io/v4/odds-by-tournaments?apiKey=${apiKey}&tournamentIds=17&bookmakers=pinnacle`, {
-      headers: { 'Accept': 'application/json' },
-    });
-
-    if (!res.ok) {
-      console.error(`[DailyPicksEngine] OddsPapi HTTP ${res.status}`);
+    try {
+      const url = `https://api.oddspapi.io/v4/odds-by-tournaments?apiKey=${apiKey}&tournamentIds=17&bookmakers=pinnacle`;
+      const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+      if (!res.ok) {
+        console.error(`[DailyPicksEngine] OddsPapi HTTP ${res.status}`);
+        return [];
+      }
+      const raw = await res.json();
+      return Array.isArray(raw) ? raw : [];
+    } catch (err) {
+      console.error('[DailyPicksEngine] OddsPapi fetch error:', err);
       return [];
     }
-
-    const raw = await res.json();
-    return Array.isArray(raw) ? raw : [];
   }
 
   /**
@@ -326,9 +356,16 @@ export class DailyPicksEngine {
       this.getOddsPapiQuotaStatus(),
     ]);
 
-    // 2. Discover Real Upcoming Fixtures (API-Football)
-    const rawFixtures = await this.discoverUpcomingFixtures();
-    const footballStateTimestamp = new Date().toISOString();
+    // 2. Discover Real Upcoming Fixtures strictly via CanonicalFixtureRegistry (Single Source of Truth)
+    const registryRes = await CanonicalFixtureRegistry.getUpcomingFixtures({
+      horizon: 'NEXT_7_DAYS',
+      limit: 50,
+      forceRefresh: options.forceRefresh,
+    });
+    const rawFixtures = registryRes.fixtures;
+    const footballStateTimestamp = registryRes.lastSuccessfulSync || new Date().toISOString();
+    const dataState: FixtureDataState = registryRes.dataState;
+    const providerState = registryRes.providerState;
 
     // 3. Fetch Real Odds (OddsPapi Pinnacle)
     const rawOdds = await this.fetchOddsPapiPinnacle();
@@ -339,6 +376,7 @@ export class DailyPicksEngine {
 
     const qualifiedPicks: DailyPickRecord[] = [];
     const upcomingMatches: UpcomingMatchDTO[] = [];
+    const participantMap = this.getOddsPapiParticipantMap();
 
     let ahCovered = 0;
     let ouCovered = 0;
@@ -346,13 +384,14 @@ export class DailyPicksEngine {
     let persistedCount = 0;
 
     for (const raw of rawFixtures) {
-      const fixtureId = String(raw.fixture.id);
-      const kickoffUtc = raw.fixture.date;
-      const homeTeam = raw.teams.home.name;
-      const awayTeam = raw.teams.away.name;
-      const competition = raw.league.name || 'Premier League';
-      const leagueId = raw.league.id || 39;
-      const season = String(raw.league.season || '2026');
+      const fixtureId = raw.fixtureId;
+      const providerFixtureId = raw.providerFixtureId;
+      const kickoffUtc = raw.kickoffUtc;
+      const homeTeam = raw.homeTeam;
+      const awayTeam = raw.awayTeam;
+      const competition = raw.competitionName;
+      const leagueId = raw.competitionId;
+      const season = raw.season;
 
       // Temporal integrity check: kickoff must be strictly in the future
       const tPred = new Date(predictionTimestamp).getTime();
@@ -361,24 +400,27 @@ export class DailyPicksEngine {
         continue;
       }
 
-      // Reconcile with OddsPapi fixture matching start time (within 10 minutes)
+      // Reconcile with OddsPapi fixture matching start time (within 2h) AND team names
       const opFixture = rawOdds.find((o: any) => {
         const oTime = new Date(o.startTime).getTime();
-        return Math.abs(oTime - tKick) <= 10 * 60 * 1000;
+        if (Math.abs(oTime - tKick) > 2 * 60 * 60 * 1000) return false;
+        const p1 = participantMap.get(o.participant1Id) || '';
+        const p2 = participantMap.get(o.participant2Id) || '';
+        return this.matchTeams(homeTeam, p1) && this.matchTeams(awayTeam, p2);
       });
 
       const hasPinnacle = Boolean(opFixture?.bookmakerOdds?.pinnacle?.markets);
 
       upcomingMatches.push({
         fixtureId,
-        apiFootballId: raw.fixture.id,
+        apiFootballId: Number(providerFixtureId) || 0,
         competition,
         leagueId,
         season,
         homeTeam,
         awayTeam,
         kickoffUtc,
-        status: raw.fixture.status?.short || 'NS',
+        status: raw.status || 'SCHEDULED',
         hasPinnacleOdds: hasPinnacle,
         hasFootyStatsEnrichment: Boolean(footystatsData),
       });
@@ -838,6 +880,11 @@ export class DailyPicksEngine {
       freshnessMinutesAgo: 0,
       window: 'NOW → NOW + 7 DAYS',
       canonicalDomain: 'salmo.dev' as const,
+      dataState,
+      providerState,
+      fixtureCount: upcomingMatches.length,
+      qualifiedPickCount: qualifiedPicks.length,
+      lastSuccessfulSync: footballStateTimestamp,
       quotaState: {
         apiFootball: { remaining: apifootballQuota.remaining, status: apifootballQuota.status },
         oddsPapi: { remaining: oddspapiQuota.remaining, status: oddspapiQuota.status },
@@ -877,9 +924,14 @@ export class DailyPicksEngine {
       return {
         success: true,
         count: result.picks.length,
+        dataState: (result.meta as any).dataState,
+        providerState: (result.meta as any).providerState,
+        fixtureCount: result.matches.length,
+        qualifiedPickCount: result.picks.length,
+        lastSuccessfulSync: (result.meta as any).lastSuccessfulSync,
         picks: result.picks,
         meta: result.meta,
-        message: result.picks.length === 0 ? 'No qualified picks today.' : undefined,
+        message: result.picks.length === 0 ? 'No qualified picks available.' : undefined,
       };
     } catch (err: any) {
       console.error('[DailyPicksEngine] Pipeline failure:', err);
@@ -930,6 +982,11 @@ export class DailyPicksEngine {
           return {
             success: true,
             count: mapped.length,
+            dataState: 'CACHED',
+            providerState: 'ACTIVE',
+            fixtureCount: mapped.length,
+            qualifiedPickCount: mapped.length,
+            lastSuccessfulSync: new Date().toISOString(),
             picks: mapped,
             meta: {
               asOfUtc: new Date().toISOString(),
@@ -947,8 +1004,13 @@ export class DailyPicksEngine {
       } catch {}
 
       return {
-        success: true,
+        success: false,
         count: 0,
+        dataState: 'DATA_UNAVAILABLE',
+        providerState: 'FAILED',
+        fixtureCount: 0,
+        qualifiedPickCount: 0,
+        lastSuccessfulSync: null,
         picks: [],
         meta: {
           asOfUtc: new Date().toISOString(),
@@ -961,7 +1023,7 @@ export class DailyPicksEngine {
             footyStats: { remaining: 0, status: 'DEGRADED' },
           },
         },
-        message: 'No qualified picks today.',
+        message: 'No qualified picks available. Provider fail-closed safeguard active.',
       };
     }
   }
