@@ -963,7 +963,7 @@ export const LEAGUE_REGISTRY: LeagueConfig[] = [
     marketPriority: ['AH', 'OU', 'ML'],
     profile: { goalEnvironment: 'high', homeAdvantage: 1.12, variance: 'medium-high', fatigueSensitivity: 1.0, marketLiquidity: 'high' },
     marketSuitability: { AH: true, OU: true, ML: true },
-    apiFootballId: 254,
+    apiFootballId: 88,
     footballDataId: 2003,
     status: 'ACTIVE',
     cohort: 'OTHER',
@@ -973,6 +973,44 @@ export const LEAGUE_REGISTRY: LeagueConfig[] = [
     is_active_now: true,
     expected_fixture_frequency: 'high',
     market_liquidity_score: 85
+  },
+  {
+    id: 'bel_pro_league',
+    name: 'Jupiler Pro League',
+    country: 'Belgium',
+    type: 'club',
+    enabled: true,
+    marketPriority: ['AH', 'OU', 'ML'],
+    profile: { goalEnvironment: 'medium-high', homeAdvantage: 1.10, variance: 'medium', fatigueSensitivity: 1.0, marketLiquidity: 'high' },
+    marketSuitability: { AH: true, OU: true, ML: true },
+    apiFootballId: 144,
+    status: 'ACTIVE',
+    cohort: 'OTHER',
+    priority: 2,
+    competition_type: 'league',
+    validation_priority: 'B',
+    is_active_now: true,
+    expected_fixture_frequency: 'high',
+    market_liquidity_score: 80
+  },
+  {
+    id: 'sco_premiership',
+    name: 'Premiership',
+    country: 'Scotland',
+    type: 'club',
+    enabled: true,
+    marketPriority: ['AH', 'OU', 'ML'],
+    profile: { goalEnvironment: 'medium-high', homeAdvantage: 1.15, variance: 'medium', fatigueSensitivity: 1.0, marketLiquidity: 'high' },
+    marketSuitability: { AH: true, OU: true, ML: true },
+    apiFootballId: 179,
+    status: 'ACTIVE',
+    cohort: 'OTHER',
+    priority: 2,
+    competition_type: 'league',
+    validation_priority: 'B',
+    is_active_now: true,
+    expected_fixture_frequency: 'high',
+    market_liquidity_score: 75
   }
 ];
 

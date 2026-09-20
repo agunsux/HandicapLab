@@ -31,8 +31,12 @@ import {
   type DailyPicksApiResponse,
   type UpcomingMatchDTO,
   type ValidationStatus,
-  type PredictionStatus
+  type PredictionStatus,
+  type PredictionLifecycleStage,
+  type PredictionHorizonBucket
 } from './types';
+import { OddsPapiQuotaAllocator } from '@/lib/providers/oddspapiQuotaAllocator';
+import { CANONICAL_15_LEAGUES } from '@/lib/config/multiLeagueRegistry';
 
 interface CachedPicksData {
   timestamp: number;
@@ -271,28 +275,64 @@ export class DailyPicksEngine {
     return res.fixtures;
   }
 
+  public static computeHorizonBucket(kickoffUtc: string, nowUtc: string = new Date().toISOString()): PredictionHorizonBucket {
+    const tKick = new Date(kickoffUtc).getTime();
+    const tNow = new Date(nowUtc).getTime();
+    const diffHours = (tKick - tNow) / (1000 * 60 * 60);
+
+    if (diffHours <= 24) return 'TODAY';
+    if (diffHours <= 48) return 'TOMORROW';
+    if (diffHours <= 72) return '+2D';
+    if (diffHours <= 96) return '+3D';
+    if (diffHours <= 120) return '+4D';
+    if (diffHours <= 144) return '+5D';
+    if (diffHours <= 168) return '+6D';
+    return '+7D';
+  }
+
+  public static computeLifecycleStage(kickoffUtc: string, predUtc: string = new Date().toISOString()): PredictionLifecycleStage {
+    const tKick = new Date(kickoffUtc).getTime();
+    const tPred = new Date(predUtc).getTime();
+    const diffHours = (tKick - tPred) / (1000 * 60 * 60);
+
+    if (diffHours < 6) return 'FINAL';
+    if (diffHours <= 72) return 'PRE-MATCH';
+    return 'EARLY';
+  }
+
   /**
-   * Fetches live Pinnacle market odds for tournament 17 (Premier League) from OddsPapi v4.
-   * Uses QuotaManager pre-flight check and caching.
+   * Fetches live Pinnacle market odds for target tournaments from OddsPapi v4.
+   * Uses QuotaManager pre-flight check and quota allocator.
    */
-  public static async fetchOddsPapiPinnacle(): Promise<any[]> {
-    const quota = await this.getOddsPapiQuotaStatus();
-    if (!quota.allowed) {
-      console.warn(`[DailyPicksEngine] OddsPapi quota protection active: used=${quota.used}/${quota.limit}`);
+  public static async fetchOddsPapiPinnacle(tournamentIds?: number[]): Promise<any[]> {
+    const quotaDecision = OddsPapiQuotaAllocator.canAcquire({
+      leagueId: 'MULTI_LEAGUE',
+      tier: 'A',
+      priority: 'HIGH',
+      cost: 1,
+    });
+
+    if (!quotaDecision.allowed) {
+      console.warn(`[DailyPicksEngine] OddsPapi quota allocator rejected: ${quotaDecision.reason}`);
       return [];
     }
 
     const apiKey = this.getEnvKey('ODDS_PAPI_KEY') || this.getEnvKey('ODDSPAPI_KEY');
     if (!apiKey) return [];
 
+    const idsParam = tournamentIds && tournamentIds.length > 0
+      ? tournamentIds.join(',')
+      : '17';
+
     try {
-      const url = `https://api.oddspapi.io/v4/odds-by-tournaments?apiKey=${apiKey}&tournamentIds=17&bookmakers=pinnacle`;
+      const url = `https://api.oddspapi.io/v4/odds-by-tournaments?apiKey=${apiKey}&tournamentIds=${idsParam}&bookmakers=pinnacle`;
       const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
       if (!res.ok) {
         console.error(`[DailyPicksEngine] OddsPapi HTTP ${res.status}`);
         return [];
       }
       const raw = await res.json();
+      OddsPapiQuotaAllocator.recordUsage({ leagueId: 'ENG-PL', tier: 'A', cost: 1 });
       return Array.isArray(raw) ? raw : [];
     } catch (err) {
       console.error('[DailyPicksEngine] OddsPapi fetch error:', err);
@@ -426,6 +466,8 @@ export class DailyPicksEngine {
         status: raw.status || 'SCHEDULED',
         hasPinnacleOdds: hasPinnacle,
         hasFootyStatsEnrichment: Boolean(footystatsData),
+        lifecycleStage: this.computeLifecycleStage(kickoffUtc, predictionTimestamp),
+        horizonBucket: this.computeHorizonBucket(kickoffUtc, predictionTimestamp),
       });
 
       // Synchronize match record to Supabase `matches` table and retrieve canonical UUID
@@ -586,6 +628,8 @@ export class DailyPicksEngine {
           ),
           providerHealth: 'HEALTHY',
           status: 'ACTIVE',
+          lifecycleStage: this.computeLifecycleStage(kickoffUtc, predictionTimestamp),
+          horizonBucket: this.computeHorizonBucket(kickoffUtc, predictionTimestamp),
           apiFootballFixtureTimestamp: footballStateTimestamp,
           footyStatsSnapshotTimestamp: footystatsStateTimestamp,
           oddsPapiSnapshotTimestamp: oddsTimestampUtc,
@@ -743,6 +787,8 @@ export class DailyPicksEngine {
           ),
           providerHealth: 'HEALTHY',
           status: 'ACTIVE',
+          lifecycleStage: this.computeLifecycleStage(kickoffUtc, predictionTimestamp),
+          horizonBucket: this.computeHorizonBucket(kickoffUtc, predictionTimestamp),
           apiFootballFixtureTimestamp: footballStateTimestamp,
           footyStatsSnapshotTimestamp: footystatsStateTimestamp,
           oddsPapiSnapshotTimestamp: oddsTimestampUtc,
@@ -896,6 +942,8 @@ export class DailyPicksEngine {
           ),
           providerHealth: 'HEALTHY',
           status: 'ACTIVE',
+          lifecycleStage: this.computeLifecycleStage(kickoffUtc, predictionTimestamp),
+          horizonBucket: this.computeHorizonBucket(kickoffUtc, predictionTimestamp),
           apiFootballFixtureTimestamp: footballStateTimestamp,
           footyStatsSnapshotTimestamp: footystatsStateTimestamp,
           oddsPapiSnapshotTimestamp: oddsTimestampUtc,

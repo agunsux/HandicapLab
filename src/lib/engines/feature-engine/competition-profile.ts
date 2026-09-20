@@ -49,11 +49,32 @@ export class CompetitionProfileEngine {
    * Retrieves mapped competition profile by league ID, Name, or apiFootballId.
    */
   public static getProfileForLeague(leagueIdOrName: string): CompetitionProfile {
-    const nameLower = (leagueIdOrName || '').toLowerCase();
+    const raw = (leagueIdOrName || '').trim();
+    const nameLower = raw.toLowerCase();
+
+    // Support canonical keys (e.g. ENG-PL -> 39)
+    let searchAfId: string | null = null;
+    if (raw === 'ENG-PL' || raw === 'EPL') searchAfId = '39';
+    else if (raw === 'ESP-LALIGA' || raw === 'La Liga' || raw === 'LaLiga') searchAfId = '140';
+    else if (raw === 'ITA-SERIEA' || raw === 'Serie A' || raw === 'SerieA') searchAfId = '135';
+    else if (raw === 'DEU-BUNDESLIGA' || raw === 'Bundesliga') searchAfId = '78';
+    else if (raw === 'FRA-LIGUE1' || raw === 'Ligue 1' || raw === 'Ligue1') searchAfId = '61';
+    else if (raw === 'NED-ERE' || raw === 'Eredivisie') searchAfId = '88';
+    else if (raw === 'POR-PRIMEIRA' || raw === 'Primeira Liga') searchAfId = '94';
+    else if (raw === 'BEL-PRO' || raw === 'Jupiler Pro League') searchAfId = '144';
+    else if (raw === 'SCO-PREM' || raw === 'Premiership') searchAfId = '179';
+    else if (raw === 'ENG-CHAMP' || raw === 'Championship') searchAfId = '40';
+    else if (raw === 'USA-MLS' || raw === 'MLS') searchAfId = '253';
+    else if (raw === 'SAU-PRO' || raw === 'Saudi Pro League') searchAfId = '307';
+    else if (raw === 'JPN-J1' || raw === 'J1 League') searchAfId = '98';
+    else if (raw === 'KOR-K1' || raw === 'K League 1') searchAfId = '292';
+    else if (raw === 'IDN-L1' || raw === 'Liga 1') searchAfId = '274';
+
     const config = LEAGUE_REGISTRY.find(
       l => l.id.toLowerCase() === nameLower || 
            l.name.toLowerCase() === nameLower ||
-           l.apiFootballId.toString() === leagueIdOrName
+           l.apiFootballId.toString() === leagueIdOrName ||
+           (searchAfId && l.apiFootballId.toString() === searchAfId)
     );
 
     if (!config) {

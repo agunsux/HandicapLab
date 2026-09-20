@@ -24,6 +24,18 @@ export type ValidationStatus =
 
 export type PredictionStatus = 'ACTIVE' | 'SETTLED' | 'VOID';
 
+export type PredictionLifecycleStage = 'EARLY' | 'PRE-MATCH' | 'FINAL';
+
+export type PredictionHorizonBucket =
+  | 'TODAY'
+  | 'TOMORROW'
+  | '+2D'
+  | '+3D'
+  | '+4D'
+  | '+5D'
+  | '+6D'
+  | '+7D';
+
 export interface OddsProvenance {
   provider: 'oddspapi';
   bookmaker: 'pinnacle' | string;
@@ -76,6 +88,8 @@ export interface DailyPickRecord {
   dataQuality: number; // 0 - 100
   providerHealth: 'HEALTHY' | 'WARNING' | 'DEGRADED';
   status: PredictionStatus;
+  lifecycleStage?: PredictionLifecycleStage;
+  horizonBucket?: PredictionHorizonBucket;
   apiFootballFixtureTimestamp: string;
   footyStatsSnapshotTimestamp?: string;
   oddsPapiSnapshotTimestamp: string;
@@ -116,4 +130,6 @@ export interface UpcomingMatchDTO {
   status: string;
   hasPinnacleOdds: boolean;
   hasFootyStatsEnrichment: boolean;
+  lifecycleStage?: PredictionLifecycleStage;
+  horizonBucket?: PredictionHorizonBucket;
 }

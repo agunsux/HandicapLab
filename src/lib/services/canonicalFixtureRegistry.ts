@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase.server';
 import { apiFootballClient, type ApiFootballFixtureResponseItem } from '@/lib/apis/apifootball';
 import { globalGateway, QuotaExhaustionError, ProviderUnavailableError } from '@/lib/providers/providerGateway';
 import { normalizeTeamName } from '@/lib/identity/fixtureMapping';
+import { CANONICAL_15_LEAGUES, getLeagueByAfId } from '@/lib/config/multiLeagueRegistry';
 
 export type CanonicalFixtureStatus =
   | 'SCHEDULED'
@@ -73,8 +74,10 @@ export interface CanonicalFixtureRegistryResponse {
 const CACHE_TTL_MS = 30 * 60 * 1000; // 30 minutes in-memory / disk cache
 const CACHE_FILE_PATH = path.resolve('data/cache/canonical_fixtures.json');
 
-// Default target leagues (Premier League: 39, Championship: 40, La Liga: 140, Serie A: 135, Bundesliga: 78)
-export const DEFAULT_LEAGUE_COVERAGE = [39, 40, 140, 135, 78];
+// Default target leagues derived from canonical 15 candidate leagues (ACTIVE & SHADOW)
+export const DEFAULT_LEAGUE_COVERAGE = CANONICAL_15_LEAGUES
+  .filter((l) => l.production_status === 'ACTIVE' || l.production_status === 'SHADOW')
+  .map((l) => l.provider_league_id);
 
 export class CanonicalFixtureRegistry {
   private static memoryCache: {
@@ -186,7 +189,7 @@ export class CanonicalFixtureRegistry {
     forceRefresh?: boolean;
     leagueIds?: number[];
   } = {}): Promise<{ fixtures: CanonicalFixture[]; dataState: FixtureDataState; providerState: string }> {
-    const { forceRefresh = false, leagueIds = [39] } = options;
+    const { forceRefresh = false, leagueIds = DEFAULT_LEAGUE_COVERAGE } = options;
     const now = new Date();
     const nowUtc = now.toISOString();
 
@@ -227,7 +230,8 @@ export class CanonicalFixtureRegistry {
 
     try {
       for (const leagueId of leagueIds) {
-        const season = now.getUTCFullYear();
+        const leagueMeta = getLeagueByAfId(leagueId);
+        const season = leagueMeta?.current_season || now.getUTCFullYear();
         const envelope = await apiFootballClient.getFixturesRange(from, to, leagueId, season);
         const responseItems: ApiFootballFixtureResponseItem[] = envelope.response || [];
 
@@ -245,7 +249,7 @@ export class CanonicalFixtureRegistry {
 
           const homeName = item.teams?.home?.name || 'Unknown Home';
           const awayName = item.teams?.away?.name || 'Unknown Away';
-          const competitionName = item.league?.name || 'Premier League';
+          const competitionName = item.league?.name || leagueMeta?.display_name || 'Premier League';
           const seasonStr = String(item.league?.season || season);
 
           const fixtureId = this.generateCanonicalFixtureId(
@@ -273,8 +277,8 @@ export class CanonicalFixtureRegistry {
             homeLogo: item.teams?.home?.logo,
             awayLogo: item.teams?.away?.logo,
             leagueLogo: item.league?.logo,
-            leagueCode: 'ENG-PL',
-            leagueCountry: item.league?.country || 'England',
+            leagueCode: leagueMeta?.internal_league_id || 'ENG-PL',
+            leagueCountry: item.league?.country || leagueMeta?.country || 'England',
             markets: {
               asianHandicap: { available: false, line: null, homeOdds: null, awayOdds: null },
               overUnder: { available: false, line: null, overOdds: null, underOdds: null },
