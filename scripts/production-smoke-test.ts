@@ -164,9 +164,42 @@ async function runProductionSmokeTest() {
 
   // ─── STEP 5: AUTOMATIC PUBLISHING TO CANONICAL STORE ─────────────────────
   console.log('\n▶ STEP 5: Automatic Publishing Reconciliation');
+  const sigInput = {
+    canonicalMatchId: fixture.fixtureId,
+    fixtureId: fixture.fixtureId,
+    providerFixtureId: fixture.providerFixtureId,
+    homeTeam: fixture.homeTeam,
+    awayTeam: fixture.awayTeam,
+    competition: fixture.competitionName,
+    leagueKey: 'ENG-PL',
+    leagueId: 39,
+    kickoffUtc,
+    market: 'AH' as const,
+    selection,
+    line,
+    marketOdds,
+    modelProbability,
+    fairOdds,
+    edge,
+    expectedValue,
+    confidence: confidenceScore, // Strictly 74.5%
+    oddsTimestampUtc,
+    predictionTimestampUtc,
+    modelVersion: 'dixon-coles-v1.0',
+    sampleSizeHome: 15,
+    sampleSizeAway: 15,
+    providerSources: {
+      fixtures: 'api-football-pro',
+      odds: 'oddspapi-pinnacle',
+      statistics: 'apifootball',
+      modelVersion: 'dixon-coles-v1.0',
+    },
+    quotaAllowed: true,
+  };
+
   const pubReport = await ProductionPublishingEngine.reconcileAndPublish({
     triggeredBy: 'SCHEDULER_CRON',
-    customFixtures: [fixture],
+    customSignals: [sigInput],
     nowMs,
   });
   console.log(`  Signals Published: ${pubReport.publishedCount}`);
@@ -176,7 +209,11 @@ async function runProductionSmokeTest() {
   if (!publishedSignal) {
     throw new Error('Published signal not found in canonical store!');
   }
+  if (publishedSignal.confidence !== confidenceScore) {
+    throw new Error(`Published confidence mismatch: expected ${confidenceScore}, got ${publishedSignal.confidence}`);
+  }
   console.log(`  Canonical Signal ID: ${publishedSignal.signalId}`);
+  console.log(`  Published Signal Confidence: ${publishedSignal.confidence}% (Model Invariant Verified)`);
   console.log(`  Payload Hash: ${publishedSignal.payloadHash}`);
 
   // ─── STEP 6: SALMO CONSUMPTION (SAME SIGNAL ID) ──────────────────────────
@@ -186,7 +223,11 @@ async function runProductionSmokeTest() {
   if (!salmoPick || salmoPick.predictionId !== publishedSignal.signalId) {
     throw new Error(`SALMO pick mismatch: expected ${publishedSignal.signalId}, got ${salmoPick?.predictionId}`);
   }
+  if (salmoPick.confidence !== publishedSignal.confidence) {
+    throw new Error(`SALMO pick confidence mismatch: expected ${publishedSignal.confidence}, got ${salmoPick.confidence}`);
+  }
   console.log(`  SALMO Pick ID: ${salmoPick.predictionId} (Matches Canonical Signal)`);
+  console.log(`  SALMO Pick Confidence: ${salmoPick.confidence}% (Viewer Invariant Verified)`);
   console.log(`  SALMO Data State: ${salmoResponse.dataState}`);
 
   // ─── STEP 7: HIGH-CONFIDENCE VIRTUAL LEDGER (1.0U) ──────────────────────
@@ -196,10 +237,13 @@ async function runProductionSmokeTest() {
     throw new Error(`Ledger qualification failed: ${qual.rejectionReason}`);
   }
   const ledgerEntry = qual.ledgerEntry;
+  if (ledgerEntry.confidenceScore !== publishedSignal.confidence) {
+    throw new Error(`Ledger confidence mismatch: expected ${publishedSignal.confidence}, got ${ledgerEntry.confidenceScore}`);
+  }
   console.log(`  Ledger ID: ${ledgerEntry.ledgerId}`);
   console.log(`  Bet Type: ${ledgerEntry.betType}`);
   console.log(`  Stake Units: ${ledgerEntry.stakeUnits}U`);
-  console.log(`  Confidence Score: ${ledgerEntry.confidenceScore}%`);
+  console.log(`  Confidence Score: ${ledgerEntry.confidenceScore}% (Strict Invariant: Published == Ledger)`);
   console.log(`  Initial Status: ${ledgerEntry.status}`);
 
   // ─── STEP 8: KICKOFF LOCK ────────────────────────────────────────────────
@@ -252,9 +296,10 @@ async function runProductionSmokeTest() {
   console.log(`  Total Qualified: ${summary.qualified}`);
   console.log(`  Total Settled: ${summary.settled}`);
   console.log(`  Settled Stake: ${summary.stakeUnits}U`);
-  console.log(`  Settled Profit: +${summary.profitUnits}U`);
-  console.log(`  Realized Yield: ${summary.yieldPct}%`);
+  console.log(`  Profit: +${summary.profitUnits}U`);
+  console.log(`  Realized Yield: +${summary.yieldPct.toFixed(1)}% (on ${summary.settled} settled bet; sample size N = ${summary.settled})`);
   console.log(`  Open Exposure: ${summary.openStakeUnits}U (${summary.openBets} open bets)`);
+  console.log(`  Statistical Context: Realized yield is strictly calculated as Net Profit / Total Staked (not a long-term betting ROI claim)`);
 
   console.log('\n═════════════════════════════════════════════════════════════════════');
   console.log('  PRODUCTION SMOKE TEST PASSED: ALL 10 PHASES DEMONSTRATED!        ');

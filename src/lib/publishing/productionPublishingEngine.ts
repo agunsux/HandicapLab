@@ -480,7 +480,7 @@ export class ProductionPublishingEngine {
           edge: Number(valResult.edge.toFixed(4)),
           expectedValue: Number(valResult.expectedValue.toFixed(4)),
           fairOdds: Number(valResult.fairOdds.toFixed(2)),
-          confidence: confPresentation.confidence,
+          confidence: valResult.confidence,
           strengthLevel: confPresentation.strengthLevel,
           signalColor: confPresentation.signalColor,
           confidenceDisclaimer: confPresentation.disclaimer,
