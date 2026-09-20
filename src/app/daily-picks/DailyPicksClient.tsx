@@ -542,16 +542,18 @@ export function DailyPicksClient({ initialData }: DailyPicksClientProps) {
                     <div className="grid grid-cols-2 gap-2 text-center text-xs font-mono">
                       <div className="p-2.5 rounded-lg bg-[#0B1120]/60 border border-[#1E293B]">
                         <div className="text-[10px] text-[#94A3B8] uppercase">Model Fair Odds</div>
-                        <div className="text-lg font-bold text-white mt-0.5">{pick.fairOdds.toFixed(2)}</div>
+                        <div className="text-lg font-bold text-white mt-0.5">
+                          {(pick.fairOdds ?? (pick.modelProbability > 0 ? 1 / pick.modelProbability : 2.0)).toFixed(2)}
+                        </div>
                         <div className="text-[10px] text-[#64748B] mt-0.5">
-                          Prob: {(pick.modelProbability * 100).toFixed(1)}%
+                          Prob: {((pick.modelProbability ?? 0) * 100).toFixed(1)}%
                         </div>
                       </div>
                       <div className="p-2.5 rounded-lg bg-[#0B1120]/60 border border-[#1E293B]">
                         <div className="text-[10px] text-[#94A3B8] uppercase">Pinnacle Odds</div>
-                        <div className="text-lg font-bold text-[#3B82F6] mt-0.5">{pick.marketOdds.toFixed(2)}</div>
+                        <div className="text-lg font-bold text-[#3B82F6] mt-0.5">{(pick.marketOdds ?? 0).toFixed(2)}</div>
                         <div className="text-[10px] text-[#64748B] mt-0.5">
-                          Devig: {(pick.marketProbability * 100).toFixed(1)}%
+                          Devig: {((pick.marketProbability ?? 0) * 100).toFixed(1)}%
                         </div>
                       </div>
                     </div>
@@ -561,20 +563,20 @@ export function DailyPicksClient({ initialData }: DailyPicksClientProps) {
                       <span className="text-[#94A3B8]">
                         Model Edge:{' '}
                         <strong className={hasEdge ? 'text-emerald-400' : 'text-slate-400'}>
-                          {(pick.edge * 100).toFixed(2)}%
+                          {((pick.edge ?? 0) * 100).toFixed(2)}%
                         </strong>
                       </span>
                       <span className="text-[#94A3B8]">
                         Expected Value:{' '}
                         <strong className={isEvPositive ? 'text-emerald-400' : 'text-slate-400'}>
-                          {(pick.expectedValue * 100).toFixed(2)}%
+                          {((pick.expectedValue ?? 0) * 100).toFixed(2)}%
                         </strong>
                       </span>
                     </div>
 
                     {/* Confidence Scientific Explainability Ribbon */}
                     <div className="text-[10px] font-mono text-[#64748B] bg-[#0B1120]/40 p-2 rounded border border-[#1E293B]/50 flex items-center justify-between">
-                      <span>Robustness Score: <strong className="text-white">{pick.confidence}/100</strong></span>
+                      <span>Robustness Score: <strong className="text-white">{pick.confidence ?? 0}/100</strong></span>
                       <span className="text-[9px] text-[#64748B] italic">Separate from win probability</span>
                     </div>
 
@@ -605,19 +607,19 @@ export function DailyPicksClient({ initialData }: DailyPicksClientProps) {
                           </div>
                           <div>
                             <span className="text-[#64748B]">Current Odds: </span>
-                            <span className="text-[#3B82F6] font-bold">{pick.marketOdds.toFixed(2)}</span>
+                            <span className="text-[#3B82F6] font-bold">{(pick.marketOdds ?? 0).toFixed(2)}</span>
                           </div>
                           <div>
                             <span className="text-[#64748B]">Model Probability: </span>
-                            <span className="text-white">{(pick.modelProbability * 100).toFixed(1)}%</span>
+                            <span className="text-white">{((pick.modelProbability ?? 0) * 100).toFixed(1)}%</span>
                           </div>
                           <div>
                             <span className="text-[#64748B]">Market Implied: </span>
-                            <span className="text-white">{(pick.marketProbability * 100).toFixed(1)}%</span>
+                            <span className="text-white">{((pick.marketProbability ?? 0) * 100).toFixed(1)}%</span>
                           </div>
                           <div>
                             <span className="text-[#64748B]">Edge / EV: </span>
-                            <span className="text-emerald-400">{(pick.edge * 100).toFixed(1)}% / {(pick.expectedValue * 100).toFixed(1)}%</span>
+                            <span className="text-emerald-400">{((pick.edge ?? 0) * 100).toFixed(1)}% / {((pick.expectedValue ?? 0) * 100).toFixed(1)}%</span>
                           </div>
                           <div>
                             <span className="text-[#64748B]">Signal Strength: </span>
