@@ -16,6 +16,7 @@ import {
   Activity,
   Layers,
   Percent,
+  Scale,
 } from 'lucide-react';
 import { DailyPickRecord, CanonicalMarket, DailyPicksApiResponse } from '@/lib/daily-picks/types';
 
@@ -30,6 +31,26 @@ export function DailyPicksClient({ initialData }: DailyPicksClientProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastRefreshed, setLastRefreshed] = useState<Date>(new Date());
   const [timeAgo, setTimeAgo] = useState<string>('just now');
+  const [perfData, setPerfData] = useState<any | null>(null);
+  const [activeHorizon, setActiveHorizon] = useState<'today' | 'yesterday' | 'last7Days' | 'last30Days' | 'allTime'>('today');
+
+  const fetchPerformance = async () => {
+    try {
+      const res = await fetch('/api/performance');
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success) {
+          setPerfData(json);
+        }
+      }
+    } catch (e) {
+      console.warn('[DailyPicksClient] Performance telemetry unavailable:', e);
+    }
+  };
+
+  useEffect(() => {
+    fetchPerformance();
+  }, []);
 
   // Relative time tracker
   useEffect(() => {
@@ -48,9 +69,12 @@ export function DailyPicksClient({ initialData }: DailyPicksClientProps) {
   const handleRefresh = async () => {
     try {
       setIsRefreshing(true);
-      const res = await fetch('/api/daily-picks?refresh=true');
-      if (res.ok) {
-        const json = await res.json();
+      const [picksRes] = await Promise.all([
+        fetch('/api/daily-picks?refresh=true'),
+        fetchPerformance(),
+      ]);
+      if (picksRes.ok) {
+        const json = await picksRes.json();
         setData(json);
         setLastRefreshed(new Date());
       }
@@ -73,6 +97,40 @@ export function DailyPicksClient({ initialData }: DailyPicksClientProps) {
   const toggleExpand = (id: string) => {
     setExpandedId(expandedId === id ? null : id);
   };
+
+  const getActiveStats = () => {
+    if (!perfData) return null;
+    const h = perfData[activeHorizon] || perfData.today || null;
+    if (!h) return null;
+    const settled = h.settled ?? h.settledBets ?? 0;
+    const wins = h.wins ?? 0;
+    const losses = h.losses ?? 0;
+    const pushes = h.pushes ?? 0;
+    const halfWins = h.halfWins ?? 0;
+    const halfLosses = h.halfLosses ?? 0;
+    const stakeUnits = h.stakeUnits ?? 0;
+    const profitUnits = h.profitUnits ?? 0;
+    const yieldPct = h.yieldPct ?? 0;
+    const avgOdds = h.averageOdds ?? h.avgOdds ?? 0;
+    const avgConf = h.averageConfidence ?? h.avgConfidence ?? 0;
+    return {
+      settled,
+      wins,
+      losses,
+      pushes,
+      halfWins,
+      halfLosses,
+      stakeUnits,
+      profitUnits,
+      yieldPct,
+      avgOdds,
+      avgConf,
+    };
+  };
+
+  const activeStats = getActiveStats();
+  const totalOpenBets = perfData?.totalOpenBets ?? 0;
+  const totalOpenStakeUnits = perfData?.openStakeUnits ?? 0;
 
   return (
     <div className="flex flex-col min-h-screen bg-[#0B1120] font-sans text-[#F0F4F8]">
@@ -145,6 +203,138 @@ export function DailyPicksClient({ initialData }: DailyPicksClientProps) {
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+        {/* High-Confidence Prediction Ledger & Realized Yield Transparency Card */}
+        <div className="p-5 rounded-xl bg-[#131B2E] border border-[#1E293B] space-y-4 shadow-lg">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#1E293B]/80 pb-3">
+            <div className="space-y-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <Scale className="h-4 w-4 text-[#3B82F6]" />
+                <h2 className="text-base sm:text-lg font-black text-white tracking-tight">
+                  High-Confidence Prediction Ledger &amp; Realized Yield
+                </h2>
+                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-blue-950/80 text-[#3B82F6] border border-blue-800/60">
+                  CONFIDENCE &gt; 70% &bull; 1.0U VIRTUAL STAKES
+                </span>
+              </div>
+              <p className="text-xs font-mono text-[#94A3B8]">
+                Realized performance is calculated strictly on confirmed FT results via Exact Asian Handicap quarter-line decomposition.
+              </p>
+            </div>
+
+            {/* Horizon Switcher Tabs */}
+            <div className="flex items-center gap-1.5 p-1 bg-[#0B1120] rounded-lg border border-[#1E293B]">
+              {[
+                { key: 'today', label: 'Today' },
+                { key: 'yesterday', label: 'Yesterday' },
+                { key: 'last7Days', label: '7D' },
+                { key: 'last30Days', label: '30D' },
+                { key: 'allTime', label: 'All-Time' },
+              ].map((tab) => (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveHorizon(tab.key as any)}
+                  className={`px-2.5 py-1 rounded text-xs font-mono font-medium transition-all ${
+                    activeHorizon === tab.key
+                      ? 'bg-[#3B82F6] text-white font-bold shadow-sm'
+                      : 'text-[#94A3B8] hover:text-white hover:bg-[#1E293B]'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Performance Numbers Grid */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            {/* 1. Realized Yield */}
+            <div className="p-3.5 rounded-lg bg-[#0B1120]/70 border border-[#1E293B]">
+              <div className="text-[10px] font-mono text-[#94A3B8] uppercase flex items-center justify-between">
+                <span>Realized Yield</span>
+                <span className="text-[9px] text-emerald-400 font-bold">Settled Only</span>
+              </div>
+              <div className="mt-1.5 flex items-baseline gap-2">
+                <span
+                  className={`text-2xl sm:text-3xl font-black font-mono ${
+                    (activeStats?.yieldPct ?? 0) > 0
+                      ? 'text-emerald-400'
+                      : (activeStats?.yieldPct ?? 0) < 0
+                      ? 'text-rose-400'
+                      : 'text-slate-300'
+                  }`}
+                >
+                  {activeStats ? `${activeStats.yieldPct > 0 ? '+' : ''}${activeStats.yieldPct.toFixed(1)}%` : '0.0%'}
+                </span>
+              </div>
+              <div className="text-[11px] font-mono text-[#94A3B8] mt-1">
+                Profit: <strong className="text-white">{activeStats ? `${activeStats.profitUnits > 0 ? '+' : ''}${activeStats.profitUnits.toFixed(2)}u` : '0.00u'}</strong> on {activeStats ? activeStats.stakeUnits.toFixed(1) : '0.0'}u staked
+              </div>
+            </div>
+
+            {/* 2. Settled Match Record */}
+            <div className="p-3.5 rounded-lg bg-[#0B1120]/70 border border-[#1E293B]">
+              <div className="text-[10px] font-mono text-[#94A3B8] uppercase flex items-center justify-between">
+                <span>Settled Record</span>
+                <span className="text-[9px] text-[#3B82F6]">N = {activeStats?.settled ?? 0}</span>
+              </div>
+              <div className="mt-1.5 text-lg sm:text-xl font-bold font-mono text-white">
+                {activeStats?.wins ?? 0}W - {activeStats?.losses ?? 0}L - {activeStats?.pushes ?? 0}P
+                {(activeStats?.halfWins ?? 0) > 0 || (activeStats?.halfLosses ?? 0) > 0 ? (
+                  <span className="text-xs text-[#94A3B8] ml-1">
+                    ({activeStats?.halfWins ?? 0}HW / {activeStats?.halfLosses ?? 0}HL)
+                  </span>
+                ) : null}
+              </div>
+              <div className="text-[11px] font-mono text-[#94A3B8] mt-1">
+                Strike Rate:{' '}
+                <strong className="text-white">
+                  {activeStats && activeStats.settled > 0
+                    ? `${(((activeStats.wins + 0.5 * activeStats.halfWins) / activeStats.settled) * 100).toFixed(1)}%`
+                    : 'N/A'}
+                </strong>
+              </div>
+            </div>
+
+            {/* 3. Open Exposure (Segregated from realized yield) */}
+            <div className="p-3.5 rounded-lg bg-[#0B1120]/70 border border-[#1E293B]">
+              <div className="text-[10px] font-mono text-[#94A3B8] uppercase flex items-center justify-between">
+                <span>Open Exposure</span>
+                <span className="text-[9px] text-amber-400 font-bold">Unsettled</span>
+              </div>
+              <div className="mt-1.5 text-2xl sm:text-3xl font-black font-mono text-amber-300">
+                {totalOpenBets} <span className="text-xs font-normal text-[#94A3B8]">bets</span>
+              </div>
+              <div className="text-[11px] font-mono text-[#94A3B8] mt-1">
+                Staked: <strong className="text-white">{totalOpenStakeUnits.toFixed(1)}u</strong> &bull; <span className="text-slate-400">Zero yield impact until FT</span>
+              </div>
+            </div>
+
+            {/* 4. Execution Quality */}
+            <div className="p-3.5 rounded-lg bg-[#0B1120]/70 border border-[#1E293B]">
+              <div className="text-[10px] font-mono text-[#94A3B8] uppercase flex items-center justify-between">
+                <span>Execution Quality</span>
+                <span className="text-[9px] text-emerald-400 font-bold">Pinnacle Benchmark</span>
+              </div>
+              <div className="mt-1.5 text-lg sm:text-xl font-bold font-mono text-white">
+                Avg @ {activeStats?.avgOdds ? activeStats.avgOdds.toFixed(2) : '—'}
+              </div>
+              <div className="text-[11px] font-mono text-[#94A3B8] mt-1">
+                Avg Conf: <strong className="text-white">{activeStats?.avgConf ? `${activeStats.avgConf.toFixed(1)}%` : '—'}</strong> (Gate &gt; 70%)
+              </div>
+            </div>
+          </div>
+
+          {/* Mathematical Invariant & Policy Ribbon */}
+          <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[#1E293B]/60 text-[10px] font-mono text-[#64748B]">
+            <span>
+              &bull; Mathematical definition: <code className="text-[#94A3B8]">Yield = Profit Units / Staked Units &times; 100%</code> (never win rate).
+            </span>
+            <span>
+              &bull; Kickoff Invariant: Bets lock at kickoff; post-kickoff odds changes never overwrite locked entry.
+            </span>
+          </div>
+        </div>
+
         {/* Market Filter Bar */}
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#1E293B] pb-4">
           <div className="flex items-center gap-2 overflow-x-auto pb-1">

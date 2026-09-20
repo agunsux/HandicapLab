@@ -78,6 +78,10 @@ export interface ProductionSignalDTO {
   payloadHash: string;
 
   // Provenance Breakdown
+  modelVersion?: string;
+  recommendation?: string;
+  bookmaker?: string;
+  competitionId?: number | string;
   providerProvenance: {
     fixtures: string;
     odds: string;
@@ -117,4 +121,37 @@ export interface ReconciliationReport {
     apiFootball: number;
     oddsPapi: number;
   };
+}
+
+export interface MarketSignalInput {
+  canonicalMatchId: string;
+  fixtureId: string;
+  providerFixtureId: string;
+  homeTeam: string;
+  awayTeam: string;
+  competition: string;
+  leagueKey: string;
+  kickoffUtc: string;
+  market: CanonicalMarket;
+  selection: string;
+  line: number;
+  marketOdds: number;
+  fairOdds: number;
+  modelProbability: number;
+  edge: number;
+  expectedValue: number;
+  confidence: number;
+  recommendation?: string;
+  oddsTimestampUtc: string;
+  predictionTimestampUtc: string;
+  modelVersion: string;
+  providerSources: {
+    fixtures: string;
+    odds: string;
+    statistics: string;
+  };
+  sampleSizeHome: number;
+  sampleSizeAway: number;
+  quotaAllowed: boolean;
+  bookmaker?: string;
 }

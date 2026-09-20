@@ -1,0 +1,333 @@
+// ============================================================================
+// PRODUCTION SETTLEMENT ENGINE SERVICE
+// ============================================================================
+// Location: src/lib/ledger/productionSettlementService.ts
+//
+// Invariants:
+// 1. Reuses authoritative ExactSettlementEngine for AH quarter-lines, OU, and BTTS.
+// 2. Only settles confirmed final fixtures (FT, AET, PEN).
+// 3. Postponed matches remain unsettled (AWAITING_RESULT).
+// 4. Cancelled/abandoned fixtures become VOID (profit = 0.0).
+// 5. Incomplete results flag DATA_ERROR. Never guesses.
+// 6. Idempotent: Settled predictions can never be settled twice.
+// ============================================================================
+
+import { ExactSettlementEngine, SettlementResult } from '@/lib/research/settlement/exactSettlement';
+import {
+  HighConfidenceLedgerEntry,
+  SettlementDetails,
+  SettlementOutcome,
+} from './types';
+import { DurableLedgerStore } from './durableLedgerStore';
+import { DailyPerformanceService } from './dailyPerformanceService';
+
+export interface AuthoritativeMatchResult {
+  fixtureId: string;
+  status: 'FT' | 'AET' | 'PEN' | 'PST' | 'CANC' | 'ABD' | 'NS' | 'LIVE' | string;
+  homeGoals: number | null;
+  awayGoals: number | null;
+  provider?: string;
+  receivedAtUtc?: string;
+  closingOdds?: number;
+}
+
+export interface SettlementBatchReport {
+  timestampUtc: string;
+  checkedCount: number;
+  settledCount: number;
+  voidCount: number;
+  skippedCount: number;
+  errorCount: number;
+  settledLedgerIds: string[];
+}
+
+export class ProductionSettlementService {
+  /**
+   * Settles an individual high-confidence ledger entry against an authoritative match result.
+   */
+  public static async settleEntry(
+    entry: HighConfidenceLedgerEntry,
+    result: AuthoritativeMatchResult
+  ): Promise<{ settled: boolean; outcome?: SettlementOutcome; reason?: string }> {
+    // 1. Idempotency Check: Cannot settle already settled bets
+    if (entry.status === 'SETTLED' || entry.settlementStatus !== null) {
+      return { settled: false, reason: 'ALREADY_SETTLED' };
+    }
+
+    const normStatus = result.status?.toUpperCase() || 'UNKNOWN';
+
+    // 2. Postponed Match Gate: Match has not been played yet
+    if (normStatus === 'PST' || normStatus === 'POSTPONED') {
+      return { settled: false, reason: 'MATCH_POSTPONED: Postponed match does not settle' };
+    }
+
+    // 3. Cancelled / Abandoned Match: Settle as VOID
+    if (normStatus === 'CANC' || normStatus === 'CANCELLED' || normStatus === 'ABD' || normStatus === 'ABANDONED') {
+      const nowIso = new Date().toISOString();
+      const settlement: SettlementDetails = {
+        settlementId: `stl_void_${entry.ledgerId}`,
+        ledgerId: entry.ledgerId,
+        signalId: entry.signalId,
+        fixtureId: entry.fixtureId,
+        homeGoals: result.homeGoals ?? 0,
+        awayGoals: result.awayGoals ?? 0,
+        finalStatus: normStatus,
+        outcome: 'VOID',
+        profitUnits: 0.0,
+        returnUnits: entry.stakeUnits, // Stake returned
+        closingOdds: entry.odds,
+        closingProbability: entry.modelProbability,
+        clv: 0.0,
+        settledAt: nowIso,
+        resultProvider: result.provider || 'api-football',
+        resultReceivedAt: result.receivedAtUtc || nowIso,
+        resultVersion: 'v1.0',
+      };
+
+      await DurableLedgerStore.recordSettlement(settlement);
+
+      DurableLedgerStore.logEvent({
+        eventId: `evt_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+        ledgerId: entry.ledgerId,
+        signalId: entry.signalId,
+        fromState: entry.status,
+        toState: 'SETTLED',
+        reason: `Match cancelled or abandoned. Settled as VOID with stake returned.`,
+        timestampUtc: nowIso,
+        actor: 'SETTLEMENT_ENGINE',
+      });
+
+      return { settled: true, outcome: 'VOID' };
+    }
+
+    // 4. Incomplete Match Check (Not finished yet)
+    const isFinal = normStatus === 'FT' || normStatus === 'AET' || normStatus === 'PEN' || normStatus === 'FINAL' || normStatus === 'FINISHED';
+    if (!isFinal) {
+      return { settled: false, reason: `MATCH_NOT_FINAL: Match status '${normStatus}' is not final` };
+    }
+
+    // 5. Missing Goals / Data Error Check
+    if (result.homeGoals === null || result.awayGoals === null || isNaN(result.homeGoals) || isNaN(result.awayGoals)) {
+      entry.status = 'DATA_ERROR';
+      entry.rejectionReason = 'MISSING_RESULT_GOALS: Match marked final but score is null or invalid';
+      const ledger = DurableLedgerStore.loadLedger();
+      ledger[entry.ledgerId] = entry;
+      DurableLedgerStore.saveLedger(ledger);
+
+      return { settled: false, reason: 'DATA_ERROR: Incomplete score data' };
+    }
+
+    const homeGoals = result.homeGoals;
+    const awayGoals = result.awayGoals;
+    const totalGoals = homeGoals + awayGoals;
+
+    // 6. Execute Authoritative Settlement via ExactSettlementEngine
+    let settleRes: SettlementResult;
+    try {
+      if (entry.market === 'AH') {
+        let side: 'HOME' | 'AWAY' = 'HOME';
+        const selLower = entry.selection.toLowerCase();
+        if (selLower.includes('away') || (entry.awayTeam && selLower.includes(entry.awayTeam.toLowerCase()))) {
+          side = 'AWAY';
+        } else if (selLower.includes('home') || (entry.homeTeam && selLower.includes(entry.homeTeam.toLowerCase()))) {
+          side = 'HOME';
+        }
+        settleRes = ExactSettlementEngine.settleAsianHandicap(
+          homeGoals,
+          awayGoals,
+          entry.line,
+          entry.odds,
+          side,
+          entry.stakeUnits
+        );
+      } else if (entry.market === 'OU') {
+        const side: 'OVER' | 'UNDER' = entry.selection.toUpperCase().includes('UNDER') ? 'UNDER' : 'OVER';
+        settleRes = ExactSettlementEngine.settleOverUnder(
+          totalGoals,
+          entry.line,
+          entry.odds,
+          side,
+          entry.stakeUnits
+        );
+      } else if (entry.market === 'BTTS') {
+        const side: 'YES' | 'NO' = entry.selection.toUpperCase().includes('NO') ? 'NO' : 'YES';
+        settleRes = ExactSettlementEngine.settleBtts(
+          homeGoals,
+          awayGoals,
+          entry.odds,
+          side,
+          entry.stakeUnits
+        );
+      } else {
+        throw new Error(`Unsupported market '${entry.market}' in settlement engine.`);
+      }
+    } catch (calcErr: any) {
+      entry.status = 'DATA_ERROR';
+      entry.rejectionReason = `SETTLEMENT_CALCULATION_ERROR: ${calcErr.message}`;
+      const ledger = DurableLedgerStore.loadLedger();
+      ledger[entry.ledgerId] = entry;
+      DurableLedgerStore.saveLedger(ledger);
+
+      return { settled: false, reason: `DATA_ERROR: Calculation error: ${calcErr.message}` };
+    }
+
+    // 7. Calculate CLV (Closing Line Value)
+    const closingOdds = result.closingOdds || entry.odds;
+    const closingProb = closingOdds > 1 ? 1 / closingOdds : entry.modelProbability;
+    const clv = Number(((entry.odds / closingOdds) - 1).toFixed(4));
+
+    // 8. Record Settlement
+    const nowIso = new Date().toISOString();
+    const settlement: SettlementDetails = {
+      settlementId: `stl_${entry.ledgerId}`,
+      ledgerId: entry.ledgerId,
+      signalId: entry.signalId,
+      fixtureId: entry.fixtureId,
+      homeGoals,
+      awayGoals,
+      finalStatus: normStatus,
+      outcome: settleRes.outcome,
+      profitUnits: settleRes.profit,
+      returnUnits: settleRes.returnAmount,
+      closingOdds,
+      closingProbability: closingProb,
+      clv,
+      settledAt: nowIso,
+      resultProvider: result.provider || 'api-football',
+      resultReceivedAt: result.receivedAtUtc || nowIso,
+      resultVersion: 'v1.0',
+    };
+
+    await DurableLedgerStore.recordSettlement(settlement);
+
+    // 9. Log Transition Event
+    DurableLedgerStore.logEvent({
+      eventId: `evt_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+      ledgerId: entry.ledgerId,
+      signalId: entry.signalId,
+      fromState: entry.status,
+      toState: 'SETTLED',
+      reason: `Settled as ${settleRes.outcome} (${homeGoals}-${awayGoals}). Profit: ${settleRes.profit > 0 ? '+' : ''}${settleRes.profit}u.`,
+      timestampUtc: nowIso,
+      actor: 'SETTLEMENT_ENGINE',
+    });
+
+    // 10. Update Daily Performance Aggregation
+    const matchDate = entry.kickoffUtc.slice(0, 10);
+    await DailyPerformanceService.recalculateDailySummary(matchDate);
+
+    return { settled: true, outcome: settleRes.outcome };
+  }
+
+  /**
+   * Settles all unsettled ledger entries whose matches have completed in the provided results map.
+   */
+  public static async settleBatch(
+    results: AuthoritativeMatchResult[]
+  ): Promise<SettlementBatchReport> {
+    const report: SettlementBatchReport = {
+      timestampUtc: new Date().toISOString(),
+      checkedCount: 0,
+      settledCount: 0,
+      voidCount: 0,
+      skippedCount: 0,
+      errorCount: 0,
+      settledLedgerIds: [],
+    };
+
+    const resultsMap = new Map<string, AuthoritativeMatchResult>();
+    for (const res of results) {
+      resultsMap.set(res.fixtureId, res);
+    }
+
+    const ledger = DurableLedgerStore.loadLedger();
+    const candidates = Object.values(ledger).filter(
+      (e) => e.status === 'LOCKED' || e.status === 'AWAITING_RESULT' || e.status === 'RECORDED'
+    );
+
+    report.checkedCount = candidates.length;
+
+    for (const entry of candidates) {
+      const matchRes = resultsMap.get(entry.fixtureId);
+      if (!matchRes) {
+        report.skippedCount++;
+        continue;
+      }
+
+      const res = await this.settleEntry(entry, matchRes);
+      if (res.settled) {
+        report.settledCount++;
+        report.settledLedgerIds.push(entry.ledgerId);
+        if (res.outcome === 'VOID') {
+          report.voidCount++;
+        }
+      } else if (res.reason?.startsWith('DATA_ERROR')) {
+        report.errorCount++;
+      } else {
+        report.skippedCount++;
+      }
+    }
+
+    return report;
+  }
+
+  /**
+   * Automatically discovers unsettled bets, queries authoritative provider scores,
+   * and settles completed matches. Safe for crons and background workers.
+   */
+  public static async settlePendingBets(nowMs: number = Date.now()): Promise<SettlementBatchReport> {
+    const { HighConfidenceLedgerService } = await import('./highConfidenceLedgerService');
+    await HighConfidenceLedgerService.lockBetsForKickoff(nowMs);
+
+    const ledger = DurableLedgerStore.loadLedger();
+    const candidates = Object.values(ledger).filter(
+      (e) => e.status === 'LOCKED' || e.status === 'AWAITING_RESULT' || e.status === 'RECORDED'
+    );
+
+    if (candidates.length === 0) {
+      return {
+        timestampUtc: new Date().toISOString(),
+        checkedCount: 0,
+        settledCount: 0,
+        voidCount: 0,
+        skippedCount: 0,
+        errorCount: 0,
+        settledLedgerIds: [],
+      };
+    }
+
+    const results: AuthoritativeMatchResult[] = [];
+    const uniqueFixtures = new Map<string, typeof candidates[0]>();
+    for (const e of candidates) {
+      uniqueFixtures.set(e.fixtureId, e);
+    }
+
+    try {
+      const { apiFootballClient } = await import('@/lib/apis/apifootball');
+      for (const [fixtureId, entry] of uniqueFixtures.entries()) {
+        try {
+          const numericId = parseInt(entry.fixtureId.replace(/\D/g, ''), 10);
+          if (numericId && !isNaN(numericId)) {
+            const apiRes = await apiFootballClient.getFixtureById(numericId);
+            if (apiRes?.fixture) {
+              results.push({
+                fixtureId,
+                status: apiRes.fixture.status?.short || 'UNKNOWN',
+                homeGoals: apiRes.goals?.home ?? null,
+                awayGoals: apiRes.goals?.away ?? null,
+                provider: 'api-football-pro',
+                receivedAtUtc: new Date().toISOString(),
+              });
+            }
+          }
+        } catch (fErr: any) {
+          console.warn(`[ProductionSettlementService] Error fetching fixture ${fixtureId}:`, fErr?.message);
+        }
+      }
+    } catch (importErr: any) {
+      console.warn('[ProductionSettlementService] Could not import apiFootballClient:', importErr?.message);
+    }
+
+    return await this.settleBatch(results);
+  }
+}

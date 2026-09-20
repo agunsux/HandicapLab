@@ -637,6 +637,22 @@ export class ApiFootballClient {
 }
 
   /**
+   * Fetch a single fixture by its provider ID
+   */
+  public async getFixtureById(
+    fixtureId: number,
+    options?: FetchOptions
+  ): Promise<ApiFootballFixtureResponseItem | undefined> {
+    const res = await this.request(
+      'fixtures',
+      { id: String(fixtureId) },
+      ApiFootballFixturesResponseSchema,
+      options
+    );
+    return res?.response?.[0];
+  }
+
+  /**
    * Fetch fixtures for a given league and season
    */
   public async getFixtures(

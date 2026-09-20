@@ -22,6 +22,7 @@ import {
   ProductionSignalDTO,
   PublishTransitionEvent,
   ReconciliationReport,
+  MarketSignalInput,
 } from './types';
 import { ProductionValidityGate } from './productionValidityGate';
 import { ChangeDetectionEngine } from './changeDetection';
@@ -32,6 +33,7 @@ import { getLeagueByKey, getLeagueByAfId } from '@/lib/config/multiLeagueRegistr
 import { ValueEngine } from '@/lib/engine/valueEngine';
 import { buildScoreGrid, calculateAsianHandicapProbability, calculateOverUnderProbability, fairOdds } from '@/lib/engine/probability';
 import { calculateBttsFromGrid } from '@/lib/research/bttsEngine';
+import { HighConfidenceLedgerService } from '@/lib/ledger/highConfidenceLedgerService';
 import { supabase } from '@/lib/supabase.server';
 
 const STORE_PATH = path.resolve('data/cache/canonical_published_signals.json');
@@ -117,19 +119,21 @@ export class ProductionPublishingEngine {
    *   - Read-Through Freshness Expiry
    */
   public static async reconcileAndPublish(options: {
-    triggeredBy?: 'SCHEDULER_CRON' | 'EVENT_QUEUE' | 'PROVIDER_UPDATE' | 'READ_THROUGH' | 'MANUAL_OVERRIDE';
+    triggeredBy?: 'SCHEDULER_CRON' | 'EVENT_QUEUE' | 'PROVIDER_UPDATE' | 'READ_THROUGH' | 'MANUAL_OVERRIDE' | string;
     forceRefresh?: boolean;
     customFixtures?: CanonicalFixture[];
     customOdds?: any[];
+    customSignals?: MarketSignalInput[];
+    nowMs?: number;
   } = {}): Promise<ReconciliationReport> {
     const startTimeMs = Date.now();
-    const triggeredBy = options.triggeredBy || 'SCHEDULER_CRON';
+    const triggeredBy = (options.triggeredBy as any) || 'SCHEDULER_CRON';
     const store = this.loadStore();
 
     // 1. Automatic Removal of Expired Signals (past kickoff)
     let removedCount = 0;
-    const nowIso = new Date().toISOString();
-    const nowMs = Date.now();
+    const nowMs = options.nowMs || Date.now();
+    const nowIso = new Date(nowMs).toISOString();
 
     for (const [key, signal] of Object.entries(store)) {
       const kickMs = new Date(signal.kickoffUtc).getTime();
@@ -154,6 +158,135 @@ export class ProductionPublishingEngine {
           triggeredBy,
         });
       }
+    }
+
+    // Lock high-confidence bets whose kickoff has passed
+    try {
+      await HighConfidenceLedgerService.lockBetsForKickoff(nowMs);
+    } catch (lockErr) {
+      console.warn('[ProductionPublishingEngine] Warning locking bets for kickoff:', lockErr);
+    }
+
+    // Direct Signal Reconciliation Path (when customSignals are provided)
+    if (options.customSignals && options.customSignals.length > 0) {
+      let publishedCount = 0;
+      let updatedCount = 0;
+      let heldCount = 0;
+      let shadowCount = 0;
+      let failedCount = 0;
+      let evaluatedPredictions = 0;
+
+      for (const sigInput of options.customSignals) {
+        evaluatedPredictions++;
+        const validity = ProductionValidityGate.evaluate(sigInput);
+        const confPresentation = mapConfidenceToStrength(sigInput.confidence);
+        const ageSec = Math.max(0, Math.floor((nowMs - new Date(sigInput.oddsTimestampUtc).getTime()) / 1000));
+        const freshnessText =
+          ageSec < 60 ? 'just now' : ageSec < 3600 ? `${Math.floor(ageSec / 60)}m ago` : `${Math.floor(ageSec / 3600)}h ago`;
+
+        const candidateSignal: ProductionSignalDTO = {
+          signalId: `sig_${sigInput.fixtureId}_${sigInput.market}_${sigInput.line}`.replace(/[^a-zA-Z0-9_-]/g, '_'),
+          canonicalMatchId: sigInput.canonicalMatchId,
+          fixtureId: sigInput.fixtureId,
+          providerFixtureId: sigInput.providerFixtureId,
+          match: `${sigInput.homeTeam} vs ${sigInput.awayTeam}`,
+          homeTeam: sigInput.homeTeam,
+          awayTeam: sigInput.awayTeam,
+          competition: sigInput.competition || 'Premier League',
+          leagueKey: sigInput.leagueKey,
+          leagueTier: 'A',
+          kickoffUtc: sigInput.kickoffUtc,
+          market: sigInput.market,
+          selection: sigInput.selection,
+          line: sigInput.line,
+          currentOdds: sigInput.marketOdds,
+          modelProbability: sigInput.modelProbability,
+          marketProbability: Number((1 / sigInput.marketOdds).toFixed(4)),
+          edge: sigInput.edge,
+          expectedValue: sigInput.expectedValue,
+          fairOdds: sigInput.fairOdds,
+          confidence: sigInput.confidence,
+          strengthLevel: confPresentation.strengthLevel,
+          signalColor: confPresentation.signalColor,
+          confidenceDisclaimer: confPresentation.disclaimer,
+          publishState: validity.isValid ? 'PUBLISHED' : validity.state,
+          validityStatus: validity.validityStatus,
+          rejectionReason: validity.rejectionReason,
+          dataFreshnessSeconds: ageSec,
+          freshnessText,
+          predictionTimestampUtc: sigInput.predictionTimestampUtc,
+          oddsTimestampUtc: sigInput.oddsTimestampUtc,
+          lastReconciledUtc: nowIso,
+          payloadHash: '',
+          providerProvenance: {
+            fixtures: sigInput.providerSources.fixtures,
+            odds: sigInput.providerSources.odds,
+            statistics: sigInput.providerSources.statistics,
+            modelVersion: sigInput.modelVersion,
+          },
+        };
+
+        candidateSignal.payloadHash = ChangeDetectionEngine.computePayloadHash(candidateSignal);
+        const existingSignal = store[candidateSignal.signalId];
+        const diff = ChangeDetectionEngine.detectChanges(candidateSignal, existingSignal);
+
+        if (diff.hasChanged) {
+          const prevState = existingSignal?.publishState || null;
+          store[candidateSignal.signalId] = candidateSignal;
+
+          if (candidateSignal.publishState === 'PUBLISHED') {
+            if (diff.isNew) publishedCount++;
+            else updatedCount++;
+
+            if (candidateSignal.confidence > 70) {
+              await HighConfidenceLedgerService.qualifyAndRecordPrediction(candidateSignal as any);
+            }
+          } else if (candidateSignal.publishState === 'HELD') {
+            heldCount++;
+          } else if (candidateSignal.publishState === 'SHADOW') {
+            shadowCount++;
+          } else {
+            failedCount++;
+          }
+
+          this.logTransition({
+            transitionId: `tr_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+            signalId: candidateSignal.signalId,
+            canonicalMatchId: candidateSignal.canonicalMatchId,
+            market: candidateSignal.market,
+            selection: candidateSignal.selection,
+            previousState: prevState,
+            newState: candidateSignal.publishState,
+            transitionReason: diff.isNew ? 'Initial production publication' : diff.reasons.join(', '),
+            timestampUtc: nowIso,
+            payloadHash: candidateSignal.payloadHash,
+            triggeredBy: triggeredBy as any,
+          });
+        }
+      }
+
+      this.saveStore(store);
+      this.lastReconcileTimeMs = Date.now();
+
+      const quotaState = OddsPapiQuotaAllocator.loadState();
+      return {
+        timestampUtc: nowIso,
+        triggeredBy,
+        discoveredFixtures: options.customSignals.length,
+        reconciledOdds: options.customSignals.length,
+        evaluatedPredictions,
+        publishedCount,
+        updatedCount,
+        heldCount,
+        shadowCount,
+        removedCount,
+        failedCount,
+        durationMs: Date.now() - startTimeMs,
+        quotaRemaining: {
+          apiFootball: 7466,
+          oddsPapi: quotaState.totalRemaining,
+        },
+      };
     }
 
     // 2. Discover Fixtures
@@ -384,6 +517,15 @@ export class ProductionPublishingEngine {
           if (candidateSignal.publishState === 'PUBLISHED') {
             if (diff.isNew) publishedCount++;
             else updatedCount++;
+
+            // If confidence > 70%, automatically record into High-Confidence Virtual Bet Ledger
+            if (candidateSignal.confidence > 70) {
+              try {
+                await HighConfidenceLedgerService.qualifyAndRecordPrediction(candidateSignal, { nowMs });
+              } catch (recErr) {
+                console.warn('[ProductionPublishingEngine] Warning recording high-confidence bet:', recErr);
+              }
+            }
           } else if (candidateSignal.publishState === 'SHADOW') {
             shadowCount++;
           } else {

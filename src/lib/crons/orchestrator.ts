@@ -40,6 +40,9 @@ import { computeAllocation, updateFixtureVolumes, updateLeagueEfficiency } from 
 import { syncLeaguesFromProvider, getActiveLeagues } from '@/lib/config/leagueRegistry';
 import { runHistoricalIngestor } from '@/lib/crons/historicalIngestor';
 import { ProductionPublishingEngine } from '@/lib/publishing/productionPublishingEngine';
+import { ProductionSettlementService } from '@/lib/ledger/productionSettlementService';
+import { DailyPerformanceService } from '@/lib/ledger/dailyPerformanceService';
+
 export interface OrchestratorReport {
   recoveredStuckEvents: number;
   queueDepth: { pending: number; processing: number; failed: number; completed: number };
@@ -58,6 +61,7 @@ export interface OrchestratorReport {
   providerHealth: Awaited<ReturnType<typeof getProviderHealth>>;
   leagueProgress: Awaited<ReturnType<typeof getLeagueImportProgress>>;
   durationMs: number;
+  highConfidenceSettlements?: number;
 }
 
 // ─── Recovery Phase ─────────────────────────────────────────────────
@@ -399,6 +403,16 @@ export async function runOrchestrator(): Promise<OrchestratorReport> {
       console.warn('[Orchestrator] Production publishing reconciliation warning:', e);
     }
 
+    // Phase 9: High-Confidence Virtual Bet Settlement & Daily Yield calculation
+    let highConfidenceSettlements = 0;
+    try {
+      const settlementBatch = await ProductionSettlementService.settlePendingBets();
+      highConfidenceSettlements = settlementBatch.settledCount;
+      await DailyPerformanceService.calculateDailySummary();
+    } catch (e) {
+      console.warn('[Orchestrator] High-confidence settlement warning:', e);
+    }
+
     // Get final state
     const queueDepth = await getQueueDepth();
     const leagueProgress = await getLeagueImportProgress();
@@ -419,6 +433,7 @@ export async function runOrchestrator(): Promise<OrchestratorReport> {
         predictionsGenerated,
         snapshotsBuilt: snapResult.built,
         settlementsProcessed,
+        highConfidenceSettlements,
         metricsUpdated,
         leaguesPromoted,
         historicalBatchesRun,
@@ -435,6 +450,7 @@ export async function runOrchestrator(): Promise<OrchestratorReport> {
       predictions: predictionsGenerated,
       snapshots: snapResult,
       settlements: settlementsProcessed,
+      highConfidenceSettlements,
       metrics: metricsUpdated,
       leagues: leaguesPromoted,
       historical: historicalBatchesRun,
@@ -449,6 +465,7 @@ export async function runOrchestrator(): Promise<OrchestratorReport> {
       snapshotErrors: snapResult.errors,
       predictionsGenerated,
       settlementsProcessed,
+      highConfidenceSettlements,
       metricsUpdated,
       leaguesPromoted,
       historicalBatchesRun,
