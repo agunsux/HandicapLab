@@ -9,7 +9,6 @@ import { getProviderHealth } from '@/lib/providers/quotaManager';
 import { getQueueDepth } from '@/lib/crons/eventQueue';
 import { getLeagueImportProgress } from '@/lib/crons/fixtureState';
 
-export const maxDuration = 300;
 
 const WINDOW_LABELS: Record<number, string> = {
   6: 'morning',

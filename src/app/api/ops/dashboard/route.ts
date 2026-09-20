@@ -13,7 +13,6 @@ import { getLeagueImportProgress } from '@/lib/crons/fixtureState';
 import { getRecentAuditEvents, getAuditSummary } from '@/lib/crons/auditTrail';
 import { getAllLeagueProfiles, initializeLeagues } from '@/lib/crons/leagueEvolution';
 
-export const maxDuration = 300;
 
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get('authorization');

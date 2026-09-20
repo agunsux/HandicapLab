@@ -15,7 +15,6 @@ import { ProductionSettlementService } from '@/lib/ledger/productionSettlementSe
 import { DailyPerformanceService } from '@/lib/ledger/dailyPerformanceService';
 import { DurableLedgerStore } from '@/lib/ledger/durableLedgerStore';
 
-export const maxDuration = 300;
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {

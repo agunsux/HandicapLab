@@ -16,7 +16,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ProductionPublishingEngine } from '@/lib/publishing/productionPublishingEngine';
 
-export const maxDuration = 300;
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
