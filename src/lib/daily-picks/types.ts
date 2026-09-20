@@ -6,6 +6,7 @@
 // ============================================================================
 
 export type CanonicalMarket = 'AH' | 'OU' | 'BTTS';
+import type { PublishState } from '@/lib/publishing/types';
 
 export type ValidationStatus =
   | 'VALUE_CANDIDATE'
@@ -90,6 +91,11 @@ export interface DailyPickRecord {
   status: PredictionStatus;
   lifecycleStage?: PredictionLifecycleStage;
   horizonBucket?: PredictionHorizonBucket;
+  strengthLevel?: 'STRONG' | 'MODERATE' | 'WEAK' | 'VERY_WEAK';
+  signalColor?: 'green' | 'yellow' | 'orange' | 'red';
+  publishState?: PublishState;
+  confidenceDisclaimer?: string;
+  freshnessText?: string;
   apiFootballFixtureTimestamp: string;
   footyStatsSnapshotTimestamp?: string;
   oddsPapiSnapshotTimestamp: string;

@@ -238,20 +238,57 @@ export function DailyPicksClient({ initialData }: DailyPicksClientProps) {
                       </span>
                     </div>
 
-                    {/* Fixture Matchup */}
-                    <div className="flex items-center justify-between">
+                    {/* Fixture Matchup & Signal Strength */}
+                    <div className="flex flex-wrap items-center justify-between gap-2">
                       <div className="text-base sm:text-lg font-bold text-white">
                         {pick.homeTeam} <span className="text-[#64748B] font-normal">vs</span> {pick.awayTeam}
                       </div>
-                      <span
-                        className={`text-[11px] font-mono px-2 py-0.5 rounded font-semibold ${
-                          isEvPositive
-                            ? 'bg-emerald-950 text-emerald-400 border border-emerald-800'
-                            : 'bg-slate-800 text-slate-400 border border-slate-700'
-                        }`}
-                      >
-                        {isEvPositive ? 'LAYAK (EV+)' : 'PANTAU'}
-                      </span>
+                      <div className="flex items-center gap-1.5">
+                        {/* 4-Tier Visual Signal Strength Badge (Presentation Only) */}
+                        {(() => {
+                          const conf = Math.max(0, Math.min(100, Math.round(pick.confidence)));
+                          if (conf >= 60) {
+                            return (
+                              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-mono font-bold bg-emerald-950 text-emerald-400 border border-emerald-800">
+                                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                                {conf}% &bull; STRONG
+                              </span>
+                            );
+                          }
+                          if (conf >= 50) {
+                            return (
+                              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-mono font-bold bg-amber-950 text-amber-400 border border-amber-800">
+                                <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+                                {conf}% &bull; MODERATE
+                              </span>
+                            );
+                          }
+                          if (conf >= 40) {
+                            return (
+                              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-mono font-bold bg-orange-950 text-orange-400 border border-orange-800">
+                                <span className="h-1.5 w-1.5 rounded-full bg-orange-400" />
+                                {conf}% &bull; WEAK
+                              </span>
+                            );
+                          }
+                          return (
+                            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-mono font-bold bg-red-950 text-red-400 border border-red-800">
+                              <span className="h-1.5 w-1.5 rounded-full bg-red-400" />
+                              {conf}% &bull; VERY WEAK
+                            </span>
+                          );
+                        })()}
+
+                        <span
+                          className={`text-[11px] font-mono px-2 py-0.5 rounded font-semibold ${
+                            isEvPositive
+                              ? 'bg-emerald-950 text-emerald-400 border border-emerald-800'
+                              : 'bg-slate-800 text-slate-400 border border-slate-700'
+                          }`}
+                        >
+                          {isEvPositive ? 'LAYAK (EV+)' : 'PANTAU'}
+                        </span>
+                      </div>
                     </div>
                   </div>
 
@@ -309,36 +346,79 @@ export function DailyPicksClient({ initialData }: DailyPicksClientProps) {
                       </span>
                     </div>
 
-                    {/* Expandable Provenance Section */}
+                    {/* Confidence Scientific Explainability Ribbon */}
+                    <div className="text-[10px] font-mono text-[#64748B] bg-[#0B1120]/40 p-2 rounded border border-[#1E293B]/50 flex items-center justify-between">
+                      <span>Robustness Score: <strong className="text-white">{pick.confidence}/100</strong></span>
+                      <span className="text-[9px] text-[#64748B] italic">Separate from win probability</span>
+                    </div>
+
+                    {/* Expandable Provenance Section (15 Required SALMO Production Fields) */}
                     {isExpanded && (
-                      <div className="p-3 rounded-lg bg-[#0B1120] border border-[#1E293B] space-y-2 text-[11px] font-mono text-[#94A3B8]">
-                        <div className="text-xs font-bold text-white flex items-center gap-1.5">
-                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
-                          Audited Odds Provenance
+                      <div className="p-3 rounded-lg bg-[#0B1120] border border-[#1E293B] space-y-2.5 text-[11px] font-mono text-[#94A3B8]">
+                        <div className="text-xs font-bold text-white flex items-center justify-between">
+                          <span className="flex items-center gap-1.5">
+                            <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+                            Audited Production Provenance
+                          </span>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800">
+                            {pick.publishState || 'PUBLISHED'}
+                          </span>
                         </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-1">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-[#1E293B]/70">
                           <div>
-                            <span className="text-[#64748B]">Fixture ID: </span>
-                            <span className="text-white">{pick.fixtureId}</span>
+                            <span className="text-[#64748B]">Match: </span>
+                            <span className="text-white">{pick.homeTeam} vs {pick.awayTeam}</span>
                           </div>
                           <div>
-                            <span className="text-[#64748B]">Bookmaker: </span>
-                            <span className="text-white">Pinnacle</span>
+                            <span className="text-[#64748B]">Competition: </span>
+                            <span className="text-white">{pick.competition}</span>
                           </div>
                           <div>
-                            <span className="text-[#64748B]">Odds Snapshot: </span>
-                            <span className="text-white">{pick.oddsTimestampUtc?.slice(11, 19)} UTC</span>
+                            <span className="text-[#64748B]">Market &amp; Selection: </span>
+                            <span className="text-white">{pick.selection}</span>
                           </div>
                           <div>
-                            <span className="text-[#64748B]">Prediction Time: </span>
-                            <span className="text-white">{pick.predictionTimestampUtc?.slice(11, 19)} UTC</span>
+                            <span className="text-[#64748B]">Current Odds: </span>
+                            <span className="text-[#3B82F6] font-bold">{pick.marketOdds.toFixed(2)}</span>
                           </div>
                           <div>
-                            <span className="text-[#64748B]">Model Engine: </span>
+                            <span className="text-[#64748B]">Model Probability: </span>
+                            <span className="text-white">{(pick.modelProbability * 100).toFixed(1)}%</span>
+                          </div>
+                          <div>
+                            <span className="text-[#64748B]">Market Implied: </span>
+                            <span className="text-white">{(pick.marketProbability * 100).toFixed(1)}%</span>
+                          </div>
+                          <div>
+                            <span className="text-[#64748B]">Edge / EV: </span>
+                            <span className="text-emerald-400">{(pick.edge * 100).toFixed(1)}% / {(pick.expectedValue * 100).toFixed(1)}%</span>
+                          </div>
+                          <div>
+                            <span className="text-[#64748B]">Signal Strength: </span>
+                            <span className="text-white font-bold">{pick.confidence}% ({pick.strengthLevel || (pick.confidence >= 60 ? 'STRONG' : pick.confidence >= 50 ? 'MODERATE' : pick.confidence >= 40 ? 'WEAK' : 'VERY_WEAK')})</span>
+                          </div>
+                          <div>
+                            <span className="text-[#64748B]">Odds Snapshot Time: </span>
+                            <span className="text-white">{pick.oddsTimestampUtc?.slice(0, 19).replace('T', ' ')} UTC</span>
+                          </div>
+                          <div>
+                            <span className="text-[#64748B]">Prediction Generated: </span>
+                            <span className="text-white">{pick.predictionTimestampUtc?.slice(0, 19).replace('T', ' ')} UTC</span>
+                          </div>
+                          <div>
+                            <span className="text-[#64748B]">Data Freshness: </span>
+                            <span className="text-white">{pick.freshnessText || 'Updated just now'}</span>
+                          </div>
+                          <div>
+                            <span className="text-[#64748B]">Sharp Benchmark: </span>
+                            <span className="text-white">Pinnacle (OddsPapi v4)</span>
+                          </div>
+                          <div>
+                            <span className="text-[#64748B]">Model Architecture: </span>
                             <span className="text-white">{pick.modelVersion}</span>
                           </div>
                           <div>
-                            <span className="text-[#64748B]">Persistence: </span>
+                            <span className="text-[#64748B]">Data Persistence: </span>
                             <span className="text-emerald-400">daily_picks + ledger_v3</span>
                           </div>
                         </div>

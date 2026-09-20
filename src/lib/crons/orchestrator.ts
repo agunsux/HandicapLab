@@ -39,6 +39,7 @@ import { PredictionExecutionService } from '@/services/predictionExecutionServic
 import { computeAllocation, updateFixtureVolumes, updateLeagueEfficiency } from '@/lib/crons/adaptiveScheduler';
 import { syncLeaguesFromProvider, getActiveLeagues } from '@/lib/config/leagueRegistry';
 import { runHistoricalIngestor } from '@/lib/crons/historicalIngestor';
+import { ProductionPublishingEngine } from '@/lib/publishing/productionPublishingEngine';
 export interface OrchestratorReport {
   recoveredStuckEvents: number;
   queueDepth: { pending: number; processing: number; failed: number; completed: number };
@@ -389,6 +390,13 @@ export async function runOrchestrator(): Promise<OrchestratorReport> {
         apiRequestsUsed: league.apiRequestsUsed,
         avgConfidence: league.avgConfidence,
       }).catch(() => {});
+    }
+
+    // Phase 8: Automatic Production Publishing Reconciliation (HandicapLab -> SALMO.DEV)
+    try {
+      await ProductionPublishingEngine.reconcileAndPublish({ triggeredBy: 'SCHEDULER_CRON' });
+    } catch (e) {
+      console.warn('[Orchestrator] Production publishing reconciliation warning:', e);
     }
 
     // Get final state
