@@ -115,6 +115,58 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ success: true, data: queue });
   }
 
+  // 5. Ops Dashboard mode (absorbed from /api/ops/dashboard)
+  if (mode === 'ops' || mode === 'dashboard') {
+    const { getRecentAuditEvents, getAuditSummary } = await import('@/lib/crons/auditTrail');
+    const { getAllLeagueProfiles } = await import('@/lib/crons/leagueEvolution');
+    const [
+      providerHealth,
+      queueDepth,
+      leagueProgress,
+      auditSummary,
+      auditEvents,
+      leagueProfiles,
+    ] = await Promise.all([
+      getProviderHealth(),
+      getQueueDepth(),
+      getLeagueImportProgress(),
+      getAuditSummary(),
+      getRecentAuditEvents(20),
+      getAllLeagueProfiles(),
+    ]);
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        system: {
+          scheduler: { healthy: true },
+          queue: queueDepth,
+          audit: auditSummary,
+          recentEvents: auditEvents,
+        },
+        providers: providerHealth,
+        predictions: {
+          leagueProgress,
+          totalFixtures: leagueProgress.reduce((acc, l) => acc + l.total, 0),
+          totalSettled: leagueProgress.reduce((acc, l) => acc + l.settled, 0),
+        },
+        evidence: {
+          leagues: leagueProfiles.map((l) => ({
+            leagueId: l.leagueId,
+            leagueName: l.leagueName,
+            certification: l.certification,
+            roi: l.roi,
+            clv: l.clv,
+            winRate: l.winRate,
+            calibrationBrier: l.calibrationBrier,
+            settledMatches: l.settledMatches,
+            totalFixtures: l.totalFixturesInSeason,
+          })),
+        },
+      },
+    });
+  }
+
   // 5. Full Orchestrator execution (default cron pipeline)
   console.log(`[Pipeline Cron] Triggered at UTC ${hour}:00 (window: ${windowLabel})`);
   try {

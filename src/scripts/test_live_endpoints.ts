@@ -1,6 +1,5 @@
 import { GET as healthGet } from '../app/api/health/route';
 import { GET as providersGet } from '../app/api/providers/route';
-import { GET as quotaGet } from '../app/api/quota/route';
 import { GET as matchesGet } from '../app/api/matches/route';
 import { GET as dailyPicksGet } from '../app/api/daily-picks/route';
 import { NextRequest } from 'next/server';
@@ -17,14 +16,14 @@ async function run() {
 
   // 2. /api/providers
   console.log('\n--- 2. Testing GET /api/providers ---');
-  const providersRes = await providersGet();
+  const providersRes = await providersGet(new NextRequest('http://localhost:3000/api/providers'));
   const providersData = await providersRes.json();
   console.log('Status:', providersRes.status);
   console.log('Payload:', JSON.stringify(providersData, null, 2));
 
-  // 3. /api/quota
+  // 3. /api/quota (via consolidated providers?view=quota)
   console.log('\n--- 3. Testing GET /api/quota ---');
-  const quotaRes = await quotaGet();
+  const quotaRes = await providersGet(new NextRequest('http://localhost:3000/api/providers?view=quota'));
   const quotaData = await quotaRes.json();
   console.log('Status:', quotaRes.status);
   console.log('Payload:', JSON.stringify(quotaData, null, 2));

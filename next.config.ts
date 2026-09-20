@@ -58,6 +58,18 @@ const nextConfig: NextConfig = {
         source: '/api/ledger/high-confidence',
         destination: '/api/ledger/high-confidence',
       },
+      {
+        source: '/api/cron/worldwide-scheduler',
+        destination: '/api/cron/pipeline',
+      },
+      {
+        source: '/api/ops/dashboard',
+        destination: '/api/cron/pipeline?mode=ops',
+      },
+      {
+        source: '/api/quota',
+        destination: '/api/providers?view=quota',
+      },
     ];
   },
   async headers() {

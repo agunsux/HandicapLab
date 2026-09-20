@@ -42,6 +42,30 @@ describe('Route Consolidation Verification (Gate 1 & Gate 2)', () => {
       expect(data.settlementReport).toBeDefined();
       expect(data.todaySummary).toBeDefined();
     });
+
+    it('returns ops dashboard when mode=ops', async () => {
+      const req = new NextRequest('http://localhost:3000/api/cron/pipeline?mode=ops');
+      const res = await getCronPipeline(req);
+      expect(res.status).toBe(200);
+      const data = await res.json();
+      expect(data.success).toBe(true);
+      expect(data.data.system).toBeDefined();
+      expect(data.data.providers).toBeDefined();
+      expect(data.data.predictions).toBeDefined();
+    });
+  });
+
+  describe('/api/providers consolidation', () => {
+    it('returns quota telemetry when view=quota', async () => {
+      const { GET: getProviders } = await import('@/app/api/providers/route');
+      const req = new NextRequest('http://localhost:3000/api/providers?view=quota');
+      const res = await getProviders(req);
+      expect(res.status).toBe(200);
+      const data = await res.json();
+      expect(data.success).toBe(true);
+      expect(data.providers.apiFootball).toBeDefined();
+      expect(data.providers.oddsPapi).toBeDefined();
+    });
   });
 
   describe('/api/performance consolidation', () => {
