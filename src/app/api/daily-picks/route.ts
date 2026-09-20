@@ -17,14 +17,23 @@ export async function GET(request: NextRequest) {
     const forceRefresh = searchParams.get('refresh') === 'true' || searchParams.get('force') === 'true';
     const marketFilter = searchParams.get('market')?.toUpperCase();
 
-    // 1. Get published production signals
+    // 1. Get published production signals (strictly read-only for public/browser requests)
     let publishedSignals = ProductionPublishingEngine.getPublishedSignals();
 
-    // Auto-reconcile on cold-start or when forceRefresh is requested
-    if (publishedSignals.length === 0 || forceRefresh) {
+    // Invariant: The browser is strictly a VIEWER.
+    // Provider calls and publishing reconciliation are strictly backend/scheduler-controlled.
+    // Only an authorized cron/token or explicit admin trigger may trigger live reconciliation here.
+    const cronSecret = process.env.CRON_SECRET;
+    const authHeader = request.headers.get('authorization');
+    const token = searchParams.get('token');
+    const isAuthorizedTrigger = Boolean(
+      cronSecret && (authHeader === `Bearer ${cronSecret}` || token === cronSecret)
+    );
+
+    if (forceRefresh && isAuthorizedTrigger) {
       await ProductionPublishingEngine.reconcileAndPublish({
-        triggeredBy: forceRefresh ? 'MANUAL_OVERRIDE' : 'READ_THROUGH',
-        forceRefresh,
+        triggeredBy: 'MANUAL_OVERRIDE',
+        forceRefresh: true,
       });
       publishedSignals = ProductionPublishingEngine.getPublishedSignals();
     }

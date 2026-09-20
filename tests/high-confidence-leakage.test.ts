@@ -16,10 +16,13 @@ describe('High-Confidence Prediction Ledger & Settlement Leakage Invariants', ()
     canonicalMatchId: 'can_123',
     fixtureId: 'af_1001',
     providerFixtureId: '1001',
+    match: 'Arsenal vs Chelsea',
     homeTeam: 'Arsenal',
     awayTeam: 'Chelsea',
     competition: 'Premier League',
     competitionId: 'ENG-PL',
+    leagueKey: 'ENG-PL',
+    leagueTier: 'A',
     kickoffUtc: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(), // 2 hours future
     market: 'AH',
     selection: 'Arsenal -0.25',
@@ -27,16 +30,31 @@ describe('High-Confidence Prediction Ledger & Settlement Leakage Invariants', ()
     currentOdds: 1.95,
     fairOdds: 1.80,
     modelProbability: 0.555,
+    marketProbability: 0.5128,
     edge: 0.083,
     expectedValue: 0.082,
     confidence: 75, // Qualified (> 70)
+    strengthLevel: 'STRONG',
+    signalColor: 'green',
+    confidenceDisclaimer: 'Strong Value Edge',
+    publishState: 'PUBLISHED',
+    validityStatus: 'VALID',
+    rejectionReason: null,
+    dataFreshnessSeconds: 60,
+    freshnessText: '1m ago',
     recommendation: 'VALUE_CANDIDATE',
     oddsTimestampUtc: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
     predictionTimestampUtc: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
+    lastReconciledUtc: new Date().toISOString(),
     modelVersion: 'dixon-coles-v1.0',
     payloadHash: 'hash_abc123',
     bookmaker: 'Pinnacle',
-    validationStatus: 'PROVISIONAL_EDGE',
+    providerProvenance: {
+      fixtures: 'api-football-pro',
+      odds: 'oddspapi-pinnacle',
+      statistics: 'apifootball',
+      modelVersion: 'dixon-coles-v1.0',
+    },
     ...overrides,
   });
 
@@ -72,14 +90,14 @@ describe('High-Confidence Prediction Ledger & Settlement Leakage Invariants', ()
 
     const initial = await HighConfidenceLedgerService.qualifyAndRecordPrediction(signal);
     expect(initial.qualified).toBe(true);
-    expect(initial.ledgerEntry.odds).toBe(1.95);
-    expect(initial.ledgerEntry.status).toBe('RECORDED');
+    expect(initial.ledgerEntry!.odds).toBe(1.95);
+    expect(initial.ledgerEntry!.status).toBe('RECORDED');
 
     // Simulate match starting (nowMs > kickoffMs)
     const lockedCount = await HighConfidenceLedgerService.lockBetsForKickoff(kickoffMs + 5000);
     expect(lockedCount).toBe(1);
 
-    const lockedEntry = DurableLedgerStore.loadLedger()[initial.ledgerEntry.ledgerId];
+    const lockedEntry = DurableLedgerStore.loadLedger()[initial.ledgerEntry!.ledgerId];
     expect(lockedEntry.status).toBe('LOCKED');
     expect(lockedEntry.odds).toBe(1.95);
 
@@ -93,7 +111,7 @@ describe('High-Confidence Prediction Ledger & Settlement Leakage Invariants', ()
     const reAttempt = await HighConfidenceLedgerService.qualifyAndRecordPrediction(mutatedSignal);
     expect(reAttempt.isNewRecord).toBe(false);
     // Locked odds remain unchanged at 1.95
-    expect(reAttempt.ledgerEntry.odds).toBe(1.95);
+    expect(reAttempt.ledgerEntry!.odds).toBe(1.95);
   });
 
   // --------------------------------------------------------------------------
@@ -109,8 +127,8 @@ describe('High-Confidence Prediction Ledger & Settlement Leakage Invariants', ()
     expect(run1.isNewRecord).toBe(true);
     expect(run2.isNewRecord).toBe(false);
     expect(run3.isNewRecord).toBe(false);
-    expect(run1.ledgerEntry.ledgerId).toBe(run2.ledgerEntry.ledgerId);
-    expect(run2.ledgerEntry.ledgerId).toBe(run3.ledgerEntry.ledgerId);
+    expect(run1.ledgerEntry!.ledgerId).toBe(run2.ledgerEntry!.ledgerId);
+    expect(run2.ledgerEntry!.ledgerId).toBe(run3.ledgerEntry!.ledgerId);
 
     const allEntries = HighConfidenceLedgerService.getLedgerEntries();
     expect(allEntries.length).toBe(1);
@@ -122,14 +140,14 @@ describe('High-Confidence Prediction Ledger & Settlement Leakage Invariants', ()
   it('T4: subsequent confidence re-calculations do not alter historical recorded confidence', async () => {
     const signal = createSignal({ confidence: 76.5 });
     const original = await HighConfidenceLedgerService.qualifyAndRecordPrediction(signal);
-    expect(original.ledgerEntry.confidenceScore).toBe(76.5);
+    expect(original.ledgerEntry!.confidenceScore).toBe(76.5);
 
     // Model later runs again with 85% confidence on same fixture/market/line
     const updatedSignal = { ...signal, confidence: 85.0 };
     const secondCall = await HighConfidenceLedgerService.qualifyAndRecordPrediction(updatedSignal);
 
     expect(secondCall.isNewRecord).toBe(false);
-    expect(secondCall.ledgerEntry.confidenceScore).toBe(76.5);
+    expect(secondCall.ledgerEntry!.confidenceScore).toBe(76.5);
   });
 
   // --------------------------------------------------------------------------
@@ -140,17 +158,17 @@ describe('High-Confidence Prediction Ledger & Settlement Leakage Invariants', ()
     const { ledgerEntry } = await HighConfidenceLedgerService.qualifyAndRecordPrediction(signal);
 
     const matchResult: AuthoritativeMatchResult = {
-      fixtureId: ledgerEntry.fixtureId,
+      fixtureId: ledgerEntry!.fixtureId,
       status: 'PST', // Postponed
       homeGoals: null,
       awayGoals: null,
     };
 
-    const settleRes = await ProductionSettlementService.settleEntry(ledgerEntry, matchResult);
+    const settleRes = await ProductionSettlementService.settleEntry(ledgerEntry!, matchResult);
     expect(settleRes.settled).toBe(false);
     expect(settleRes.reason).toContain('MATCH_POSTPONED');
 
-    const loaded = DurableLedgerStore.loadLedger()[ledgerEntry.ledgerId];
+    const loaded = DurableLedgerStore.loadLedger()[ledgerEntry!.ledgerId];
     expect(loaded.status).not.toBe('SETTLED');
   });
 
@@ -162,18 +180,18 @@ describe('High-Confidence Prediction Ledger & Settlement Leakage Invariants', ()
     const { ledgerEntry } = await HighConfidenceLedgerService.qualifyAndRecordPrediction(signal);
 
     const matchResult: AuthoritativeMatchResult = {
-      fixtureId: ledgerEntry.fixtureId,
+      fixtureId: ledgerEntry!.fixtureId,
       status: 'CANC', // Cancelled
       homeGoals: null,
       awayGoals: null,
     };
 
-    const settleRes = await ProductionSettlementService.settleEntry(ledgerEntry, matchResult);
+    const settleRes = await ProductionSettlementService.settleEntry(ledgerEntry!, matchResult);
     expect(settleRes.settled).toBe(true);
     expect(settleRes.outcome).toBe('VOID');
 
     const settlements = DurableLedgerStore.loadSettlements();
-    const settlement = settlements[ledgerEntry.ledgerId];
+    const settlement = settlements[ledgerEntry!.ledgerId];
     expect(settlement.outcome).toBe('VOID');
     expect(settlement.profitUnits).toBe(0.0);
     expect(settlement.returnUnits).toBe(1.0); // 1.0u stake returned
@@ -187,17 +205,17 @@ describe('High-Confidence Prediction Ledger & Settlement Leakage Invariants', ()
     const { ledgerEntry } = await HighConfidenceLedgerService.qualifyAndRecordPrediction(signal);
 
     const matchResult: AuthoritativeMatchResult = {
-      fixtureId: ledgerEntry.fixtureId,
+      fixtureId: ledgerEntry!.fixtureId,
       status: 'FT',
       homeGoals: null, // Corrupted / missing
       awayGoals: 1,
     };
 
-    const settleRes = await ProductionSettlementService.settleEntry(ledgerEntry, matchResult);
+    const settleRes = await ProductionSettlementService.settleEntry(ledgerEntry!, matchResult);
     expect(settleRes.settled).toBe(false);
     expect(settleRes.reason).toContain('DATA_ERROR');
 
-    const loaded = DurableLedgerStore.loadLedger()[ledgerEntry.ledgerId];
+    const loaded = DurableLedgerStore.loadLedger()[ledgerEntry!.ledgerId];
     expect(loaded.status).toBe('DATA_ERROR');
     expect(loaded.rejectionReason).toContain('MISSING_RESULT_GOALS');
   });
@@ -216,14 +234,14 @@ describe('High-Confidence Prediction Ledger & Settlement Leakage Invariants', ()
       confidence: 72,
     });
     const resHL = await HighConfidenceLedgerService.qualifyAndRecordPrediction(sigHalfLoss);
-    const hlSettlement = await ProductionSettlementService.settleEntry(resHL.ledgerEntry, {
+    const hlSettlement = await ProductionSettlementService.settleEntry(resHL.ledgerEntry!, {
       fixtureId: 'af_801',
       status: 'FT',
       homeGoals: 1,
       awayGoals: 1,
     });
     expect(hlSettlement.outcome).toBe('HALF_LOSS');
-    const stlHL = DurableLedgerStore.loadSettlements()[resHL.ledgerEntry.ledgerId];
+    const stlHL = DurableLedgerStore.loadSettlements()[resHL.ledgerEntry!.ledgerId];
     expect(stlHL.profitUnits).toBe(-0.5);
     expect(stlHL.returnUnits).toBe(0.5);
 
@@ -237,14 +255,14 @@ describe('High-Confidence Prediction Ledger & Settlement Leakage Invariants', ()
       confidence: 72,
     });
     const resHW = await HighConfidenceLedgerService.qualifyAndRecordPrediction(sigHalfWin);
-    const hwSettlement = await ProductionSettlementService.settleEntry(resHW.ledgerEntry, {
+    const hwSettlement = await ProductionSettlementService.settleEntry(resHW.ledgerEntry!, {
       fixtureId: 'af_802',
       status: 'FT',
       homeGoals: 1,
       awayGoals: 1,
     });
     expect(hwSettlement.outcome).toBe('HALF_WIN');
-    const stlHW = DurableLedgerStore.loadSettlements()[resHW.ledgerEntry.ledgerId];
+    const stlHW = DurableLedgerStore.loadSettlements()[resHW.ledgerEntry!.ledgerId];
     expect(stlHW.profitUnits).toBe(0.475);
     expect(stlHW.returnUnits).toBe(1.475);
 
@@ -258,14 +276,14 @@ describe('High-Confidence Prediction Ledger & Settlement Leakage Invariants', ()
       confidence: 75,
     });
     const res75 = await HighConfidenceLedgerService.qualifyAndRecordPrediction(sigAh75);
-    const set75 = await ProductionSettlementService.settleEntry(res75.ledgerEntry, {
+    const set75 = await ProductionSettlementService.settleEntry(res75.ledgerEntry!, {
       fixtureId: 'af_803',
       status: 'FT',
       homeGoals: 2,
       awayGoals: 1,
     });
     expect(set75.outcome).toBe('HALF_WIN');
-    const stl75 = DurableLedgerStore.loadSettlements()[res75.ledgerEntry.ledgerId];
+    const stl75 = DurableLedgerStore.loadSettlements()[res75.ledgerEntry!.ledgerId];
     expect(stl75.profitUnits).toBe(0.45);
     expect(stl75.returnUnits).toBe(1.45);
 
@@ -279,14 +297,14 @@ describe('High-Confidence Prediction Ledger & Settlement Leakage Invariants', ()
       confidence: 75,
     });
     const resP75 = await HighConfidenceLedgerService.qualifyAndRecordPrediction(sigAhPlus75);
-    const setP75 = await ProductionSettlementService.settleEntry(resP75.ledgerEntry, {
+    const setP75 = await ProductionSettlementService.settleEntry(resP75.ledgerEntry!, {
       fixtureId: 'af_804',
       status: 'FT',
       homeGoals: 2,
       awayGoals: 1,
     });
     expect(setP75.outcome).toBe('HALF_LOSS');
-    const stlP75 = DurableLedgerStore.loadSettlements()[resP75.ledgerEntry.ledgerId];
+    const stlP75 = DurableLedgerStore.loadSettlements()[resP75.ledgerEntry!.ledgerId];
     expect(stlP75.profitUnits).toBe(-0.5);
     expect(stlP75.returnUnits).toBe(0.5);
   });
@@ -305,7 +323,7 @@ describe('High-Confidence Prediction Ledger & Settlement Leakage Invariants', ()
       confidence: 74,
     });
     const { ledgerEntry } = await HighConfidenceLedgerService.qualifyAndRecordPrediction(signal);
-    const settleRes = await ProductionSettlementService.settleEntry(ledgerEntry, {
+    const settleRes = await ProductionSettlementService.settleEntry(ledgerEntry!, {
       fixtureId: 'af_901',
       status: 'FT',
       homeGoals: 1,
@@ -314,7 +332,7 @@ describe('High-Confidence Prediction Ledger & Settlement Leakage Invariants', ()
 
     expect(settleRes.outcome).toBe('PUSH');
     const settlements = DurableLedgerStore.loadSettlements();
-    const settlement = settlements[ledgerEntry.ledgerId];
+    const settlement = settlements[ledgerEntry!.ledgerId];
     expect(settlement.profitUnits).toBe(0.0);
     expect(settlement.returnUnits).toBe(1.0);
   });
@@ -325,11 +343,15 @@ describe('High-Confidence Prediction Ledger & Settlement Leakage Invariants', ()
   it('T10: yield is calculated strictly from units staked and profit, NEVER from win rate', async () => {
     const todayStr = '2026-09-20';
     const kickoff = `${todayStr}T14:00:00Z`;
+    const predTime = `${todayStr}T12:00:00Z`;
+    const oddsTime = `${todayStr}T11:50:00Z`;
 
     // Bet 1: 1.0u staked @ 2.00 odds -> WIN (+1.0u profit)
     const sig1 = createSignal({
       fixtureId: 'af_1001',
       kickoffUtc: kickoff,
+      predictionTimestampUtc: predTime,
+      oddsTimestampUtc: oddsTime,
       currentOdds: 2.00,
       market: 'OU',
       selection: 'Over 2.5',
@@ -337,7 +359,7 @@ describe('High-Confidence Prediction Ledger & Settlement Leakage Invariants', ()
       confidence: 75,
     });
     const res1 = await HighConfidenceLedgerService.qualifyAndRecordPrediction(sig1);
-    await ProductionSettlementService.settleEntry(res1.ledgerEntry, {
+    await ProductionSettlementService.settleEntry(res1.ledgerEntry!, {
       fixtureId: 'af_1001',
       status: 'FT',
       homeGoals: 2,
@@ -348,6 +370,8 @@ describe('High-Confidence Prediction Ledger & Settlement Leakage Invariants', ()
     const sig2 = createSignal({
       fixtureId: 'af_1002',
       kickoffUtc: kickoff,
+      predictionTimestampUtc: predTime,
+      oddsTimestampUtc: oddsTime,
       currentOdds: 2.00,
       market: 'BTTS',
       selection: 'BTTS Yes',
@@ -355,7 +379,7 @@ describe('High-Confidence Prediction Ledger & Settlement Leakage Invariants', ()
       confidence: 72,
     });
     const res2 = await HighConfidenceLedgerService.qualifyAndRecordPrediction(sig2);
-    await ProductionSettlementService.settleEntry(res2.ledgerEntry, {
+    await ProductionSettlementService.settleEntry(res2.ledgerEntry!, {
       fixtureId: 'af_1002',
       status: 'FT',
       homeGoals: 2,
@@ -393,7 +417,7 @@ describe('High-Confidence Prediction Ledger & Settlement Leakage Invariants', ()
     const sig70_1 = createSignal({ fixtureId: 'af_1102', confidence: 70.1 });
     const res70_1 = await HighConfidenceLedgerService.qualifyAndRecordPrediction(sig70_1);
     expect(res70_1.qualified).toBe(true);
-    expect(res70_1.ledgerEntry.confidenceScore).toBe(70.1);
+    expect(res70_1.ledgerEntry!.confidenceScore).toBe(70.1);
 
     // 75.0 -> QUALIFIED
     const sig75 = createSignal({ fixtureId: 'af_1103', confidence: 75.0 });
@@ -444,7 +468,7 @@ describe('High-Confidence Prediction Ledger & Settlement Leakage Invariants', ()
 
     const secondCall = await HighConfidenceLedgerService.qualifyAndRecordPrediction(signal);
     expect(secondCall.isNewRecord).toBe(false);
-    expect(secondCall.ledgerEntry.ledgerId).toBe(firstCall.ledgerEntry.ledgerId);
+    expect(secondCall.ledgerEntry!.ledgerId).toBe(firstCall.ledgerEntry!.ledgerId);
   });
 
   // --------------------------------------------------------------------------
@@ -468,11 +492,11 @@ describe('High-Confidence Prediction Ledger & Settlement Leakage Invariants', ()
     };
 
     // First settlement
-    const firstSettle = await ProductionSettlementService.settleEntry(ledgerEntry, matchResult);
+    const firstSettle = await ProductionSettlementService.settleEntry(ledgerEntry!, matchResult);
     expect(firstSettle.settled).toBe(true);
 
     // Retrieve settled entry from store
-    const updatedEntry = DurableLedgerStore.loadLedger()[ledgerEntry.ledgerId];
+    const updatedEntry = DurableLedgerStore.loadLedger()[ledgerEntry!.ledgerId];
     expect(updatedEntry.status).toBe('SETTLED');
 
     // Second settlement attempt on same entry

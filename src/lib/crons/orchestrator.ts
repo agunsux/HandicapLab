@@ -43,6 +43,16 @@ import { ProductionPublishingEngine } from '@/lib/publishing/productionPublishin
 import { ProductionSettlementService } from '@/lib/ledger/productionSettlementService';
 import { DailyPerformanceService } from '@/lib/ledger/dailyPerformanceService';
 
+export interface PhaseTelemetry {
+  phase: number;
+  name: string;
+  success: boolean;
+  count: number;
+  durationMs: number;
+  details?: any;
+  error?: string;
+}
+
 export interface OrchestratorReport {
   recoveredStuckEvents: number;
   queueDepth: { pending: number; processing: number; failed: number; completed: number };
@@ -62,6 +72,10 @@ export interface OrchestratorReport {
   leagueProgress: Awaited<ReturnType<typeof getLeagueImportProgress>>;
   durationMs: number;
   highConfidenceSettlements?: number;
+  publishedSignalsCount?: number;
+  kickoffLocksCount?: number;
+  revalidatedPaths?: string[];
+  pipelinePhases?: Record<string, PhaseTelemetry>;
 }
 
 // ─── Recovery Phase ─────────────────────────────────────────────────
@@ -361,31 +375,286 @@ export async function runOrchestrator(): Promise<OrchestratorReport> {
 
   console.log(`[Orchestrator] Allocation: ${activeCount} active, ${skippedCount} skipped, mode=${allocation.mode}`);
 
+  const nowMs = startTime;
+
   // Check if we have enough quota for discovery
   if (allocation.activeLeagues.length > 0 || allocation.mode === 'NORMAL') {
-    // Phase 4 (Now 1st): Settlement (Priority 100)
-    const settlementsProcessed = await phaseSettlement();
+    const pipelinePhases: Record<string, PhaseTelemetry> = {};
 
-    // Phase 2 (Now 2nd): Predictions (Priority 90)
-    const predictionsGenerated = await phasePredictions();
-
-    // Phase 3 (Now 3rd): T-60 snapshots (Priority 80)
-    const snapResult = await phaseSnapshots();
-
-    // Phase 1 (Now 4th): Fixture discovery (Priority 60)
-    const newFixturesDiscovered = await phaseDiscovery();
-
-    // Phase 7 (Now 5th): Historical surplus (Priority 40)
-    let historicalBatchesRun = 0;
-    if (allocation.mode === 'NORMAL') {
-      historicalBatchesRun = await phaseHistorical();
+    // ─── Phase 1: Fixture Reconciliation (API-Football PRO, Top Leagues Whitelist) ───
+    const p1Start = Date.now();
+    let newFixturesDiscovered = 0;
+    try {
+      newFixturesDiscovered = await phaseDiscovery();
+      pipelinePhases['phase_1_fixture_reconciliation'] = {
+        phase: 1,
+        name: 'Fixture Reconciliation',
+        success: true,
+        count: newFixturesDiscovered,
+        durationMs: Date.now() - p1Start,
+      };
+    } catch (e: any) {
+      console.warn('[Orchestrator] Phase 1 warning:', e.message);
+      pipelinePhases['phase_1_fixture_reconciliation'] = {
+        phase: 1,
+        name: 'Fixture Reconciliation',
+        success: false,
+        count: 0,
+        durationMs: Date.now() - p1Start,
+        error: e.message,
+      };
     }
 
-    // Phase 6 (Now 6th): League evolution / Metadata (Priority 20)
-    const leaguesPromoted = await phaseLeagueEvolution();
+    // ─── Phase 2: Odds Reconciliation (OddsPapi Pinnacle, Quota-Aware) ───
+    const p2Start = Date.now();
+    let snapResult = { built: 0, errors: 0 };
+    try {
+      snapResult = await phaseSnapshots();
+      pipelinePhases['phase_2_odds_reconciliation'] = {
+        phase: 2,
+        name: 'Odds Reconciliation',
+        success: true,
+        count: snapResult.built,
+        durationMs: Date.now() - p2Start,
+        details: { errors: snapResult.errors },
+      };
+    } catch (e: any) {
+      console.warn('[Orchestrator] Phase 2 warning:', e.message);
+      pipelinePhases['phase_2_odds_reconciliation'] = {
+        phase: 2,
+        name: 'Odds Reconciliation',
+        success: false,
+        count: 0,
+        durationMs: Date.now() - p2Start,
+        error: e.message,
+      };
+    }
 
-    // Phase 5 (Now 7th): Metrics update (evidence engine)
-    const metricsUpdated = await phaseMetrics();
+    // ─── Phase 3: Prediction Generation (Dixon-Coles Model: AH, OU, BTTS) ───
+    const p3Start = Date.now();
+    let predictionsGenerated = 0;
+    try {
+      predictionsGenerated = await phasePredictions();
+      pipelinePhases['phase_3_prediction_generation'] = {
+        phase: 3,
+        name: 'Prediction Generation',
+        success: true,
+        count: predictionsGenerated,
+        durationMs: Date.now() - p3Start,
+      };
+    } catch (e: any) {
+      console.warn('[Orchestrator] Phase 3 warning:', e.message);
+      pipelinePhases['phase_3_prediction_generation'] = {
+        phase: 3,
+        name: 'Prediction Generation',
+        success: false,
+        count: 0,
+        durationMs: Date.now() - p3Start,
+        error: e.message,
+      };
+    }
+
+    // Phase 7 (Now 5th): Historical surplus (Priority 40)
+    // ─── Phase 4: Production Validity Gate & Automatic Publishing ───
+    const p4Start = Date.now();
+    let publishedSignalsCount = 0;
+    try {
+      const pubReport = await ProductionPublishingEngine.reconcileAndPublish({ triggeredBy: 'SCHEDULER_CRON', nowMs });
+      publishedSignalsCount = pubReport.publishedCount;
+      pipelinePhases['phase_4_publishing_reconciliation'] = {
+        phase: 4,
+        name: 'Publishing Reconciliation',
+        success: true,
+        count: pubReport.publishedCount,
+        durationMs: Date.now() - p4Start,
+        details: {
+          evaluated: pubReport.evaluatedPredictions,
+          updated: pubReport.updatedCount,
+          held: pubReport.heldCount,
+          shadow: pubReport.shadowCount,
+        },
+      };
+    } catch (e: any) {
+      console.warn('[Orchestrator] Phase 4 warning:', e.message);
+      pipelinePhases['phase_4_publishing_reconciliation'] = {
+        phase: 4,
+        name: 'Publishing Reconciliation',
+        success: false,
+        count: 0,
+        durationMs: Date.now() - p4Start,
+        error: e.message,
+      };
+    }
+
+    // ─── Phase 5: High-Confidence Virtual Ledger (> 70% Confidence, 1.0U) ───
+    const p5Start = Date.now();
+    let highConfidenceRecorded = 0;
+    try {
+      const { HighConfidenceLedgerService } = await import('@/lib/ledger/highConfidenceLedgerService');
+      const published = ProductionPublishingEngine.getPublishedSignals();
+      for (const sig of published) {
+        if (sig.confidence > 70) {
+          const qual = await HighConfidenceLedgerService.qualifyAndRecordPrediction(sig as any, { nowMs });
+          if (qual.isNewRecord) highConfidenceRecorded++;
+        }
+      }
+      pipelinePhases['phase_5_high_confidence_ledger'] = {
+        phase: 5,
+        name: 'High-Confidence Virtual Ledger',
+        success: true,
+        count: highConfidenceRecorded,
+        durationMs: Date.now() - p5Start,
+      };
+    } catch (e: any) {
+      console.warn('[Orchestrator] Phase 5 warning:', e.message);
+      pipelinePhases['phase_5_high_confidence_ledger'] = {
+        phase: 5,
+        name: 'High-Confidence Virtual Ledger',
+        success: false,
+        count: 0,
+        durationMs: Date.now() - p5Start,
+        error: e.message,
+      };
+    }
+
+    // ─── Phase 6: Kickoff Lock (Predictions Frozen Immutably) ───
+    const p6Start = Date.now();
+    let kickoffLocksCount = 0;
+    try {
+      const { HighConfidenceLedgerService } = await import('@/lib/ledger/highConfidenceLedgerService');
+      kickoffLocksCount = await HighConfidenceLedgerService.lockBetsForKickoff(nowMs);
+      pipelinePhases['phase_6_kickoff_lock'] = {
+        phase: 6,
+        name: 'Kickoff Lock',
+        success: true,
+        count: kickoffLocksCount,
+        durationMs: Date.now() - p6Start,
+      };
+    } catch (e: any) {
+      console.warn('[Orchestrator] Phase 6 warning:', e.message);
+      pipelinePhases['phase_6_kickoff_lock'] = {
+        phase: 6,
+        name: 'Kickoff Lock',
+        success: false,
+        count: 0,
+        durationMs: Date.now() - p6Start,
+        error: e.message,
+      };
+    }
+
+    // ─── Phase 7 & 8: Result Reconciliation & Exact Settlement ───
+    const p78Start = Date.now();
+    let highConfidenceSettlements = 0;
+    let settlementsProcessed = 0;
+    try {
+      const settleBatch = await ProductionSettlementService.settlePendingBets(nowMs);
+      highConfidenceSettlements = settleBatch.settledCount;
+      settlementsProcessed = settleBatch.settledCount;
+      pipelinePhases['phase_7_result_reconciliation'] = {
+        phase: 7,
+        name: 'Result Reconciliation',
+        success: true,
+        count: settleBatch.checkedCount,
+        durationMs: Date.now() - p78Start,
+        details: { skippedNotFinal: settleBatch.skippedCount },
+      };
+      pipelinePhases['phase_8_settlement'] = {
+        phase: 8,
+        name: 'Exact Settlement',
+        success: true,
+        count: settleBatch.settledCount,
+        durationMs: Date.now() - p78Start,
+        details: { voidCount: settleBatch.voidCount, errorCount: settleBatch.errorCount },
+      };
+    } catch (e: any) {
+      console.warn('[Orchestrator] Phase 7/8 warning:', e.message);
+      pipelinePhases['phase_7_result_reconciliation'] = {
+        phase: 7,
+        name: 'Result Reconciliation',
+        success: false,
+        count: 0,
+        durationMs: Date.now() - p78Start,
+        error: e.message,
+      };
+      pipelinePhases['phase_8_settlement'] = {
+        phase: 8,
+        name: 'Exact Settlement',
+        success: false,
+        count: 0,
+        durationMs: Date.now() - p78Start,
+        error: e.message,
+      };
+    }
+
+    // ─── Phase 9: Daily Performance & Realized Yield Calculation ───
+    const p9Start = Date.now();
+    try {
+      const todayStr = new Date(nowMs).toISOString().slice(0, 10);
+      const perfSummary = await DailyPerformanceService.calculateDailySummary(todayStr);
+      pipelinePhases['phase_9_daily_performance'] = {
+        phase: 9,
+        name: 'Daily Performance Aggregation',
+        success: true,
+        count: perfSummary.settled,
+        durationMs: Date.now() - p9Start,
+        details: { yieldPct: perfSummary.yieldPct, profitUnits: perfSummary.profitUnits, openBets: perfSummary.openBets },
+      };
+    } catch (e: any) {
+      console.warn('[Orchestrator] Phase 9 warning:', e.message);
+      pipelinePhases['phase_9_daily_performance'] = {
+        phase: 9,
+        name: 'Daily Performance Aggregation',
+        success: false,
+        count: 0,
+        durationMs: Date.now() - p9Start,
+        error: e.message,
+      };
+    }
+
+    // ─── Phase 10: Cache Invalidation & Revalidation Trigger ───
+    const p10Start = Date.now();
+    const revalidatedPaths: string[] = [];
+    try {
+      const pathsToRevalidate = ['/daily-picks', '/app/ledger', '/app/picks', '/performance', '/asian-handicap'];
+      try {
+        const { revalidatePath } = await import('next/cache');
+        for (const p of pathsToRevalidate) {
+          try {
+            revalidatePath(p);
+            revalidatedPaths.push(p);
+          } catch {}
+        }
+      } catch {}
+
+      pipelinePhases['phase_10_cache_revalidation'] = {
+        phase: 10,
+        name: 'Cache / Revalidation Trigger',
+        success: true,
+        count: revalidatedPaths.length,
+        durationMs: Date.now() - p10Start,
+        details: { paths: revalidatedPaths },
+      };
+    } catch (e: any) {
+      console.warn('[Orchestrator] Phase 10 warning:', e.message);
+      pipelinePhases['phase_10_cache_revalidation'] = {
+        phase: 10,
+        name: 'Cache / Revalidation Trigger',
+        success: false,
+        count: 0,
+        durationMs: Date.now() - p10Start,
+        error: e.message,
+      };
+    }
+
+    // Background maintenance tasks
+    let historicalBatchesRun = 0;
+    if (allocation.mode === 'NORMAL') {
+      try { historicalBatchesRun = await phaseHistorical(); } catch {}
+    }
+    let leaguesPromoted = 0;
+    try { leaguesPromoted = await phaseLeagueEvolution(); } catch {}
+    let metricsUpdated = 0;
+    try { metricsUpdated = await phaseMetrics(); } catch {}
 
     // Update efficiency scores for active leagues
     for (const league of allocation.activeLeagues) {
@@ -394,23 +663,6 @@ export async function runOrchestrator(): Promise<OrchestratorReport> {
         apiRequestsUsed: league.apiRequestsUsed,
         avgConfidence: league.avgConfidence,
       }).catch(() => {});
-    }
-
-    // Phase 8: Automatic Production Publishing Reconciliation (HandicapLab -> SALMO.DEV)
-    try {
-      await ProductionPublishingEngine.reconcileAndPublish({ triggeredBy: 'SCHEDULER_CRON' });
-    } catch (e) {
-      console.warn('[Orchestrator] Production publishing reconciliation warning:', e);
-    }
-
-    // Phase 9: High-Confidence Virtual Bet Settlement & Daily Yield calculation
-    let highConfidenceSettlements = 0;
-    try {
-      const settlementBatch = await ProductionSettlementService.settlePendingBets();
-      highConfidenceSettlements = settlementBatch.settledCount;
-      await DailyPerformanceService.calculateDailySummary();
-    } catch (e) {
-      console.warn('[Orchestrator] High-confidence settlement warning:', e);
     }
 
     // Get final state
@@ -434,6 +686,8 @@ export async function runOrchestrator(): Promise<OrchestratorReport> {
         snapshotsBuilt: snapResult.built,
         settlementsProcessed,
         highConfidenceSettlements,
+        publishedSignalsCount,
+        kickoffLocksCount,
         metricsUpdated,
         leaguesPromoted,
         historicalBatchesRun,
@@ -441,20 +695,15 @@ export async function runOrchestrator(): Promise<OrchestratorReport> {
       },
     });
 
-    console.log(`[Orchestrator] Pipeline complete in ${durationMs}ms`, {
-      recovered: recoveredStuckEvents,
-      allocationMode: allocation.mode,
-      active: activeCount,
-      skipped: skippedCount,
+    console.log(`[Orchestrator] 10-Phase Pipeline complete in ${durationMs}ms`, {
       discovered: newFixturesDiscovered,
+      oddsSnapshots: snapResult.built,
       predictions: predictionsGenerated,
-      snapshots: snapResult,
-      settlements: settlementsProcessed,
-      highConfidenceSettlements,
-      metrics: metricsUpdated,
-      leagues: leaguesPromoted,
-      historical: historicalBatchesRun,
-      queue: queueDepth,
+      published: publishedSignalsCount,
+      highConfidenceRecorded,
+      kickoffLocks: kickoffLocksCount,
+      settled: settlementsProcessed,
+      revalidated: revalidatedPaths,
     });
 
     return {
@@ -476,6 +725,10 @@ export async function runOrchestrator(): Promise<OrchestratorReport> {
       providerHealth: healthAfter,
       leagueProgress,
       durationMs,
+      publishedSignalsCount,
+      kickoffLocksCount,
+      revalidatedPaths,
+      pipelinePhases,
     };
   }
 

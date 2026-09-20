@@ -42,7 +42,16 @@ export class DurableLedgerStore {
     }
     const tempPath = `${filePath}.tmp.${Date.now()}.${Math.random().toString(36).slice(2, 7)}`;
     fs.writeFileSync(tempPath, JSON.stringify(data, null, 2), 'utf8');
-    fs.renameSync(tempPath, filePath);
+    try {
+      fs.renameSync(tempPath, filePath);
+    } catch (err: any) {
+      if (err?.code === 'EPERM' || err?.code === 'EBUSY') {
+        fs.copyFileSync(tempPath, filePath);
+        try { fs.unlinkSync(tempPath); } catch {}
+      } else {
+        throw err;
+      }
+    }
   }
 
   private static appendJsonLine(filePath: string, item: any): void {

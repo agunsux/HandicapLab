@@ -2,40 +2,8 @@
   "framework": "nextjs",
   "crons": [
     {
-      "path": "/api/cron/discovery",
-      "schedule": "10 0 * * *"
-    },
-    {
-      "path": "/api/cron/odds",
-      "schedule": "20 0 * * *"
-    },
-    {
-      "path": "/api/cron/update-ratings",
-      "schedule": "30 0 * * *"
-    },
-    {
-      "path": "/api/cron/enrichment",
-      "schedule": "35 0 * * *"
-    },
-    {
-      "path": "/api/cron/settlement",
-      "schedule": "40 0 * * *"
-    },
-    {
-      "path": "/api/cron/predict",
-      "schedule": "50 0 * * *"
-    },
-    {
-      "path": "/api/cron/update-results",
-      "schedule": "0 3 * * *"
-    },
-    {
-      "path": "/api/cron/ah-shadow-pipeline",
-      "schedule": "0 4 * * *"
-    },
-    {
-      "path": "/api/cron/quota-cleanup",
-      "schedule": "0 5 * * *"
+      "path": "/api/cron/pipeline",
+      "schedule": "*/15 * * * *"
     }
   ]
 }

@@ -298,17 +298,46 @@ export class ProductionSettlementService {
 
     const results: AuthoritativeMatchResult[] = [];
     const uniqueFixtures = new Map<string, typeof candidates[0]>();
+    const EXPECTED_MATCH_DURATION_MS = 100 * 60 * 1000; // 100 minutes from kickoff
+
     for (const e of candidates) {
+      const kickMs = new Date(e.kickoffUtc).getTime();
+      // Guardrail 5: Only poll fixtures whose expected final time has elapsed
+      if (!isNaN(kickMs) && nowMs < kickMs + EXPECTED_MATCH_DURATION_MS) {
+        // Still before or during match: skip querying API-Football
+        continue;
+      }
       uniqueFixtures.set(e.fixtureId, e);
+    }
+
+    if (uniqueFixtures.size === 0) {
+      return {
+        timestampUtc: new Date().toISOString(),
+        checkedCount: candidates.length,
+        settledCount: 0,
+        voidCount: 0,
+        skippedCount: candidates.length,
+        errorCount: 0,
+        settledLedgerIds: [],
+      };
     }
 
     try {
       const { apiFootballClient } = await import('@/lib/apis/apifootball');
+      const { logCall } = await import('@/lib/providers/quotaManager');
+
       for (const [fixtureId, entry] of uniqueFixtures.entries()) {
         try {
           const numericId = parseInt(entry.fixtureId.replace(/\D/g, ''), 10);
           if (numericId && !isNaN(numericId)) {
+            const startReq = Date.now();
             const apiRes = await apiFootballClient.getFixtureById(numericId);
+            await logCall('apifootball', 'fixtures', Date.now() - startReq, 200, {
+              reason: 'RESULT_SETTLEMENT',
+              fixtureId,
+              status: apiRes?.fixture?.status?.short,
+            }).catch(() => {});
+
             if (apiRes?.fixture) {
               results.push({
                 fixtureId,

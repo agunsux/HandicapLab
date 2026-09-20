@@ -99,9 +99,8 @@ export class ProductionPublishingEngine {
    * Retrieves all currently active and PUBLISHED signals for SALMO.DEV.
    * Reads strictly from the canonical published state.
    */
-  public static getPublishedSignals(): ProductionSignalDTO[] {
+  public static getPublishedSignals(nowMs: number = Date.now()): ProductionSignalDTO[] {
     const store = this.loadStore();
-    const nowMs = Date.now();
 
     return Object.values(store)
       .filter((s) => s.publishState === 'PUBLISHED')

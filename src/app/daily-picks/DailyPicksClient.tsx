@@ -66,11 +66,11 @@ export function DailyPicksClient({ initialData }: DailyPicksClientProps) {
     return () => clearInterval(interval);
   }, [lastRefreshed]);
 
-  const handleRefresh = async () => {
+  const refreshData = async (silent = false) => {
     try {
-      setIsRefreshing(true);
+      if (!silent) setIsRefreshing(true);
       const [picksRes] = await Promise.all([
-        fetch('/api/daily-picks?refresh=true'),
+        fetch('/api/daily-picks'),
         fetchPerformance(),
       ]);
       if (picksRes.ok) {
@@ -81,9 +81,45 @@ export function DailyPicksClient({ initialData }: DailyPicksClientProps) {
     } catch (err) {
       console.error('[DailyPicksClient] Refresh error:', err);
     } finally {
-      setIsRefreshing(false);
+      if (!silent) setIsRefreshing(false);
     }
   };
+
+  const handleRefresh = async () => {
+    await refreshData(false);
+  };
+
+  // Automatic Background Revalidation:
+  // Decoupled from provider calls — strictly polls canonical backend cache.
+  useEffect(() => {
+    // Determine cadence: if any match in picks is near kickoff (< 2h) or recently finished, poll at 30s; otherwise 60s
+    const nowMs = Date.now();
+    const hasLiveOrNearMatch = (data.picks || []).some((p) => {
+      const kickMs = new Date(p.kickoffUtc).getTime();
+      const diffMin = (kickMs - nowMs) / 60000;
+      return diffMin > -150 && diffMin < 120; // from 2h before kickoff to 2.5h after kickoff
+    });
+
+    const intervalMs = hasLiveOrNearMatch ? 30_000 : 60_000;
+
+    const intervalId = setInterval(() => {
+      if (typeof document !== 'undefined' && document.hidden) return; // Pause polling when tab is inactive
+      refreshData(true);
+    }, intervalMs);
+
+    const handleVisibilityChange = () => {
+      if (typeof document !== 'undefined' && !document.hidden) {
+        refreshData(true);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      clearInterval(intervalId);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [data.picks]);
 
   const picks = data.picks || [];
   const filteredPicks = selectedMarket === 'ALL'

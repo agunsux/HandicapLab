@@ -115,6 +115,72 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ success: true, data: queue });
   }
 
+  // 5. Full Observability Mode (Section 18 Operational View)
+  if (mode === 'observability' || mode === 'status') {
+    const health = await getProviderHealth();
+    const store = ProductionPublishingEngine.loadStore();
+    const signals = Object.values(store);
+    const ledger = DurableLedgerStore.loadLedger();
+    const entries = Object.values(ledger);
+    const settlements = DurableLedgerStore.loadSettlements();
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const perfSummary = await DailyPerformanceService.calculateDailySummary(todayStr);
+
+    const observabilityData = {
+      timestampUtc: new Date().toISOString(),
+      fixtures: {
+        totalSignalsCount: signals.length,
+        activeUpcomingCount: signals.filter((s) => new Date(s.kickoffUtc).getTime() > Date.now()).length,
+      },
+      odds: {
+        cachedSnapshots: signals.filter((s) => s.currentOdds > 1).length,
+        staleSnapshots: signals.filter((s) => s.validityStatus === 'STALE').length,
+        provider: 'OddsPapi-Pinnacle',
+      },
+      predictions: {
+        total: signals.length,
+        published: signals.filter((s) => s.publishState === 'PUBLISHED').length,
+        held: signals.filter((s) => s.publishState === 'HELD').length,
+        shadow: signals.filter((s) => s.publishState === 'SHADOW').length,
+        valid: signals.filter((s) => s.validityStatus === 'VALID').length,
+      },
+      ledger: {
+        totalVirtualBets: entries.length,
+        recorded: entries.filter((e) => e.status === 'RECORDED').length,
+        locked: entries.filter((e) => e.status === 'LOCKED').length,
+        awaitingResult: entries.filter((e) => e.status === 'AWAITING_RESULT').length,
+        settled: entries.filter((e) => e.status === 'SETTLED').length,
+        dataErrors: entries.filter((e) => e.status === 'DATA_ERROR').length,
+      },
+      settlement: {
+        totalSettledRecords: Object.keys(settlements).length,
+        wins: entries.filter((e) => settlements[e.ledgerId]?.outcome === 'WIN').length,
+        halfWins: entries.filter((e) => settlements[e.ledgerId]?.outcome === 'HALF_WIN').length,
+        pushes: entries.filter((e) => settlements[e.ledgerId]?.outcome === 'PUSH').length,
+        halfLosses: entries.filter((e) => settlements[e.ledgerId]?.outcome === 'HALF_LOSS').length,
+        losses: entries.filter((e) => settlements[e.ledgerId]?.outcome === 'LOSS').length,
+        voids: entries.filter((e) => settlements[e.ledgerId]?.outcome === 'VOID').length,
+      },
+      performance: {
+        settledStakeUnits: perfSummary.stakeUnits,
+        profitUnits: perfSummary.profitUnits,
+        realizedYieldPct: perfSummary.yieldPct,
+        openExposureUnits: perfSummary.openStakeUnits,
+        openBetsCount: perfSummary.openBets,
+        strikeRatePct: perfSummary.strikeRatePct,
+      },
+      providerHealth: {
+        apiFootball: health.find((h) => h.provider === 'apifootball') || { healthy: true },
+        oddsPapi: health.find((h) => h.provider === 'oddspapi') || { healthy: true },
+      },
+    };
+
+    return NextResponse.json({
+      success: true,
+      observability: observabilityData,
+    });
+  }
+
   // 5. Ops Dashboard mode (absorbed from /api/ops/dashboard)
   if (mode === 'ops' || mode === 'dashboard') {
     const { getRecentAuditEvents, getAuditSummary } = await import('@/lib/crons/auditTrail');

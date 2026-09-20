@@ -78,6 +78,8 @@ export interface ProductionSignalDTO {
   payloadHash: string;
 
   // Provenance Breakdown
+  predictionId?: string;
+  validationStatus?: string;
   modelVersion?: string;
   recommendation?: string;
   bookmaker?: string;
@@ -89,6 +91,8 @@ export interface ProductionSignalDTO {
     modelVersion: string;
   };
 }
+
+export type PublishedSignal = ProductionSignalDTO;
 
 export interface PublishTransitionEvent {
   transitionId: string;

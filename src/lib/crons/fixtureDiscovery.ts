@@ -20,6 +20,19 @@ export interface ScoredFixture {
   priorityScore: number;
 }
 
+export const TOP_LEAGUE_WHITELIST_IDS = new Set<number>([
+  39,  // Premier League (ENG-PL)
+  40,  // Championship (ENG-CH)
+  135, // Serie A (ITA-SA)
+  78,  // Bundesliga (GER-BL)
+  140, // La Liga (ESP-LL)
+  61,  // Ligue 1 (FRA-L1)
+  88,  // Eredivisie (NED-ED)
+  98,  // J1 League (JPN-J1)
+  292, // K League 1 (KOR-KL1)
+  279, // Liga 1 Indonesia (IDN-L1)
+]);
+
 // Priority score: 0-100
 // Factors: league tier, time until kickoff, whether lineups could be available
 function computePriorityScore(leagueTier: number, kickoff: Date, now: Date): number {
@@ -100,6 +113,9 @@ export async function discoverFixtures(): Promise<{
       for (const item of response.response) {
         const kickoff = new Date(item.fixture.date);
         const status = item.fixture.status.short;
+
+        // Enforce Top Leagues Whitelist (Product Governance Rule)
+        if (!TOP_LEAGUE_WHITELIST_IDS.has(item.league.id)) continue;
 
         // Skip finished matches
         if (['FT', 'AET', 'PEN', 'CANC', 'ABD', 'POSTP'].includes(status)) continue;
