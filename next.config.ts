@@ -40,6 +40,26 @@ const nextConfig: NextConfig = {
       }
     ];
   },
+  async rewrites() {
+    return [
+      {
+        source: '/api/cron/publishing-reconcile',
+        destination: '/api/cron/pipeline?mode=reconcile',
+      },
+      {
+        source: '/api/cron/settle-predictions',
+        destination: '/api/cron/pipeline?mode=settle',
+      },
+      {
+        source: '/api/performance/daily',
+        destination: '/api/performance?view=daily',
+      },
+      {
+        source: '/api/ledger/high-confidence',
+        destination: '/api/ledger/high-confidence',
+      },
+    ];
+  },
   async headers() {
     return [
       {

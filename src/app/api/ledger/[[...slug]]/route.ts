@@ -1,9 +1,13 @@
 // ============================================================================
 // HIGH-CONFIDENCE PREDICTION LEDGER API ROUTE
 // ============================================================================
-// Location: src/app/api/ledger/high-confidence/route.ts
+// Location: src/app/api/ledger/[[...slug]]/route.ts
 //
 // Exposes the immutable virtual bet ledger for HandicapLab -> SALMO.DEV.
+// Supports:
+// - /api/ledger
+// - /api/ledger/high-confidence
+//
 // Supports filtering by:
 // - date (YYYY-MM-DD)
 // - market (AH, OU, BTTS)
@@ -86,7 +90,7 @@ export async function GET(request: NextRequest) {
       entries: enrichedEntries,
     });
   } catch (error: any) {
-    console.error('[API /ledger/high-confidence] Error:', error);
+    console.error('[API /api/ledger] Error:', error);
     return NextResponse.json(
       {
         success: false,
