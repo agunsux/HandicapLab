@@ -20,6 +20,7 @@ import {
 } from './types';
 import { DurableLedgerStore } from './durableLedgerStore';
 import { DailyPerformanceService } from './dailyPerformanceService';
+import { PredictionArchiveService } from '@/lib/archive/predictionArchiveService';
 
 export interface AuthoritativeMatchResult {
   fixtureId: string;
@@ -47,11 +48,21 @@ export class ProductionSettlementService {
    */
   public static async settleEntry(
     entry: HighConfidenceLedgerEntry,
-    result: AuthoritativeMatchResult
+    result: AuthoritativeMatchResult,
+    options?: { nowMs?: number }
   ): Promise<{ settled: boolean; outcome?: SettlementOutcome; reason?: string }> {
     // 1. Idempotency Check: Cannot settle already settled bets
     if (entry.status === 'SETTLED' || entry.settlementStatus !== null) {
       return { settled: false, reason: 'ALREADY_SETTLED' };
+    }
+
+    // Invariant: Cannot settle before kickoff time
+    if (entry.kickoffUtc) {
+      const kickMs = new Date(entry.kickoffUtc).getTime();
+      const currentMs = options?.nowMs ?? Date.now();
+      if (!isNaN(kickMs) && currentMs < kickMs) {
+        return { settled: false, reason: 'KICKOFF_NOT_REACHED: Cannot settle prediction before kickoff timestamp' };
+      }
     }
 
     const normStatus = result.status?.toUpperCase() || 'UNKNOWN';
@@ -216,7 +227,151 @@ export class ProductionSettlementService {
     const matchDate = entry.kickoffUtc.slice(0, 10);
     await DailyPerformanceService.recalculateDailySummary(matchDate);
 
+    // 11. Synchronize to PredictionArchive if corresponding record exists
+    try {
+      await PredictionArchiveService.settleArchivedPrediction(entry.signalId, {
+        settlementId: `stl_${entry.ledgerId}`,
+        outcome: settleRes.outcome,
+        profitUnits: settleRes.profit,
+        stakeUnits: entry.stakeUnits,
+        returnUnits: settleRes.returnAmount,
+        homeGoals,
+        awayGoals,
+        finalStatus: normStatus,
+        closingOdds,
+        clv,
+        settledAt: nowIso,
+        resultProvider: result.provider || 'api-football',
+      });
+    } catch (e) {
+      // Non-blocking fallback
+    }
+
     return { settled: true, outcome: settleRes.outcome };
+  }
+
+  /**
+   * Settles all unsettled archived predictions for completed fixtures in results map.
+   */
+  public static async settleArchiveBatch(
+    resultsMap: Map<string, AuthoritativeMatchResult>
+  ): Promise<{ settledCount: number; voidCount: number; errorCount: number }> {
+    const archive = PredictionArchiveService.loadArchive();
+    const unsettled = Object.values(archive).filter(
+      (r) => r.status !== 'SETTLED' && r.status !== 'VOID'
+    );
+
+    let settledCount = 0;
+    let voidCount = 0;
+    let errorCount = 0;
+
+    for (const record of unsettled) {
+      const matchRes = resultsMap.get(record.fixtureId);
+      if (!matchRes) continue;
+
+      const normStatus = matchRes.status?.toUpperCase() || 'UNKNOWN';
+      if (normStatus === 'PST' || normStatus === 'POSTPONED') continue;
+
+      const nowIso = new Date().toISOString();
+
+      if (normStatus === 'CANC' || normStatus === 'CANCELLED' || normStatus === 'ABD' || normStatus === 'ABANDONED') {
+        await PredictionArchiveService.settleArchivedPrediction(record.predictionId, {
+          settlementId: `stl_void_${record.predictionId}`,
+          outcome: 'VOID',
+          profitUnits: 0.0,
+          stakeUnits: 1.0,
+          returnUnits: 1.0,
+          homeGoals: matchRes.homeGoals ?? 0,
+          awayGoals: matchRes.awayGoals ?? 0,
+          finalStatus: normStatus,
+          closingOdds: record.marketOdds,
+          clv: 0.0,
+          settledAt: nowIso,
+          resultProvider: matchRes.provider || 'api-football',
+        });
+        voidCount++;
+        settledCount++;
+        continue;
+      }
+
+      const isFinal = normStatus === 'FT' || normStatus === 'AET' || normStatus === 'PEN' || normStatus === 'FINAL' || normStatus === 'FINISHED';
+      if (!isFinal) continue;
+
+      if (matchRes.homeGoals === null || matchRes.awayGoals === null || isNaN(matchRes.homeGoals) || isNaN(matchRes.awayGoals)) {
+        errorCount++;
+        continue;
+      }
+
+      const homeGoals = matchRes.homeGoals;
+      const awayGoals = matchRes.awayGoals;
+      const totalGoals = homeGoals + awayGoals;
+
+      let settleRes: SettlementResult;
+      try {
+        if (record.market === 'AH') {
+          let side: 'HOME' | 'AWAY' = 'HOME';
+          const selLower = record.selection.toLowerCase();
+          if (selLower.includes('away') || (record.awayTeam && selLower.includes(record.awayTeam.toLowerCase()))) {
+            side = 'AWAY';
+          }
+          settleRes = ExactSettlementEngine.settleAsianHandicap(
+            homeGoals,
+            awayGoals,
+            record.line,
+            record.marketOdds,
+            side,
+            1.0
+          );
+        } else if (record.market === 'OU') {
+          const side: 'OVER' | 'UNDER' = record.selection.toUpperCase().includes('UNDER') ? 'UNDER' : 'OVER';
+          settleRes = ExactSettlementEngine.settleOverUnder(
+            totalGoals,
+            record.line,
+            record.marketOdds,
+            side,
+            1.0
+          );
+        } else if (record.market === 'BTTS') {
+          const side: 'YES' | 'NO' = record.selection.toUpperCase().includes('NO') ? 'NO' : 'YES';
+          settleRes = ExactSettlementEngine.settleBtts(
+            homeGoals,
+            awayGoals,
+            record.marketOdds,
+            side,
+            1.0
+          );
+        } else {
+          continue;
+        }
+      } catch (err) {
+        errorCount++;
+        continue;
+      }
+
+      const closingOdds = matchRes.closingOdds || record.marketOdds;
+      const clv = Number(((record.marketOdds / closingOdds) - 1).toFixed(4));
+
+      await PredictionArchiveService.settleArchivedPrediction(record.predictionId, {
+        settlementId: `stl_${record.predictionId}`,
+        outcome: settleRes.outcome,
+        profitUnits: settleRes.profit,
+        stakeUnits: 1.0,
+        returnUnits: settleRes.returnAmount,
+        homeGoals,
+        awayGoals,
+        finalStatus: normStatus,
+        closingOdds,
+        clv,
+        settledAt: nowIso,
+        resultProvider: matchRes.provider || 'api-football',
+      });
+
+      settledCount++;
+      const matchDate = record.kickoffTimestamp.slice(0, 10);
+      await DailyPerformanceService.recalculateDailySummary(matchDate);
+    }
+
+    return { settledCount, voidCount, errorCount };
   }
 
   /**
@@ -239,6 +394,9 @@ export class ProductionSettlementService {
     for (const res of results) {
       resultsMap.set(res.fixtureId, res);
     }
+
+    // Settle both HighConfidenceLedger entries and canonical PredictionArchive records
+    await this.settleArchiveBatch(resultsMap);
 
     const ledger = DurableLedgerStore.loadLedger();
     const candidates = Object.values(ledger).filter(

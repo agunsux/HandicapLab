@@ -20,6 +20,8 @@ import {
 } from './types';
 import { DurableLedgerStore } from './durableLedgerStore';
 import { HIGH_CONFIDENCE_THRESHOLD, CONFIDENCE_BANDS } from './constants';
+import { PredictionArchiveService } from '@/lib/archive/predictionArchiveService';
+import { PredictionArchiveRecord } from '@/lib/archive/types';
 
 export class DailyPerformanceService {
   /**
@@ -291,6 +293,127 @@ export class DailyPerformanceService {
       byConfidenceBand,
       byLeague,
       recentSettlements,
+    };
+  }
+
+  /**
+   * Computes comprehensive performance windows and multi-dimension slices
+   * from the canonical Prediction Archive.
+   */
+  public static getArchivePerformanceReport(options: { nowMs?: number } = {}) {
+    const nowMs = options.nowMs || Date.now();
+    const todayStr = new Date(nowMs).toISOString().slice(0, 10);
+    const yesterdayStr = new Date(nowMs - 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+    const sevenDaysAgoStr = new Date(nowMs - 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+    const thirtyDaysAgoStr = new Date(nowMs - 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+
+    const archive = PredictionArchiveService.loadArchive();
+    const allRecords = Object.values(archive);
+    const settledRecords = allRecords.filter((r) => r.settlement !== null);
+
+    const computeSlice = (records: PredictionArchiveRecord[], label: string) => {
+      let settledBets = 0;
+      let wins = 0;
+      let halfWins = 0;
+      let pushes = 0;
+      let halfLosses = 0;
+      let losses = 0;
+      let voids = 0;
+      let stakeUnits = 0;
+      let profitUnits = 0;
+      let sumOdds = 0;
+      let sumClv = 0;
+      let clvCount = 0;
+
+      for (const r of records) {
+        if (!r.settlement) continue;
+        settledBets++;
+        stakeUnits += r.settlement.stakeUnits || 1.0;
+        profitUnits += r.settlement.profitUnits;
+        sumOdds += r.marketOdds;
+
+        if (r.settlement.clv !== undefined && r.settlement.clv !== null) {
+          sumClv += r.settlement.clv;
+          clvCount++;
+        }
+
+        switch (r.settlement.outcome) {
+          case 'WIN': wins++; break;
+          case 'HALF_WIN': halfWins++; break;
+          case 'PUSH': pushes++; break;
+          case 'HALF_LOSS': halfLosses++; break;
+          case 'LOSS': losses++; break;
+          case 'VOID': voids++; break;
+        }
+      }
+
+      const yieldPct = stakeUnits > 0 ? Number(((profitUnits / stakeUnits) * 100).toFixed(2)) : 0.0;
+      const effectiveBets = settledBets - voids;
+      const strikeRatePct = effectiveBets > 0
+        ? Number((((wins + 0.5 * halfWins) / effectiveBets) * 100).toFixed(2))
+        : 0.0;
+
+      return {
+        label,
+        totalBets: records.length,
+        settledBets,
+        wins,
+        halfWins,
+        pushes,
+        halfLosses,
+        losses,
+        voids,
+        stakeUnits: Number(stakeUnits.toFixed(2)),
+        profitUnits: Number(profitUnits.toFixed(4)),
+        yieldPct,
+        avgOdds: settledBets > 0 ? Number((sumOdds / settledBets).toFixed(3)) : 0.0,
+        avgClvPct: clvCount > 0 ? Number(((sumClv / clvCount) * 100).toFixed(2)) : 0.0,
+        strikeRatePct,
+      };
+    };
+
+    const today = computeSlice(settledRecords.filter((r) => r.kickoffTimestamp.startsWith(todayStr)), 'Today');
+    const yesterday = computeSlice(settledRecords.filter((r) => r.kickoffTimestamp.startsWith(yesterdayStr)), 'Yesterday');
+    const last7Days = computeSlice(settledRecords.filter((r) => r.kickoffTimestamp >= sevenDaysAgoStr), 'Last 7 Days');
+    const last30Days = computeSlice(settledRecords.filter((r) => r.kickoffTimestamp >= thirtyDaysAgoStr), 'Last 30 Days');
+    const allTime = computeSlice(settledRecords, 'All Time');
+
+    const byMarket = ['AH', 'OU', 'BTTS'].map((m) =>
+      computeSlice(settledRecords.filter((r) => r.market === m), m)
+    );
+
+    const leagues = Array.from(new Set(settledRecords.map((r) => r.competition)));
+    const byLeague = leagues.map((l) =>
+      computeSlice(settledRecords.filter((r) => r.competition === l), l)
+    );
+
+    const modelVersions = Array.from(new Set(settledRecords.map((r) => r.modelVersion)));
+    const byModelVersion = modelVersions.map((mv) =>
+      computeSlice(settledRecords.filter((r) => r.modelVersion === mv), mv)
+    );
+
+    const openPredictions = allRecords.filter((r) => r.status === 'ACTIVE' || r.status === 'GENERATED' || r.status === 'KICKED_OFF');
+
+    return {
+      generatedAtUtc: new Date(nowMs).toISOString(),
+      canonicalDomain: 'salmo.dev' as const,
+      totalArchived: allRecords.length,
+      totalSettled: settledRecords.length,
+      totalOpen: openPredictions.length,
+      openStakeUnits: Number((openPredictions.length * 1.0).toFixed(2)),
+      allTimeYieldPct: allTime.yieldPct,
+      allTimeProfitUnits: allTime.profitUnits,
+      allTimeStakeUnits: allTime.stakeUnits,
+      windows: {
+        today,
+        yesterday,
+        last7Days,
+        last30Days,
+        allTime,
+      },
+      byMarket,
+      byLeague,
+      byModelVersion,
     };
   }
 }

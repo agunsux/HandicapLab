@@ -21,10 +21,29 @@ import {
 } from './types';
 import { supabase } from '@/lib/supabase.server';
 
-const LEDGER_PATH = path.resolve('data/ledger/high_confidence_ledger.json');
-const SETTLEMENTS_PATH = path.resolve('data/ledger/settlements.json');
-const DAILY_PERF_PATH = path.resolve('data/ledger/daily_performance.json');
-const EVENTS_PATH = path.resolve('data/ledger/ledger_events.jsonl');
+function getLedgerPath(): string {
+  return process.env.NODE_ENV === 'test'
+    ? path.resolve('data/test_ledger/high_confidence_ledger.json')
+    : path.resolve('data/ledger/high_confidence_ledger.json');
+}
+
+function getSettlementsPath(): string {
+  return process.env.NODE_ENV === 'test'
+    ? path.resolve('data/test_ledger/settlements.json')
+    : path.resolve('data/ledger/settlements.json');
+}
+
+function getDailyPerfPath(): string {
+  return process.env.NODE_ENV === 'test'
+    ? path.resolve('data/test_ledger/daily_performance.json')
+    : path.resolve('data/ledger/daily_performance.json');
+}
+
+function getEventsPath(): string {
+  return process.env.NODE_ENV === 'test'
+    ? path.resolve('data/test_ledger/ledger_events.jsonl')
+    : path.resolve('data/ledger/ledger_events.jsonl');
+}
 
 export class DurableLedgerStore {
   private static cachedLedger: Record<string, HighConfidenceLedgerEntry> | null = null;
@@ -70,8 +89,9 @@ export class DurableLedgerStore {
     if (this.cachedLedger) return this.cachedLedger;
 
     try {
-      if (fs.existsSync(LEDGER_PATH)) {
-        const raw = fs.readFileSync(LEDGER_PATH, 'utf8');
+      const ledgerPath = getLedgerPath();
+      if (fs.existsSync(ledgerPath)) {
+        const raw = fs.readFileSync(ledgerPath, 'utf8');
         this.cachedLedger = JSON.parse(raw);
         return this.cachedLedger!;
       }
@@ -84,7 +104,7 @@ export class DurableLedgerStore {
 
   public static saveLedger(ledger: Record<string, HighConfidenceLedgerEntry>): void {
     this.cachedLedger = ledger;
-    this.atomicWriteJson(LEDGER_PATH, ledger);
+    this.atomicWriteJson(getLedgerPath(), ledger);
   }
 
   public static getEntry(ledgerId: string): HighConfidenceLedgerEntry | null {
@@ -153,8 +173,9 @@ export class DurableLedgerStore {
     if (this.cachedSettlements) return this.cachedSettlements;
 
     try {
-      if (fs.existsSync(SETTLEMENTS_PATH)) {
-        const raw = fs.readFileSync(SETTLEMENTS_PATH, 'utf8');
+      const p = getSettlementsPath();
+      if (fs.existsSync(p)) {
+        const raw = fs.readFileSync(p, 'utf8');
         this.cachedSettlements = JSON.parse(raw);
         return this.cachedSettlements!;
       }
@@ -167,7 +188,7 @@ export class DurableLedgerStore {
 
   public static saveSettlements(settlements: Record<string, SettlementDetails>): void {
     this.cachedSettlements = settlements;
-    this.atomicWriteJson(SETTLEMENTS_PATH, settlements);
+    this.atomicWriteJson(getSettlementsPath(), settlements);
   }
 
   public static getSettlement(ledgerId: string): SettlementDetails | null {
@@ -217,8 +238,9 @@ export class DurableLedgerStore {
     if (this.cachedDailyPerf) return this.cachedDailyPerf;
 
     try {
-      if (fs.existsSync(DAILY_PERF_PATH)) {
-        const raw = fs.readFileSync(DAILY_PERF_PATH, 'utf8');
+      const p = getDailyPerfPath();
+      if (fs.existsSync(p)) {
+        const raw = fs.readFileSync(p, 'utf8');
         this.cachedDailyPerf = JSON.parse(raw);
         return this.cachedDailyPerf!;
       }
@@ -231,7 +253,7 @@ export class DurableLedgerStore {
 
   public static saveDailyPerformance(data: Record<string, DailyPerformanceSummary>): void {
     this.cachedDailyPerf = data;
-    this.atomicWriteJson(DAILY_PERF_PATH, data);
+    this.atomicWriteJson(getDailyPerfPath(), data);
   }
 
   public static async recordDailySummary(summary: DailyPerformanceSummary): Promise<void> {
@@ -270,13 +292,14 @@ export class DurableLedgerStore {
   // ──────────────────────────────────────────────────────────────────────────
 
   public static logEvent(event: LedgerTransitionEvent): void {
-    this.appendJsonLine(EVENTS_PATH, event);
+    this.appendJsonLine(getEventsPath(), event);
   }
 
   public static getEvents(limit = 100): LedgerTransitionEvent[] {
     try {
-      if (!fs.existsSync(EVENTS_PATH)) return [];
-      const lines = fs.readFileSync(EVENTS_PATH, 'utf8').trim().split('\n').filter(Boolean);
+      const p = getEventsPath();
+      if (!fs.existsSync(p)) return [];
+      const lines = fs.readFileSync(p, 'utf8').trim().split('\n').filter(Boolean);
       return lines
         .slice(-limit)
         .map((l) => JSON.parse(l))
@@ -293,11 +316,12 @@ export class DurableLedgerStore {
     this.cachedLedger = {};
     this.cachedSettlements = {};
     this.cachedDailyPerf = {};
-    this.atomicWriteJson(LEDGER_PATH, {});
-    this.atomicWriteJson(SETTLEMENTS_PATH, {});
-    this.atomicWriteJson(DAILY_PERF_PATH, {});
-    if (fs.existsSync(EVENTS_PATH)) {
-      fs.writeFileSync(EVENTS_PATH, '', 'utf8');
+    this.atomicWriteJson(getLedgerPath(), {});
+    this.atomicWriteJson(getSettlementsPath(), {});
+    this.atomicWriteJson(getDailyPerfPath(), {});
+    const ep = getEventsPath();
+    if (fs.existsSync(ep)) {
+      fs.writeFileSync(ep, '', 'utf8');
     }
   }
 }

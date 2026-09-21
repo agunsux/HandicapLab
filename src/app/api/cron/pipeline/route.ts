@@ -16,6 +16,9 @@ import { ProductionPublishingEngine } from '@/lib/publishing/productionPublishin
 import { ProductionSettlementService } from '@/lib/ledger/productionSettlementService';
 import { DailyPerformanceService } from '@/lib/ledger/dailyPerformanceService';
 import { DurableLedgerStore } from '@/lib/ledger/durableLedgerStore';
+import { PredictionArchiveService } from '@/lib/archive/predictionArchiveService';
+import { ReconciliationService } from '@/lib/archive/reconciliationService';
+import { ModelVersionRegistry } from '@/lib/archive/modelVersionRegistry';
 
 const WINDOW_LABELS: Record<number, string> = {
   6: 'morning',
@@ -99,7 +102,96 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  // 3. Telemetry health mode
+  // 3. Canonical Sync & Rollover Mode
+  if (mode === 'sync' || mode === 'salmo-sync') {
+    try {
+      const nowMs = Date.now();
+      const lockedCount = await PredictionArchiveService.lockKickedOffPredictions(nowMs);
+      const snapshot = PredictionArchiveService.generateDailyPicksSnapshot(nowMs);
+      const reconciliation = ReconciliationService.reconcileArchive();
+
+      return NextResponse.json({
+        success: true,
+        timestamp: new Date(nowMs).toISOString(),
+        lockedKickoffCount: lockedCount,
+        dailyPicksSnapshot: {
+          runId: snapshot.runId,
+          runTimestamp: snapshot.runTimestamp,
+          actionablePicks: snapshot.actionablePicks,
+          predictionsGenerated: snapshot.predictionsGenerated,
+        },
+        reconciliation: {
+          isConsistent: reconciliation.isConsistent,
+          discrepancyCount: reconciliation.discrepancies.length,
+        },
+      });
+    } catch (error: any) {
+      console.error('[Pipeline Cron - Sync] Error:', error);
+      return NextResponse.json(
+        { success: false, error: error.message || 'Sync failed' },
+        { status: 500 }
+      );
+    }
+  }
+
+  // 4. Zero-Data Contradiction Check Mode
+  if (mode === 'contradiction-check' || mode === 'contradiction') {
+    try {
+      const nowMs = Date.now();
+      const archive = PredictionArchiveService.loadArchive();
+      const records = Object.values(archive);
+      const upcomingRecords = records.filter((r) => new Date(r.kickoffTimestamp).getTime() > nowMs);
+      const settledRecords = records.filter((r) => r.status === 'SETTLED' || r.status === 'VOID');
+      const dailyPicks = PredictionArchiveService.getDailyPicksProjection({ nowMs });
+      const performance = DailyPerformanceService.getArchivePerformanceReport({ nowMs });
+
+      const contradictions: Array<{ code: string; message: string; severity: 'CRITICAL' | 'WARNING' }> = [];
+
+      if (upcomingRecords.length === 0 && dailyPicks.length > 0) {
+        contradictions.push({
+          code: 'ZERO_FIXTURES_ACTIVE_SIGNALS',
+          message: `Detected 0 upcoming fixtures but ${dailyPicks.length} active daily picks!`,
+          severity: 'CRITICAL',
+        });
+      }
+
+      if (settledRecords.length === 0 && performance.allTimeYieldPct > 0) {
+        contradictions.push({
+          code: 'ZERO_SETTLED_POSITIVE_YIELD',
+          message: `Detected 0 settled predictions but positive realized yield (${performance.allTimeYieldPct}%)!`,
+          severity: 'CRITICAL',
+        });
+      }
+
+      const modelVerification = ModelVersionRegistry.verifyModelConfiguration('dixon-coles-v1.0');
+
+      return NextResponse.json({
+        success: true,
+        status: contradictions.length === 0 ? 'HEALTHY' : 'CONTRADICTION_DETECTED',
+        timestamp: new Date(nowMs).toISOString(),
+        contradictions,
+        modelIntegrity: {
+          modelVersion: 'dixon-coles-v1.0',
+          verified: modelVerification.verified,
+        },
+        summary: {
+          totalArchived: records.length,
+          upcomingCount: upcomingRecords.length,
+          dailyPicksCount: dailyPicks.length,
+          settledCount: settledRecords.length,
+          allTimeYieldPct: performance.allTimeYieldPct,
+        },
+      });
+    } catch (error: any) {
+      console.error('[Pipeline Cron - ContradictionCheck] Error:', error);
+      return NextResponse.json(
+        { success: false, error: error.message || 'Contradiction check failed' },
+        { status: 500 }
+      );
+    }
+  }
+
+  // 5. Telemetry health mode
   if (mode === 'health') {
     const [health, queue, progress] = await Promise.all([
       getProviderHealth(),

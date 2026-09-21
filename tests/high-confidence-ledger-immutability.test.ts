@@ -117,3 +117,4 @@ describe('HighConfidenceLedgerService - Confidence Immutability & Gate Rule', ()
     expect(result.ledgerEntry?.confidenceScore).toBe(qualifiedSignal.confidence);
   });
 });
+

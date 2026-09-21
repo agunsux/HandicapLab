@@ -99,6 +99,8 @@ scratch_*.js
 data/golden/epic65/
 data/cache/
 data/ledger/
+data/test_cache/
+data/test_ledger/
 artifacts/forensic_raw_summary.json
 .cursor/
 __pycache__/

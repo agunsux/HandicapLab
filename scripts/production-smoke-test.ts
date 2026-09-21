@@ -1,5 +1,6 @@
 // ============================================================================
 // PRODUCTION SMOKE TEST: FULL AUTOMATIC LIFECYCLE (HANDICAPLAB -> SALMO)
+// LIFECYCLE & INTEGRATION PIPELINE SIMULATION (SMOKE TEST)
 // ============================================================================
 // Location: scripts/production-smoke-test.ts
 //
@@ -17,7 +18,26 @@
 //   → settlement
 //   → daily performance/yield
 //   → SALMO reflects the updated state automatically
+// CLASSIFICATION: INTEGRATION PIPELINE SIMULATION
+// STATUS: TEST VERIFIED (NOT LIVE PRODUCTION OPERATIONAL PROOF)
+//
+// Purpose: Demonstrates the end-to-end mathematical lifecycle:
+//   SIMULATED FIXTURE
+//   → PINNACLE-STYLE ODDS
+//   → DIXON-COLES MODEL EVALUATION
+//   → VALIDITY GATE
+//   → CANONICAL STORE RECONCILIATION
+//   → SALMO VIEWER CONSUMPTION
+//   → 1.0U VIRTUAL LEDGER QUALIFICATION
+//   → KICKOFF LOCK
+//   → QUARTER-LINE SETTLEMENT
+//   → MULTI-WINDOW YIELD AGGREGATION
+//
+// Invariant: Runs strictly with NODE_ENV='test' to protect production ledger
+// and cache from synthetic test data contamination.
 // ============================================================================
+
+(process.env as Record<string, string | undefined>)['NODE_ENV'] = 'test';
 
 import { ProductionValidityGate } from '../src/lib/publishing/productionValidityGate';
 import { ProductionPublishingEngine } from '../src/lib/publishing/productionPublishingEngine';
@@ -199,6 +219,7 @@ async function runProductionSmokeTest() {
 
   const pubReport = await ProductionPublishingEngine.reconcileAndPublish({
     triggeredBy: 'SCHEDULER_CRON',
+    customFixtures: [fixture],
     customSignals: [sigInput],
     nowMs,
   });
@@ -273,7 +294,9 @@ async function runProductionSmokeTest() {
     closingOdds: 1.88, // Closing line was 1.88 (We beat the closing line!)
   };
 
-  const settleRes = await ProductionSettlementService.settleEntry(lockedBet, finalResult);
+  const settleRes = await ProductionSettlementService.settleEntry(lockedBet, finalResult, {
+    nowMs: kickoffMs + 105 * 60 * 1000,
+  });
   if (!settleRes.settled) {
     throw new Error(`Settlement failed: ${settleRes.reason}`);
   }
@@ -304,6 +327,9 @@ async function runProductionSmokeTest() {
   console.log('\n═════════════════════════════════════════════════════════════════════');
   console.log('  PRODUCTION SMOKE TEST PASSED: ALL 10 PHASES DEMONSTRATED!        ');
   console.log('  REAL FIXTURE -> MODEL -> PUBLISH -> SALMO -> SETTLED -> YIELD    ');
+  console.log('  INTEGRATION TEST HARNESS PASSED: ALL 10 LIFECYCLE PHASES VERIFIED!  ');
+  console.log('  STATUS: TEST VERIFIED (NOT LIVE CONTINUOUS PRODUCTION OPERATION)   ');
+  console.log('  SANDBOX: MODEL -> PUBLISH -> SALMO -> LOCK -> SETTLE -> YIELD      ');
   console.log('═════════════════════════════════════════════════════════════════════\n');
 }
 
