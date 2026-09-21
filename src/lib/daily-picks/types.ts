@@ -5,8 +5,17 @@
 // Canonical markets supported: AH (Asian Handicap), OU (Over/Under 2.5), BTTS (Both Teams To Score).
 // ============================================================================
 
-export type CanonicalMarket = 'AH' | 'OU' | 'BTTS';
+export type CanonicalMarket = 'AH' | 'OU' | 'ML' | 'BTTS';
 import type { PublishState } from '@/lib/publishing/types';
+import type {
+  PriceSnapshot,
+  ReferencePriceInfo,
+  ModelPriceInfo,
+  ExecutionPriceInfo,
+  SuggestedBet,
+  PredictionLifecycle,
+  EvidenceStatus,
+} from '@/lib/archive/types';
 
 export type ValidationStatus =
   | 'VALUE_CANDIDATE'
@@ -41,7 +50,7 @@ export interface OddsProvenance {
   provider: 'oddspapi';
   bookmaker: 'pinnacle' | string;
   market: CanonicalMarket;
-  line: number;
+  line: number | null;
   marketOdds: number;
   impliedProbability: number;
   devigProbability: number;
@@ -68,7 +77,7 @@ export interface DailyPickRecord {
   kickoffUtc: string;
   market: CanonicalMarket;
   selection: string;
-  line: number;
+  line: number | null;
   predictionTimestampUtc: string;
   oddsTimestampUtc: string;
   modelVersion: string;
@@ -81,7 +90,7 @@ export interface DailyPickRecord {
   modelProbability: number; // 0.0000 - 1.0000
   marketProbability: number; // 0.0000 - 1.0000 (devigged)
   fairOdds: number; // 1 / modelProbability
-  marketOdds: number; // Pinnacle decimal odds
+  marketOdds: number; // Pinnacle decimal odds (Reference Price)
   edge: number; // (modelProbability - marketProbability)
   expectedValue: number; // (modelProbability * marketOdds) - 1
   confidence: number; // 0 - 100
@@ -89,6 +98,8 @@ export interface DailyPickRecord {
   dataQuality: number; // 0 - 100
   providerHealth: 'HEALTHY' | 'WARNING' | 'DEGRADED';
   status: PredictionStatus;
+  lifecycle?: PredictionLifecycle;
+  evidenceStatus?: EvidenceStatus;
   lifecycleStage?: PredictionLifecycleStage;
   horizonBucket?: PredictionHorizonBucket;
   strengthLevel?: 'STRONG' | 'MODERATE' | 'WEAK' | 'VERY_WEAK';
@@ -99,6 +110,13 @@ export interface DailyPickRecord {
   apiFootballFixtureTimestamp: string;
   footyStatsSnapshotTimestamp?: string;
   oddsPapiSnapshotTimestamp: string;
+
+  // Three-Price Separation & Suggested Bet (Gate 2 & 3)
+  referencePrice?: ReferencePriceInfo;
+  modelPrice?: ModelPriceInfo;
+  executionPrice?: ExecutionPriceInfo | null;
+  suggestedBet?: SuggestedBet | null;
+  clvStatus?: 'PENDING' | 'VERIFIED' | 'VOID';
 }
 
 export interface DailyPicksApiResponse {

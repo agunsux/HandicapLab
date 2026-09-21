@@ -11,18 +11,34 @@
 // 5. Model versioning is immutable: historical predictions are never rewritten.
 // ============================================================================
 
-export type ArchiveMarket = 'AH' | 'OU' | 'BTTS';
+export type ArchiveMarket = 'AH' | 'OU' | 'ML' | 'BTTS';
 
 export type ArchiveDecision = 'VALUE_CANDIDATE' | 'WATCH' | 'NO_SIGNAL';
 
+// Explicit Prediction Lifecycle (Gate 4)
+export type PredictionLifecycle =
+  | 'DRAFT'
+  | 'PUBLISHED'
+  | 'LIVE'
+  | 'COMPLETED'
+  | 'CANCELLED'
+  | 'VOID';
+
+// Explicit Evidence & Validation Status (Gate 4)
+export type EvidenceStatus =
+  | 'DATA_VERIFIED'
+  | 'MODEL_VERIFIED'
+  | 'CLV_PENDING'
+  | 'CLV_VERIFIED'
+  | 'RESULT_VERIFIED';
+
 export type ArchiveStatus =
+  | PredictionLifecycle
   | 'GENERATED'
   | 'ACTIVE'
   | 'KICKED_OFF'
   | 'PENDING_SETTLEMENT'
   | 'SETTLED'
-  | 'VOID'
-  | 'CANCELLED'
   | 'REJECTED';
 
 export type QuarterLineOutcome =
@@ -57,6 +73,102 @@ export interface PredictionSettlementRecord {
   resultSource?: string;
 }
 
+// ────────────────────────────────────────────────────────────────────────────
+// THREE-SNAPSHOT EVIDENCE CONTRACTS (Gate 2 & 3)
+// ────────────────────────────────────────────────────────────────────
+export interface PriceSnapshot {
+  snapshotId: string;
+  provider: string; // 'OddsPapi'
+  bookmaker: string; // 'Pinnacle' | 'Bet365' | string
+  market: ArchiveMarket;
+  selection: string;
+  line: number | null;
+  odds: number;
+  timestamp?: string;
+  timestampUtc?: string;
+  fixtureId?: string;
+  source?: string; // 'odds-by-tournaments' | 'odds-by-fixtures' | 'cache'
+  provenanceHash?: string;
+  impliedProbability?: number;
+  devigProbability?: number;
+  fixtureIdentity?: {
+    fixtureId: string;
+    homeTeam: string;
+    awayTeam: string;
+    kickoffUtc: string;
+  };
+}
+
+export interface ClvBenchmarkRecord {
+  status: 'PENDING' | 'CALCULATED' | 'VERIFIED' | 'VOID';
+  entryBookmaker?: string;
+  entryOdds?: number;
+  entryTimestamp?: string;
+  referenceBookmaker?: 'Pinnacle' | string;
+  closingOdds: number | null;
+  closingTimestamp?: string | null;
+  closingTimestampUtc?: string | null;
+  closingLine?: number | null;
+  clv?: number | null; // (entryOdds / closingOdds) - 1
+  clvValue?: number | null;
+  clvRatio?: number | null;
+  clvBps?: number | null;
+  benchmarkSource?: string;
+}
+
+export interface SuggestedBet {
+  bookmaker?: string; // e.g. 'Bet365' (or fallback 'Pinnacle')
+  odds?: number;
+  market?: ArchiveMarket;
+  selection?: string;
+  line?: number | null;
+  edge?: number; // vs SALMO model fair odds
+  expectedValue?: number;
+  isSoftExecution?: boolean;
+  qualifies?: boolean;
+  timestamp?: string;
+  // Aliases and rich fields
+  qualified?: boolean;
+  executionBookmaker?: string;
+  executionOdds?: number;
+  executionEdge?: number;
+  ruleApplied?: string;
+  disclaimer?: string;
+}
+
+// Disaggregated Pricing Pillars for API / Projections (Gate 2 & 5)
+export interface ReferencePriceInfo {
+  bookmaker: 'Pinnacle' | string;
+  odds: number;
+  devigProbability?: number;
+  market: ArchiveMarket;
+  line: number | null;
+  selection: string;
+  timestamp?: string;
+  timestampUtc?: string;
+}
+
+export interface ModelPriceInfo {
+  modelProbability: number;
+  fairOdds: number;
+  edge: number; // Model prob - devig market prob
+  expectedValue: number; // (Model prob * Reference odds) - 1
+  modelVersion: string;
+}
+
+export interface ExecutionPriceInfo {
+  bookmaker: string; // 'Bet365'
+  odds: number;
+  market?: ArchiveMarket;
+  selection?: string;
+  line?: number | null;
+  edge?: number; // vs model fair odds
+  expectedValue?: number; // (Model prob * Execution odds) - 1
+  isSuggested?: boolean;
+  timestamp?: string;
+  timestampUtc?: string;
+}
+
 export interface PredictionArchiveRecord {
   // Identity
   predictionId: string;
@@ -67,16 +179,16 @@ export interface PredictionArchiveRecord {
   competition: string;
   leagueKey: string;
 
-  // Market definition (strictly AH, OU, BTTS)
+  // Explicit Market Definition (strictly AH, OU, ML, BTTS)
   market: ArchiveMarket;
-  line: number;
+  line: number | null;
   selection: string;
 
-  // Probabilities & Fair Values
+  // Probabilities & Fair Values (SALMO Model)
   modelProbability: number;
   fairOdds: number;
 
-  // Real Market Odds Snapshot
+  // Real Market Odds Snapshot (Pinnacle Benchmark)
   marketOdds: number;
   bookmaker: string; // Pinnacle ground truth
   oddsProvider: string; // OddsPapi
@@ -105,8 +217,26 @@ export interface PredictionArchiveRecord {
   // Mathematical state for forensic reconstruction
   scoreGridSummary: ScoreGridSummary;
 
-  // Lifecycle State Machine
+  // Three-Snapshot Evidence Preservation (Gate 2 & 3)
+  referenceSnapshot?: PriceSnapshot;
+  executionSnapshot?: PriceSnapshot | null;
+  closingSnapshot?: PriceSnapshot | null;
+
+  // Disaggregated Pricing Pillars (Gate 2 & 5)
+  referencePrice?: ReferencePriceInfo;
+  modelPrice?: ModelPriceInfo;
+  executionPrice?: ExecutionPriceInfo | null;
+
+  // CLV Benchmark Governance (Pinnacle Benchmark - Gate 5)
+  clvRecord?: ClvBenchmarkRecord;
+
+  // Suggested Bet (Execution Qualification - Gate 3)
+  suggestedBet?: SuggestedBet | null;
+
+  // Disaggregated Lifecycle & Evidence State Machine (Gate 4)
   status: ArchiveStatus;
+  lifecycle?: PredictionLifecycle;
+  evidenceStatus?: EvidenceStatus;
   rejectionReason?: string | null;
 
   // Result & Settlement
@@ -128,7 +258,7 @@ export interface DailyPickProjection {
   leagueKey: string;
   kickoffUtc: string;
   market: ArchiveMarket;
-  line: number;
+  line: number | null;
   selection: string;
   modelProbability: number;
   fairOdds: number;
@@ -141,11 +271,20 @@ export interface DailyPickProjection {
   verdict: 'LAYAK' | 'PANTAU' | 'LEWATI';
   signalColor: 'green' | 'amber' | 'yellow' | 'gray' | 'red' | string;
   status: ArchiveStatus;
+  lifecycle?: PredictionLifecycle;
+  evidenceStatus?: EvidenceStatus;
   modelVersion: string;
   horizonBucket: 'TODAY' | 'TOMORROW' | 'NEXT_7_DAYS';
   predictionTimestampUtc: string;
   oddsTimestampUtc: string;
   updatedAtUtc: string;
+
+  // Three Disaggregated Pricing Pillars (Gate 2)
+  referencePrice?: ReferencePriceInfo;
+  modelPrice?: ModelPriceInfo;
+  executionPrice?: ExecutionPriceInfo | null;
+  suggestedBet?: SuggestedBet | null;
+  clvStatus?: 'PENDING' | 'VERIFIED' | 'VOID';
 }
 
 export interface DailyPickRunSnapshot {

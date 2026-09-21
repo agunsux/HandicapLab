@@ -155,7 +155,7 @@ export class ProductionSettlementService {
         settleRes = ExactSettlementEngine.settleAsianHandicap(
           homeGoals,
           awayGoals,
-          entry.line,
+          entry.line ?? 0,
           entry.odds,
           side,
           entry.stakeUnits
@@ -164,7 +164,7 @@ export class ProductionSettlementService {
         const side: 'OVER' | 'UNDER' = entry.selection.toUpperCase().includes('UNDER') ? 'UNDER' : 'OVER';
         settleRes = ExactSettlementEngine.settleOverUnder(
           totalGoals,
-          entry.line,
+          entry.line ?? 2.5,
           entry.odds,
           side,
           entry.stakeUnits
@@ -176,6 +176,21 @@ export class ProductionSettlementService {
           awayGoals,
           entry.odds,
           side,
+          entry.stakeUnits
+        );
+      } else if (entry.market === 'ML') {
+        let sel: 'HOME' | 'DRAW' | 'AWAY' = 'HOME';
+        const selUpper = entry.selection.toUpperCase();
+        if (selUpper.includes('DRAW') || selUpper.includes('SERI')) {
+          sel = 'DRAW';
+        } else if (selUpper.includes('AWAY') || (entry.awayTeam && entry.selection.toLowerCase().includes(entry.awayTeam.toLowerCase()))) {
+          sel = 'AWAY';
+        }
+        settleRes = ExactSettlementEngine.settleMoneyline(
+          homeGoals,
+          awayGoals,
+          entry.odds,
+          sel,
           entry.stakeUnits
         );
       } else {
@@ -326,7 +341,7 @@ export class ProductionSettlementService {
           settleRes = ExactSettlementEngine.settleAsianHandicap(
             homeGoals,
             awayGoals,
-            record.line,
+            record.line ?? 0,
             record.marketOdds,
             side,
             1.0
@@ -335,7 +350,7 @@ export class ProductionSettlementService {
           const side: 'OVER' | 'UNDER' = record.selection.toUpperCase().includes('UNDER') ? 'UNDER' : 'OVER';
           settleRes = ExactSettlementEngine.settleOverUnder(
             totalGoals,
-            record.line,
+            record.line ?? 2.5,
             record.marketOdds,
             side,
             1.0
@@ -347,6 +362,21 @@ export class ProductionSettlementService {
             awayGoals,
             record.marketOdds,
             side,
+            1.0
+          );
+        } else if (record.market === 'ML') {
+          let sel: 'HOME' | 'DRAW' | 'AWAY' = 'HOME';
+          const selUpper = record.selection.toUpperCase();
+          if (selUpper.includes('DRAW') || selUpper.includes('SERI')) {
+            sel = 'DRAW';
+          } else if (selUpper.includes('AWAY') || (record.awayTeam && record.selection.toLowerCase().includes(record.awayTeam.toLowerCase()))) {
+            sel = 'AWAY';
+          }
+          settleRes = ExactSettlementEngine.settleMoneyline(
+            homeGoals,
+            awayGoals,
+            record.marketOdds,
+            sel,
             1.0
           );
         } else {

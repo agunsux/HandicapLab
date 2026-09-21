@@ -38,8 +38,8 @@ export interface ConfidenceBreakdown {
 
 export interface ValueEngineSelectionInput {
   selection: string;
-  market: 'AH' | 'OU' | 'BTTS';
-  line: number;
+  market: 'AH' | 'OU' | 'ML' | 'BTTS';
+  line: number | null;
   // Model probability (for AH, this is the cover probability)
   modelProbability: number;
   // Detailed outcome probabilities for AH (win, halfWin, push, halfLoss, loss)
@@ -50,10 +50,11 @@ export interface ValueEngineSelectionInput {
     halfLoss: number;
     loss: number;
   };
-  // Pinnacle two-way quotes for the exact same market pair
+  // Pinnacle two-way or three-way quotes for the exact same market pair
   pinnacleOdds: {
     sideOdds: number;
     oppositeOdds: number;
+    drawOdds?: number;
   };
   // Sample sizes (finished matches in point-in-time sample)
   sampleSizeHome: number;
@@ -73,9 +74,9 @@ export interface ValueEngineSelectionInput {
 }
 
 export interface ValueEvaluationResult {
-  market: 'AH' | 'OU' | 'BTTS';
+  market: 'AH' | 'OU' | 'ML' | 'BTTS';
   selection: string;
-  line: number;
+  line: number | null;
   modelProbability: number;
   marketProbability: number;
   fairOdds: number;
@@ -183,6 +184,62 @@ export class ValueEngine {
     return {
       pA: Number((q1 / overround).toFixed(4)),
       pB: Number((q2 / overround).toFixed(4)),
+      overround: Number(overround.toFixed(4)),
+      valid: true,
+      reason: null,
+    };
+  }
+
+  /**
+   * Three-way multiplicative margin removal (de-vigging for ML / 1X2).
+   */
+  public static devigThreeWay(
+    odds1: number,
+    odds2: number,
+    odds3: number
+  ): {
+    pA: number;
+    pB: number;
+    pC: number;
+    overround: number;
+    valid: boolean;
+    reason: string | null;
+  } {
+    if (
+      !odds1 || !odds2 || !odds3 ||
+      isNaN(odds1) || isNaN(odds2) || isNaN(odds3) ||
+      odds1 <= 1.01 || odds2 <= 1.01 || odds3 <= 1.01
+    ) {
+      return {
+        pA: 0.3333,
+        pB: 0.3333,
+        pC: 0.3333,
+        overround: 1.0,
+        valid: false,
+        reason: 'Market odds <= 1.01 or invalid',
+      };
+    }
+
+    const q1 = 1 / odds1;
+    const q2 = 1 / odds2;
+    const q3 = 1 / odds3;
+    const overround = q1 + q2 + q3;
+
+    if (overround < this.MIN_OVERROUND || overround > 1.150) {
+      return {
+        pA: Number((q1 / overround).toFixed(4)),
+        pB: Number((q2 / overround).toFixed(4)),
+        pC: Number((q3 / overround).toFixed(4)),
+        overround: Number(overround.toFixed(4)),
+        valid: false,
+        reason: `Overround ${overround.toFixed(4)} outside bounds [${this.MIN_OVERROUND}, 1.150]`,
+      };
+    }
+
+    return {
+      pA: Number((q1 / overround).toFixed(4)),
+      pB: Number((q2 / overround).toFixed(4)),
+      pC: Number((q3 / overround).toFixed(4)),
       overround: Number(overround.toFixed(4)),
       valid: true,
       reason: null,
@@ -340,10 +397,25 @@ export class ValueEngine {
     // ------------------------------------------------------------------------
     // GATE 3: PINNACLE_REFERENCE_VALID & DE-VIG
     // ------------------------------------------------------------------------
-    const devig = this.devigTwoWay(
-      input.pinnacleOdds.sideOdds,
-      input.pinnacleOdds.oppositeOdds
-    );
+    let devig: { pA: number; overround: number; valid: boolean; reason: string | null };
+    if (input.market === 'ML' && input.pinnacleOdds.drawOdds) {
+      const devig3 = this.devigThreeWay(
+        input.pinnacleOdds.sideOdds,
+        input.pinnacleOdds.drawOdds,
+        input.pinnacleOdds.oppositeOdds
+      );
+      devig = {
+        pA: devig3.pA,
+        overround: devig3.overround,
+        valid: devig3.valid,
+        reason: devig3.reason,
+      };
+    } else {
+      devig = this.devigTwoWay(
+        input.pinnacleOdds.sideOdds,
+        input.pinnacleOdds.oppositeOdds
+      );
+    }
     const pinnacleReferenceValid = devig.valid;
 
     // ------------------------------------------------------------------------
@@ -400,7 +472,7 @@ export class ValueEngine {
       !input.fixtureId.toLowerCase().startsWith('fake-');
 
     const dataCompleteness =
-      isWhitelistedLeague && hasTeamIdentity && hasValidFixtureId && !isNaN(input.line);
+      isWhitelistedLeague && hasTeamIdentity && hasValidFixtureId && (input.line === null || !isNaN(input.line));
 
     // ------------------------------------------------------------------------
     // CONFIDENCE COMPUTATION

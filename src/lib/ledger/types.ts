@@ -35,7 +35,7 @@ export interface HighConfidenceLedgerEntry {
 
   // Market & Selection
   market: CanonicalMarket;
-  line: number;
+  line: number | null;
   selection: string;
   verdict: string;
 
@@ -184,7 +184,7 @@ export interface OverallPerformanceReport {
     ledgerId: string;
     fixture: string;
     market: string;
-    line: number;
+    line: number | null;
     selection: string;
     odds: number;
     score: string;

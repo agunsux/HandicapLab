@@ -77,7 +77,7 @@ export class ModelVersionRegistry {
   /**
    * Returns active model version for a given market.
    */
-  public static getActiveModelVersion(market: 'AH' | 'OU' | 'BTTS'): ModelVersionDefinition {
+  public static getActiveModelVersion(market: 'AH' | 'OU' | 'BTTS' | 'ML' | string): ModelVersionDefinition {
     if (market === 'BTTS') {
       return this.REGISTRY['BTTS-jointscore-v1.0.0'] || this.REGISTRY['dixon-coles-v1.0'];
     }

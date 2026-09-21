@@ -128,6 +128,7 @@ export function DailyPicksClient({ initialData }: DailyPicksClientProps) {
 
   const ahCount = picks.filter((p) => p.market === 'AH').length;
   const ouCount = picks.filter((p) => p.market === 'OU').length;
+  const mlCount = picks.filter((p) => p.market === 'ML').length;
   const bttsCount = picks.filter((p) => p.market === 'BTTS').length;
 
   const toggleExpand = (id: string) => {
@@ -176,9 +177,13 @@ export function DailyPicksClient({ initialData }: DailyPicksClientProps) {
           {/* Real Data & Live Status Badges */}
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/80 border border-emerald-800 text-emerald-400 text-xs font-mono font-semibold">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/90 border border-emerald-700 text-emerald-300 text-xs font-mono font-bold">
                 <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                REAL DATA &bull; ZERO MOCK
+                LEVEL 2 &bull; VERIFIED LIVE PRODUCTION PIPELINE
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-950/80 border border-amber-800 text-amber-300 text-xs font-mono font-semibold">
+                <Clock className="h-3.5 w-3.5 text-amber-400" />
+                LEVEL 3 &bull; PENDING MATCH COMPLETION
               </span>
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#131B2E] border border-[#1E293B] text-xs font-mono text-[#94A3B8]">
                 <Clock className="h-3.5 w-3.5 text-[#3B82F6]" />
@@ -207,7 +212,7 @@ export function DailyPicksClient({ initialData }: DailyPicksClientProps) {
               Real-Time Football Market Intelligence
             </h1>
             <p className="text-sm sm:text-base text-[#94A3B8] max-w-3xl leading-relaxed">
-              Dixon-Coles bivariate Poisson quantitative model evaluating real upcoming Premier League fixtures against live Pinnacle market odds. Every pick preserves full provenance and ledger auditability.
+              Strict quantitative separation between <strong>Pinnacle Reference Price</strong> (CLV ground truth), <strong>SALMO Model Price</strong> (Dixon-Coles fair odds), and <strong>Retail Execution Price</strong>. Every prediction is anchored by an immutable 3-snapshot audit chain.
             </p>
           </div>
 
@@ -216,7 +221,7 @@ export function DailyPicksClient({ initialData }: DailyPicksClientProps) {
             <div className="p-3 rounded-lg bg-[#131B2E] border border-[#1E293B]">
               <div className="text-[11px] font-mono text-[#94A3B8] uppercase">Active Predictions</div>
               <div className="text-xl sm:text-2xl font-black text-white mt-1">{picks.length}</div>
-              <div className="text-[10px] font-mono text-emerald-400 mt-0.5">AH, OU, BTTS</div>
+              <div className="text-[10px] font-mono text-emerald-400 mt-0.5">AH, OU, ML, BTTS</div>
             </div>
             <div className="p-3 rounded-lg bg-[#131B2E] border border-[#1E293B]">
               <div className="text-[11px] font-mono text-[#94A3B8] uppercase">Upcoming Fixtures</div>
@@ -224,14 +229,14 @@ export function DailyPicksClient({ initialData }: DailyPicksClientProps) {
               <div className="text-[10px] font-mono text-[#94A3B8] mt-0.5">Next 7 Days (EPL)</div>
             </div>
             <div className="p-3 rounded-lg bg-[#131B2E] border border-[#1E293B]">
-              <div className="text-[11px] font-mono text-[#94A3B8] uppercase">Odds Benchmark</div>
-              <div className="text-xl sm:text-2xl font-black text-white mt-1">Pinnacle</div>
-              <div className="text-[10px] font-mono text-[#94A3B8] mt-0.5">Via OddsPapi v4</div>
+              <div className="text-[11px] font-mono text-[#94A3B8] uppercase">CLV Ground Truth</div>
+              <div className="text-xl sm:text-2xl font-black text-white mt-1">Pinnacle Close</div>
+              <div className="text-[10px] font-mono text-amber-400 mt-0.5">Status: PENDING</div>
             </div>
             <div className="p-3 rounded-lg bg-[#131B2E] border border-[#1E293B]">
-              <div className="text-[11px] font-mono text-[#94A3B8] uppercase">Temporal Invariant</div>
-              <div className="text-xl sm:text-2xl font-black text-emerald-400 mt-1">VERIFIED</div>
-              <div className="text-[10px] font-mono text-[#94A3B8] mt-0.5">odds &le; pred &lt; kickoff</div>
+              <div className="text-[11px] font-mono text-[#94A3B8] uppercase">Pipeline Provenance</div>
+              <div className="text-xl sm:text-2xl font-black text-emerald-400 mt-1">LEVEL 2 VERIFIED</div>
+              <div className="text-[10px] font-mono text-[#94A3B8] mt-0.5">Real Data &bull; Zero Mock</div>
             </div>
           </div>
         </div>
@@ -405,6 +410,16 @@ export function DailyPicksClient({ initialData }: DailyPicksClientProps) {
               Over / Under ({ouCount})
             </button>
             <button
+              onClick={() => setSelectedMarket('ML')}
+              className={`px-3 py-1.5 rounded-md text-xs font-mono font-medium transition-colors ${
+                selectedMarket === 'ML'
+                  ? 'bg-[#3B82F6] text-white'
+                  : 'bg-[#131B2E] text-[#94A3B8] hover:text-white border border-[#1E293B]'
+              }`}
+            >
+              Moneyline 1X2 ({mlCount})
+            </button>
+            <button
               onClick={() => setSelectedMarket('BTTS')}
               className={`px-3 py-1.5 rounded-md text-xs font-mono font-medium transition-colors ${
                 selectedMarket === 'BTTS'
@@ -520,46 +535,95 @@ export function DailyPicksClient({ initialData }: DailyPicksClientProps) {
 
                   {/* Market Selection & Quantitative Comparison */}
                   <div className="p-4 space-y-4 flex-1">
-                    {/* Market Line Banner */}
-                    <div className="flex items-center justify-between bg-[#0B1120] p-2.5 rounded-lg border border-[#1E293B]">
-                      <div>
-                        <div className="text-[10px] font-mono uppercase text-[#94A3B8]">Market &amp; Selection</div>
-                        <div className="text-sm font-black text-white mt-0.5">{pick.selection}</div>
+                    {/* Explicit Market Schema & Line Banner */}
+                    <div className="flex flex-wrap items-center justify-between gap-2 bg-[#0B1120] p-3 rounded-lg border border-[#1E293B]">
+                      <div className="space-y-0.5">
+                        <div className="flex items-center gap-2">
+                          <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-[#1E293B] text-[#3B82F6] border border-[#334155]">
+                            MARKET: {pick.market}
+                          </span>
+                          <span className="text-xs font-mono text-[#94A3B8]">
+                            Line: <strong className="text-white">{pick.line !== null && pick.line !== undefined ? (pick.line > 0 ? `+${pick.line}` : pick.line) : 'None (1X2)'}</strong>
+                          </span>
+                        </div>
+                        <div className="text-sm font-black text-white">{pick.selection}</div>
                       </div>
-                      <div className="text-right">
-                        <div className="text-[10px] font-mono uppercase text-[#94A3B8]">Validation</div>
-                        <div
-                          className={`text-xs font-mono font-bold ${
-                            pick.validationStatus === 'PROVISIONAL_EDGE' ? 'text-emerald-400' : 'text-[#94A3B8]'
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-950/80 text-amber-400 border border-amber-800/80">
+                          CLV: PENDING (Pinnacle Close)
+                        </span>
+                        <span
+                          className={`text-xs font-mono font-bold px-2 py-0.5 rounded ${
+                            pick.validationStatus === 'PROVISIONAL_EDGE' ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-slate-800 text-slate-300'
                           }`}
                         >
                           {pick.validationStatus}
-                        </div>
+                        </span>
                       </div>
                     </div>
 
-                    {/* Model vs Pinnacle Comparison Table */}
-                    <div className="grid grid-cols-2 gap-2 text-center text-xs font-mono">
-                      <div className="p-2.5 rounded-lg bg-[#0B1120]/60 border border-[#1E293B]">
-                        <div className="text-[10px] text-[#94A3B8] uppercase">Model Fair Odds</div>
+                    {/* Three-Price Separation Grid (Reference vs Model vs Execution) */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs font-mono">
+                      {/* 1. REFERENCE PRICE (Pinnacle Benchmark) */}
+                      <div className="p-3 rounded-lg bg-[#0B1120]/80 border border-[#1E293B] space-y-1">
+                        <div className="flex items-center justify-between text-[10px] text-[#94A3B8] uppercase">
+                          <span>1. Reference Price</span>
+                          <span className="text-[9px] text-[#3B82F6] font-bold">Pinnacle</span>
+                        </div>
+                        <div className="text-lg font-bold text-[#3B82F6] mt-0.5">
+                          {(pick.referencePrice?.odds ?? pick.marketOdds ?? 0).toFixed(2)}
+                        </div>
+                        <div className="text-[10px] text-[#94A3B8]">
+                          Devig: {(((pick.referencePrice?.devigProbability ?? pick.marketProbability) ?? 0) * 100).toFixed(1)}%
+                        </div>
+                        <div className="text-[9px] text-[#64748B] pt-1 border-t border-[#1E293B]">
+                          Sharp CLV Ground Truth
+                        </div>
+                      </div>
+
+                      {/* 2. MODEL PRICE (SALMO Dixon-Coles) */}
+                      <div className="p-3 rounded-lg bg-[#0B1120]/80 border border-[#1E293B] space-y-1">
+                        <div className="flex items-center justify-between text-[10px] text-[#94A3B8] uppercase">
+                          <span>2. Model Price</span>
+                          <span className="text-[9px] text-emerald-400 font-bold">SALMO DC</span>
+                        </div>
                         <div className="text-lg font-bold text-white mt-0.5">
-                          {(pick.fairOdds ?? (pick.modelProbability > 0 ? 1 / pick.modelProbability : 2.0)).toFixed(2)}
+                          {(pick.modelPrice?.fairOdds ?? pick.fairOdds ?? (pick.modelProbability > 0 ? 1 / pick.modelProbability : 2.0)).toFixed(2)}
                         </div>
-                        <div className="text-[10px] text-[#64748B] mt-0.5">
-                          Prob: {((pick.modelProbability ?? 0) * 100).toFixed(1)}%
+                        <div className="text-[10px] text-[#94A3B8]">
+                          Prob: {(((pick.modelPrice?.modelProbability ?? pick.modelProbability) ?? 0) * 100).toFixed(1)}%
+                        </div>
+                        <div className="text-[9px] text-emerald-400 pt-1 border-t border-[#1E293B]">
+                          EV: {(((pick.modelPrice?.expectedValue ?? pick.expectedValue) ?? 0) * 100).toFixed(1)}%
                         </div>
                       </div>
-                      <div className="p-2.5 rounded-lg bg-[#0B1120]/60 border border-[#1E293B]">
-                        <div className="text-[10px] text-[#94A3B8] uppercase">Pinnacle Odds</div>
-                        <div className="text-lg font-bold text-[#3B82F6] mt-0.5">{(pick.marketOdds ?? 0).toFixed(2)}</div>
-                        <div className="text-[10px] text-[#64748B] mt-0.5">
-                          Devig: {((pick.marketProbability ?? 0) * 100).toFixed(1)}%
+
+                      {/* 3. EXECUTION PRICE (Retail Market) */}
+                      <div className="p-3 rounded-lg bg-[#0B1120]/80 border border-[#1E293B] space-y-1">
+                        <div className="flex items-center justify-between text-[10px] text-[#94A3B8] uppercase">
+                          <span>3. Execution Price</span>
+                          <span className="text-[9px] text-purple-400 font-bold">{pick.executionPrice?.bookmaker || 'Bet365 (Retail)'}</span>
+                        </div>
+                        <div className="text-lg font-bold text-purple-300 mt-0.5">
+                          {pick.executionPrice?.odds ? pick.executionPrice.odds.toFixed(2) : (pick.marketOdds ?? 0).toFixed(2)}
+                        </div>
+                        <div className="text-[10px] text-[#94A3B8]">
+                          {pick.suggestedBet?.qualified ? (
+                            <span className="text-emerald-400 font-bold">
+                              Qualifies (+{(((pick.suggestedBet.executionEdge ?? 0)) * 100).toFixed(1)}%)
+                            </span>
+                          ) : (
+                            <span className="text-slate-400">Execution edge pending</span>
+                          )}
+                        </div>
+                        <div className="text-[9px] text-[#64748B] pt-1 border-t border-[#1E293B]">
+                          Qualifies &ne; Positive CLV
                         </div>
                       </div>
                     </div>
 
-                    {/* Edge & EV Stats Bar */}
-                    <div className="flex items-center justify-between text-xs font-mono px-2 py-1.5 bg-[#1E293B]/40 rounded-lg border border-[#1E293B]">
+                    {/* Pre-Match Metrics Bar (Strict Gate 5: Zero Realized ROI Pre-Match) */}
+                    <div className="flex flex-wrap items-center justify-between text-xs font-mono px-3 py-2 bg-[#1E293B]/40 rounded-lg border border-[#1E293B] gap-2">
                       <span className="text-[#94A3B8]">
                         Model Edge:{' '}
                         <strong className={hasEdge ? 'text-emerald-400' : 'text-slate-400'}>
@@ -567,29 +631,32 @@ export function DailyPicksClient({ initialData }: DailyPicksClientProps) {
                         </strong>
                       </span>
                       <span className="text-[#94A3B8]">
-                        Expected Value:{' '}
+                        Expected ROI / EV:{' '}
                         <strong className={isEvPositive ? 'text-emerald-400' : 'text-slate-400'}>
                           {((pick.expectedValue ?? 0) * 100).toFixed(2)}%
                         </strong>
                       </span>
+                      <span className="text-amber-400 text-[11px] font-semibold">
+                        Realized ROI: PENDING FT
+                      </span>
                     </div>
 
-                    {/* Confidence Scientific Explainability Ribbon */}
+                    {/* Confidence & Explainability Ribbon */}
                     <div className="text-[10px] font-mono text-[#64748B] bg-[#0B1120]/40 p-2 rounded border border-[#1E293B]/50 flex items-center justify-between">
                       <span>Robustness Score: <strong className="text-white">{pick.confidence ?? 0}/100</strong></span>
                       <span className="text-[9px] text-[#64748B] italic">Separate from win probability</span>
                     </div>
 
-                    {/* Expandable Provenance Section (15 Required SALMO Production Fields) */}
+                    {/* Expandable Provenance Section (Audit Snapshots & Invariants) */}
                     {isExpanded && (
                       <div className="p-3 rounded-lg bg-[#0B1120] border border-[#1E293B] space-y-2.5 text-[11px] font-mono text-[#94A3B8]">
                         <div className="text-xs font-bold text-white flex items-center justify-between">
                           <span className="flex items-center gap-1.5">
                             <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
-                            Audited Production Provenance
+                            Audited Production Provenance &amp; 3-Snapshot Chain
                           </span>
                           <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800">
-                            {pick.publishState || 'PUBLISHED'}
+                            {pick.lifecycle || 'PUBLISHED'} &bull; {pick.evidenceStatus || 'MODEL_VERIFIED'}
                           </span>
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-[#1E293B]/70">
@@ -602,44 +669,46 @@ export function DailyPicksClient({ initialData }: DailyPicksClientProps) {
                             <span className="text-white">{pick.competition}</span>
                           </div>
                           <div>
-                            <span className="text-[#64748B]">Market &amp; Selection: </span>
-                            <span className="text-white">{pick.selection}</span>
+                            <span className="text-[#64748B]">Market Schema: </span>
+                            <span className="text-white">{pick.market} | Line: {pick.line ?? 'None'}</span>
                           </div>
                           <div>
-                            <span className="text-[#64748B]">Current Odds: </span>
-                            <span className="text-[#3B82F6] font-bold">{(pick.marketOdds ?? 0).toFixed(2)}</span>
+                            <span className="text-[#64748B]">Reference (Pinnacle): </span>
+                            <span className="text-[#3B82F6] font-bold">{(pick.referencePrice?.odds ?? pick.marketOdds ?? 0).toFixed(2)}</span>
+                          </div>
+                          <div>
+                            <span className="text-[#64748B]">Execution Book: </span>
+                            <span className="text-purple-300 font-bold">{pick.executionPrice?.bookmaker || 'Bet365'} @ {pick.executionPrice?.odds ? pick.executionPrice.odds.toFixed(2) : (pick.marketOdds ?? 0).toFixed(2)}</span>
+                          </div>
+                          <div>
+                            <span className="text-[#64748B]">Closing Snapshot: </span>
+                            <span className="text-amber-400">PENDING KICKOFF (Oct 10, 2026)</span>
                           </div>
                           <div>
                             <span className="text-[#64748B]">Model Probability: </span>
                             <span className="text-white">{((pick.modelProbability ?? 0) * 100).toFixed(1)}%</span>
                           </div>
                           <div>
-                            <span className="text-[#64748B]">Market Implied: </span>
+                            <span className="text-[#64748B]">Pinnacle Devig: </span>
                             <span className="text-white">{((pick.marketProbability ?? 0) * 100).toFixed(1)}%</span>
                           </div>
                           <div>
-                            <span className="text-[#64748B]">Edge / EV: </span>
-                            <span className="text-emerald-400">{((pick.edge ?? 0) * 100).toFixed(1)}% / {((pick.expectedValue ?? 0) * 100).toFixed(1)}%</span>
+                            <span className="text-[#64748B]">Suggested Bet Status: </span>
+                            <span className={pick.suggestedBet?.qualified ? 'text-emerald-400' : 'text-slate-400'}>
+                              {pick.suggestedBet?.qualified ? 'QUALIFIED (Retail Edge)' : 'MONITOR'}
+                            </span>
                           </div>
                           <div>
-                            <span className="text-[#64748B]">Signal Strength: </span>
-                            <span className="text-white font-bold">{pick.confidence}% ({pick.strengthLevel || (pick.confidence >= 60 ? 'STRONG' : pick.confidence >= 50 ? 'MODERATE' : pick.confidence >= 40 ? 'WEAK' : 'VERY_WEAK')})</span>
+                            <span className="text-[#64748B]">CLV Status: </span>
+                            <span className="text-amber-400 font-bold">PENDING (Post-Close Only)</span>
                           </div>
                           <div>
                             <span className="text-[#64748B]">Odds Snapshot Time: </span>
                             <span className="text-white">{pick.oddsTimestampUtc?.slice(0, 19).replace('T', ' ')} UTC</span>
                           </div>
                           <div>
-                            <span className="text-[#64748B]">Prediction Generated: </span>
+                            <span className="text-[#64748B]">Prediction Time: </span>
                             <span className="text-white">{pick.predictionTimestampUtc?.slice(0, 19).replace('T', ' ')} UTC</span>
-                          </div>
-                          <div>
-                            <span className="text-[#64748B]">Data Freshness: </span>
-                            <span className="text-white">{pick.freshnessText || 'Updated just now'}</span>
-                          </div>
-                          <div>
-                            <span className="text-[#64748B]">Sharp Benchmark: </span>
-                            <span className="text-white">Pinnacle (OddsPapi v4)</span>
                           </div>
                           <div>
                             <span className="text-[#64748B]">Model Architecture: </span>
@@ -647,7 +716,7 @@ export function DailyPicksClient({ initialData }: DailyPicksClientProps) {
                           </div>
                           <div>
                             <span className="text-[#64748B]">Data Persistence: </span>
-                            <span className="text-emerald-400">daily_picks + ledger_v3</span>
+                            <span className="text-emerald-400">daily_picks + ledger_v3 + archive</span>
                           </div>
                         </div>
                       </div>

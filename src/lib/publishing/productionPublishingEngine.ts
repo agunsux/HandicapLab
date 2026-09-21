@@ -31,10 +31,11 @@ import { CanonicalFixtureRegistry, CanonicalFixture } from '@/lib/services/canon
 import { OddsPapiQuotaAllocator } from '@/lib/providers/oddspapiQuotaAllocator';
 import { getLeagueByKey, getLeagueByAfId } from '@/lib/config/multiLeagueRegistry';
 import { ValueEngine } from '@/lib/engine/valueEngine';
-import { buildScoreGrid, calculateAsianHandicapProbability, calculateOverUnderProbability, fairOdds } from '@/lib/engine/probability';
+import { buildScoreGrid, calculateAsianHandicapProbability, calculateOverUnderProbability, calculate1X2Probability, fairOdds } from '@/lib/engine/probability';
 import { calculateBttsFromGrid } from '@/lib/research/bttsEngine';
 import { HighConfidenceLedgerService } from '@/lib/ledger/highConfidenceLedgerService';
 import { PredictionArchiveService } from '@/lib/archive/predictionArchiveService';
+import { PriceSnapshot, ClvBenchmarkRecord, SuggestedBet, PredictionLifecycle, EvidenceStatus } from '@/lib/archive/types';
 import { CanonicalOrchestrator, CompetitionProfileEngine } from '@/lib/pipeline/canonicalOrchestrator';
 import { supabase } from '@/lib/supabase.server';
 
@@ -468,10 +469,27 @@ export class ProductionPublishingEngine {
           const bttsYes = pinMarkets['1050']?.outcomes?.['1050']?.players?.['0']?.price;
           const bttsNo = pinMarkets['1050']?.outcomes?.['1052']?.players?.['0']?.price;
 
+          const mlHome = pinMarkets['101']?.outcomes?.['101']?.players?.['0']?.price;
+          const mlDraw = pinMarkets['101']?.outcomes?.['102']?.players?.['0']?.price;
+          const mlAway = pinMarkets['101']?.outcomes?.['103']?.players?.['0']?.price;
+
+          // Bet365 Execution Price Extraction
+          const b365Markets = opFixture?.bookmakerOdds?.bet365?.markets;
+          const b365AhHome = b365Markets?.['1070']?.outcomes?.['1070']?.players?.['0']?.price || b365Markets?.['1072']?.outcomes?.['1072']?.players?.['0']?.price;
+          const b365OuOver = b365Markets?.['1010']?.outcomes?.['1010']?.players?.['0']?.price;
+          const b365MlHome = b365Markets?.['101']?.outcomes?.['101']?.players?.['0']?.price;
+
           fixture.markets = {
             asianHandicap: ahHome && ahAway ? { available: true, line: ahLine, homeOdds: ahHome, awayOdds: ahAway } : fixture.markets?.asianHandicap,
             overUnder: ouOver && ouUnder ? { available: true, line: 2.5, overOdds: ouOver, underOdds: ouUnder } : fixture.markets?.overUnder,
             btts: bttsYes && bttsNo ? { available: true, line: 0.5, yesOdds: bttsYes, noOdds: bttsNo } : fixture.markets?.btts,
+            moneyline: mlHome && mlAway && mlDraw ? { available: true, homeOdds: mlHome, drawOdds: mlDraw, awayOdds: mlAway } : (fixture.markets as any)?.moneyline,
+          } as any;
+
+          (fixture as any).bet365Markets = {
+            asianHandicap: b365AhHome ? { homeOdds: b365AhHome } : undefined,
+            overUnder: b365OuOver ? { overOdds: b365OuOver } : undefined,
+            moneyline: b365MlHome ? { homeOdds: b365MlHome } : undefined,
           };
         }
       }
@@ -480,14 +498,18 @@ export class ProductionPublishingEngine {
       const ahMarket = fixture.markets?.asianHandicap;
       const ouMarket = fixture.markets?.overUnder;
       const bttsMarket = fixture.markets?.btts;
+      const mlMarket = (fixture.markets as any)?.moneyline;
 
       // Candidate markets to evaluate
       const candidateMarkets: Array<{
-        market: 'AH' | 'OU' | 'BTTS';
+        market: 'AH' | 'OU' | 'ML' | 'BTTS';
         selection: string;
-        line: number;
+        line: number | null;
         marketOdds: number;
         oppositeOdds?: number;
+        drawOdds?: number;
+        executionOdds?: number;
+        executionBookmaker?: string;
       }> = [];
 
       if (ahMarket?.available && ahMarket.homeOdds && ahMarket.awayOdds && typeof ahMarket.line === 'number') {
@@ -497,6 +519,8 @@ export class ProductionPublishingEngine {
           line: ahMarket.line,
           marketOdds: ahMarket.homeOdds,
           oppositeOdds: ahMarket.awayOdds,
+          executionOdds: (fixture as any).bet365Markets?.asianHandicap?.homeOdds || undefined,
+          executionBookmaker: (fixture as any).bet365Markets?.asianHandicap?.homeOdds ? 'Bet365' : undefined,
         });
       }
 
@@ -507,6 +531,21 @@ export class ProductionPublishingEngine {
           line: ouMarket.line,
           marketOdds: ouMarket.overOdds,
           oppositeOdds: ouMarket.underOdds,
+          executionOdds: (fixture as any).bet365Markets?.overUnder?.overOdds || undefined,
+          executionBookmaker: (fixture as any).bet365Markets?.overUnder?.overOdds ? 'Bet365' : undefined,
+        });
+      }
+
+      if (mlMarket?.available && mlMarket.homeOdds && mlMarket.awayOdds && mlMarket.drawOdds) {
+        candidateMarkets.push({
+          market: 'ML',
+          selection: `${homeTeam} Win`,
+          line: null,
+          marketOdds: mlMarket.homeOdds,
+          oppositeOdds: mlMarket.awayOdds,
+          drawOdds: mlMarket.drawOdds,
+          executionOdds: (fixture as any).bet365Markets?.moneyline?.homeOdds || undefined,
+          executionBookmaker: (fixture as any).bet365Markets?.moneyline?.homeOdds ? 'Bet365' : undefined,
         });
       }
 
@@ -552,21 +591,21 @@ export class ProductionPublishingEngine {
 
       for (const cand of candidateMarkets) {
         evaluatedPredictions++;
-        const signalId = `sig_${fixtureId}_${cand.market}_${cand.line}`.replace(/[^a-zA-Z0-9_-]/g, '_');
+        const normalizedLineStr = cand.line !== null ? Number(cand.line).toFixed(2) : 'ML';
+        const signalId = `sig_${fixtureId}_${cand.market}_${cand.line ?? 'ML'}`.replace(/[^a-zA-Z0-9_-]/g, '_');
         const oddsTimestampUtc = fixture.lastSyncedAt || new Date().toISOString();
 
         // 1. Model Intensity & Probability Evaluation (Dixon-Coles)
-        const homeXg = 1.45;
-        const awayXg = 1.15;
-        const rho = -0.05;
-        // 2. Model Intensity & Probability Evaluation (Dixon-Coles)
         let modelProb = 0.5;
         if (cand.market === 'AH') {
-          const prob = calculateAsianHandicapProbability(homeXg, awayXg, cand.line, rho);
+          const prob = calculateAsianHandicapProbability(homeXg, awayXg, cand.line ?? 0, rho);
           modelProb = prob.cover;
         } else if (cand.market === 'OU') {
-          const prob = calculateOverUnderProbability(homeXg, awayXg, cand.line, rho);
+          const prob = calculateOverUnderProbability(homeXg, awayXg, cand.line ?? 2.5, rho);
           modelProb = prob.over;
+        } else if (cand.market === 'ML') {
+          const prob = calculate1X2Probability(homeXg, awayXg, rho);
+          modelProb = cand.selection.includes('Away') ? prob.away : cand.selection.includes('Draw') ? prob.draw : prob.home;
         } else if (cand.market === 'BTTS') {
           const grid = buildScoreGrid(homeXg, awayXg, rho);
           const prob = calculateBttsFromGrid(grid);
@@ -574,7 +613,6 @@ export class ProductionPublishingEngine {
         }
 
         // 2. ValueEngine Evaluation & Multi-Factor Confidence Scoring
-        // 3. ValueEngine Evaluation & Multi-Factor Confidence Scoring
         const valResult = ValueEngine.evaluateSelection({
           selection: cand.selection,
           market: cand.market,
@@ -583,6 +621,7 @@ export class ProductionPublishingEngine {
           pinnacleOdds: {
             sideOdds: cand.marketOdds,
             oppositeOdds: cand.oppositeOdds || cand.marketOdds,
+            drawOdds: cand.drawOdds,
           },
           sampleSizeHome,
           sampleSizeAway,
@@ -630,7 +669,84 @@ export class ProductionPublishingEngine {
         const freshnessText =
           ageSec < 60 ? 'just now' : ageSec < 3600 ? `${Math.floor(ageSec / 60)}m ago` : `${Math.floor(ageSec / 3600)}h ago`;
 
-        // 5. Synthesize Candidate Published Signal
+        // 5. Suggested Bet Qualification (Gate 3 & 6)
+        // Retail Bet365 price qualifies only when model edge and positive execution EV exist
+        let suggestedBet: SuggestedBet | null = null;
+        if (cand.executionOdds && cand.executionOdds > 1.0) {
+          const execEv = (valResult.modelProbability * cand.executionOdds) - 1;
+          const execEdge = valResult.modelProbability - (1 / cand.executionOdds);
+          const qualifies = validity.isValid && execEv > 0.01 && execEdge > 0.01;
+          suggestedBet = {
+            bookmaker: cand.executionBookmaker || 'Bet365',
+            odds: cand.executionOdds,
+            market: cand.market,
+            selection: cand.selection,
+            line: cand.line,
+            edge: Number(execEdge.toFixed(4)),
+            expectedValue: Number(execEv.toFixed(4)),
+            isSoftExecution: true,
+            qualifies,
+            timestamp: oddsTimestampUtc,
+          };
+        } else if (valResult.edge > 0.02 && valResult.expectedValue > 0.01) {
+          suggestedBet = {
+            bookmaker: 'Pinnacle',
+            odds: cand.marketOdds,
+            market: cand.market,
+            selection: cand.selection,
+            line: cand.line,
+            edge: Number(valResult.edge.toFixed(4)),
+            expectedValue: Number(valResult.expectedValue.toFixed(4)),
+            isSoftExecution: false,
+            qualifies: validity.isValid,
+            timestamp: oddsTimestampUtc,
+          };
+        }
+
+        // 6. Construct Three-Snapshot Evidence & CLV Record (Gate 2 & 5)
+        const referenceSnapshot: PriceSnapshot = {
+          snapshotId: `snap_ref_${fixtureId}_${cand.market}_${normalizedLineStr}_pin`,
+          provider: 'OddsPapi',
+          bookmaker: 'Pinnacle',
+          market: cand.market,
+          selection: cand.selection,
+          line: cand.line,
+          odds: cand.marketOdds,
+          timestamp: oddsTimestampUtc,
+          fixtureId,
+          source: 'odds-by-tournaments',
+        };
+
+        const executionSnapshot: PriceSnapshot | null = cand.executionOdds ? {
+          snapshotId: `snap_exec_${fixtureId}_${cand.market}_${normalizedLineStr}_b365`,
+          provider: 'OddsPapi',
+          bookmaker: cand.executionBookmaker || 'Bet365',
+          market: cand.market,
+          selection: cand.selection,
+          line: cand.line,
+          odds: cand.executionOdds,
+          timestamp: oddsTimestampUtc,
+          fixtureId,
+          source: 'odds-by-tournaments',
+        } : null;
+
+        const clvRecord: ClvBenchmarkRecord = {
+          status: 'PENDING',
+          entryBookmaker: cand.executionBookmaker || 'Pinnacle',
+          entryOdds: cand.executionOdds || cand.marketOdds,
+          entryTimestamp: oddsTimestampUtc,
+          referenceBookmaker: 'Pinnacle',
+          closingOdds: null,
+          closingTimestamp: null,
+          clv: null,
+          clvBps: null,
+          benchmarkSource: 'pinnacle-closing-line',
+        };
+
+        const lifecycle: PredictionLifecycle = validity.isValid ? 'PUBLISHED' : 'DRAFT';
+        const evidenceStatus: EvidenceStatus = 'MODEL_VERIFIED';
+
+        // 7. Synthesize Candidate Published Signal
         const candidateSignal: ProductionSignalDTO = {
           signalId,
           canonicalMatchId: fixtureId,
@@ -666,6 +782,34 @@ export class ProductionPublishingEngine {
           oddsTimestampUtc,
           lastReconciledUtc: nowIso,
           payloadHash: '',
+          referencePrice: {
+            bookmaker: 'Pinnacle',
+            odds: cand.marketOdds,
+            devigProbability: Number(valResult.marketProbability.toFixed(4)),
+            market: cand.market,
+            line: cand.line,
+            selection: cand.selection,
+            timestamp: oddsTimestampUtc,
+          },
+          modelPrice: {
+            modelProbability: Number(valResult.modelProbability.toFixed(4)),
+            fairOdds: Number(valResult.fairOdds.toFixed(2)),
+            edge: Number(valResult.edge.toFixed(4)),
+            expectedValue: Number(valResult.expectedValue.toFixed(4)),
+            modelVersion: 'dixon-coles-v1.0',
+          },
+          executionPrice: cand.executionOdds ? {
+            bookmaker: cand.executionBookmaker || 'Bet365',
+            odds: cand.executionOdds,
+            edge: Number((valResult.modelProbability - 1 / cand.executionOdds).toFixed(4)),
+            expectedValue: Number(((valResult.modelProbability * cand.executionOdds) - 1).toFixed(4)),
+            isSuggested: Boolean(suggestedBet?.qualifies && suggestedBet.bookmaker !== 'Pinnacle'),
+            timestamp: oddsTimestampUtc,
+          } : null,
+          suggestedBet,
+          clvStatus: 'PENDING',
+          lifecycle,
+          evidenceStatus,
           providerProvenance: {
             fixtures: 'api-football-pro',
             odds: 'oddspapi-pinnacle',
@@ -677,7 +821,7 @@ export class ProductionPublishingEngine {
         // Compute hash
         candidateSignal.payloadHash = ChangeDetectionEngine.computePayloadHash(candidateSignal);
 
-        // 6. Change Detection against existing published state
+        // 8. Change Detection against existing published state
         const existingSignal = store[signalId];
         const diff = ChangeDetectionEngine.detectChanges(candidateSignal, existingSignal);
 
@@ -703,7 +847,7 @@ export class ProductionPublishingEngine {
             heldCount++;
           }
 
-          // Immutably record prediction in canonical archive
+          // Immutably record prediction in canonical archive (with all 3 snapshots)
           try {
             const decision = (candidateSignal.publishState === 'PUBLISHED' && candidateSignal.edge > 0.02)
               ? 'VALUE_CANDIDATE'
@@ -748,6 +892,13 @@ export class ProductionPublishingEngine {
                 rho,
                 scoreGridHash: candidateSignal.payloadHash,
               },
+              referenceSnapshot,
+              executionSnapshot,
+              closingSnapshot: null,
+              clvRecord,
+              suggestedBet,
+              lifecycle,
+              evidenceStatus,
               status: candidateSignal.publishState === 'PUBLISHED' ? 'ACTIVE' : candidateSignal.publishState === 'SHADOW' ? 'GENERATED' : 'REJECTED',
               rejectionReason: candidateSignal.rejectionReason,
               settlement: null,

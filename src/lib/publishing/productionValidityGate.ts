@@ -34,11 +34,15 @@ export interface ProductionValidityInput {
   awayTeam: string;
   leagueKey: string;
   leagueId?: number;
+  competition?: string;
   kickoffUtc: string;
   market: string;
   selection: string;
-  line?: number;
+  line?: number | null;
   marketOdds?: number;
+  modelProbability?: number;
+  fairOdds?: number;
+  confidence?: number;
   oddsTimestampUtc?: string;
   predictionTimestampUtc?: string;
   modelVersion?: string;
@@ -142,12 +146,12 @@ export class ProductionValidityGate {
       if (!oddsFresh) reasons.push('STALE_ODDS: Odds snapshot older than 24 hours or in future');
     }
 
-    // 6. Supported Market (strictly AH, OU, BTTS)
+    // 6. Supported Market (strictly AH, OU, ML, BTTS)
     const upperMarket = (input.market || '').toUpperCase();
-    const isMoneyline = upperMarket === '1X2' || upperMarket === 'MONEYLINE' || upperMarket === 'ML';
-    const supportedMarket = ['AH', 'OU', 'BTTS'].includes(upperMarket) && !isMoneyline;
-    if (isMoneyline) {
-      reasons.push('MONEYLINE_UNSUPPORTED: Product policy restricts production strictly to AH, OU, BTTS');
+    const isForbiddenMoneyline = upperMarket === '1X2' || upperMarket === 'MONEYLINE';
+    const supportedMarket = ['AH', 'OU', 'ML', 'BTTS'].includes(upperMarket) && !isForbiddenMoneyline;
+    if (isForbiddenMoneyline) {
+      reasons.push('MONEYLINE_UNSUPPORTED: Ambiguous 1X2 / MONEYLINE format is rejected. Use explicit schema ML with line: null.');
     } else if (!supportedMarket) {
       reasons.push(`UNSUPPORTED_MARKET: ${input.market} is not a production market`);
     }
@@ -226,7 +230,7 @@ export class ProductionValidityGate {
     } else if (!oddsFresh) {
       state = 'STALE';
       validityStatus = 'STALE';
-    } else if (isSynthetic || !supportedMarket || isMoneyline) {
+    } else if (isSynthetic || !supportedMarket || isForbiddenMoneyline) {
       state = 'INVALID';
       validityStatus = 'INVALID';
     } else {

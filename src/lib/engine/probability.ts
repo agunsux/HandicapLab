@@ -151,6 +151,35 @@ export function calculateAsianHandicapProbability(
 }
 
 /**
+ * Calculates Moneyline (1X2) probabilities: Home Win, Draw, Away Win.
+ */
+export function calculate1X2Probability(
+  homeXG: number,
+  awayXG: number,
+  rho: number
+): { home: number; draw: number; away: number } {
+  const grid = buildScoreGrid(homeXG, awayXG, rho);
+  let home = 0;
+  let draw = 0;
+  let away = 0;
+
+  for (let x = 0; x <= 10; x++) {
+    for (let y = 0; y <= 10; y++) {
+      const prob = grid[x][y];
+      if (x > y) {
+        home += prob;
+      } else if (x === y) {
+        draw += prob;
+      } else {
+        away += prob;
+      }
+    }
+  }
+
+  return { home, draw, away };
+}
+
+/**
  * Calculates Fair Odds based on the probability.
  * Formula: 1 / probability
  */
@@ -167,3 +196,4 @@ export function edgePercentage(fairOdds: number, marketOdds: number): number {
   if (fairOdds <= 0 || marketOdds <= 0) return 0;
   return ((marketOdds / fairOdds) - 1) * 100;
 }
+

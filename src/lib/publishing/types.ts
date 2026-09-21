@@ -48,10 +48,10 @@ export interface ProductionSignalDTO {
   // Market & Selection
   market: CanonicalMarket;
   selection: string; // "Arsenal", "Over 2.5", "Yes"
-  line: number; // e.g. -0.25, 2.5
+  line: number | null; // e.g. -0.25, 2.5, null for ML
 
   // Quantitative Metrics (Strictly Disaggregated)
-  currentOdds: number; // Current Pinnacle sharp decimal odds
+  currentOdds: number; // Current Pinnacle sharp decimal odds (Reference Price)
   modelProbability: number; // Dixon-Coles model probability (0.0000 - 1.0000)
   marketProbability: number; // De-vigged market implied probability (0.0000 - 1.0000)
   edge: number; // modelProbability - marketProbability
@@ -76,6 +76,15 @@ export interface ProductionSignalDTO {
   oddsTimestampUtc: string;
   lastReconciledUtc: string;
   payloadHash: string;
+
+  // Three Disaggregated Pricing Pillars (Gate 2 & 3)
+  referencePrice?: any;
+  modelPrice?: any;
+  executionPrice?: any;
+  suggestedBet?: any;
+  clvStatus?: 'PENDING' | 'VERIFIED' | 'VOID';
+  lifecycle?: 'DRAFT' | 'PUBLISHED' | 'LIVE' | 'COMPLETED' | 'CANCELLED' | 'VOID';
+  evidenceStatus?: 'DATA_VERIFIED' | 'MODEL_VERIFIED' | 'CLV_PENDING' | 'CLV_VERIFIED' | 'RESULT_VERIFIED';
 
   // Provenance Breakdown
   predictionId?: string;

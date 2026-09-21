@@ -34,12 +34,12 @@ export async function GET(request: NextRequest) {
     const dailyPicks = PredictionArchiveService.getDailyPicksProjection({
       nowMs,
       horizon: horizonParam === 'ALL' ? undefined : horizonParam,
-      market: ['AH', 'OU', 'BTTS'].includes(marketParam) ? marketParam : undefined,
+      market: ['AH', 'OU', 'ML', 'BTTS'].includes(marketParam) ? marketParam : undefined,
     });
 
     // 2. Load incremental archive records
     let predictions = PredictionArchiveService.getIncrementalUpdates(sinceParam);
-    if (marketParam && ['AH', 'OU', 'BTTS'].includes(marketParam)) {
+    if (marketParam && ['AH', 'OU', 'ML', 'BTTS'].includes(marketParam)) {
       predictions = predictions.filter((p) => p.market === marketParam);
     }
 

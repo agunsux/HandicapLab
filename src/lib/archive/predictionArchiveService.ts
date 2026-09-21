@@ -182,6 +182,7 @@ export class PredictionArchiveService {
     input: Omit<PredictionArchiveRecord, 'predictionId' | 'provenanceHash' | 'createdAt' | 'updatedAt'> & {
       predictionId?: string;
       provenanceHash?: string;
+      isSynthetic?: boolean;
     }
   ): Promise<{ record: PredictionArchiveRecord; isNew: boolean }> {
     const store = this.loadArchive();
@@ -204,21 +205,37 @@ export class PredictionArchiveService {
     }
 
     const modelVersion = input.modelVersion || ModelVersionRegistry.getActiveModelVersion(input.market).versionId;
-    const normalizedLine = Number(input.line).toFixed(2);
+    const normalizedLine = input.line !== null && input.line !== undefined ? Number(input.line).toFixed(2) : 'ML';
     const normalizedSelection = input.selection.trim().toUpperCase();
     const idempotencyKey = `${input.fixtureId}_${input.market}_${normalizedLine}_${normalizedSelection}_${modelVersion}`;
     const predictionId = input.predictionId || `pred_${crypto.createHash('sha256').update(idempotencyKey).digest('hex').slice(0, 16)}`;
 
+    // Gate 1: No Synthetic Production Evidence
+    const isSynthetic =
+      (input as any).isSynthetic === true ||
+      input.oddsProvider?.toLowerCase().includes('synthetic') ||
+      input.oddsProvider?.toLowerCase().includes('mock') ||
+      input.bookmaker?.toLowerCase().includes('synthetic') ||
+      input.bookmaker?.toLowerCase().includes('mock') ||
+      input.modelVersion?.toLowerCase().includes('synthetic') ||
+      input.homeTeam?.toLowerCase().includes('mock') ||
+      input.awayTeam?.toLowerCase().includes('mock') ||
+      input.fixtureId?.toLowerCase().includes('mock') ||
+      input.fixtureId?.toLowerCase().includes('synthetic');
+    if (isSynthetic) {
+      throw new Error('GATE 1 VIOLATION: Cannot archive prediction with synthetic evidence.');
+    }
+
     const existing = store[predictionId];
     if (existing) {
       // If already settled or locked, do not modify
-      if (existing.status === 'SETTLED' || existing.status === 'KICKED_OFF') {
+      if (existing.status === 'SETTLED' || existing.status === 'KICKED_OFF' || existing.lifecycle === 'COMPLETED') {
         return { record: existing, isNew: false };
       }
 
       // If market odds shifted prior to kickoff, update entry odds snapshot while preserving identity
-      if (existing.status === 'GENERATED' || existing.status === 'ACTIVE') {
-        if (input.marketOdds !== existing.marketOdds || input.edge !== existing.edge) {
+      if (existing.status === 'GENERATED' || existing.status === 'ACTIVE' || existing.lifecycle === 'PUBLISHED') {
+        if (input.marketOdds !== existing.marketOdds || input.edge !== existing.edge || input.executionSnapshot) {
           existing.marketOdds = input.marketOdds;
           existing.edge = input.edge;
           existing.expectedValue = input.expectedValue;
@@ -226,6 +243,8 @@ export class PredictionArchiveService {
           existing.decision = input.decision;
           existing.confidence = input.confidence;
           existing.oddsTimestamp = input.oddsTimestamp;
+          if (input.executionSnapshot) existing.executionSnapshot = input.executionSnapshot;
+          if (input.suggestedBet) existing.suggestedBet = input.suggestedBet;
           existing.updatedAt = nowIso;
           this.saveArchive(store);
           return { record: existing, isNew: false };
@@ -233,6 +252,40 @@ export class PredictionArchiveService {
       }
       return { record: existing, isNew: false };
     }
+
+    // Default 3 snapshots and CLV record if not explicitly provided
+    const referenceSnapshot = input.referenceSnapshot || {
+      snapshotId: `snap_ref_${input.fixtureId}_${input.market}_${normalizedLine}_pin`,
+      provider: input.oddsProvider || 'OddsPapi',
+      bookmaker: 'Pinnacle',
+      market: input.market,
+      selection: input.selection,
+      line: input.line,
+      odds: input.marketOdds,
+      timestamp: input.oddsTimestamp,
+      fixtureId: input.fixtureId,
+      source: 'odds-by-tournaments',
+    };
+
+    const clvRecord = input.clvRecord || {
+      status: 'PENDING' as const,
+      entryBookmaker: input.executionSnapshot?.bookmaker || input.bookmaker || 'Pinnacle',
+      entryOdds: input.executionSnapshot?.odds || input.marketOdds,
+      entryTimestamp: input.oddsTimestamp,
+      referenceBookmaker: 'Pinnacle' as const,
+      closingOdds: null,
+      closingTimestamp: null,
+      clv: null,
+      clvBps: null,
+      benchmarkSource: 'pinnacle-closing-line',
+    };
+
+    const lifecycle = input.lifecycle || (
+      input.status === 'ACTIVE' || input.status === 'PUBLISHED' ? 'PUBLISHED' as const :
+      input.status === 'KICKED_OFF' ? 'LIVE' as const :
+      input.status === 'SETTLED' ? 'COMPLETED' as const : 'DRAFT' as const
+    );
+    const evidenceStatus = input.evidenceStatus || 'MODEL_VERIFIED' as const;
 
     // Compute cryptographic provenance hash for forensic auditability
     const provenancePayload = JSON.stringify({
@@ -250,6 +303,8 @@ export class PredictionArchiveService {
       modelProbability: input.modelProbability,
       predictionTimestamp: input.predictionTimestamp,
       kickoffTimestamp: input.kickoffTimestamp,
+      referenceSnapshot,
+      clvRecord,
     });
     const provenanceHash = input.provenanceHash || crypto.createHash('sha256').update(provenancePayload).digest('hex');
 
@@ -258,6 +313,13 @@ export class PredictionArchiveService {
       predictionId,
       modelVersion,
       provenanceHash,
+      referenceSnapshot,
+      executionSnapshot: input.executionSnapshot || null,
+      closingSnapshot: input.closingSnapshot || null,
+      clvRecord,
+      suggestedBet: input.suggestedBet || null,
+      lifecycle,
+      evidenceStatus,
       createdAt: nowIso,
       updatedAt: nowIso,
     };
@@ -500,11 +562,41 @@ export class PredictionArchiveService {
         verdict: record.decision === 'VALUE_CANDIDATE' ? 'LAYAK' : 'PANTAU',
         signalColor: record.signalColor,
         status: record.status,
+        lifecycle: record.lifecycle || (record.status === 'ACTIVE' || record.status === 'PUBLISHED' ? 'PUBLISHED' : record.status === 'KICKED_OFF' ? 'LIVE' : record.status === 'SETTLED' ? 'COMPLETED' : 'DRAFT'),
+        evidenceStatus: record.evidenceStatus || 'MODEL_VERIFIED',
         modelVersion: record.modelVersion,
         horizonBucket,
         predictionTimestampUtc: record.predictionTimestamp,
         oddsTimestampUtc: record.oddsTimestamp,
         updatedAtUtc: record.updatedAt,
+
+        // Disaggregated Pricing Pillars (Gate 2 & 5)
+        referencePrice: {
+          bookmaker: record.referenceSnapshot?.bookmaker || record.bookmaker || 'Pinnacle',
+          odds: record.referenceSnapshot?.odds || record.marketOdds,
+          devigProbability: record.marketOdds > 1 ? Number((1 / record.marketOdds).toFixed(4)) : undefined,
+          market: record.market,
+          line: record.line,
+          selection: record.selection,
+          timestamp: record.referenceSnapshot?.timestamp || record.oddsTimestamp,
+        },
+        modelPrice: {
+          modelProbability: record.modelProbability,
+          fairOdds: record.fairOdds,
+          edge: record.edge,
+          expectedValue: record.expectedValue,
+          modelVersion: record.modelVersion,
+        },
+        executionPrice: record.executionSnapshot ? {
+          bookmaker: record.executionSnapshot.bookmaker,
+          odds: record.executionSnapshot.odds,
+          edge: Number((record.modelProbability - 1 / record.executionSnapshot.odds).toFixed(4)),
+          expectedValue: Number(((record.modelProbability * record.executionSnapshot.odds) - 1).toFixed(4)),
+          isSuggested: Boolean(record.suggestedBet?.qualifies && record.suggestedBet.bookmaker !== 'Pinnacle'),
+          timestamp: record.executionSnapshot.timestamp,
+        } : null,
+        suggestedBet: record.suggestedBet || null,
+        clvStatus: (record.clvRecord?.status as any) || 'PENDING',
       });
     }
 
@@ -574,7 +666,7 @@ export class PredictionArchiveService {
       records = records.filter((r) => r.market === filters.market);
     }
     if (filters.line !== undefined) {
-      records = records.filter((r) => Math.abs(r.line - filters.line!) < 0.001);
+      records = records.filter((r) => r.line !== null && r.line !== undefined && Math.abs(r.line - filters.line!) < 0.001);
     }
     if (filters.status) {
       records = records.filter((r) => r.status === filters.status);

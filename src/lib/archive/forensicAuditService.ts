@@ -40,7 +40,7 @@ export interface ForensicAuditReport {
     };
     derivation: {
       market: string;
-      line: number;
+      line: number | null;
       selection: string;
       modelProbability: number;
       fairOdds: number;

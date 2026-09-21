@@ -325,7 +325,7 @@ export class DailyPicksEngine {
       : '17';
 
     try {
-      const url = `https://api.oddspapi.io/v4/odds-by-tournaments?apiKey=${apiKey}&tournamentIds=${idsParam}&bookmakers=pinnacle`;
+      const url = `https://api.oddspapi.io/v4/odds-by-tournaments?apiKey=${apiKey}&tournamentIds=${idsParam}&bookmakers=pinnacle,bet365`;
       const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
       if (!res.ok) {
         console.error(`[DailyPicksEngine] OddsPapi HTTP ${res.status}`);
