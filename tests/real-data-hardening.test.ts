@@ -1,4 +1,4 @@
-﻿import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -20,6 +20,7 @@ describe('FINAL REAL-DATA HARDENING & INVARIANT LOCK SUITE', () => {
     const content = fs.readFileSync(pipelinePath, 'utf-8');
     // Must strictly check status NS and league matching
     expect(content).toContain("item.fixture.status.short !== 'NS'");
+    expect(content).toMatch(/item\.fixture\.status(\?)?\.short !== 'NS'/);
   });
 
   // Test C: No Fabricated Odds Fallback

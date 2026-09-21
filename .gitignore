@@ -99,6 +99,15 @@ scratch_*.js
 data/golden/epic65/
 data/cache/
 data/ledger/
+data/cache/*
+!data/cache/canonical_fixtures.json
+!data/cache/canonical_published_signals.json
+!data/cache/oddspapi_quota_allocator_state.json
+data/ledger/*
+!data/ledger/prediction_archive.json
+!data/ledger/prediction_archive.jsonl
+!data/ledger/oddspapi_call_audit.jsonl
+!data/ledger/pipeline_execution_summary.json
 data/test_cache/
 data/test_ledger/
 artifacts/forensic_raw_summary.json

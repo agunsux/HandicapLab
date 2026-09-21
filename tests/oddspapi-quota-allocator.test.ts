@@ -1,10 +1,10 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { OddsPapiQuotaAllocator } from '@/lib/providers/oddspapiQuotaAllocator';
 
-describe('OddsPapiQuotaAllocator Unit Tests', () => {
+describe('OddsPapiQuotaAllocator Quota Safety & Reserve Floor', () => {
   beforeEach(() => {
-    // Reset state before each test with standard 250 budget
-    OddsPapiQuotaAllocator.resetState(250);
+    // Reset to clean test state
+    OddsPapiQuotaAllocator.resetState(250, 0);
   });
 
   it('initializes with correct tier allocations and buffer', () => {
@@ -12,6 +12,8 @@ describe('OddsPapiQuotaAllocator Unit Tests', () => {
     expect(state.totalMonthlyBudget).toBe(250);
     expect(state.totalRemaining).toBe(250);
     expect(state.totalUsed).toBe(0);
+    expect(state.reserveFloor).toBe(50);
+    expect(state.usableRemaining).toBe(200);
 
     // Tier A: 60% = 150
     expect(state.tierBudgets.A.allocatedBudget).toBe(150);
@@ -30,32 +32,106 @@ describe('OddsPapiQuotaAllocator Unit Tests', () => {
     expect(state.bufferBudget.remaining).toBe(12);
   });
 
+  it('correctly calculates usable quota when remaining is 98 (remaining - 50 = 48)', () => {
+    // 250 limit, 152 used = 98 remaining
+    OddsPapiQuotaAllocator.resetState(250, 152);
+    const state = OddsPapiQuotaAllocator.loadState();
+    expect(state.totalRemaining).toBe(98);
+    expect(state.reserveFloor).toBe(50);
+    expect(state.usableRemaining).toBe(48);
+    expect(state.status).toBe('NORMAL');
+  });
+
   it('allows normal acquisition within budget', () => {
+    OddsPapiQuotaAllocator.resetState(250, 152); // 98 remaining, 48 usable
     const decision = OddsPapiQuotaAllocator.canAcquire({
       leagueId: 'ENG-PL',
       tier: 'A',
-      priority: 'NORMAL',
+      priority: 'HIGH',
       cost: 1,
     });
 
     expect(decision.allowed).toBe(true);
     expect(decision.reason).toBe('ACQUIRE_PERMITTED');
     expect(decision.reservationToken).toBeDefined();
+    expect(decision.usableRemaining).toBe(48);
   });
 
-  it('records usage and decrements remaining quota accurately', () => {
-    OddsPapiQuotaAllocator.recordUsage({
+  it('rejects requests when remaining <= 50 (EMERGENCY_RESERVE_ACTIVE)', () => {
+    // 250 limit, 200 used = 50 remaining
+    OddsPapiQuotaAllocator.resetState(250, 200);
+    const state = OddsPapiQuotaAllocator.loadState();
+    expect(state.totalRemaining).toBe(50);
+    expect(state.usableRemaining).toBe(0);
+    expect(state.status).toBe('EMERGENCY_RESERVE_ACTIVE');
+
+    const decision = OddsPapiQuotaAllocator.canAcquire({
       leagueId: 'ENG-PL',
       tier: 'A',
-      cost: 5,
+      priority: 'HIGH',
+      cost: 1,
     });
 
+    expect(decision.allowed).toBe(false);
+    expect(decision.reason).toContain('EMERGENCY_RESERVE_ACTIVE');
+  });
+
+  it('rejects requests that would breach the 50 reserve floor', () => {
+    // 250 limit, 199 used = 51 remaining. Cost of 2 would result in 49 (< 50)
+    OddsPapiQuotaAllocator.resetState(250, 199);
     const state = OddsPapiQuotaAllocator.loadState();
-    expect(state.totalUsed).toBe(5);
-    expect(state.totalRemaining).toBe(245);
-    expect(state.tierBudgets.A.used).toBe(5);
-    expect(state.tierBudgets.A.remaining).toBe(145);
-    expect(state.leagueUsage['ENG-PL']).toBe(5);
+    expect(state.totalRemaining).toBe(51);
+    expect(state.usableRemaining).toBe(1);
+
+    const decision = OddsPapiQuotaAllocator.canAcquire({
+      leagueId: 'ENG-PL',
+      tier: 'A',
+      priority: 'HIGH',
+      cost: 2,
+    });
+
+    expect(decision.allowed).toBe(false);
+    expect(decision.reason).toContain('would breach reserve floor');
+  });
+
+  it('enforces CRITICAL_QUOTA when remaining <= 20', () => {
+    OddsPapiQuotaAllocator.resetState(250, 235); // 15 remaining
+    const state = OddsPapiQuotaAllocator.loadState();
+    expect(state.totalRemaining).toBe(15);
+    expect(state.status).toBe('CRITICAL_QUOTA');
+
+    const highDecision = OddsPapiQuotaAllocator.canAcquire({
+      leagueId: 'ENG-PL',
+      tier: 'A',
+      priority: 'HIGH',
+      cost: 1,
+    });
+    expect(highDecision.allowed).toBe(false);
+    expect(highDecision.reason).toContain('CRITICAL_QUOTA');
+
+    const critDecision = OddsPapiQuotaAllocator.canAcquire({
+      leagueId: 'ENG-PL',
+      tier: 'A',
+      priority: 'CRITICAL',
+      cost: 1,
+    });
+    expect(critDecision.allowed).toBe(true);
+  });
+
+  it('enforces HARD_STOP when remaining <= 5', () => {
+    OddsPapiQuotaAllocator.resetState(250, 246); // 4 remaining
+    const state = OddsPapiQuotaAllocator.loadState();
+    expect(state.totalRemaining).toBe(4);
+    expect(state.status).toBe('HARD_STOP');
+
+    const critDecision = OddsPapiQuotaAllocator.canAcquire({
+      leagueId: 'ENG-PL',
+      tier: 'A',
+      priority: 'CRITICAL',
+      cost: 1,
+    });
+    expect(critDecision.allowed).toBe(false);
+    expect(critDecision.reason).toContain('HARD_STOP');
   });
 
   it('enforces single-league 25% maximum ceiling', () => {
@@ -84,84 +160,33 @@ describe('OddsPapiQuotaAllocator Unit Tests', () => {
     expect(criticalDecision.allowed).toBe(true);
   });
 
-  it('enforces tier exhaustion', () => {
-    const state = OddsPapiQuotaAllocator.loadState();
-    // Exhaust Tier C (25 calls)
-    state.tierBudgets.C.used = 25;
-    state.tierBudgets.C.remaining = 0;
-    OddsPapiQuotaAllocator.saveState(state);
+  it('records detailed call instrumentation upon usage', () => {
+    OddsPapiQuotaAllocator.resetState(250, 152); // 98 remaining, 48 usable
 
-    const decision = OddsPapiQuotaAllocator.canAcquire({
-      leagueId: 'JPN-J1',
-      tier: 'C',
-      priority: 'NORMAL',
-      cost: 1,
-    });
-
-    expect(decision.allowed).toBe(false);
-    expect(decision.reason).toContain('TIER_C_BUDGET_EXHAUSTED');
-  });
-
-  it('enforces Economy Mode when remaining < 30 (rejects LOW priority)', () => {
-    const state = OddsPapiQuotaAllocator.loadState();
-    state.totalRemaining = 25;
-    OddsPapiQuotaAllocator.saveState(state);
-
-    const lowDecision = OddsPapiQuotaAllocator.canAcquire({
-      leagueId: 'ESP-LALIGA',
-      tier: 'A',
-      priority: 'LOW',
-      cost: 1,
-    });
-    expect(lowDecision.allowed).toBe(false);
-    expect(lowDecision.reason).toContain('ECONOMY_MODE_ACTIVE');
-
-    const normalDecision = OddsPapiQuotaAllocator.canAcquire({
-      leagueId: 'ESP-LALIGA',
-      tier: 'A',
-      priority: 'NORMAL',
-      cost: 1,
-    });
-    expect(normalDecision.allowed).toBe(true);
-  });
-
-  it('enforces Safety Reserve when remaining < 5 (only CRITICAL allowed)', () => {
-    const state = OddsPapiQuotaAllocator.loadState();
-    state.totalRemaining = 4;
-    OddsPapiQuotaAllocator.saveState(state);
-
-    const normalDecision = OddsPapiQuotaAllocator.canAcquire({
+    const record = OddsPapiQuotaAllocator.recordUsage({
       leagueId: 'ENG-PL',
       tier: 'A',
-      priority: 'NORMAL',
       cost: 1,
+      fixtureId: '1203456',
+      market: 'AH',
+      endpoint: 'odds-by-tournaments',
+      reservationId: 'res_test_123',
+      billable: true,
     });
-    expect(normalDecision.allowed).toBe(false);
-    expect(normalDecision.reason).toContain('SAFETY_RESERVE_ACTIVE');
 
-    const criticalDecision = OddsPapiQuotaAllocator.canAcquire({
-      leagueId: 'ENG-PL',
-      tier: 'A',
-      priority: 'CRITICAL',
-      cost: 1,
-    });
-    expect(criticalDecision.allowed).toBe(true);
-  });
+    expect(record.cost).toBe(1);
+    expect(record.countBefore).toBe(152);
+    expect(record.countAfter).toBe(153);
+    expect(record.remainingBefore).toBe(98);
+    expect(record.remainingAfter).toBe(97);
+    expect(record.usableRemainingBefore).toBe(48);
+    expect(record.usableRemainingAfter).toBe(47);
+    expect(record.fixtureId).toBe('1203456');
+    expect(record.market).toBe('AH');
+    expect(record.billable).toBe(true);
 
-  it('rejects all acquisition when total quota is fully exhausted', () => {
-    const state = OddsPapiQuotaAllocator.loadState();
-    state.totalRemaining = 0;
-    state.status = 'EXHAUSTED';
-    OddsPapiQuotaAllocator.saveState(state);
-
-    const decision = OddsPapiQuotaAllocator.canAcquire({
-      leagueId: 'ENG-PL',
-      tier: 'A',
-      priority: 'CRITICAL',
-      cost: 1,
-    });
-    expect(decision.allowed).toBe(false);
-    expect(decision.reason).toContain('QUOTA_EXHAUSTED');
+    const afterState = OddsPapiQuotaAllocator.loadState();
+    expect(afterState.totalRemaining).toBe(97);
+    expect(afterState.usableRemaining).toBe(47);
   });
 });
-

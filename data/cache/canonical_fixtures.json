@@ -1,0 +1,806 @@
+{
+  "fixtures": [
+    {
+      "fixtureId": "98df4f73a6e8df8a",
+      "providerFixtureId": "1570408",
+      "competitionId": 140,
+      "competitionName": "La Liga",
+      "season": "2026",
+      "homeTeam": "Malaga",
+      "awayTeam": "Espanyol",
+      "kickoffUtc": "2026-10-09T19:00:00+00:00",
+      "status": "SCHEDULED",
+      "source": "api-football",
+      "firstSeenAt": "2026-09-21T19:20:00.155Z",
+      "lastSyncedAt": "2026-09-21T19:20:00.155Z",
+      "venue": "Estadio La Rosaleda, Malaga",
+      "homeLogo": "https://media.api-sports.io/football/teams/535.png",
+      "awayLogo": "https://media.api-sports.io/football/teams/540.png",
+      "leagueLogo": "https://media.api-sports.io/football/leagues/140.png",
+      "leagueCode": "ESP-LALIGA",
+      "leagueCountry": "Spain",
+      "markets": {
+        "asianHandicap": {
+          "available": false,
+          "line": null,
+          "homeOdds": null,
+          "awayOdds": null
+        },
+        "overUnder": {
+          "available": false,
+          "line": null,
+          "overOdds": null,
+          "underOdds": null
+        },
+        "btts": {
+          "available": false,
+          "line": null,
+          "yesOdds": null,
+          "noOdds": null
+        }
+      }
+    },
+    {
+      "fixtureId": "d04f1171ef89182a",
+      "providerFixtureId": "1557417",
+      "competitionId": 39,
+      "competitionName": "Premier League",
+      "season": "2026",
+      "homeTeam": "Arsenal",
+      "awayTeam": "Leeds",
+      "kickoffUtc": "2026-10-10T11:30:00+00:00",
+      "status": "SCHEDULED",
+      "source": "api-football",
+      "firstSeenAt": "2026-09-21T19:20:00.155Z",
+      "lastSyncedAt": "2026-09-21T19:20:00.155Z",
+      "venue": "Emirates Stadium, London",
+      "homeLogo": "https://media.api-sports.io/football/teams/42.png",
+      "awayLogo": "https://media.api-sports.io/football/teams/63.png",
+      "leagueLogo": "https://media.api-sports.io/football/leagues/39.png",
+      "leagueCode": "ENG-PL",
+      "leagueCountry": "England",
+      "markets": {
+        "asianHandicap": {
+          "available": false,
+          "line": null,
+          "homeOdds": null,
+          "awayOdds": null
+        },
+        "overUnder": {
+          "available": false,
+          "line": null,
+          "overOdds": null,
+          "underOdds": null
+        },
+        "btts": {
+          "available": false,
+          "line": null,
+          "yesOdds": null,
+          "noOdds": null
+        }
+      }
+    },
+    {
+      "fixtureId": "0f4af8d20c841f6c",
+      "providerFixtureId": "1570410",
+      "competitionId": 140,
+      "competitionName": "La Liga",
+      "season": "2026",
+      "homeTeam": "Rayo Vallecano",
+      "awayTeam": "Athletic Club",
+      "kickoffUtc": "2026-10-10T12:00:00+00:00",
+      "status": "SCHEDULED",
+      "source": "api-football",
+      "firstSeenAt": "2026-09-21T19:20:00.155Z",
+      "lastSyncedAt": "2026-09-21T19:20:00.155Z",
+      "venue": "Campo de Futbol de Vallecas, Madrid",
+      "homeLogo": "https://media.api-sports.io/football/teams/728.png",
+      "awayLogo": "https://media.api-sports.io/football/teams/531.png",
+      "leagueLogo": "https://media.api-sports.io/football/leagues/140.png",
+      "leagueCode": "ESP-LALIGA",
+      "leagueCountry": "Spain",
+      "markets": {
+        "asianHandicap": {
+          "available": false,
+          "line": null,
+          "homeOdds": null,
+          "awayOdds": null
+        },
+        "overUnder": {
+          "available": false,
+          "line": null,
+          "overOdds": null,
+          "underOdds": null
+        },
+        "btts": {
+          "available": false,
+          "line": null,
+          "yesOdds": null,
+          "noOdds": null
+        }
+      }
+    },
+    {
+      "fixtureId": "1d7bd6c31bad5e4f",
+      "providerFixtureId": "1557419",
+      "competitionId": 39,
+      "competitionName": "Premier League",
+      "season": "2026",
+      "homeTeam": "Chelsea",
+      "awayTeam": "Bournemouth",
+      "kickoffUtc": "2026-10-10T14:00:00+00:00",
+      "status": "SCHEDULED",
+      "source": "api-football",
+      "firstSeenAt": "2026-09-21T19:20:00.155Z",
+      "lastSyncedAt": "2026-09-21T19:20:00.155Z",
+      "venue": "Stamford Bridge, London",
+      "homeLogo": "https://media.api-sports.io/football/teams/49.png",
+      "awayLogo": "https://media.api-sports.io/football/teams/35.png",
+      "leagueLogo": "https://media.api-sports.io/football/leagues/39.png",
+      "leagueCode": "ENG-PL",
+      "leagueCountry": "England",
+      "markets": {
+        "asianHandicap": {
+          "available": false,
+          "line": null,
+          "homeOdds": null,
+          "awayOdds": null
+        },
+        "overUnder": {
+          "available": false,
+          "line": null,
+          "overOdds": null,
+          "underOdds": null
+        },
+        "btts": {
+          "available": false,
+          "line": null,
+          "yesOdds": null,
+          "noOdds": null
+        }
+      }
+    },
+    {
+      "fixtureId": "e919d5d9f5d3df0d",
+      "providerFixtureId": "1557423",
+      "competitionId": 39,
+      "competitionName": "Premier League",
+      "season": "2026",
+      "homeTeam": "Ipswich",
+      "awayTeam": "Fulham",
+      "kickoffUtc": "2026-10-10T14:00:00+00:00",
+      "status": "SCHEDULED",
+      "source": "api-football",
+      "firstSeenAt": "2026-09-21T19:20:00.155Z",
+      "lastSyncedAt": "2026-09-21T19:20:00.155Z",
+      "venue": "Portman Road, Ipswich",
+      "homeLogo": "https://media.api-sports.io/football/teams/57.png",
+      "awayLogo": "https://media.api-sports.io/football/teams/36.png",
+      "leagueLogo": "https://media.api-sports.io/football/leagues/39.png",
+      "leagueCode": "ENG-PL",
+      "leagueCountry": "England",
+      "markets": {
+        "asianHandicap": {
+          "available": false,
+          "line": null,
+          "homeOdds": null,
+          "awayOdds": null
+        },
+        "overUnder": {
+          "available": false,
+          "line": null,
+          "overOdds": null,
+          "underOdds": null
+        },
+        "btts": {
+          "available": false,
+          "line": null,
+          "yesOdds": null,
+          "noOdds": null
+        }
+      }
+    },
+    {
+      "fixtureId": "940796aac74a9c1c",
+      "providerFixtureId": "1557418",
+      "competitionId": 39,
+      "competitionName": "Premier League",
+      "season": "2026",
+      "homeTeam": "Aston Villa",
+      "awayTeam": "Brentford",
+      "kickoffUtc": "2026-10-10T14:00:00+00:00",
+      "status": "SCHEDULED",
+      "source": "api-football",
+      "firstSeenAt": "2026-09-21T19:20:00.155Z",
+      "lastSyncedAt": "2026-09-21T19:20:00.155Z",
+      "venue": "Villa Park, Birmingham",
+      "homeLogo": "https://media.api-sports.io/football/teams/66.png",
+      "awayLogo": "https://media.api-sports.io/football/teams/55.png",
+      "leagueLogo": "https://media.api-sports.io/football/leagues/39.png",
+      "leagueCode": "ENG-PL",
+      "leagueCountry": "England",
+      "markets": {
+        "asianHandicap": {
+          "available": false,
+          "line": null,
+          "homeOdds": null,
+          "awayOdds": null
+        },
+        "overUnder": {
+          "available": false,
+          "line": null,
+          "overOdds": null,
+          "underOdds": null
+        },
+        "btts": {
+          "available": false,
+          "line": null,
+          "yesOdds": null,
+          "noOdds": null
+        }
+      }
+    },
+    {
+      "fixtureId": "375dc142d31d133e",
+      "providerFixtureId": "1557426",
+      "competitionId": 39,
+      "competitionName": "Premier League",
+      "season": "2026",
+      "homeTeam": "Sunderland",
+      "awayTeam": "Brighton",
+      "kickoffUtc": "2026-10-10T14:00:00+00:00",
+      "status": "SCHEDULED",
+      "source": "api-football",
+      "firstSeenAt": "2026-09-21T19:20:00.155Z",
+      "lastSyncedAt": "2026-09-21T19:20:00.155Z",
+      "venue": "Stadium of Light, Sunderland",
+      "homeLogo": "https://media.api-sports.io/football/teams/746.png",
+      "awayLogo": "https://media.api-sports.io/football/teams/51.png",
+      "leagueLogo": "https://media.api-sports.io/football/leagues/39.png",
+      "leagueCode": "ENG-PL",
+      "leagueCountry": "England",
+      "markets": {
+        "asianHandicap": {
+          "available": false,
+          "line": null,
+          "homeOdds": null,
+          "awayOdds": null
+        },
+        "overUnder": {
+          "available": false,
+          "line": null,
+          "overOdds": null,
+          "underOdds": null
+        },
+        "btts": {
+          "available": false,
+          "line": null,
+          "yesOdds": null,
+          "noOdds": null
+        }
+      }
+    },
+    {
+      "fixtureId": "162bfb79f000eb3c",
+      "providerFixtureId": "1570403",
+      "competitionId": 140,
+      "competitionName": "La Liga",
+      "season": "2026",
+      "homeTeam": "Alaves",
+      "awayTeam": "Atletico Madrid",
+      "kickoffUtc": "2026-10-10T14:15:00+00:00",
+      "status": "SCHEDULED",
+      "source": "api-football",
+      "firstSeenAt": "2026-09-21T19:20:00.155Z",
+      "lastSyncedAt": "2026-09-21T19:20:00.155Z",
+      "venue": "Estadio Mendizorrotza, Vitoria-Gasteiz",
+      "homeLogo": "https://media.api-sports.io/football/teams/542.png",
+      "awayLogo": "https://media.api-sports.io/football/teams/530.png",
+      "leagueLogo": "https://media.api-sports.io/football/leagues/140.png",
+      "leagueCode": "ESP-LALIGA",
+      "leagueCountry": "Spain",
+      "markets": {
+        "asianHandicap": {
+          "available": false,
+          "line": null,
+          "homeOdds": null,
+          "awayOdds": null
+        },
+        "overUnder": {
+          "available": false,
+          "line": null,
+          "overOdds": null,
+          "underOdds": null
+        },
+        "btts": {
+          "available": false,
+          "line": null,
+          "yesOdds": null,
+          "noOdds": null
+        }
+      }
+    },
+    {
+      "fixtureId": "fb08455de17da1c4",
+      "providerFixtureId": "1557425",
+      "competitionId": 39,
+      "competitionName": "Premier League",
+      "season": "2026",
+      "homeTeam": "Manchester United",
+      "awayTeam": "Tottenham",
+      "kickoffUtc": "2026-10-10T16:30:00+00:00",
+      "status": "SCHEDULED",
+      "source": "api-football",
+      "firstSeenAt": "2026-09-21T19:20:00.155Z",
+      "lastSyncedAt": "2026-09-21T19:20:00.155Z",
+      "venue": "Old Trafford, Manchester",
+      "homeLogo": "https://media.api-sports.io/football/teams/33.png",
+      "awayLogo": "https://media.api-sports.io/football/teams/47.png",
+      "leagueLogo": "https://media.api-sports.io/football/leagues/39.png",
+      "leagueCode": "ENG-PL",
+      "leagueCountry": "England",
+      "markets": {
+        "asianHandicap": {
+          "available": false,
+          "line": null,
+          "homeOdds": null,
+          "awayOdds": null
+        },
+        "overUnder": {
+          "available": false,
+          "line": null,
+          "overOdds": null,
+          "underOdds": null
+        },
+        "btts": {
+          "available": false,
+          "line": null,
+          "yesOdds": null,
+          "noOdds": null
+        }
+      }
+    },
+    {
+      "fixtureId": "45a2f9fa43165945",
+      "providerFixtureId": "1570404",
+      "competitionId": 140,
+      "competitionName": "La Liga",
+      "season": "2026",
+      "homeTeam": "Barcelona",
+      "awayTeam": "Getafe",
+      "kickoffUtc": "2026-10-10T16:30:00+00:00",
+      "status": "SCHEDULED",
+      "source": "api-football",
+      "firstSeenAt": "2026-09-21T19:20:00.155Z",
+      "lastSyncedAt": "2026-09-21T19:20:00.155Z",
+      "venue": "Camp Nou, Barcelona",
+      "homeLogo": "https://media.api-sports.io/football/teams/529.png",
+      "awayLogo": "https://media.api-sports.io/football/teams/546.png",
+      "leagueLogo": "https://media.api-sports.io/football/leagues/140.png",
+      "leagueCode": "ESP-LALIGA",
+      "leagueCountry": "Spain",
+      "markets": {
+        "asianHandicap": {
+          "available": false,
+          "line": null,
+          "homeOdds": null,
+          "awayOdds": null
+        },
+        "overUnder": {
+          "available": false,
+          "line": null,
+          "overOdds": null,
+          "underOdds": null
+        },
+        "btts": {
+          "available": false,
+          "line": null,
+          "yesOdds": null,
+          "noOdds": null
+        }
+      }
+    },
+    {
+      "fixtureId": "03df98f8ac2b4ffd",
+      "providerFixtureId": "1570411",
+      "competitionId": 140,
+      "competitionName": "La Liga",
+      "season": "2026",
+      "homeTeam": "Real Madrid",
+      "awayTeam": "Villarreal",
+      "kickoffUtc": "2026-10-10T19:00:00+00:00",
+      "status": "SCHEDULED",
+      "source": "api-football",
+      "firstSeenAt": "2026-09-21T19:20:00.155Z",
+      "lastSyncedAt": "2026-09-21T19:20:00.155Z",
+      "venue": "Santiago Bernabéu Stadium, Madrid",
+      "homeLogo": "https://media.api-sports.io/football/teams/541.png",
+      "awayLogo": "https://media.api-sports.io/football/teams/533.png",
+      "leagueLogo": "https://media.api-sports.io/football/leagues/140.png",
+      "leagueCode": "ESP-LALIGA",
+      "leagueCountry": "Spain",
+      "markets": {
+        "asianHandicap": {
+          "available": false,
+          "line": null,
+          "homeOdds": null,
+          "awayOdds": null
+        },
+        "overUnder": {
+          "available": false,
+          "line": null,
+          "overOdds": null,
+          "underOdds": null
+        },
+        "btts": {
+          "available": false,
+          "line": null,
+          "yesOdds": null,
+          "noOdds": null
+        }
+      }
+    },
+    {
+      "fixtureId": "8d93aa2c58e16e38",
+      "providerFixtureId": "1570406",
+      "competitionId": 140,
+      "competitionName": "La Liga",
+      "season": "2026",
+      "homeTeam": "Elche",
+      "awayTeam": "Celta Vigo",
+      "kickoffUtc": "2026-10-11T12:00:00+00:00",
+      "status": "SCHEDULED",
+      "source": "api-football",
+      "firstSeenAt": "2026-09-21T19:20:00.155Z",
+      "lastSyncedAt": "2026-09-21T19:20:00.155Z",
+      "venue": "Estadio Manuel Martínez Valero, Elche",
+      "homeLogo": "https://media.api-sports.io/football/teams/797.png",
+      "awayLogo": "https://media.api-sports.io/football/teams/538.png",
+      "leagueLogo": "https://media.api-sports.io/football/leagues/140.png",
+      "leagueCode": "ESP-LALIGA",
+      "leagueCountry": "Spain",
+      "markets": {
+        "asianHandicap": {
+          "available": false,
+          "line": null,
+          "homeOdds": null,
+          "awayOdds": null
+        },
+        "overUnder": {
+          "available": false,
+          "line": null,
+          "overOdds": null,
+          "underOdds": null
+        },
+        "btts": {
+          "available": false,
+          "line": null,
+          "yesOdds": null,
+          "noOdds": null
+        }
+      }
+    },
+    {
+      "fixtureId": "f5b40bec95e4ed97",
+      "providerFixtureId": "1557421",
+      "competitionId": 39,
+      "competitionName": "Premier League",
+      "season": "2026",
+      "homeTeam": "Crystal Palace",
+      "awayTeam": "Nottingham Forest",
+      "kickoffUtc": "2026-10-11T13:00:00+00:00",
+      "status": "SCHEDULED",
+      "source": "api-football",
+      "firstSeenAt": "2026-09-21T19:20:00.155Z",
+      "lastSyncedAt": "2026-09-21T19:20:00.155Z",
+      "venue": "Selhurst Park, London",
+      "homeLogo": "https://media.api-sports.io/football/teams/52.png",
+      "awayLogo": "https://media.api-sports.io/football/teams/65.png",
+      "leagueLogo": "https://media.api-sports.io/football/leagues/39.png",
+      "leagueCode": "ENG-PL",
+      "leagueCountry": "England",
+      "markets": {
+        "asianHandicap": {
+          "available": false,
+          "line": null,
+          "homeOdds": null,
+          "awayOdds": null
+        },
+        "overUnder": {
+          "available": false,
+          "line": null,
+          "overOdds": null,
+          "underOdds": null
+        },
+        "btts": {
+          "available": false,
+          "line": null,
+          "yesOdds": null,
+          "noOdds": null
+        }
+      }
+    },
+    {
+      "fixtureId": "a8a6e180546a4236",
+      "providerFixtureId": "1557422",
+      "competitionId": 39,
+      "competitionName": "Premier League",
+      "season": "2026",
+      "homeTeam": "Hull City",
+      "awayTeam": "Everton",
+      "kickoffUtc": "2026-10-11T13:00:00+00:00",
+      "status": "SCHEDULED",
+      "source": "api-football",
+      "firstSeenAt": "2026-09-21T19:20:00.155Z",
+      "lastSyncedAt": "2026-09-21T19:20:00.155Z",
+      "venue": "MKM Stadium, Hull",
+      "homeLogo": "https://media.api-sports.io/football/teams/64.png",
+      "awayLogo": "https://media.api-sports.io/football/teams/45.png",
+      "leagueLogo": "https://media.api-sports.io/football/leagues/39.png",
+      "leagueCode": "ENG-PL",
+      "leagueCountry": "England",
+      "markets": {
+        "asianHandicap": {
+          "available": false,
+          "line": null,
+          "homeOdds": null,
+          "awayOdds": null
+        },
+        "overUnder": {
+          "available": false,
+          "line": null,
+          "overOdds": null,
+          "underOdds": null
+        },
+        "btts": {
+          "available": false,
+          "line": null,
+          "yesOdds": null,
+          "noOdds": null
+        }
+      }
+    },
+    {
+      "fixtureId": "7553b38d46cd4d65",
+      "providerFixtureId": "1570412",
+      "competitionId": 140,
+      "competitionName": "La Liga",
+      "season": "2026",
+      "homeTeam": "Real Sociedad",
+      "awayTeam": "Deportivo La Coruna",
+      "kickoffUtc": "2026-10-11T14:15:00+00:00",
+      "status": "SCHEDULED",
+      "source": "api-football",
+      "firstSeenAt": "2026-09-21T19:20:00.155Z",
+      "lastSyncedAt": "2026-09-21T19:20:00.155Z",
+      "venue": "Anoeta, San Sebastian",
+      "homeLogo": "https://media.api-sports.io/football/teams/548.png",
+      "awayLogo": "https://media.api-sports.io/football/teams/544.png",
+      "leagueLogo": "https://media.api-sports.io/football/leagues/140.png",
+      "leagueCode": "ESP-LALIGA",
+      "leagueCountry": "Spain",
+      "markets": {
+        "asianHandicap": {
+          "available": false,
+          "line": null,
+          "homeOdds": null,
+          "awayOdds": null
+        },
+        "overUnder": {
+          "available": false,
+          "line": null,
+          "overOdds": null,
+          "underOdds": null
+        },
+        "btts": {
+          "available": false,
+          "line": null,
+          "yesOdds": null,
+          "noOdds": null
+        }
+      }
+    },
+    {
+      "fixtureId": "267dfb7390b5d44a",
+      "providerFixtureId": "1557424",
+      "competitionId": 39,
+      "competitionName": "Premier League",
+      "season": "2026",
+      "homeTeam": "Liverpool",
+      "awayTeam": "Manchester City",
+      "kickoffUtc": "2026-10-11T15:30:00+00:00",
+      "status": "SCHEDULED",
+      "source": "api-football",
+      "firstSeenAt": "2026-09-21T19:20:00.155Z",
+      "lastSyncedAt": "2026-09-21T19:20:00.155Z",
+      "venue": "Anfield, Liverpool",
+      "homeLogo": "https://media.api-sports.io/football/teams/40.png",
+      "awayLogo": "https://media.api-sports.io/football/teams/50.png",
+      "leagueLogo": "https://media.api-sports.io/football/leagues/39.png",
+      "leagueCode": "ENG-PL",
+      "leagueCountry": "England",
+      "markets": {
+        "asianHandicap": {
+          "available": false,
+          "line": null,
+          "homeOdds": null,
+          "awayOdds": null
+        },
+        "overUnder": {
+          "available": false,
+          "line": null,
+          "overOdds": null,
+          "underOdds": null
+        },
+        "btts": {
+          "available": false,
+          "line": null,
+          "yesOdds": null,
+          "noOdds": null
+        }
+      }
+    },
+    {
+      "fixtureId": "ba2f7b309bd43590",
+      "providerFixtureId": "1570405",
+      "competitionId": 140,
+      "competitionName": "La Liga",
+      "season": "2026",
+      "homeTeam": "Real Betis",
+      "awayTeam": "Osasuna",
+      "kickoffUtc": "2026-10-11T16:30:00+00:00",
+      "status": "SCHEDULED",
+      "source": "api-football",
+      "firstSeenAt": "2026-09-21T19:20:00.155Z",
+      "lastSyncedAt": "2026-09-21T19:20:00.155Z",
+      "venue": "Estadio de La Cartuja, Sevilla",
+      "homeLogo": "https://media.api-sports.io/football/teams/543.png",
+      "awayLogo": "https://media.api-sports.io/football/teams/727.png",
+      "leagueLogo": "https://media.api-sports.io/football/leagues/140.png",
+      "leagueCode": "ESP-LALIGA",
+      "leagueCountry": "Spain",
+      "markets": {
+        "asianHandicap": {
+          "available": false,
+          "line": null,
+          "homeOdds": null,
+          "awayOdds": null
+        },
+        "overUnder": {
+          "available": false,
+          "line": null,
+          "overOdds": null,
+          "underOdds": null
+        },
+        "btts": {
+          "available": false,
+          "line": null,
+          "yesOdds": null,
+          "noOdds": null
+        }
+      }
+    },
+    {
+      "fixtureId": "82ca8d604962e048",
+      "providerFixtureId": "1570409",
+      "competitionId": 140,
+      "competitionName": "La Liga",
+      "season": "2026",
+      "homeTeam": "Racing Santander",
+      "awayTeam": "Valencia",
+      "kickoffUtc": "2026-10-11T19:00:00+00:00",
+      "status": "SCHEDULED",
+      "source": "api-football",
+      "firstSeenAt": "2026-09-21T19:20:00.155Z",
+      "lastSyncedAt": "2026-09-21T19:20:00.155Z",
+      "venue": "Estadio El Sardinero, Santander",
+      "homeLogo": "https://media.api-sports.io/football/teams/4665.png",
+      "awayLogo": "https://media.api-sports.io/football/teams/532.png",
+      "leagueLogo": "https://media.api-sports.io/football/leagues/140.png",
+      "leagueCode": "ESP-LALIGA",
+      "leagueCountry": "Spain",
+      "markets": {
+        "asianHandicap": {
+          "available": false,
+          "line": null,
+          "homeOdds": null,
+          "awayOdds": null
+        },
+        "overUnder": {
+          "available": false,
+          "line": null,
+          "overOdds": null,
+          "underOdds": null
+        },
+        "btts": {
+          "available": false,
+          "line": null,
+          "yesOdds": null,
+          "noOdds": null
+        }
+      }
+    },
+    {
+      "fixtureId": "f8b6f01b7927e1ed",
+      "providerFixtureId": "1557420",
+      "competitionId": 39,
+      "competitionName": "Premier League",
+      "season": "2026",
+      "homeTeam": "Coventry",
+      "awayTeam": "Newcastle",
+      "kickoffUtc": "2026-10-12T19:00:00+00:00",
+      "status": "SCHEDULED",
+      "source": "api-football",
+      "firstSeenAt": "2026-09-21T19:20:00.155Z",
+      "lastSyncedAt": "2026-09-21T19:20:00.155Z",
+      "venue": "Coventry Building Society Arena, Coventry",
+      "homeLogo": "https://media.api-sports.io/football/teams/1346.png",
+      "awayLogo": "https://media.api-sports.io/football/teams/34.png",
+      "leagueLogo": "https://media.api-sports.io/football/leagues/39.png",
+      "leagueCode": "ENG-PL",
+      "leagueCountry": "England",
+      "markets": {
+        "asianHandicap": {
+          "available": false,
+          "line": null,
+          "homeOdds": null,
+          "awayOdds": null
+        },
+        "overUnder": {
+          "available": false,
+          "line": null,
+          "overOdds": null,
+          "underOdds": null
+        },
+        "btts": {
+          "available": false,
+          "line": null,
+          "yesOdds": null,
+          "noOdds": null
+        }
+      }
+    },
+    {
+      "fixtureId": "1768f0d2510decde",
+      "providerFixtureId": "1570407",
+      "competitionId": 140,
+      "competitionName": "La Liga",
+      "season": "2026",
+      "homeTeam": "Levante",
+      "awayTeam": "Sevilla",
+      "kickoffUtc": "2026-10-12T19:00:00+00:00",
+      "status": "SCHEDULED",
+      "source": "api-football",
+      "firstSeenAt": "2026-09-21T19:20:00.155Z",
+      "lastSyncedAt": "2026-09-21T19:20:00.155Z",
+      "venue": "Estadio Ciudad de Valencia, Valencia",
+      "homeLogo": "https://media.api-sports.io/football/teams/539.png",
+      "awayLogo": "https://media.api-sports.io/football/teams/536.png",
+      "leagueLogo": "https://media.api-sports.io/football/leagues/140.png",
+      "leagueCode": "ESP-LALIGA",
+      "leagueCountry": "Spain",
+      "markets": {
+        "asianHandicap": {
+          "available": false,
+          "line": null,
+          "homeOdds": null,
+          "awayOdds": null
+        },
+        "overUnder": {
+          "available": false,
+          "line": null,
+          "overOdds": null,
+          "underOdds": null
+        },
+        "btts": {
+          "available": false,
+          "line": null,
+          "yesOdds": null,
+          "noOdds": null
+        }
+      }
+    }
+  ],
+  "lastSyncedAt": "2026-09-21T19:20:00.155Z",
+  "updatedAt": "2026-09-21T19:20:12.124Z"
+}

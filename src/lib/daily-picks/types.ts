@@ -118,7 +118,7 @@ export interface DailyPicksApiResponse {
     quotaState: {
       apiFootball: { remaining: number; status: string };
       oddsPapi: { remaining: number; status: string };
-      footyStats: { remaining: number; status: string };
+      footyStats?: { remaining: number; status: string };
     };
   };
   message?: string;

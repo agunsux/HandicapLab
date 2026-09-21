@@ -19,6 +19,7 @@ import { DurableLedgerStore } from '@/lib/ledger/durableLedgerStore';
 import { PredictionArchiveService } from '@/lib/archive/predictionArchiveService';
 import { ReconciliationService } from '@/lib/archive/reconciliationService';
 import { ModelVersionRegistry } from '@/lib/archive/modelVersionRegistry';
+import { DistributedCronLease } from '@/lib/crons/distributedCronLease';
 
 const WINDOW_LABELS: Record<number, string> = {
   6: 'morning',
@@ -45,6 +46,23 @@ export async function GET(request: NextRequest) {
   const mode = searchParams.get('mode') || 'full';
   const hour = new Date().getUTCHours();
   const windowLabel = WINDOW_LABELS[hour] ?? `hour_${hour}`;
+
+  const isMutationMode = ['full', 'reconcile', 'publishing-reconcile', 'settle', 'settle-predictions', 'sync', 'salmo-sync'].includes(mode);
+  let leaseId: string | undefined;
+
+  if (isMutationMode) {
+    const lease = await DistributedCronLease.acquireLease(`cron_${mode}`, 5 * 60 * 1000);
+    if (!lease.acquired) {
+      return NextResponse.json({
+        success: false,
+        message: 'Concurrent cron execution skipped',
+        reason: lease.reason,
+      }, { status: 409 });
+    }
+    leaseId = lease.leaseId;
+  }
+
+  try {
 
   // 1. Publishing Reconciliation mode (absorbed from /api/cron/publishing-reconcile)
   if (mode === 'reconcile' || mode === 'publishing-reconcile') {
@@ -335,6 +353,11 @@ export async function GET(request: NextRequest) {
     console.error('[Pipeline Cron] Fatal:', error);
     return NextResponse.json({ error: message }, { status: 500 });
   }
+} finally {
+  if (leaseId) {
+    await DistributedCronLease.releaseLease(`cron_${mode}`, leaseId);
+  }
+}
 }
 
 export async function POST(request: NextRequest) {

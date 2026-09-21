@@ -29,14 +29,8 @@ export async function GET(request: NextRequest) {
       const oddspapiLive = await DailyPicksEngine.getOddsPapiQuotaStatus();
       const oddspapiDbSnapshot = await getQuotaSnapshot('oddspapi').catch(() => null);
 
-      // 3. FootyStats connection check
-      let footyStatsConnected = false;
-      try {
-        const footyData = await DailyPicksEngine.fetchFootyStatsEnrichment();
-        footyStatsConnected = Boolean(footyData && (footyData.data || footyData.status));
-      } catch {
-        footyStatsConnected = false;
-      }
+      // 3. FootyStats connection check (Discontinued per Single Source of Truth policy)
+      const footyStatsConnected = false;
 
       // 4. Supabase DB Check
       let supabaseStatus = 'CONNECTED';
@@ -124,13 +118,8 @@ export async function GET(request: NextRequest) {
     const apifootballLive = await DailyPicksEngine.getApiFootballQuotaStatus();
     const oddspapiLive = await DailyPicksEngine.getOddsPapiQuotaStatus();
 
-    let footyStatsActive = false;
-    try {
-      const fsData = await DailyPicksEngine.fetchFootyStatsEnrichment();
-      footyStatsActive = Boolean(fsData && (fsData.data || fsData.status));
-    } catch {
-      footyStatsActive = false;
-    }
+    // 3. FootyStats status (Discontinued per Single Source of Truth policy)
+    const footyStatsActive = false;
 
     const providers = [
       {

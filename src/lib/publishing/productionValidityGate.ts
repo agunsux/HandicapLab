@@ -75,7 +75,7 @@ export interface ProductionValidityResult {
 
 export class ProductionValidityGate {
   private static readonly MAX_ODDS_AGE_MS = 24 * 60 * 60 * 1000; // 24 hours max odds age
-  private static readonly MAX_HORIZON_DAYS_MS = 7 * 24 * 60 * 60 * 1000; // 7 days ahead
+  private static readonly MAX_HORIZON_DAYS_MS = 21 * 24 * 60 * 60 * 1000; // 21 days ahead (calendar-aware for international breaks)
 
   /**
    * Evaluates end-to-end production validity.
@@ -192,7 +192,7 @@ export class ProductionValidityGate {
       const diffToKick = kickMs - nowMs;
       horizonValid = diffToKick > 0 && diffToKick <= this.MAX_HORIZON_DAYS_MS;
       if (diffToKick <= 0) reasons.push('FIXTURE_PAST_KICKOFF');
-      else if (diffToKick > this.MAX_HORIZON_DAYS_MS) reasons.push('OUTSIDE_7_DAY_HORIZON');
+      else if (diffToKick > this.MAX_HORIZON_DAYS_MS) reasons.push('OUTSIDE_HORIZON');
     }
 
     // 11. Quota Gate

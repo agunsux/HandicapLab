@@ -25,20 +25,18 @@ async function runLiveAudit() {
   const apifootballMonitor = globalGateway.getHealthMonitor('apifootball');
   const oddspapiMonitor = globalGateway.getHealthMonitor('oddspapi');
 
-  const [apifootballQuota, oddspapiQuota, footystatsData] = await Promise.all([
+  const [apifootballQuota, oddspapiQuota] = await Promise.all([
     DailyPicksEngine.getApiFootballQuotaStatus(),
     DailyPicksEngine.getOddsPapiQuotaStatus(),
-    DailyPicksEngine.fetchFootyStatsEnrichment(),
   ]);
 
   const apiFootballState = apifootballMonitor.getState();
   const oddsPapiState = oddspapiQuota.allowed ? 'ACTIVE' : 'FAILED';
-  const footyStatsState = footystatsData ? 'ACTIVE' : 'FAILED';
 
   console.log('\n--- PROVIDER HEALTH ---');
   console.log('API-Football:', apiFootballState, `(Limit: ${apifootballQuota.limit}, Remaining: ${apifootballQuota.remaining})`);
   console.log('OddsPapi:', oddsPapiState, `(Limit: ${oddspapiQuota.limit}, Remaining: ${oddspapiQuota.remaining}, Status: ${oddspapiQuota.status})`);
-  console.log('FootyStats:', footyStatsState, `(Authenticated: ${Boolean(footystatsData)})`);
+  console.log('FootyStats: DISCONTINUED (Single Source of Truth: API-Football + OddsPapi)');
 
   // 2. Canonical Fixture Discovery
   console.log('\n--- CANONICAL FIXTURES DISCOVERY ---');

@@ -159,7 +159,7 @@ export class CanonicalFixtureRegistry {
       if (fs.existsSync(cachePath)) {
         const stats = fs.statSync(cachePath);
         const ageMs = Date.now() - stats.mtimeMs;
-        if (ageMs < 24 * 60 * 60 * 1000) {
+        if (ageMs < 24 * 60 * 60 * 1000) { // Keep disk cache up to 24h as stale fallback
           const raw = fs.readFileSync(cachePath, 'utf-8');
           const parsed = JSON.parse(raw);
           return {
@@ -213,8 +213,9 @@ export class CanonicalFixtureRegistry {
   public static async syncUpcomingFixtures(options: {
     forceRefresh?: boolean;
     leagueIds?: number[];
+    horizonDays?: number;
   } = {}): Promise<{ fixtures: CanonicalFixture[]; dataState: FixtureDataState; providerState: string }> {
-    const { forceRefresh = false, leagueIds = DEFAULT_LEAGUE_COVERAGE } = options;
+    const { forceRefresh = false, leagueIds = DEFAULT_LEAGUE_COVERAGE, horizonDays = 21 } = options;
     const now = new Date();
     const nowUtc = now.toISOString();
 
@@ -248,7 +249,7 @@ export class CanonicalFixtureRegistry {
     }
 
     const from = nowUtc.slice(0, 10);
-    const toDate = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+    const toDate = new Date(now.getTime() + horizonDays * 24 * 60 * 60 * 1000);
     const to = toDate.toISOString().slice(0, 10);
 
     const syncedFixtures: CanonicalFixture[] = [];
@@ -473,21 +474,29 @@ export class CanonicalFixtureRegistry {
    * Only future scheduled/timed fixtures are eligible.
    */
   public static async getUpcomingFixtures(options: {
-    horizon?: 'TODAY' | 'TOMORROW' | 'WEEKEND' | 'NEXT_7_DAYS';
+    horizon?: 'TODAY' | 'TOMORROW' | 'WEEKEND' | 'NEXT_7_DAYS' | 'NEXT_14_DAYS' | 'NEXT_30_DAYS' | 'ALL_UPCOMING';
     limit?: number;
     forceRefresh?: boolean;
+    leagueIds?: number[];
   } = {}): Promise<CanonicalFixtureRegistryResponse> {
-    const { horizon = 'NEXT_7_DAYS', limit = 50, forceRefresh = false } = options;
+    const { horizon = 'NEXT_7_DAYS', limit = 50, forceRefresh = false, leagueIds } = options;
 
-    const syncResult = await this.syncUpcomingFixtures({ forceRefresh });
+    let horizonMs = 21 * 24 * 60 * 60 * 1000;
+    if (horizon === 'NEXT_7_DAYS') horizonMs = 7 * 24 * 60 * 60 * 1000;
+    else if (horizon === 'NEXT_14_DAYS') horizonMs = 14 * 24 * 60 * 60 * 1000;
+    else if (horizon === 'NEXT_30_DAYS') horizonMs = 30 * 24 * 60 * 60 * 1000;
+    else if (horizon === 'ALL_UPCOMING') horizonMs = 60 * 24 * 60 * 60 * 1000;
+
+    const horizonDays = Math.max(21, Math.ceil(horizonMs / (24 * 60 * 60 * 1000)));
+    const syncResult = await this.syncUpcomingFixtures({ forceRefresh, horizonDays, leagueIds });
     const now = new Date();
     const nowTime = now.getTime();
-    const sevenDaysTime = nowTime + 7 * 24 * 60 * 60 * 1000;
+    const windowEndTime = nowTime + horizonMs;
 
-    // Strict 7-day future horizon filter: kickoffUtc > nowUtc && kickoffUtc <= nowUtc + 7d
+    // Strict future horizon filter
     let filtered = syncResult.fixtures.filter((f) => {
       const kTime = new Date(f.kickoffUtc).getTime();
-      const isFuture = kTime > nowTime && kTime <= sevenDaysTime;
+      const isFuture = kTime > nowTime && (horizon === 'ALL_UPCOMING' ? true : kTime <= windowEndTime);
       const isPreMatch = f.status === 'SCHEDULED' || f.status === 'TIMED';
       return isFuture && isPreMatch;
     });
@@ -504,6 +513,16 @@ export class CanonicalFixtureRegistry {
       filtered = filtered.filter((f) => {
         const day = new Date(f.kickoffUtc).getUTCDay();
         return day === 0 || day === 6; // Sunday = 0, Saturday = 6
+      });
+    }
+
+    // If a standard 7-day window yields 0 fixtures due to an international break,
+    // gracefully fall back to the next available upcoming scheduled round
+    if (filtered.length === 0 && (horizon === 'NEXT_7_DAYS' || !options.horizon)) {
+      filtered = syncResult.fixtures.filter((f) => {
+        const kTime = new Date(f.kickoffUtc).getTime();
+        const isPreMatch = f.status === 'SCHEDULED' || f.status === 'TIMED';
+        return kTime > nowTime && isPreMatch;
       });
     }
 

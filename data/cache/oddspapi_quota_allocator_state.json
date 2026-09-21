@@ -1,0 +1,36 @@
+{
+  "totalMonthlyBudget": 250,
+  "totalUsed": 155,
+  "totalRemaining": 95,
+  "providerLimit": 250,
+  "providerCount": 155,
+  "status": "NORMAL",
+  "tierBudgets": {
+    "A": {
+      "allocatedBudget": 150,
+      "used": 2,
+      "remaining": 148
+    },
+    "B": {
+      "allocatedBudget": 62,
+      "used": 0,
+      "remaining": 62
+    },
+    "C": {
+      "allocatedBudget": 25,
+      "used": 0,
+      "remaining": 25
+    }
+  },
+  "bufferBudget": {
+    "allocatedBudget": 12,
+    "used": 0,
+    "remaining": 12
+  },
+  "leagueUsage": {
+    "ENG-PL": 2
+  },
+  "lastSyncedAt": "2026-09-21T19:05:41.074Z",
+  "reserveFloor": 50,
+  "usableRemaining": 45
+}

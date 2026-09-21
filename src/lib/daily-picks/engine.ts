@@ -332,7 +332,14 @@ export class DailyPicksEngine {
         return [];
       }
       const raw = await res.json();
-      OddsPapiQuotaAllocator.recordUsage({ leagueId: 'ENG-PL', tier: 'A', cost: 1 });
+      OddsPapiQuotaAllocator.recordUsage({
+        leagueId: 'ENG-PL',
+        tier: 'A',
+        cost: 1,
+        endpoint: 'odds-by-tournaments',
+        reservationId: quotaDecision.reservationToken,
+        billable: true,
+      });
       return Array.isArray(raw) ? raw : [];
     } catch (err) {
       console.error('[DailyPicksEngine] OddsPapi fetch error:', err);
@@ -465,7 +472,7 @@ export class DailyPicksEngine {
         kickoffUtc,
         status: raw.status || 'SCHEDULED',
         hasPinnacleOdds: hasPinnacle,
-        hasFootyStatsEnrichment: Boolean(footystatsData),
+        hasFootyStatsEnrichment: false,
         lifecycleStage: this.computeLifecycleStage(kickoffUtc, predictionTimestamp),
         horizonBucket: this.computeHorizonBucket(kickoffUtc, predictionTimestamp),
       });
@@ -612,7 +619,7 @@ export class DailyPicksEngine {
           providerSources: {
             fixtures: 'api-football-pro',
             odds: 'oddspapi-pinnacle',
-            statistics: footystatsData ? 'footystats-epl' : 'apifootball-baseline',
+            statistics: 'apifootball-baseline',
           },
           modelProbability: ahVal.modelProbability,
           marketProbability: ahVal.marketProbability,
@@ -631,7 +638,7 @@ export class DailyPicksEngine {
           lifecycleStage: this.computeLifecycleStage(kickoffUtc, predictionTimestamp),
           horizonBucket: this.computeHorizonBucket(kickoffUtc, predictionTimestamp),
           apiFootballFixtureTimestamp: footballStateTimestamp,
-          footyStatsSnapshotTimestamp: footystatsStateTimestamp,
+          footyStatsSnapshotTimestamp: undefined,
           oddsPapiSnapshotTimestamp: oddsTimestampUtc,
         };
 
@@ -771,7 +778,7 @@ export class DailyPicksEngine {
           providerSources: {
             fixtures: 'api-football-pro',
             odds: 'oddspapi-pinnacle',
-            statistics: footystatsData ? 'footystats-epl' : 'apifootball-baseline',
+            statistics: 'apifootball-baseline',
           },
           modelProbability: ouVal.modelProbability,
           marketProbability: ouVal.marketProbability,
@@ -790,7 +797,7 @@ export class DailyPicksEngine {
           lifecycleStage: this.computeLifecycleStage(kickoffUtc, predictionTimestamp),
           horizonBucket: this.computeHorizonBucket(kickoffUtc, predictionTimestamp),
           apiFootballFixtureTimestamp: footballStateTimestamp,
-          footyStatsSnapshotTimestamp: footystatsStateTimestamp,
+          footyStatsSnapshotTimestamp: undefined,
           oddsPapiSnapshotTimestamp: oddsTimestampUtc,
         };
 
@@ -926,7 +933,7 @@ export class DailyPicksEngine {
           providerSources: {
             fixtures: 'api-football-pro',
             odds: 'oddspapi-pinnacle',
-            statistics: footystatsData ? 'footystats-epl' : 'apifootball-baseline',
+            statistics: 'apifootball-baseline',
           },
           modelProbability: bttsVal.modelProbability,
           marketProbability: bttsVal.marketProbability,
@@ -945,7 +952,7 @@ export class DailyPicksEngine {
           lifecycleStage: this.computeLifecycleStage(kickoffUtc, predictionTimestamp),
           horizonBucket: this.computeHorizonBucket(kickoffUtc, predictionTimestamp),
           apiFootballFixtureTimestamp: footballStateTimestamp,
-          footyStatsSnapshotTimestamp: footystatsStateTimestamp,
+          footyStatsSnapshotTimestamp: undefined,
           oddsPapiSnapshotTimestamp: oddsTimestampUtc,
         };
 
@@ -1137,8 +1144,7 @@ export class DailyPicksEngine {
               canonicalDomain: 'salmo.dev',
               quotaState: {
                 apiFootball: { remaining: 7466, status: 'NORMAL' },
-                oddsPapi: { remaining: 170, status: 'NORMAL' },
-                footyStats: { remaining: 100, status: 'NORMAL' },
+                oddsPapi: { remaining: 98, status: 'NORMAL' },
               },
             },
           };
@@ -1225,8 +1231,7 @@ export class DailyPicksEngine {
               canonicalDomain: 'salmo.dev',
               quotaState: {
                 apiFootball: { remaining: 7400, status: 'NORMAL' },
-                oddsPapi: { remaining: 170, status: 'NORMAL' },
-                footyStats: { remaining: 100, status: 'NORMAL' },
+                oddsPapi: { remaining: 98, status: 'NORMAL' },
               },
             },
           };

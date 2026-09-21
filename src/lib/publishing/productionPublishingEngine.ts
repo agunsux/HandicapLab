@@ -53,9 +53,6 @@ function getStorePath(): string {
 }
 
 function getAuditLogPath(): string {
-  return process.env.NODE_ENV === 'test'
-    ? path.resolve('data/test_cache/publishing_audit_log.jsonl')
-    : path.resolve('data/cache/publishing_audit_log.jsonl');
   if (process.env.NODE_ENV === 'test') {
     return path.resolve('data/test_cache/publishing_audit_log.jsonl');
   }
@@ -442,6 +439,43 @@ export class ProductionPublishingEngine {
       const isShadowLeague = league?.production_status === 'SHADOW';
 
       // Reconcile Pinnacle Odds for this fixture
+      // Reconcile Pinnacle Odds for this fixture from rawOdds if available
+      if (rawOdds && rawOdds.length > 0 && (!fixture.markets?.asianHandicap?.available && !fixture.markets?.overUnder?.available && !fixture.markets?.btts?.available)) {
+        const { DailyPicksEngine } = await import('@/lib/daily-picks/engine');
+        const participantMap = DailyPicksEngine.getOddsPapiParticipantMap();
+        const opFixture = rawOdds.find((o: any) => {
+          const oTime = new Date(o.startTime).getTime();
+          if (Math.abs(oTime - kickMs) > 3 * 60 * 60 * 1000) return false;
+          const p1 = o.participant1Name || participantMap.get(o.participant1Id) || '';
+          const p2 = o.participant2Name || participantMap.get(o.participant2Id) || '';
+          return DailyPicksEngine.matchTeams(homeTeam, p1) && DailyPicksEngine.matchTeams(awayTeam, p2);
+        });
+
+        if (opFixture?.bookmakerOdds?.pinnacle?.markets) {
+          const pinMarkets = opFixture.bookmakerOdds.pinnacle.markets;
+          let ahHome = pinMarkets['1070']?.outcomes?.['1070']?.players?.['0']?.price;
+          let ahAway = pinMarkets['1070']?.outcomes?.['1071']?.players?.['0']?.price;
+          let ahLine = -0.25;
+          if (!ahHome && pinMarkets['1072']) {
+            ahHome = pinMarkets['1072']?.outcomes?.['1072']?.players?.['0']?.price;
+            ahAway = pinMarkets['1072']?.outcomes?.['1073']?.players?.['0']?.price;
+            ahLine = 0.0;
+          }
+
+          const ouOver = pinMarkets['1010']?.outcomes?.['1010']?.players?.['0']?.price;
+          const ouUnder = pinMarkets['1010']?.outcomes?.['1012']?.players?.['0']?.price;
+
+          const bttsYes = pinMarkets['1050']?.outcomes?.['1050']?.players?.['0']?.price;
+          const bttsNo = pinMarkets['1050']?.outcomes?.['1052']?.players?.['0']?.price;
+
+          fixture.markets = {
+            asianHandicap: ahHome && ahAway ? { available: true, line: ahLine, homeOdds: ahHome, awayOdds: ahAway } : fixture.markets?.asianHandicap,
+            overUnder: ouOver && ouUnder ? { available: true, line: 2.5, overOdds: ouOver, underOdds: ouUnder } : fixture.markets?.overUnder,
+            btts: bttsYes && bttsNo ? { available: true, line: 0.5, yesOdds: bttsYes, noOdds: bttsNo } : fixture.markets?.btts,
+          };
+        }
+      }
+
       // Look for matching market lines
       const ahMarket = fixture.markets?.asianHandicap;
       const ouMarket = fixture.markets?.overUnder;
