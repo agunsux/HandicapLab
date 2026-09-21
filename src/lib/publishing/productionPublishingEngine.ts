@@ -35,18 +35,35 @@ import { buildScoreGrid, calculateAsianHandicapProbability, calculateOverUnderPr
 import { calculateBttsFromGrid } from '@/lib/research/bttsEngine';
 import { HighConfidenceLedgerService } from '@/lib/ledger/highConfidenceLedgerService';
 import { PredictionArchiveService } from '@/lib/archive/predictionArchiveService';
+import { CanonicalOrchestrator, CompetitionProfileEngine } from '@/lib/pipeline/canonicalOrchestrator';
 import { supabase } from '@/lib/supabase.server';
 
 function getStorePath(): string {
   return process.env.NODE_ENV === 'test'
     ? path.resolve('data/test_cache/canonical_published_signals.json')
     : path.resolve('data/cache/canonical_published_signals.json');
+  if (process.env.NODE_ENV === 'test') {
+    return path.resolve('data/test_cache/canonical_published_signals.json');
+  }
+  if (process.env.VERCEL) {
+    const os = require('os');
+    return path.join(os.tmpdir(), 'handicaplab_canonical_published_signals.json');
+  }
+  return path.resolve('data/cache/canonical_published_signals.json');
 }
 
 function getAuditLogPath(): string {
   return process.env.NODE_ENV === 'test'
     ? path.resolve('data/test_cache/publishing_audit_log.jsonl')
     : path.resolve('data/cache/publishing_audit_log.jsonl');
+  if (process.env.NODE_ENV === 'test') {
+    return path.resolve('data/test_cache/publishing_audit_log.jsonl');
+  }
+  if (process.env.VERCEL) {
+    const os = require('os');
+    return path.join(os.tmpdir(), 'handicaplab_publishing_audit_log.jsonl');
+  }
+  return path.resolve('data/cache/publishing_audit_log.jsonl');
 }
 
 export class ProductionPublishingEngine {
@@ -68,6 +85,16 @@ export class ProductionPublishingEngine {
         if (parsed && typeof parsed === 'object') {
           this.cachedStore = parsed;
           return parsed;
+        }
+      } else if (process.env.VERCEL) {
+        const bundled = path.resolve('data/cache/canonical_published_signals.json');
+        if (fs.existsSync(bundled)) {
+          const raw = fs.readFileSync(bundled, 'utf8');
+          const parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === 'object') {
+            this.cachedStore = parsed;
+            return parsed;
+          }
         }
       }
     } catch (e) {
@@ -459,6 +486,36 @@ export class ProductionPublishingEngine {
         });
       }
 
+      // 1. Resolve Team Ratings & Expected Goals (Dixon-Coles)
+      let homeXg = 1.45;
+      let awayXg = 1.15;
+      let rho = -0.05;
+      let sampleSizeHome = 10;
+      let sampleSizeAway = 10;
+      let isModelSufficient = true;
+
+      try {
+        const ratings = await CanonicalOrchestrator.resolveTeamRatings(
+          homeTeam,
+          awayTeam,
+          competitionName,
+          predictionTimestampUtc
+        );
+        if (ratings.isSufficient && ratings.homeRating && ratings.awayRating) {
+          const profile = CompetitionProfileEngine.getProfileForLeague(competitionName);
+          const leagueAvgGoals = profile.goalEnvironment || 2.65;
+          const homeBase = leagueAvgGoals * 0.55;
+          const awayBase = leagueAvgGoals * 0.45;
+          homeXg = Number(Math.max(0.20, ratings.homeRating.attack_strength * ratings.awayRating.defense_strength * homeBase).toFixed(4));
+          awayXg = Number(Math.max(0.20, ratings.awayRating.attack_strength * ratings.homeRating.defense_strength * awayBase).toFixed(4));
+          sampleSizeHome = ratings.homeRating.matches_played;
+          sampleSizeAway = ratings.awayRating.matches_played;
+          isModelSufficient = true;
+        }
+      } catch {
+        // Safe baseline parameters
+      }
+
       for (const cand of candidateMarkets) {
         evaluatedPredictions++;
         const signalId = `sig_${fixtureId}_${cand.market}_${cand.line}`.replace(/[^a-zA-Z0-9_-]/g, '_');
@@ -468,6 +525,7 @@ export class ProductionPublishingEngine {
         const homeXg = 1.45;
         const awayXg = 1.15;
         const rho = -0.05;
+        // 2. Model Intensity & Probability Evaluation (Dixon-Coles)
         let modelProb = 0.5;
         if (cand.market === 'AH') {
           const prob = calculateAsianHandicapProbability(homeXg, awayXg, cand.line, rho);
@@ -482,6 +540,7 @@ export class ProductionPublishingEngine {
         }
 
         // 2. ValueEngine Evaluation & Multi-Factor Confidence Scoring
+        // 3. ValueEngine Evaluation & Multi-Factor Confidence Scoring
         const valResult = ValueEngine.evaluateSelection({
           selection: cand.selection,
           market: cand.market,
@@ -491,8 +550,8 @@ export class ProductionPublishingEngine {
             sideOdds: cand.marketOdds,
             oppositeOdds: cand.oppositeOdds || cand.marketOdds,
           },
-          sampleSizeHome: 10, // In production, connected to team match count
-          sampleSizeAway: 10,
+          sampleSizeHome,
+          sampleSizeAway,
           oddsTimestampUtc,
           predictionTimestampUtc,
           kickoffUtc,
@@ -500,7 +559,7 @@ export class ProductionPublishingEngine {
           homeTeam,
           awayTeam,
           league: competitionName,
-          modelStatus: 'FIXTURE_SPECIFIC',
+          modelStatus: isModelSufficient ? 'FIXTURE_SPECIFIC' : 'INSUFFICIENT_MODEL',
         });
 
         // 3. Evaluate Production Validity (SEPARATE from Confidence)
@@ -650,9 +709,9 @@ export class ProductionPublishingEngine {
               oddsSnapshotId: `odds_${fixtureId}`,
               provenanceHash: candidateSignal.payloadHash,
               scoreGridSummary: {
-                homeXG: 1.45,
-                awayXG: 1.15,
-                rho: -0.05,
+                homeXG: homeXg,
+                awayXG: awayXg,
+                rho,
                 scoreGridHash: candidateSignal.payloadHash,
               },
               status: candidateSignal.publishState === 'PUBLISHED' ? 'ACTIVE' : candidateSignal.publishState === 'SHADOW' ? 'GENERATED' : 'REJECTED',

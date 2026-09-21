@@ -52,6 +52,7 @@ export interface PredictionSettlementRecord {
   closingOdds?: number;
   clv?: number; // (entryOdds / closingOdds) - 1
   settledAt: string;
+  resultReceivedAt?: string;
   resultProvider?: string;
   resultSource?: string;
 }

@@ -65,6 +65,15 @@ export class ProductionSettlementService {
       }
     }
 
+    // Invariant (Gate 6): Cannot settle before match result timestamp
+    if (result.receivedAtUtc) {
+      const resultMs = new Date(result.receivedAtUtc).getTime();
+      const currentMs = options?.nowMs ?? Date.now();
+      if (!isNaN(resultMs) && currentMs < resultMs) {
+        return { settled: false, reason: 'RESULT_TIMESTAMP_VIOLATION: Settlement timestamp cannot precede result arrival' };
+      }
+    }
+
     const normStatus = result.status?.toUpperCase() || 'UNKNOWN';
 
     // 2. Postponed Match Gate: Match has not been played yet

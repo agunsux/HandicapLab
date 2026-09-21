@@ -262,8 +262,8 @@ export async function GET(request: NextRequest) {
         strikeRatePct: perfSummary.strikeRatePct,
       },
       providerHealth: {
-        apiFootball: health.find((h) => h.provider === 'apifootball') || { healthy: true },
-        oddsPapi: health.find((h) => h.provider === 'oddspapi') || { healthy: true },
+        apiFootball: health.find((h) => h.provider === 'apifootball') || { healthy: false, error: 'NO_HEALTH_RECORD' },
+        oddsPapi: health.find((h) => h.provider === 'oddspapi') || { healthy: false, error: 'NO_HEALTH_RECORD' },
       },
     };
 

@@ -21,6 +21,7 @@
 import { supabase } from '../supabase.server';
 import { calculateTeamRatings, MatchData, TeamRating } from '../engine/ratings';
 import { CompetitionProfileEngine } from '../engines/feature-engine/competition-profile';
+export { CompetitionProfileEngine };
 import {
   buildScoreGrid,
   calculateAsianHandicapProbability,

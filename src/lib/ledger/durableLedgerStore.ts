@@ -25,24 +25,56 @@ function getLedgerPath(): string {
   return process.env.NODE_ENV === 'test'
     ? path.resolve('data/test_ledger/high_confidence_ledger.json')
     : path.resolve('data/ledger/high_confidence_ledger.json');
+  if (process.env.NODE_ENV === 'test') {
+    return path.resolve('data/test_ledger/high_confidence_ledger.json');
+  }
+  if (process.env.VERCEL) {
+    const os = require('os');
+    return path.join(os.tmpdir(), 'handicaplab_high_confidence_ledger.json');
+  }
+  return path.resolve('data/ledger/high_confidence_ledger.json');
 }
 
 function getSettlementsPath(): string {
   return process.env.NODE_ENV === 'test'
     ? path.resolve('data/test_ledger/settlements.json')
     : path.resolve('data/ledger/settlements.json');
+  if (process.env.NODE_ENV === 'test') {
+    return path.resolve('data/test_ledger/settlements.json');
+  }
+  if (process.env.VERCEL) {
+    const os = require('os');
+    return path.join(os.tmpdir(), 'handicaplab_settlements.json');
+  }
+  return path.resolve('data/ledger/settlements.json');
 }
 
 function getDailyPerfPath(): string {
   return process.env.NODE_ENV === 'test'
     ? path.resolve('data/test_ledger/daily_performance.json')
     : path.resolve('data/ledger/daily_performance.json');
+  if (process.env.NODE_ENV === 'test') {
+    return path.resolve('data/test_ledger/daily_performance.json');
+  }
+  if (process.env.VERCEL) {
+    const os = require('os');
+    return path.join(os.tmpdir(), 'handicaplab_daily_performance.json');
+  }
+  return path.resolve('data/ledger/daily_performance.json');
 }
 
 function getEventsPath(): string {
   return process.env.NODE_ENV === 'test'
     ? path.resolve('data/test_ledger/ledger_events.jsonl')
     : path.resolve('data/ledger/ledger_events.jsonl');
+  if (process.env.NODE_ENV === 'test') {
+    return path.resolve('data/test_ledger/ledger_events.jsonl');
+  }
+  if (process.env.VERCEL) {
+    const os = require('os');
+    return path.join(os.tmpdir(), 'handicaplab_ledger_events.jsonl');
+  }
+  return path.resolve('data/ledger/ledger_events.jsonl');
 }
 
 export class DurableLedgerStore {
@@ -55,31 +87,47 @@ export class DurableLedgerStore {
   // ──────────────────────────────────────────────────────────────────────────
 
   private static atomicWriteJson(filePath: string, data: any): void {
-    const dir = path.dirname(filePath);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-    const tempPath = `${filePath}.tmp.${Date.now()}.${Math.random().toString(36).slice(2, 7)}`;
-    fs.writeFileSync(tempPath, JSON.stringify(data, null, 2), 'utf8');
     try {
-      fs.renameSync(tempPath, filePath);
-    } catch (err: any) {
-      if (err?.code === 'EPERM' || err?.code === 'EBUSY') {
-        fs.copyFileSync(tempPath, filePath);
-        try { fs.unlinkSync(tempPath); } catch {}
-      } else {
-        throw err;
+      const dir = path.dirname(filePath);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
       }
+      const tempPath = filePath + '.tmp.' + Date.now() + '.' + Math.random().toString(36).slice(2, 7);
+      fs.writeFileSync(tempPath, JSON.stringify(data, null, 2), 'utf8');
+      try {
+        fs.renameSync(tempPath, filePath);
+      } catch (err: any) {
+        if (err?.code === 'EPERM' || err?.code === 'EBUSY') {
+          fs.copyFileSync(tempPath, filePath);
+          try { fs.unlinkSync(tempPath); } catch {}
+        } else {
+          throw err;
+        }
+      }
+    } catch (err: any) {
+      if (err?.code === 'EROFS') {
+        console.warn('[DurableLedgerStore] Read-only filesystem detected, write skipped:', filePath);
+        return;
+      }
+      throw err;
     }
   }
 
   private static appendJsonLine(filePath: string, item: any): void {
-    const dir = path.dirname(filePath);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
+    try {
+      const dir = path.dirname(filePath);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+      fs.appendFileSync(filePath, JSON.stringify(item) + '\n', 'utf8');
+    } catch (e: any) {
+      if (e?.code === 'EROFS') {
+        return;
+      }
+      console.warn('[DurableLedgerStore] Failed to append JSONL line to ' + filePath + ':', e);
     }
-    fs.appendFileSync(filePath, JSON.stringify(item) + '\n', 'utf8');
   }
+
 
   // ──────────────────────────────────────────────────────────────────────────
   // LEDGER ENTRIES
@@ -94,6 +142,13 @@ export class DurableLedgerStore {
         const raw = fs.readFileSync(ledgerPath, 'utf8');
         this.cachedLedger = JSON.parse(raw);
         return this.cachedLedger!;
+      } else if (process.env.VERCEL) {
+        const bundled = path.resolve('data/ledger/high_confidence_ledger.json');
+        if (fs.existsSync(bundled)) {
+          const raw = fs.readFileSync(bundled, 'utf8');
+          this.cachedLedger = JSON.parse(raw);
+          return this.cachedLedger!;
+        }
       }
     } catch (e) {
       console.warn('[DurableLedgerStore] Error reading ledger file, initializing empty:', e);
@@ -178,6 +233,13 @@ export class DurableLedgerStore {
         const raw = fs.readFileSync(p, 'utf8');
         this.cachedSettlements = JSON.parse(raw);
         return this.cachedSettlements!;
+      } else if (process.env.VERCEL) {
+        const bundled = path.resolve('data/ledger/settlements.json');
+        if (fs.existsSync(bundled)) {
+          const raw = fs.readFileSync(bundled, 'utf8');
+          this.cachedSettlements = JSON.parse(raw);
+          return this.cachedSettlements!;
+        }
       }
     } catch (e) {
       console.warn('[DurableLedgerStore] Error reading settlements file:', e);
@@ -219,11 +281,19 @@ export class DurableLedgerStore {
           closing_prob: settlement.closingProbability,
           result: dbResult,
           profit: settlement.profitUnits,
+          profit_loss_units: settlement.profitUnits,
+          return_units: settlement.returnUnits,
           clv: settlement.clv,
           realized_roi: settlement.profitUnits, // 1 unit stake
+          home_goals: settlement.homeGoals,
+          away_goals: settlement.awayGoals,
           settled_at: settlement.settledAt,
         };
         await supabase.from('public_settlements').insert(payload);
+
+        await supabase
+          .from('public_settlements')
+          .upsert({ id: settlement.settlementId, ledger_id: settlement.ledgerId, ...payload });
       }
     } catch (err: any) {
       console.warn('[DurableLedgerStore] Supabase settlement sync warning:', err?.message || err);
@@ -243,6 +313,13 @@ export class DurableLedgerStore {
         const raw = fs.readFileSync(p, 'utf8');
         this.cachedDailyPerf = JSON.parse(raw);
         return this.cachedDailyPerf!;
+      } else if (process.env.VERCEL) {
+        const bundled = path.resolve('data/ledger/daily_performance.json');
+        if (fs.existsSync(bundled)) {
+          const raw = fs.readFileSync(bundled, 'utf8');
+          this.cachedDailyPerf = JSON.parse(raw);
+          return this.cachedDailyPerf!;
+        }
       }
     } catch (e) {
       console.warn('[DurableLedgerStore] Error reading daily performance:', e);

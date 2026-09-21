@@ -238,6 +238,57 @@ describe('Automatic Settlement, Exact Quarter-Line Math & Multi-Window Yield', (
       expect(report.allTimeProfitUnits).toBeCloseTo(0.0, 2);
       expect(report.allTimeYieldPct).toBeCloseTo(0.0, 1);
     });
+
+    it('strictly enforces Gate 6: rejects settlement occurring before result received timestamp', async () => {
+      const pred = await PredictionArchiveService.recordPrediction({
+        fixtureId: 'gate6_fix_1',
+        canonicalMatchId: 'EPL_2026_ARSENAL_CHELSEA_2026-09-20',
+        competition: 'Premier League',
+        leagueKey: 'epl',
+        homeTeam: 'Arsenal',
+        awayTeam: 'Chelsea',
+        market: 'AH',
+        line: -0.5,
+        selection: 'Arsenal -0.5',
+        marketOdds: 2.05,
+        fairOdds: 1.724,
+        modelProbability: 0.58,
+        expectedValue: 0.189,
+        edge: 0.10,
+        bookmaker: 'Pinnacle',
+        oddsProvider: 'OddsPapi',
+        decision: 'VALUE_CANDIDATE',
+        confidence: 78,
+        strengthLevel: 'VERY_STRONG',
+        signalColor: 'GREEN',
+        predictionTimestamp: '2026-09-20T10:00:00.000Z',
+        oddsTimestamp: '2026-09-20T09:50:00.000Z',
+        kickoffTimestamp: '2026-09-20T14:00:00.000Z',
+        modelVersion: 'dixon-coles-v1.0',
+        modelParametersVersion: 'params-epl-2026-v1',
+        dataVersion: 'canonical-production-v1',
+        featureSnapshotId: 'feat_gate6',
+        oddsSnapshotId: 'odds_gate6',
+        scoreGridSummary: { homeXG: 1.5, awayXG: 1.0, rho: -0.05 },
+        status: 'ACTIVE',
+        settlement: null,
+      });
+
+      // Attempt to settle with settledAt (15:50) earlier than resultReceivedAt (16:00)
+      await expect(
+        PredictionArchiveService.settleArchivedPrediction(pred.record.predictionId, {
+          settledAt: '2026-09-20T15:50:00.000Z',
+          resultReceivedAt: '2026-09-20T16:00:00.000Z',
+          homeGoals: 2,
+          awayGoals: 1,
+          outcome: 'WIN',
+          profitUnits: 1.05,
+          closingOdds: 2.00,
+          clv: 0.025,
+          resultSource: 'API-Football',
+        })
+      ).rejects.toThrow(/Temporal settlement violation: settledAt .* < resultReceivedAt/);
+    });
   });
 });
 

@@ -74,6 +74,17 @@ export interface CanonicalFixtureRegistryResponse {
 const CACHE_TTL_MS = 30 * 60 * 1000; // 30 minutes in-memory / disk cache
 const CACHE_FILE_PATH = path.resolve('data/cache/canonical_fixtures.json');
 
+function getCanonicalFixturesCachePath(): string {
+  if (process.env.NODE_ENV === 'test') {
+    return path.resolve('data/test_cache/canonical_fixtures.json');
+  }
+  if (process.env.VERCEL) {
+    const os = require('os');
+    return path.join(os.tmpdir(), 'handicaplab_canonical_fixtures.json');
+  }
+  return path.resolve('data/cache/canonical_fixtures.json');
+}
+
 // Default target leagues derived from canonical 15 candidate leagues (ACTIVE & SHADOW)
 export const DEFAULT_LEAGUE_COVERAGE = CANONICAL_15_LEAGUES
   .filter((l) => l.production_status === 'ACTIVE' || l.production_status === 'SHADOW')
@@ -144,15 +155,26 @@ export class CanonicalFixtureRegistry {
    */
   private static readDiskCache(): { fixtures: CanonicalFixture[]; lastSyncedAt: string } | null {
     try {
-      if (fs.existsSync(CACHE_FILE_PATH)) {
-        const stats = fs.statSync(CACHE_FILE_PATH);
+      const cachePath = getCanonicalFixturesCachePath();
+      if (fs.existsSync(cachePath)) {
+        const stats = fs.statSync(cachePath);
         const ageMs = Date.now() - stats.mtimeMs;
-        if (ageMs < 24 * 60 * 60 * 1000) { // Keep disk cache up to 24h as stale fallback
-          const raw = fs.readFileSync(CACHE_FILE_PATH, 'utf-8');
+        if (ageMs < 24 * 60 * 60 * 1000) {
+          const raw = fs.readFileSync(cachePath, 'utf-8');
           const parsed = JSON.parse(raw);
           return {
             fixtures: parsed.fixtures || [],
             lastSyncedAt: parsed.lastSyncedAt || stats.mtime.toISOString(),
+          };
+        }
+      } else if (process.env.VERCEL) {
+        const bundledPath = path.resolve('data/cache/canonical_fixtures.json');
+        if (fs.existsSync(bundledPath)) {
+          const raw = fs.readFileSync(bundledPath, 'utf-8');
+          const parsed = JSON.parse(raw);
+          return {
+            fixtures: parsed.fixtures || [],
+            lastSyncedAt: parsed.lastSyncedAt || new Date().toISOString(),
           };
         }
       }
@@ -167,17 +189,20 @@ export class CanonicalFixtureRegistry {
    */
   private static writeDiskCache(fixtures: CanonicalFixture[], lastSyncedAt: string): void {
     try {
-      const dir = path.dirname(CACHE_FILE_PATH);
+      const cachePath = getCanonicalFixturesCachePath();
+      const dir = path.dirname(cachePath);
       if (!fs.existsSync(dir)) {
         fs.mkdirSync(dir, { recursive: true });
       }
       fs.writeFileSync(
-        CACHE_FILE_PATH,
+        cachePath,
         JSON.stringify({ fixtures, lastSyncedAt, updatedAt: new Date().toISOString() }, null, 2),
         'utf-8'
       );
-    } catch (e) {
-      console.warn('[CanonicalFixtureRegistry] Disk cache write error:', e);
+    } catch (e: any) {
+      if (e?.code !== 'EROFS') {
+        console.warn('[CanonicalFixtureRegistry] Disk cache write error:', e);
+      }
     }
   }
 
@@ -347,6 +372,9 @@ export class CanonicalFixtureRegistry {
    * Never creates duplicate records.
    */
   public static async upsertMatchesToDatabase(fixtures: CanonicalFixture[]): Promise<void> {
+    if (process.env.NODE_ENV === 'test') {
+      return;
+    }
     try {
       for (const f of fixtures) {
         const { data: existing } = await supabase

@@ -27,27 +27,47 @@ import { DurableLedgerStore } from '@/lib/ledger/durableLedgerStore';
 import { supabase } from '@/lib/supabase.server';
 
 function getArchiveJsonPath(): string {
-  return process.env.NODE_ENV === 'test'
-    ? path.resolve('data/test_ledger/prediction_archive.json')
-    : path.resolve('data/ledger/prediction_archive.json');
+  if (process.env.NODE_ENV === 'test') {
+    return path.resolve('data/test_ledger/prediction_archive.json');
+  }
+  if (process.env.VERCEL) {
+    const os = require('os');
+    return path.join(os.tmpdir(), 'handicaplab_prediction_archive.json');
+  }
+  return path.resolve('data/ledger/prediction_archive.json');
 }
 
 function getArchiveJsonlPath(): string {
-  return process.env.NODE_ENV === 'test'
-    ? path.resolve('data/test_ledger/prediction_archive.jsonl')
-    : path.resolve('data/ledger/prediction_archive.jsonl');
+  if (process.env.NODE_ENV === 'test') {
+    return path.resolve('data/test_ledger/prediction_archive.jsonl');
+  }
+  if (process.env.VERCEL) {
+    const os = require('os');
+    return path.join(os.tmpdir(), 'handicaplab_prediction_archive.jsonl');
+  }
+  return path.resolve('data/ledger/prediction_archive.jsonl');
 }
 
 function getDailyRunSnapshotsPath(): string {
-  return process.env.NODE_ENV === 'test'
-    ? path.resolve('data/test_ledger/daily_pick_run_snapshots.jsonl')
-    : path.resolve('data/ledger/daily_pick_run_snapshots.jsonl');
+  if (process.env.NODE_ENV === 'test') {
+    return path.resolve('data/test_ledger/daily_pick_run_snapshots.jsonl');
+  }
+  if (process.env.VERCEL) {
+    const os = require('os');
+    return path.join(os.tmpdir(), 'handicaplab_daily_pick_run_snapshots.jsonl');
+  }
+  return path.resolve('data/ledger/daily_pick_run_snapshots.jsonl');
 }
 
 function getSettlementsJsonlPath(): string {
-  return process.env.NODE_ENV === 'test'
-    ? path.resolve('data/test_ledger/prediction_settlements.jsonl')
-    : path.resolve('data/ledger/prediction_settlements.jsonl');
+  if (process.env.NODE_ENV === 'test') {
+    return path.resolve('data/test_ledger/prediction_settlements.jsonl');
+  }
+  if (process.env.VERCEL) {
+    const os = require('os');
+    return path.join(os.tmpdir(), 'handicaplab_prediction_settlements.jsonl');
+  }
+  return path.resolve('data/ledger/prediction_settlements.jsonl');
 }
 
 export class PredictionArchiveService {
@@ -58,44 +78,59 @@ export class PredictionArchiveService {
   // ──────────────────────────────────────────────────────────────────────────
 
   private static atomicWriteJson(filePath: string, data: any): void {
-    const dir = path.dirname(filePath);
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-    const content = JSON.stringify(data, null, 2);
-    const tempPath = `${filePath}.tmp.${Date.now()}.${Math.random().toString(36).slice(2, 7)}`;
-    fs.writeFileSync(tempPath, content, 'utf8');
+    try {
+      const dir = path.dirname(filePath);
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+      const content = JSON.stringify(data, null, 2);
+      const tempPath = filePath + '.tmp.' + Date.now() + '.' + Math.random().toString(36).slice(2, 7);
+      fs.writeFileSync(tempPath, content, 'utf8');
 
-    let attempts = 0;
-    while (attempts < 5) {
-      try {
-        fs.renameSync(tempPath, filePath);
-        return;
-      } catch (err: any) {
-        if (err?.code === 'EPERM' || err?.code === 'EBUSY') {
-          attempts++;
-          try {
-            fs.writeFileSync(filePath, content, 'utf8');
-            try { fs.unlinkSync(tempPath); } catch {}
-            return;
-          } catch (writeErr: any) {
-            if (attempts >= 5) {
+      let attempts = 0;
+      while (attempts < 5) {
+        try {
+          fs.renameSync(tempPath, filePath);
+          return;
+        } catch (err: any) {
+          if (err?.code === 'EPERM' || err?.code === 'EBUSY') {
+            attempts++;
+            try {
+              fs.writeFileSync(filePath, content, 'utf8');
               try { fs.unlinkSync(tempPath); } catch {}
-              throw writeErr;
+              return;
+            } catch (writeErr: any) {
+              if (attempts >= 5) {
+                try { fs.unlinkSync(tempPath); } catch {}
+                throw writeErr;
+              }
+              const end = Date.now() + 25;
+              while (Date.now() < end) {}
             }
-            const end = Date.now() + 25;
-            while (Date.now() < end) {}
+          } else {
+            try { fs.unlinkSync(tempPath); } catch {}
+            throw err;
           }
-        } else {
-          try { fs.unlinkSync(tempPath); } catch {}
-          throw err;
         }
       }
+    } catch (err: any) {
+      if (err?.code === 'EROFS') {
+        console.warn('[PredictionArchiveService] Read-only filesystem detected, write skipped:', filePath);
+        return;
+      }
+      throw err;
     }
   }
 
   private static appendJsonLine(filePath: string, item: any): void {
-    const dir = path.dirname(filePath);
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-    fs.appendFileSync(filePath, JSON.stringify(item) + '\n', 'utf8');
+    try {
+      const dir = path.dirname(filePath);
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+      fs.appendFileSync(filePath, JSON.stringify(item) + '\n', 'utf8');
+    } catch (e: any) {
+      if (e?.code === 'EROFS') {
+        return;
+      }
+      console.warn('[PredictionArchiveService] Failed to append JSONL line to ' + filePath + ':', e);
+    }
   }
 
   public static loadArchive(): Record<string, PredictionArchiveRecord> {
@@ -109,6 +144,16 @@ export class PredictionArchiveService {
         if (parsed && typeof parsed === 'object') {
           this.cachedStore = parsed;
           return parsed;
+        }
+      } else if (process.env.VERCEL) {
+        const bundled = path.resolve('data/ledger/prediction_archive.json');
+        if (fs.existsSync(bundled)) {
+          const raw = fs.readFileSync(bundled, 'utf8');
+          const parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === 'object') {
+            this.cachedStore = parsed;
+            return parsed;
+          }
         }
       }
     } catch (e) {
@@ -290,6 +335,16 @@ export class PredictionArchiveService {
       throw new Error(
         `[PredictionArchive] Temporal settlement violation: settledAt (${settlement.settledAt}) < kickoffTimestamp (${record.kickoffTimestamp})`
       );
+    }
+
+    // Invariant (Gate 6): Settlement cannot occur before match result timestamp
+    if (settlement.resultReceivedAt) {
+      const resultMs = new Date(settlement.resultReceivedAt).getTime();
+      if (!isNaN(resultMs) && !isNaN(settledMs) && settledMs < resultMs) {
+        throw new Error(
+          `[PredictionArchive] Temporal settlement violation: settledAt (${settlement.settledAt}) < resultReceivedAt (${settlement.resultReceivedAt})`
+        );
+      }
     }
 
     const nowIso = new Date().toISOString();
