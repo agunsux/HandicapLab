@@ -11493,5 +11493,100 @@
     "timestamp": "2026-09-21T19:58:50.227Z",
     "evidenceHash": "17c5933ca36bef1097bd68c3ca6f8e1718a11de4dccb8c4be1301164e6269f3f",
     "evidenceSignature": "signed_by_handicaplab_research_17c5933ca36bef10"
+  },
+  {
+    "experimentId": "exp-1790368369360",
+    "datasetSha": "unknown-dataset-sha",
+    "gitCommitSha": "a1b2c3d4e5f6",
+    "featureVersion": "1.0.0",
+    "calibrationVersion": "platt-epl-default",
+    "modelVersion": "dixonColes",
+    "randomSeed": 42,
+    "validationMetrics": {
+      "totalMatches": 0,
+      "totalPredictions": 0,
+      "won": 0,
+      "lost": 0,
+      "voided": 0,
+      "roi": 0,
+      "yield": 0,
+      "avgClv": 0,
+      "winRate": 0,
+      "totalStake": 0,
+      "totalProfit": 0,
+      "brierScore": 0,
+      "logLoss": 0,
+      "avgKellyStake": 0,
+      "maxDrawdown": 0,
+      "sharpeRatio": null,
+      "sortinoRatio": null,
+      "profitFactor": 0,
+      "longestWinStreak": 0,
+      "longestLossStreak": 0,
+      "ece": 0,
+      "mce": 0,
+      "sharpness": 0,
+      "entropy": 0,
+      "accuracy": 0,
+      "precision": 0,
+      "recall": 0,
+      "f1": 0,
+      "rocauc": 0,
+      "prauc": 0,
+      "kellyRiskRatio": 0,
+      "psi": 0
+    },
+    "confidenceIntervals": [
+      {
+        "metric": "ROI (%)",
+        "observed": 0,
+        "mean": 0,
+        "stdErr": 0,
+        "ciLower": 0,
+        "ciUpper": 0,
+        "confidenceLevel": 0.95
+      },
+      {
+        "metric": "Brier Score",
+        "observed": 0,
+        "mean": 0,
+        "stdErr": 0,
+        "ciLower": 0,
+        "ciUpper": 0,
+        "confidenceLevel": 0.95
+      },
+      {
+        "metric": "CLV (%)",
+        "observed": 0,
+        "mean": 0,
+        "stdErr": 0,
+        "ciLower": 0,
+        "ciUpper": 0,
+        "confidenceLevel": 0.95
+      }
+    ],
+    "bootstrapResults": {
+      "mean": 0,
+      "median": 0,
+      "ciLower": 0,
+      "ciUpper": 0,
+      "isSignificant": false
+    },
+    "monteCarloResults": {
+      "cagr": 0,
+      "maxDrawdown": 0,
+      "ruinProbability": 0,
+      "medianBankroll": 100,
+      "worst5Pct": 100,
+      "best5Pct": 100
+    },
+    "runtime": {
+      "durationMs": 7,
+      "memoryMB": 0.23,
+      "cpuTimeMs": 7
+    },
+    "timestamp": "2026-09-25T20:32:49.360Z",
+    "evidenceHash": "b20e2b1a7e031c65893cc62b94d39d5986b2c0f446d1b46252133b5c2db2bff0",
+    "evidenceSignature": "signed_by_handicaplab_research_b20e2b1a7e031c65"
   }
 ]
