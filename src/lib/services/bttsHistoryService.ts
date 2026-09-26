@@ -6,11 +6,17 @@
 //   - Zero live provider calls. Reads exclusively from persisted, immutable JSONL.
 //   - Fast in-memory caching.
 //   - Full traceability back to provider fixture ID and canonical match ID.
-//   - No prediction model, EV, or value signals in Phase 1.
+//   - Seamless integration with BTTS Value Engine v1 walk-forward backtest.
 // ============================================================================
 
 import * as fs from 'fs';
 import * as path from 'path';
+import {
+  BttsBacktestEngine,
+  BttsValueEvaluation,
+  BttsBacktestSummary,
+  HistoricalMatchRecord,
+} from '@/lib/research/btts';
 
 export interface BttsHistoricalRecord {
   canonical_match_id: string;
@@ -37,6 +43,9 @@ export interface BttsHistoricalRecord {
   provenance_status: 'PREMATCH_VERIFIED' | 'MISSING_CLOSING' | 'MISSING_OPENING' | 'UNAVAILABLE';
   rejection_reason?: string | null;
   inplay_observations_rejected: number;
+
+  // Phase 2 BTTS Value Engine Walk-Forward Research Evaluation
+  researchEvaluation?: BttsValueEvaluation;
 }
 
 export interface BttsHistorySummary {
@@ -62,6 +71,9 @@ export interface BttsHistorySummary {
     quotaDelta: number;
     isUnmeteredConfirmed: boolean;
   };
+
+  // Walk-forward model backtest metrics
+  backtest?: BttsBacktestSummary;
 }
 
 export interface BttsHistoryFilters {
@@ -95,6 +107,31 @@ export class BttsHistoryService {
       const content = fs.readFileSync(filePath, 'utf-8');
       const lines = content.trim().split('\n').filter(Boolean);
       const records = lines.map((l) => JSON.parse(l) as BttsHistoricalRecord);
+
+      // Load canonical match database for walk-forward feature extraction & settlement
+      const canonicalPath = path.resolve('data/golden/europe/canonical_matches.jsonl');
+      let canonicalMatches: HistoricalMatchRecord[] = [];
+      if (fs.existsSync(canonicalPath)) {
+        try {
+          const canonicalLines = fs.readFileSync(canonicalPath, 'utf-8').trim().split('\n').filter(Boolean);
+          canonicalMatches = canonicalLines.map((l) => JSON.parse(l) as HistoricalMatchRecord);
+        } catch (err) {
+          console.error('[BttsHistoryService] Error loading canonical_matches.jsonl:', err);
+        }
+      }
+
+      // Attach walk-forward evaluation to each record
+      if (canonicalMatches.length > 0) {
+        const { evaluations } = BttsBacktestEngine.runBacktest(records, canonicalMatches);
+        const evalMap = new Map<string, BttsValueEvaluation>();
+        for (const ev of evaluations) {
+          evalMap.set(ev.canonicalMatchId, ev);
+        }
+        for (const r of records) {
+          r.researchEvaluation = evalMap.get(r.canonical_match_id);
+        }
+      }
+
       cachedRecords = records;
       cacheTimestamp = now;
       return records;
@@ -105,9 +142,28 @@ export class BttsHistoryService {
   }
 
   /**
-   * Load ingestion summary metadata from disk.
+   * Load ingestion summary metadata from disk and compute walk-forward backtest summary.
    */
   public static getSummary(): BttsHistorySummary {
+    const records = this.getRecords();
+
+    const canonicalPath = path.resolve('data/golden/europe/canonical_matches.jsonl');
+    let canonicalMatches: HistoricalMatchRecord[] = [];
+    if (fs.existsSync(canonicalPath)) {
+      try {
+        const canonicalLines = fs.readFileSync(canonicalPath, 'utf-8').trim().split('\n').filter(Boolean);
+        canonicalMatches = canonicalLines.map((l) => JSON.parse(l) as HistoricalMatchRecord);
+      } catch (err) {
+        console.error('[BttsHistoryService] Error loading canonical_matches.jsonl:', err);
+      }
+    }
+
+    let backtestSummary: BttsBacktestSummary | undefined;
+    if (canonicalMatches.length > 0) {
+      const { summary } = BttsBacktestEngine.runBacktest(records, canonicalMatches);
+      backtestSummary = summary;
+    }
+
     const summaryPath = path.resolve('data/historical/btts_historical_summary_2026.json');
     if (fs.existsSync(summaryPath)) {
       try {
@@ -119,13 +175,13 @@ export class BttsHistoryService {
         return {
           ...raw,
           coveragePercentage: coverage,
+          backtest: backtestSummary,
         };
       } catch (err) {
         console.error('[BttsHistoryService] Error loading summary JSON:', err);
       }
     }
 
-    const records = this.getRecords();
     return {
       dataset: 'BTTS_HISTORICAL_ODDS_2026',
       league: 'ENG-PL',
@@ -149,6 +205,7 @@ export class BttsHistoryService {
         quotaDelta: 0,
         isUnmeteredConfirmed: true,
       },
+      backtest: backtestSummary,
     };
   }
 
