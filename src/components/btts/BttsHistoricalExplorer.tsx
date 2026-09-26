@@ -53,10 +53,22 @@ export function BttsHistoricalExplorer({ initialRecords, summary }: BttsHistoric
             RESEARCH ONLY ENGINE &bull; NO LIVE BETTING &bull; ZERO KELLY STAKING
           </div>
           <p className="text-neutral-300 leading-relaxed">
-            All probabilities and Expected Value (EV) metrics are generated through a strict walk-forward
-            Poisson goal model with empirical Bayesian shrinkage. With $N=16$ EPL 2026 fixtures, sample size is
-            statistically insufficient for commercial validation (minimum required: 100 fixtures). All signals
-            are strictly classified as <strong>INSUFFICIENT_DATA</strong>.
+            {backtest?.isSampleSufficient ? (
+              <>
+                All probabilities and Expected Value (EV) metrics are generated through a strict walk-forward
+                Poisson goal model with empirical Bayesian shrinkage. With $N={initialRecords.length}$ verified EPL fixtures,
+                sample size meets the statistical research threshold ($N \ge 100$). All signals are strictly
+                classified as <strong>RESEARCH_ONLY</strong>; commercial value generation remains blocked pending
+                out-of-sample edge confirmation.
+              </>
+            ) : (
+              <>
+                All probabilities and Expected Value (EV) metrics are generated through a strict walk-forward
+                Poisson goal model with empirical Bayesian shrinkage. With $N={initialRecords.length}$ EPL fixtures,
+                sample size is statistically insufficient for commercial validation (minimum required: 100 fixtures).
+                All signals are strictly classified as <strong>INSUFFICIENT_DATA</strong>.
+              </>
+            )}
           </p>
         </div>
       </div>
@@ -66,7 +78,7 @@ export function BttsHistoricalExplorer({ initialRecords, summary }: BttsHistoric
         {/* Coverage Card */}
         <div className="rounded-xl border border-[#1F2937] bg-[#0E1413] p-5">
           <div className="flex items-center justify-between text-neutral-400 mb-2">
-            <span className="text-xs font-mono uppercase tracking-wider">2026 Fixture Scope</span>
+            <span className="text-xs font-mono uppercase tracking-wider">Fixture Scope</span>
             <Database className="h-4 w-4 text-[#10B981]" />
           </div>
           <div className="flex items-baseline gap-2">
@@ -79,17 +91,27 @@ export function BttsHistoricalExplorer({ initialRecords, summary }: BttsHistoric
         </div>
 
         {/* Data Sufficiency Gate */}
-        <div className="rounded-xl border border-amber-900/50 bg-[#0E1413] p-5">
+        <div className={`rounded-xl border bg-[#0E1413] p-5 ${backtest?.isSampleSufficient ? 'border-emerald-900/50' : 'border-amber-900/50'}`}>
           <div className="flex items-center justify-between text-neutral-400 mb-2">
             <span className="text-xs font-mono uppercase tracking-wider">Data Sufficiency Gate</span>
-            <AlertCircle className="h-4 w-4 text-amber-400" />
+            {backtest?.isSampleSufficient ? (
+              <CheckCircle2 className="h-4 w-4 text-[#10B981]" />
+            ) : (
+              <AlertCircle className="h-4 w-4 text-amber-400" />
+            )}
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-bold font-mono text-amber-400">INSUFFICIENT</span>
-            <span className="text-xs text-neutral-400 font-mono">16 / 100 min</span>
+            <span className={`text-2xl font-bold font-mono ${backtest?.isSampleSufficient ? 'text-[#10B981]' : 'text-amber-400'}`}>
+              {backtest?.dataSufficiencyVerdict ?? (backtest?.isSampleSufficient ? 'SUFFICIENT_FOR_RESEARCH' : 'INSUFFICIENT')}
+            </span>
+            <span className="text-xs text-neutral-400 font-mono">
+              {backtest?.sampleSize ?? initialRecords.length} / {backtest?.minSampleSizeRequired ?? 100} min
+            </span>
           </div>
           <p className="text-xs text-neutral-400 mt-2">
-            Commercial edge unproven due to limited validation sample
+            {backtest?.isSampleSufficient
+              ? 'Sample meets statistical research requirements'
+              : 'Commercial edge unproven due to limited validation sample'}
           </p>
         </div>
 
@@ -104,7 +126,7 @@ export function BttsHistoricalExplorer({ initialRecords, summary }: BttsHistoric
             <span className="text-xs text-emerald-400 font-mono">violations</span>
           </div>
           <p className="text-xs text-neutral-400 mt-2">
-            100% pre-kickoff features (<span className="text-emerald-400">1,995 in-play rejected</span>)
+            100% pre-kickoff features (<span className="text-emerald-400">{(summary.timing?.inplayObservationsRejected ?? 0).toLocaleString()} in-play rejected</span>)
           </p>
         </div>
 
@@ -116,10 +138,10 @@ export function BttsHistoricalExplorer({ initialRecords, summary }: BttsHistoric
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-2xl font-bold font-mono text-white">
-              {backtest?.metrics.model.brierScore.toFixed(4) ?? '0.2185'}
+              {backtest?.metrics.model.brierScore.toFixed(4) ?? '0.2564'}
             </span>
             <span className="text-xs text-neutral-400 font-mono">
-              vs Mkt {backtest?.metrics.market.brierScore.toFixed(4) ?? '0.2112'}
+              vs Mkt {backtest?.metrics.market.brierScore.toFixed(4) ?? '0.2444'}
             </span>
           </div>
           <p className="text-xs text-neutral-400 mt-2">
@@ -149,10 +171,18 @@ export function BttsHistoricalExplorer({ initialRecords, summary }: BttsHistoric
             className="bg-[#111827] border border-[#1F2937] rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-[#10B981]"
           >
             <option value="ALL">All Statuses ({initialRecords.length})</option>
-            <option value="INSUFFICIENT_DATA">INSUFFICIENT_DATA ({initialRecords.length})</option>
-            <option value="RESEARCH_ONLY">RESEARCH_ONLY (0)</option>
-            <option value="VALUE">VALUE (0)</option>
-            <option value="NO_VALUE">NO_VALUE (0)</option>
+            <option value="RESEARCH_ONLY">
+              RESEARCH_ONLY ({initialRecords.filter((r) => r.researchEvaluation?.status === 'RESEARCH_ONLY').length})
+            </option>
+            <option value="INSUFFICIENT_DATA">
+              INSUFFICIENT_DATA ({initialRecords.filter((r) => r.researchEvaluation?.status === 'INSUFFICIENT_DATA').length})
+            </option>
+            <option value="VALUE">
+              VALUE ({initialRecords.filter((r) => r.researchEvaluation?.status === 'VALUE').length})
+            </option>
+            <option value="NO_VALUE">
+              NO_VALUE ({initialRecords.filter((r) => r.researchEvaluation?.status === 'NO_VALUE').length})
+            </option>
           </select>
         </div>
       </div>
@@ -301,7 +331,13 @@ export function BttsHistoricalExplorer({ initialRecords, summary }: BttsHistoric
                       </td>
 
                       <td className="py-3 px-4 text-center">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-950/70 text-amber-300 border border-amber-800">
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold border ${
+                          ev?.status === 'VALUE'
+                            ? 'bg-emerald-950/70 text-emerald-300 border-emerald-800'
+                            : ev?.status === 'RESEARCH_ONLY'
+                            ? 'bg-sky-950/70 text-sky-300 border-sky-800'
+                            : 'bg-amber-950/70 text-amber-300 border-amber-800'
+                        }`}>
                           {ev?.status ?? 'INSUFFICIENT_DATA'}
                         </span>
                       </td>
@@ -439,9 +475,17 @@ export function BttsHistoricalExplorer({ initialRecords, summary }: BttsHistoric
             </div>
 
             <div className="text-[11px] font-mono text-neutral-400 border-t border-[#1F2937] pt-2">
-              <strong>Strict Decision:</strong> Signal status remains{' '}
-              <span className="text-amber-300 font-semibold">INSUFFICIENT_DATA</span> because statistical sample size
-              (16 fixtures) is below the 100-fixture minimum threshold.
+              <strong>Strict Decision:</strong> Signal status is{' '}
+              <span className={`font-semibold ${
+                selectedRecord.researchEvaluation?.status === 'VALUE'
+                  ? 'text-emerald-300'
+                  : selectedRecord.researchEvaluation?.status === 'RESEARCH_ONLY'
+                  ? 'text-sky-300'
+                  : 'text-amber-300'
+              }`}>
+                {selectedRecord.researchEvaluation?.status ?? 'INSUFFICIENT_DATA'}
+              </span>
+              : {selectedRecord.researchEvaluation?.reason ?? 'Sample size below validation threshold.'}
             </div>
           </div>
         </div>

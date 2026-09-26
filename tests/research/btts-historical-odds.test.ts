@@ -164,10 +164,14 @@ describe('4. AH / OU / BTTS Canonical Synchronization', () => {
 
       // AH and OU odds must coexist on the same canonical fixture
       expect(match.odds).toBeDefined();
-      expect(match.odds.ahLine).toBeDefined();
-      expect(match.odds.ouLine).toBeDefined();
-      expect(match.odds.ahHome).toBeGreaterThan(1.0);
-      expect(match.odds.over).toBeGreaterThan(1.0);
+      const ahLine = match.odds.ahLine ?? match.odds.chLine;
+      const ouLine = match.odds.ouLine ?? match.odds.couLine;
+      const ahHome = match.odds.ahHome ?? match.odds.chHome;
+      const over = match.odds.over ?? match.odds.cover;
+      expect(ahLine).toBeDefined();
+      expect(ouLine).toBeDefined();
+      expect(ahHome).toBeGreaterThan(1.0);
+      expect(over).toBeGreaterThan(1.0);
 
       // BTTS shares identical teams, season, and kickoff date
       expect(btts.home_team.toLowerCase()).toContain(match.homeTeam.toLowerCase().split(' ')[0]);

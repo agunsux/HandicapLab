@@ -1,0 +1,110 @@
+{
+  "generated_at": "2026-09-26T08:09:22.463Z",
+  "stats": {
+    "discovered": 194,
+    "candidates": 194,
+    "unmapped": 0,
+    "requestsAttempted": 77,
+    "requestsSuccessful": 77,
+    "requestsNotFound404": 0,
+    "requestsFailed": 0,
+    "rateLimitEvents": 0,
+    "rawReusedFromDisk": 28,
+    "bttsFoundCount": 105,
+    "bttsMissingCount": 0,
+    "closingAfterKickoffRejected": 10355,
+    "malformedOddsRejected": 0,
+    "lookaheadViolations": 0,
+    "duplicateRecordsRemoved": 0
+  },
+  "quotaAudit": {
+    "accountBefore": {
+      "requestLimit": 250,
+      "requestCount": 156
+    },
+    "accountAfter": {
+      "requestLimit": 250,
+      "requestCount": 156
+    },
+    "quotaDelta": 0,
+    "isUnmetered": true
+  },
+  "backtestSummary": {
+    "datasetName": "BTTS_HISTORICAL_ODDS_2026",
+    "totalMatches": 105,
+    "evaluatedMatches": 105,
+    "lookaheadViolations": 0,
+    "statusCounts": {
+      "INSUFFICIENT_DATA": 0,
+      "RESEARCH_ONLY": 105,
+      "NO_VALUE": 0,
+      "VALUE": 0,
+      "INVALID": 0
+    },
+    "sampleSize": 105,
+    "minSampleSizeRequired": 100,
+    "isSampleSufficient": true,
+    "metrics": {
+      "model": {
+        "brierScore": 0.25642,
+        "logLoss": 0.70656,
+        "meanPredictedProb": 0.5259
+      },
+      "market": {
+        "brierScore": 0.24437,
+        "logLoss": 0.6818,
+        "meanMarketProb": 0.5593
+      },
+      "leagueBaseline": {
+        "brierScore": 0.24812,
+        "logLoss": 0.6894,
+        "baselineProb": 0.5574
+      }
+    },
+    "calibrationBuckets": [
+      {
+        "bucketRange": "0.50-0.55",
+        "predictedMean": 0.5233,
+        "observedRate": 0.6071,
+        "count": 28
+      },
+      {
+        "bucketRange": "0.55-0.60",
+        "predictedMean": 0.5714,
+        "observedRate": 0.5789,
+        "count": 19
+      },
+      {
+        "bucketRange": "0.60-0.65",
+        "predictedMean": 0.619,
+        "observedRate": 0.4545,
+        "count": 11
+      },
+      {
+        "bucketRange": "0.65-0.70",
+        "predictedMean": 0.6676,
+        "observedRate": 0.5,
+        "count": 8
+      },
+      {
+        "bucketRange": "0.70+",
+        "predictedMean": 0,
+        "observedRate": 0,
+        "count": 0
+      }
+    ],
+    "signalsCount": 67,
+    "winsCount": 28,
+    "lossesCount": 39,
+    "hitRate": 41.8,
+    "avgOdds": 2.208,
+    "avgEdge": 0.0919,
+    "avgEV": 0.1742,
+    "totalStaked": 67,
+    "totalReturn": -8.543,
+    "roi": -0.1275,
+    "yieldPct": -12.75,
+    "dataSufficiencyVerdict": "SUFFICIENT_FOR_RESEARCH",
+    "researchConclusion": "Sample size is sufficient for research exploration."
+  }
+}

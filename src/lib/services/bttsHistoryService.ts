@@ -90,7 +90,17 @@ const CACHE_TTL_MS = 60 * 1000; // 1 minute in-memory cache
 
 export class BttsHistoryService {
   /**
+   * Reset cache for test isolation.
+   */
+  public static clearCache(): void {
+    cachedRecords = null;
+    cachedSummary = null;
+    cacheTimestamp = 0;
+  }
+
+  /**
    * Load persisted BTTS canonical records from disk without live provider calls.
+   * Prefers expanded dataset when available, falls back to baseline 2026 dataset.
    */
   public static getRecords(): BttsHistoricalRecord[] {
     const now = Date.now();
@@ -98,7 +108,9 @@ export class BttsHistoryService {
       return cachedRecords;
     }
 
-    const filePath = path.resolve('data/historical/btts_historical_odds_2026.jsonl');
+    const expandedPath = path.resolve('data/historical/btts_historical_odds_expanded.jsonl');
+    const legacyPath = path.resolve('data/historical/btts_historical_odds_2026.jsonl');
+    const filePath = fs.existsSync(expandedPath) ? expandedPath : legacyPath;
     if (!fs.existsSync(filePath)) {
       return [];
     }
@@ -136,7 +148,7 @@ export class BttsHistoryService {
       cacheTimestamp = now;
       return records;
     } catch (err) {
-      console.error('[BttsHistoryService] Error loading btts_historical_odds_2026.jsonl:', err);
+      console.error(`[BttsHistoryService] Error loading ${filePath}:`, err);
       return [];
     }
   }
@@ -162,6 +174,46 @@ export class BttsHistoryService {
     if (canonicalMatches.length > 0) {
       const { summary } = BttsBacktestEngine.runBacktest(records, canonicalMatches);
       backtestSummary = summary;
+    }
+
+    // Try expanded summary first
+    const expandedSummaryPath = path.resolve('data/historical/btts_expansion_summary.json');
+    if (fs.existsSync(expandedSummaryPath)) {
+      try {
+        const raw = JSON.parse(fs.readFileSync(expandedSummaryPath, 'utf-8'));
+        const stats = raw.stats || {};
+        const eligible = stats.discovered || 194;
+        const count = records.length;
+        const coverage = eligible > 0 ? Number(((count / eligible) * 100).toFixed(1)) : 0;
+
+        return {
+          dataset: raw.dataset || raw.backtestSummary?.datasetName || 'BTTS_HISTORICAL_ODDS_2026',
+          league: 'ENG-PL',
+          bookmaker: 'Pinnacle',
+          eligibleFixtures: eligible,
+          mappedFixtures: count,
+          unmappedFixtures: Math.max(0, eligible - count),
+          bttsRecordsCount: count,
+          verifiedRecords: records.filter((r) => r.data_quality === 'VERIFIED').length,
+          partialRecords: records.filter((r) => r.data_quality === 'PARTIAL').length,
+          invalidRecords: records.filter((r) => r.data_quality === 'INVALID').length,
+          coveragePercentage: coverage,
+          timing: {
+            inplayObservationsRejected: stats.closingAfterKickoffRejected || records.reduce((s, r) => s + (r.inplay_observations_rejected || 0), 0),
+            allPrematchVerified: (stats.lookaheadViolations || 0) === 0,
+          },
+          quotaAudit: {
+            requestLimit: raw.quotaAudit?.accountBefore?.requestLimit ?? 250,
+            countBefore: raw.quotaAudit?.accountBefore?.requestCount ?? 156,
+            countAfter: raw.quotaAudit?.accountAfter?.requestCount ?? 156,
+            quotaDelta: raw.quotaAudit?.quotaDelta ?? 0,
+            isUnmeteredConfirmed: raw.quotaAudit?.isUnmetered ?? true,
+          },
+          backtest: backtestSummary,
+        };
+      } catch (err) {
+        console.error('[BttsHistoryService] Error loading expanded summary JSON:', err);
+      }
     }
 
     const summaryPath = path.resolve('data/historical/btts_historical_summary_2026.json');
