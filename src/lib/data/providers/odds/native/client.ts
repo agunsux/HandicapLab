@@ -302,9 +302,10 @@ export class NativeOddsClient {
       const res = await this.client.get<any>(this.resolveUrl('/account'), { skipCache: true } as any);
       const data = res.data;
       if (!data || typeof data !== 'object') return null;
+      const sub = Array.isArray(data.subscriptions) && data.subscriptions.length > 0 ? data.subscriptions[0] : {};
       return {
-        requestLimit: Number(data.request_limit ?? data.requestLimit ?? 0),
-        requestCount: Number(data.request_count ?? data.requestCount ?? 0),
+        requestLimit: Number(data.request_limit ?? data.requestLimit ?? sub.request_limit ?? 0),
+        requestCount: Number(data.request_count ?? data.requestCount ?? sub.request_count ?? 0),
       };
     } catch {
       return null;

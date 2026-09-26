@@ -205,7 +205,9 @@ export class HttpClient {
       return { data, status: response.status, headers: response.headers, durationMs, fromCache: false };
     } catch (error: any) {
       const durationMs = Math.round(performance.now() - startTime);
-      this.circuitBreaker?.onFailure();
+      if (error?.status !== 404) {
+        this.circuitBreaker?.onFailure();
+      }
       this.log.error('request_failed', { path, error: error?.message, code: error?.code, status: error?.status, durationMs });
       throw error;
     }

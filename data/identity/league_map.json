@@ -2,13 +2,10 @@
   "_meta": {
     "purpose": "Explicit provider tournament-id to canonical league-key mapping. Provider ids are external identifiers; canonical league keys are internal.",
     "source": "OddsPapi /v4/fixtures tournamentId=17 confirmed as 'Premier League' (tournamentSlug=premier-league, categoryName=England) from real cached provider data.",
-    "source": "OddsPapi /v4/tournaments sportId=10 verified against HandicapLab Multi-League Expansion v1.",
     "policy": "Never guess a league mapping. Unknown ids stay unmapped.",
-    "version": "2026-09-11"
     "version": "2026-09-20"
   },
   "oddspapi": {
-    "17": "ENG-PL"
     "17": "ENG-PL",
     "8": "ESP-LALIGA",
     "23": "ITA-SERIEA",

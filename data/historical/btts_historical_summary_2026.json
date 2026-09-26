@@ -1,0 +1,27 @@
+{
+  "generatedAt": "2026-09-26T00:44:50.346Z",
+  "dataset": "BTTS_HISTORICAL_ODDS_2026",
+  "league": "ENG-PL",
+  "bookmaker": "Pinnacle",
+  "runId": "2026-09-26T00-44-47-935Z",
+  "eligibleFixtures": 214,
+  "mappedFixtures": 194,
+  "unmappedFixtures": 20,
+  "bttsRecordsCount": 16,
+  "verifiedRecords": 16,
+  "partialRecords": 0,
+  "invalidRecords": 0,
+  "quotaAudit": {
+    "timestampBefore": "2026-09-26T00:44:48.694Z",
+    "timestampAfter": "2026-09-26T00:44:50.343Z",
+    "requestLimit": 250,
+    "countBefore": 156,
+    "countAfter": 156,
+    "quotaDelta": 0,
+    "isUnmeteredConfirmed": true
+  },
+  "timing": {
+    "inplayObservationsRejected": 1995,
+    "allPrematchVerified": true
+  }
+}

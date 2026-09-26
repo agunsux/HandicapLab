@@ -59,6 +59,11 @@ export function classifyCatalogMarket(market: CatalogMarket): ClassifiedMarket |
   const type = market.marketType.toLowerCase();
   const name = market.marketName.toLowerCase();
 
+  // Exclude sub-period markets (1st half, 2nd half, overtime, etc.) to ensure canonical full-match scope
+  if (name.includes('half') || name.includes('period') || name.includes('overtime') || name.includes('1st') || name.includes('2nd')) {
+    return null;
+  }
+
   if (type === '1x2' || type === 'moneyline' || name.includes('full time result')) {
     return { market: 'ML', line: null };
   }
