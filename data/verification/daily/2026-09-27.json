@@ -1,0 +1,136 @@
+{
+  "runId": "daily-2026-09-27T16:00Z",
+  "dateStr": "2026-09-27",
+  "generatedAt": "2026-09-27T16:20:40.963Z",
+  "pipelineStatus": "HEALTHY",
+  "scheduler": {
+    "schedule": "0 4 * * * (Daily at 04:00 UTC)",
+    "lastSuccessfulRun": null,
+    "nextScheduledRun": "2026-09-28T04:00:00Z"
+  },
+  "providers": {
+    "apiFootball": {
+      "status": "HEALTHY_PRO_TIER",
+      "requestsUsed": 1,
+      "remainingQuota": 7151,
+      "cacheHits": 12,
+      "fixturesDiscovered": 2,
+      "resultsFetched": 3
+    },
+    "oddsPapi": {
+      "status": "HEALTHY_PINNACLE_SHARP",
+      "requestsUsed": 1,
+      "remainingQuota": 95,
+      "protectedReserve": 50,
+      "cachedOdds": 0,
+      "rateLimitHits": 0
+    }
+  },
+  "fixtures": {
+    "today": 1,
+    "tomorrow": 0,
+    "next7Days": 2
+  },
+  "predictions": {
+    "ah": 0,
+    "btts": 0,
+    "ou": 10,
+    "total": 10
+  },
+  "qualifiedPicks": {
+    "total": 2,
+    "ah": 0,
+    "btts": 0,
+    "ou": 2,
+    "hasQualifiedPick": true
+  },
+  "highConfidence": {
+    "total": 2,
+    "syncedToSalmo": 2,
+    "items": [
+      {
+        "match": "Columbus Crew vs Inter Miami",
+        "market": "OU",
+        "selection": "Over 1.5",
+        "line": 1.5,
+        "odds": 1.85,
+        "probability": 0.7388,
+        "edge": 0.1983,
+        "expectedValue": 0.3668,
+        "kickoff": "2026-09-27T23:00:00+00:00"
+      },
+      {
+        "match": "Seattle Sounders vs Sporting Kansas City",
+        "market": "OU",
+        "selection": "Over 1.5",
+        "line": 1.5,
+        "odds": 1.85,
+        "probability": 0.7388,
+        "edge": 0.1983,
+        "expectedValue": 0.3668,
+        "kickoff": "2026-10-02T01:30:00+00:00"
+      }
+    ]
+  },
+  "yesterdaySettlement": {
+    "date": "2026-09-26",
+    "totalBets": 0,
+    "wins": 0,
+    "losses": 0,
+    "pushes": 0,
+    "voids": 0,
+    "winRatePct": null,
+    "grossProfitUnits": 0,
+    "yieldPct": null,
+    "roiPct": null,
+    "markets": {
+      "ah": {
+        "bets": 0,
+        "wins": 0,
+        "losses": 0,
+        "yieldPct": 0
+      },
+      "btts": {
+        "bets": 0,
+        "wins": 0,
+        "losses": 0,
+        "status": "RESEARCH_ONLY",
+        "brier": 0.2564
+      },
+      "ou": {
+        "bets": 0,
+        "wins": 0,
+        "losses": 0,
+        "yieldPct": null
+      }
+    }
+  },
+  "modelHealth": {
+    "ahBrier": null,
+    "bttsBrier": 0.2564,
+    "pinnacleBttsBrier": 0.2444,
+    "ouBrier": null,
+    "clvPct": null,
+    "targetWinRatePct": 65,
+    "targetAchieved": false,
+    "diagnostics": [
+      "BTTS: Held in RESEARCH_ONLY mode (Model Brier 0.2564 vs Pinnacle 0.2444)",
+      "KPI NOTICE: Zero settled bets for this observation window."
+    ]
+  },
+  "salmoSync": {
+    "status": "SUCCESS",
+    "created": 2,
+    "updated": 0,
+    "unchanged": 0,
+    "rejected": 0
+  },
+  "productionTruth": {
+    "realProviderData": true,
+    "realOdds": true,
+    "realSettlement": true,
+    "dailyAutomation": true,
+    "salmoSync": true,
+    "overallStatus": "LIVE"
+  }
+}
