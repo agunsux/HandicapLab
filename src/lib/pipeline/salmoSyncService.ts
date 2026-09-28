@@ -97,9 +97,10 @@ export class SalmoSyncService {
     const why: string[] = [];
     const edgePct = (pred.edge * 100).toFixed(1);
     const evPct = (pred.expectedValue * 100).toFixed(1);
+    const oddsStr = typeof pred.odds === 'number' ? pred.odds.toFixed(2) : 'N/A';
 
     why.push(`Model identified +${edgePct}% statistical edge over Pinnacle closing consensus`);
-    why.push(`Expected value +${evPct}% with minimum qualified odds >= ${pred.odds.toFixed(2)}`);
+    why.push(`Expected value +${evPct}% with minimum qualified odds >= ${oddsStr}`);
     why.push('Point-in-time ratings confirmed with zero future lookahead contamination');
 
     return why;
@@ -130,17 +131,29 @@ export class SalmoSyncService {
     }
 
     try {
-      // 1. Strict Filter: ONLY HIGH_CONFIDENCE predictions eligible
-      // Invariant: BTTS can NEVER be High Confidence!
+      // 1. Strict Filter: ONLY HIGH_CONFIDENCE predictions eligible with valid real odds
+      // Invariants:
+      // - BTTS can NEVER be High Confidence!
+      // - AWAITING_ODDS or unquoted predictions (null or <= 1.0) can NEVER be synced!
       const highConfidencePicks = predictions.filter(
-        (p) => p.status === 'HIGH_CONFIDENCE' && p.market !== 'BTTS'
+        (p) =>
+          p.status === 'HIGH_CONFIDENCE' &&
+          p.market !== 'BTTS' &&
+          typeof p.odds === 'number' &&
+          p.odds > 1.0
       );
 
       const store = this.loadSyncedStore();
       let created = 0;
       let updated = 0;
       let unchanged = 0;
-      let rejected = predictions.filter((p) => p.status !== 'HIGH_CONFIDENCE' || p.market === 'BTTS').length;
+      let rejected = predictions.filter(
+        (p) =>
+          p.status !== 'HIGH_CONFIDENCE' ||
+          p.market === 'BTTS' ||
+          typeof p.odds !== 'number' ||
+          p.odds <= 1.0
+      ).length;
 
       const syncedDecisions: SalmoDecisionCardPayload[] = [];
 
@@ -162,7 +175,7 @@ export class SalmoSyncService {
           market: pick.market as 'AH' | 'OU',
           selection: pick.selection,
           line: pick.line,
-          odds: pick.odds,
+          odds: pick.odds!,
           modelProbabilityPct: Number((pick.modelProbability * 100).toFixed(1)),
           calibratedProbabilityPct: Number((pick.calibratedProbability * 100).toFixed(1)),
           edgePct: Number((pick.edge * 100).toFixed(1)),

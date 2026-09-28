@@ -27,7 +27,8 @@ export type PredictionLedgerStatus =
   | 'SETTLED_WIN'
   | 'SETTLED_LOSS'
   | 'VOID'
-  | 'INVALID';
+  | 'INVALID'
+  | 'AWAITING_ODDS';
 
 export interface ConfidenceGateInput {
   canonicalMatchId: string;
@@ -40,7 +41,7 @@ export interface ConfidenceGateInput {
   market: SupportedPipelineMarket;
   selection: string;
   line: number | null;
-  odds: number;
+  odds?: number | null;
   modelProbability: number;
   calibratedProbability?: number;
   predictionTimestampUtc: string;
@@ -104,8 +105,50 @@ export class ConfidenceGateSystem {
       Math.max(0.0001, Math.min(0.9999, input.calibratedProbability ?? modelProb)).toFixed(4)
     );
 
-    const odds = input.odds;
-    const impliedProb = odds > 1.0 ? Number((1 / odds).toFixed(4)) : 0.5;
+    // ZERO SYNTHETIC ODDS INVARIANT:
+    // If odds quote is missing (null/undefined) or invalid (<= 1.0), do NOT manufacture odds.
+    // Return status: 'AWAITING_ODDS', qualified: false, isHighConfidence: false, edge: 0, expectedValue: 0.
+    const hasValidOdds = typeof input.odds === 'number' && !isNaN(input.odds) && input.odds > 1.0;
+    if (!hasValidOdds) {
+      const kickMs = new Date(input.kickoffUtc).getTime();
+      const predMs = new Date(input.predictionTimestampUtc).getTime();
+      const oddsMs = new Date(input.oddsTimestampUtc).getTime();
+      const temporalSanity = !isNaN(kickMs) && !isNaN(predMs) && predMs < kickMs && oddsMs <= predMs;
+      const homeSample = input.sampleSizeHome ?? 0;
+      const awaySample = input.sampleSizeAway ?? 0;
+      const samplePass = homeSample >= this.MIN_SAMPLE_SIZE && awaySample >= this.MIN_SAMPLE_SIZE;
+      const modelValidated = input.modelValidated !== false;
+      const probPass = calibratedProb > this.MIN_PROBABILITY_THRESHOLD;
+
+      return {
+        qualified: false,
+        isHighConfidence: false,
+        status: 'AWAITING_ODDS',
+        confidenceTier: 'PASS',
+        confidenceScore: 0,
+        modelProbability: modelProb,
+        calibratedProbability: calibratedProb,
+        marketImpliedProbability: 0,
+        edge: 0,
+        expectedValue: 0,
+        verdict: 'LEWATI',
+        rejectionReasons: ['AWAITING_ODDS: Missing or invalid market odds quote (null or <= 1.0)'],
+        passes: {
+          marketSupported: isMarketSupported,
+          oddsThreshold: false,
+          probabilityThreshold: probPass,
+          positiveEdge: false,
+          positiveEv: false,
+          sufficientSample: samplePass,
+          modelValidated,
+          temporalSanity,
+          bttsResearchGated: market === 'BTTS',
+        },
+      };
+    }
+
+    const odds = input.odds!;
+    const impliedProb = Number((1 / odds).toFixed(4));
     const edge = Number((calibratedProb - impliedProb).toFixed(4));
     const expectedValue = Number(((calibratedProb * odds) - 1).toFixed(4));
 

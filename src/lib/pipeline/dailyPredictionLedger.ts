@@ -27,7 +27,7 @@ export interface PredictionLedgerRecord {
   line: number | null;
   modelProbability: number;
   calibratedProbability: number;
-  odds: number;
+  odds: number | null;
   impliedProbability: number;
   edge: number;
   expectedValue: number;

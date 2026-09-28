@@ -20,6 +20,7 @@ import { PredictionArchiveService } from '@/lib/archive/predictionArchiveService
 import { ReconciliationService } from '@/lib/archive/reconciliationService';
 import { ModelVersionRegistry } from '@/lib/archive/modelVersionRegistry';
 import { DistributedCronLease } from '@/lib/crons/distributedCronLease';
+import { DailyPipelineOrchestrator } from '@/lib/pipeline/dailyOrchestrator';
 
 const WINDOW_LABELS: Record<number, string> = {
   6: 'morning',
@@ -43,11 +44,11 @@ export async function GET(request: NextRequest) {
   }
 
   const searchParams = request.nextUrl.searchParams;
-  const mode = searchParams.get('mode') || 'full';
+  const mode = searchParams.get('mode') || 'daily';
   const hour = new Date().getUTCHours();
   const windowLabel = WINDOW_LABELS[hour] ?? `hour_${hour}`;
 
-  const isMutationMode = ['full', 'reconcile', 'publishing-reconcile', 'settle', 'settle-predictions', 'sync', 'salmo-sync'].includes(mode);
+  const isMutationMode = ['full', 'daily', 'reconcile', 'publishing-reconcile', 'settle', 'settle-predictions', 'sync', 'salmo-sync'].includes(mode);
   let leaseId: string | undefined;
 
   if (isMutationMode) {
@@ -343,11 +344,18 @@ export async function GET(request: NextRequest) {
     });
   }
 
-  // 5. Full Orchestrator execution (default cron pipeline)
-  console.log(`[Pipeline Cron] Triggered at UTC ${hour}:00 (window: ${windowLabel})`);
+  // 5. Canonical Daily Pipeline Orchestrator execution (default cron pipeline)
+  console.log(`[Pipeline Cron] Triggered at UTC ${hour}:00 (window: ${windowLabel}, mode: ${mode})`);
   try {
-    const report = await runOrchestrator();
-    return NextResponse.json({ success: true, window: windowLabel, result: report });
+    if (mode === 'legacy') {
+      const report = await runOrchestrator();
+      return NextResponse.json({ success: true, window: windowLabel, mode: 'legacy', result: report });
+    }
+
+    const report = await DailyPipelineOrchestrator.executeDailyRun({
+      trigger: 'SCHEDULER_CRON',
+    });
+    return NextResponse.json({ success: true, window: windowLabel, mode, result: report });
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Unknown error';
     console.error('[Pipeline Cron] Fatal:', error);

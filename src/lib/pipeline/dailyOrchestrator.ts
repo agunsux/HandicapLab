@@ -429,10 +429,12 @@ export class DailyPipelineOrchestrator {
         for (const line of eligibleOuLines) {
           const ouProb = calculateOverUnderProbability(homeXg, awayXg, line, rho);
           const selection = `Over ${line}`;
-          const currentOdds =
-            line === (ouMarket?.line ?? 2.5) && ouMarket?.overOdds
-              ? ouMarket.overOdds
-              : 1.85;
+          const hasQuote =
+            Boolean(ouMarket?.available) &&
+            ouMarket?.line === line &&
+            typeof ouMarket?.overOdds === 'number' &&
+            ouMarket.overOdds > 1.0;
+          const currentOdds: number | null = hasQuote ? ouMarket!.overOdds! : null;
 
           const gateResult = ConfidenceGateSystem.evaluate({
             canonicalMatchId: fixtureId,
@@ -709,7 +711,7 @@ export class DailyPipelineOrchestrator {
             market: r.market,
             selection: r.selection,
             line: r.line,
-            odds: r.odds,
+            odds: r.odds ?? 0,
             probability: r.calibratedProbability,
             edge: r.edge,
             expectedValue: r.expectedValue,
