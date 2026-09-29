@@ -215,7 +215,7 @@ export class DailyAhShadowPipeline {
         const items = Array.isArray(res) ? res : res?.response || [];
 
         for (const item of items) {
-          if (!item?.fixture || item.fixture.status?.short !== 'NS' || !item.league?.id) continue;
+          if (!item?.fixture || item.fixture.status.short !== 'NS' || !item.league?.id) continue;
           const leagueId = Number(item.league.id);
           const meta = CONFIRMED_LEAGUES[leagueId];
           if (!meta) continue;
