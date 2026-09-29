@@ -25,7 +25,7 @@ import {
   ValueStatus,
   PredictionStatus,
 } from './predictionLedgerTypes';
-import bundledCanonicalLedger from '../../../data/ledger/canonical_prediction_ledger.json';
+import { BUNDLED_CANONICAL_LEDGER } from './canonicalLedgerData';
 
 function getCanonicalLedgerPath(): string {
   if (process.env.NODE_ENV === 'test') {
@@ -73,8 +73,8 @@ export class CanonicalBetLedgerService {
 
     // In non-test environments (production / serverless), fallback to bundled ledger
     if (process.env.NODE_ENV !== 'test') {
-      if (bundledCanonicalLedger && typeof bundledCanonicalLedger === 'object' && Object.keys(bundledCanonicalLedger).length > 0) {
-        this.cachedLedger = { ...bundledCanonicalLedger } as unknown as Record<string, CanonicalPredictionRecord>;
+      if (BUNDLED_CANONICAL_LEDGER && typeof BUNDLED_CANONICAL_LEDGER === 'object' && Object.keys(BUNDLED_CANONICAL_LEDGER).length > 0) {
+        this.cachedLedger = { ...BUNDLED_CANONICAL_LEDGER };
         return this.cachedLedger;
       }
     }
