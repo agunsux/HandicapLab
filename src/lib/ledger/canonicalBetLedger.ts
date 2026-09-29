@@ -15,6 +15,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
+import * as os from 'os';
 import crypto from 'crypto';
 import {
   CanonicalPredictionRecord,
@@ -24,27 +25,20 @@ import {
   ValueStatus,
   PredictionStatus,
 } from './predictionLedgerTypes';
+import bundledCanonicalLedger from '../../../data/ledger/canonical_prediction_ledger.json';
 
 function getCanonicalLedgerPath(): string {
   if (process.env.NODE_ENV === 'test') {
-    return path.resolve('data/test_ledger/canonical_prediction_ledger.json');
+    return path.join(process.cwd(), 'data', 'test_ledger', 'canonical_prediction_ledger.json');
   }
-  if (process.env.VERCEL) {
-    const os = require('os');
-    return path.join(os.tmpdir(), 'handicaplab_canonical_prediction_ledger.json');
-  }
-  return path.resolve('data/ledger/canonical_prediction_ledger.json');
+  return path.join(process.cwd(), 'data', 'ledger', 'canonical_prediction_ledger.json');
 }
 
 function getCanonicalJsonlPath(): string {
   if (process.env.NODE_ENV === 'test') {
-    return path.resolve('data/test_ledger/canonical_prediction_ledger.jsonl');
+    return path.join(process.cwd(), 'data', 'test_ledger', 'canonical_prediction_ledger.jsonl');
   }
-  if (process.env.VERCEL) {
-    const os = require('os');
-    return path.join(os.tmpdir(), 'handicaplab_canonical_prediction_ledger.jsonl');
-  }
-  return path.resolve('data/ledger/canonical_prediction_ledger.jsonl');
+  return path.join(process.cwd(), 'data', 'ledger', 'canonical_prediction_ledger.jsonl');
 }
 
 export function classifyLineType(line: number | null): LineType {
@@ -68,13 +62,21 @@ export class CanonicalBetLedgerService {
       if (fs.existsSync(p)) {
         const raw = fs.readFileSync(p, 'utf8');
         const parsed = JSON.parse(raw);
-        if (parsed && typeof parsed === 'object') {
+        if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
           this.cachedLedger = parsed;
           return parsed;
         }
       }
     } catch (e) {
       console.warn('[CanonicalBetLedgerService] Failed to load ledger:', e);
+    }
+
+    // In non-test environments (production / serverless), fallback to bundled ledger
+    if (process.env.NODE_ENV !== 'test') {
+      if (bundledCanonicalLedger && typeof bundledCanonicalLedger === 'object' && Object.keys(bundledCanonicalLedger).length > 0) {
+        this.cachedLedger = { ...bundledCanonicalLedger } as unknown as Record<string, CanonicalPredictionRecord>;
+        return this.cachedLedger;
+      }
     }
 
     const empty: Record<string, CanonicalPredictionRecord> = {};
@@ -90,7 +92,13 @@ export class CanonicalBetLedgerService {
       fs.writeFileSync(p, JSON.stringify(ledger, null, 2), 'utf8');
       this.cachedLedger = ledger;
     } catch (e) {
-      console.warn('[CanonicalBetLedgerService] Failed to save ledger:', e);
+      try {
+        const fallback = path.join(os.tmpdir(), 'handicaplab_canonical_prediction_ledger.json');
+        fs.writeFileSync(fallback, JSON.stringify(ledger, null, 2), 'utf8');
+        this.cachedLedger = ledger;
+      } catch (err) {
+        console.warn('[CanonicalBetLedgerService] Failed to save ledger:', e);
+      }
     }
   }
 
