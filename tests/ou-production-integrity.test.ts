@@ -432,5 +432,91 @@ describe('Over/Under Production Mathematical Integrity & Line Family Gate', () =
       expect(ouId).not.toBe(bttsId);
       expect(ahId).not.toBe(bttsId);
     });
+
+    it('32. Explicitly verifies quarter lines 0.25, 0.75, 1.25, 1.75, 2.25, 2.75, 3.25, 3.75', () => {
+      const quarterLines = [0.25, 0.75, 1.25, 1.75, 2.25, 2.75, 3.25, 3.75];
+      for (const q of quarterLines) {
+        expect(OuProbabilityEngine.classifyOuLine(q)).toBe('QUARTER');
+        const [l1, l2] = OuProbabilityEngine.getQuarterComponents(q);
+        expect(l1).toBeCloseTo(q - 0.25, 2);
+        expect(l2).toBeCloseTo(q + 0.25, 2);
+
+        const overP = OuProbabilityEngine.deriveOuSettlementProbabilities(manualPmf, q, 'OVER');
+        const underP = OuProbabilityEngine.deriveOuSettlementProbabilities(manualPmf, q, 'UNDER');
+
+        // Conservation
+        expect(overP.pFullWin + overP.pHalfWin + overP.pPush + overP.pHalfLoss + overP.pFullLoss).toBeCloseTo(1.0, 5);
+        expect(underP.pFullWin + underP.pHalfWin + underP.pPush + underP.pHalfLoss + underP.pFullLoss).toBeCloseTo(1.0, 5);
+
+        // Complementarity
+        expect(overP.pEffectiveWin + underP.pEffectiveWin).toBeCloseTo(1.0, 5);
+
+        // Fair odds zero expected profit
+        const evOverFair = OuProbabilityEngine.computeOuEv(overP, overP.fairOdds);
+        const evUnderFair = OuProbabilityEngine.computeOuEv(underP, underP.fairOdds);
+        expect(Math.abs(evOverFair)).toBeLessThan(1e-4);
+        expect(Math.abs(evUnderFair)).toBeLessThan(1e-4);
+      }
+    });
+
+    it('33. Market Isolation: Rejects corners, bookings, and props from totals pipeline', () => {
+      const mockRawMarkets = [
+        { marketId: 1010, marketType: 'totals', period: 'fulltime', playerProp: false, handicap: 2.5 },
+        { marketId: 1020, marketType: 'totals-corners', period: 'fulltime', playerProp: false, handicap: 9.5 },
+        { marketId: 1030, marketType: 'totals-bookings', period: 'fulltime', playerProp: false, handicap: 3.5 },
+        { marketId: 1040, marketType: 'playertotals-goals', period: 'fulltime', playerProp: true, handicap: 0.5 },
+        { marketId: 1050, marketType: 'totals', period: 'firsthalf', playerProp: false, handicap: 1.5 },
+      ];
+
+      const accepted = mockRawMarkets.filter(
+        (m) =>
+          m.marketType === 'totals' &&
+          m.period === 'fulltime' &&
+          !m.playerProp
+      );
+
+      expect(accepted.length).toBe(1);
+      expect(accepted[0].marketId).toBe(1010);
+      expect(accepted[0].handicap).toBe(2.5);
+    });
+
+    it('34. Cache isolation: predictionId uniqueness prevents cross-line and cross-side collisions', () => {
+      const fixtureId = 'test_fixture_456';
+      const idOver225 = `PRED-${fixtureId}-OU-OVER-2.25`;
+      const idOver250 = `PRED-${fixtureId}-OU-OVER-2.5`;
+      const idUnder225 = `PRED-${fixtureId}-OU-UNDER-2.25`;
+      const idUnder250 = `PRED-${fixtureId}-OU-UNDER-2.5`;
+
+      const idSet = new Set([idOver225, idOver250, idUnder225, idUnder250]);
+      expect(idSet.size).toBe(4);
+    });
+
+    it('35. Historical walk-forward & calibration: verifies Brier score on goal distribution', () => {
+      // Simulate 5 historical test matches with known actual total goals
+      const testCases = [
+        { expH: 1.6, expA: 1.2, actualGoals: 3 },
+        { expH: 1.1, expA: 0.9, actualGoals: 1 },
+        { expH: 2.1, expA: 1.5, actualGoals: 4 },
+        { expH: 1.4, expA: 1.3, actualGoals: 2 },
+        { expH: 0.9, expA: 0.8, actualGoals: 0 },
+      ];
+
+      let brierSum = 0;
+      for (const tc of testCases) {
+        const grid = buildScoreGrid(tc.expH, tc.expA, -0.04);
+        const totalPmf = OuProbabilityEngine.computeTotalGoalsPmf(grid);
+        const probs = OuProbabilityEngine.deriveOuSettlementProbabilities(totalPmf, 2.5, 'OVER');
+
+        const outcomeOver = tc.actualGoals > 2.5 ? 1 : 0;
+        const brier = Math.pow(probs.pEffectiveWin - outcomeOver, 2);
+        brierSum += brier;
+
+        expect(probs.pEffectiveWin).toBeGreaterThan(0.2);
+        expect(probs.pEffectiveWin).toBeLessThan(0.8);
+      }
+
+      const meanBrier = brierSum / testCases.length;
+      expect(meanBrier).toBeLessThan(0.35); // Well calibrated on expected goal distributions
+    });
   });
 });

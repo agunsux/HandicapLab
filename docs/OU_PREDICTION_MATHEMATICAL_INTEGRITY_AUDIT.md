@@ -223,7 +223,7 @@ Test suite execution results:
 - `tests/btts-production-integrity.test.ts`: **23 passed**
 - `tests/pipeline/salmo-sync.test.ts`: **5 passed**
 - `tests/research-engine/market-derivation.test.ts`: **4 passed**
-- **Total Test Count**: **67 passed (100% green)**
+- **Total Test Count**: **71 passed (100% green)**
 
 Asian Handicap and BTTS calculation paths remain 100% untouched and preserved.
 
@@ -248,10 +248,10 @@ Asian Handicap and BTTS calculation paths remain 100% untouched and preserved.
 - [x] Cache isolation (distinct deterministic IDs)
 - [x] Count reconciliation ($118 = 53 + 53 + 12$)
 - [x] Multi-factor confidence gating
-- [x] OU test suite (25/25 green)
+- [x] OU test suite (29/29 green)
 - [x] AH regression suite (10/10 green)
 - [x] BTTS regression suite (23/23 green)
-- [x] Relevant full Vitest suite (67/67 green)
+- [x] Relevant full Vitest suite (71/71 green)
 - [x] Real production dry run completed successfully
 - [x] Manual sanity check on 15 real predictions completed
 - [x] Salmo sync validated (30 OU decisions, total 58 in ledger)
