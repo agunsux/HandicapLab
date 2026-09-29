@@ -86,6 +86,18 @@ const nextConfig: NextConfig = {
         source: '/api/performance/timeseries',
         destination: '/api/performance?view=timeseries',
       },
+      {
+        source: '/api/performance/markets',
+        destination: '/api/performance?view=markets',
+      },
+      {
+        source: '/api/performance/clv',
+        destination: '/api/performance?view=clv',
+      },
+      {
+        source: '/api/performance/leagues',
+        destination: '/api/performance?view=leagues',
+      },
     ];
   },
   async headers() {
