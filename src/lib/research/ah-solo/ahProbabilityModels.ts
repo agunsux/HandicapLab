@@ -1,4 +1,4 @@
-﻿// EPIC 56 — Asian Handicap Probability Models Engine (Optimized)
+// EPIC 56 — Asian Handicap Probability Models Engine (Optimized)
 // Location: src/lib/research/ah-solo/ahProbabilityModels.ts
 
 import {
