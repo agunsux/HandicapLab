@@ -1,0 +1,1452 @@
+<USER_REQUEST>
+Ya. Tahap berikutnya seharusnya bukan menambah market lagi, tetapi membangun **Bet Ledger + Performance/Settlement Engine** yang mencatat setiap prediction dari lahir sampai hasil akhirnya diketahui.
+
+Prompt-nya harus keras: **tidak boleh ada prediction yang hilang, overwritten, atau hanya dicatat kalau menang.** Semua harus masuk ledger dan akhirnya berstatus WIN / LOSS / PUSH / HALF-WIN / HALF-LOSS / VOID / PENDING sesuai settlement market.
+
+# NO-BULLSHIT COHERENT PROMPT
+## SALMO SPORTS BETTING LEDGER — PREDICTION → SETTLEMENT → PROFIT/LOSS → YIELD/ROI/CLV
+
+You are now implementing the canonical prediction-performance accounting layer for HandicapLab and Salmo.
+
+This is NOT a new prediction model.
+
+Do NOT change the mathematical engines for:
+
+- Asian Handicap
+- BTTS
+- Over/Under
+
+Those markets are already production-approved.
+
+The objective is to ensure EVERY prediction is permanently recorded, traceable, settled, and included in performance analytics from prediction creation until final outcome.
+
+==================================================
+1. PRIMARY OBJECTIVE
+==================================================
+
+Build a canonical:
+
+PREDICTION LEDGER
++
+SETTLEMENT ENGINE
++
+PERFORMANCE ENGINE
++
+CLV ENGINE
++
+BANKROLL / STAKE SIMULATION
++
+SALMO PERFORMANCE SYNC
+
+The complete lifecycle must be:
+
+PREDICTION CREATED
+→ SNAPSHOT MARKET/ODDS
+→ PREDICTION LOCKED
+→ KICKOFF
+→ MARKET SETTLEMENT
+→ RESULT RESOLVED
+→ WIN/LOSS/PUSH/HALF-WIN/HALF-LOSS/VOID
+→ PROFIT/LOSS
+→ ROI
+→ YIELD
+→ CLV
+→ CUMULATIVE PERFORMANCE
+→ SALMO SYNC
+
+No prediction may disappear between these states.
+
+==================================================
+2. ABSOLUTE ACCOUNTING PRINCIPLE
+==================================================
+
+EVERY prediction must be recorded.
+
+This includes:
+
+VALUE
+NO_VALUE
+HIGH
+MEDIUM
+LOW
+DATA_UNAVAILABLE
+and every production prediction that passes the configured eligibility criteria.
+
+Do NOT only record winning bets.
+
+Do NOT delete losing bets.
+
+Do NOT overwrite historical prediction records.
+
+Do NOT mutate historical odds snapshots.
+
+Do NOT retroactively alter a prediction because the result was unfavorable.
+
+Historical prediction records are immutable evidence.
+
+==================================================
+3. CANONICAL PREDICTION ID
+==================================================
+
+Every prediction receives a globally unique immutable:
+
+prediction_id
+
+The identity must include enough information to distinguish:
+
+canonical_fixture_id
+market
+selection
+line where applicable
+provider/bookmaker
+odds observation
+prediction timestamp
+
+Examples:
+
+AH +0.25
+BTTS YES
+OU OVER 2.25
+
+must never collide.
+
+A prediction at:
+
+OU OVER 2.25
+
+must not collide with:
+
+OU OVER 2.5
+
+or:
+
+OU UNDER 2.25.
+
+==================================================
+4. IMMUTABLE PREDICTION SNAPSHOT
+==================================================
+
+At prediction creation store:
+
+prediction_id
+canonical_fixture_id
+fixture
+league
+home_team
+away_team
+kickoff_timestamp
+market
+selection
+line
+provider
+bookmaker
+market_odds
+odds_timestamp
+model_probability
+fair_odds
+EV
+confidence
+value_status
+prediction_timestamp
+feature_timestamp
+model_version
+pipeline_version
+data_version
+
+Also store:
+
+raw_prediction_payload_hash
+
+and preferably:
+
+input_snapshot_hash
+
+The objective is reproducibility.
+
+A future model update must not change an old prediction.
+
+==================================================
+5. MARKET-SPECIFIC SETTLEMENT
+==================================================
+
+The ledger must support the actual settlement semantics of all approved markets.
+
+AH:
+
+- full win
+- half win
+- push
+- half loss
+- full loss
+
+BTTS:
+
+- win
+- loss
+- void if applicable
+
+OU:
+
+- full win
+- half win
+- push
+- half loss
+- full loss
+
+Do NOT force all markets into binary WIN/LOSS.
+
+The settlement engine must use the exact market line and selection.
+
+Examples:
+
+AH -0.75
+
+OU 2.25
+
+OU 2.75
+
+must retain their split settlement semantics.
+
+==================================================
+6. RESULT RESOLUTION
+==================================================
+
+After a fixture is final:
+
+Resolve the canonical match result.
+
+Store:
+
+home_goals
+away_goals
+total_goals
+match_status
+result_timestamp
+result_source
+result_source_timestamp
+
+Then calculate settlement.
+
+Never use manually entered outcomes if an authoritative production result source is available.
+
+==================================================
+7. SETTLEMENT STATES
+==================================================
+
+Canonical settlement enum:
+
+PENDING
+WIN
+LOSS
+PUSH
+HALF_WIN
+HALF_LOSS
+VOID
+CANCELLED
+
+No ambiguous statuses.
+
+Every finalized prediction must eventually resolve to exactly one canonical settlement state, except where an explicitly documented market rule requires another state.
+
+==================================================
+8. PROFIT / LOSS ACCOUNTING
+==================================================
+
+Create a deterministic stake model.
+
+Default research stake:
+
+1.0 unit
+
+Do NOT confuse:
+
+probability
+odds
+EV
+stake
+profit
+
+For decimal odds O:
+
+FULL WIN:
+
+profit = stake × (O - 1)
+
+FULL LOSS:
+
+profit = -stake
+
+PUSH:
+
+profit = 0
+
+HALF WIN:
+
+profit = stake × (O - 1) / 2
+
+HALF LOSS:
+
+profit = -stake / 2
+
+VOID:
+
+profit = 0
+
+Store:
+
+stake_units
+stake_currency if applicable
+gross_return
+profit_loss
+settlement_state
+
+Never overwrite the original market odds.
+
+==================================================
+9. TWO PERFORMANCE MODES
+==================================================
+
+Support:
+
+A. UNIT-STAKE RESEARCH MODE
+
+Every eligible prediction receives:
+
+stake = 1.0 unit
+
+This is the canonical mode for model evaluation.
+
+B. USER BANKROLL SIMULATION MODE
+
+Allow configurable:
+
+starting_bankroll
+stake_size
+flat stake
+fixed percentage
+Kelly-derived simulation if implemented
+
+Do NOT mix these modes.
+
+Research ROI must use the canonical unit-stake ledger.
+
+==================================================
+10. ROI
+==================================================
+
+Canonical unit-stake ROI:
+
+ROI =
+total_profit / total_staked
+
+Express both:
+
+decimal
+
+and
+
+percentage.
+
+Example:
+
+10 bets
+10 units staked
++1.50 units profit
+
+ROI = 15%
+
+Do not calculate ROI using only winning bets.
+
+Do not exclude losses.
+
+==================================================
+11. YIELD
+==================================================
+
+Define Yield explicitly.
+
+For flat-stake betting research:
+
+Yield = total_profit / total_staked
+
+If the implementation uses a different industry definition, document it explicitly.
+
+Do NOT present multiple incompatible formulas under the same label.
+
+ROI and Yield must not silently use different denominators.
+
+==================================================
+12. EV
+==================================================
+
+Preserve prediction-time EV.
+
+Store:
+
+model_ev
+
+and, where useful:
+
+realized_profit
+
+These are NOT the same metric.
+
+EV answers:
+
+"What did the model expect at prediction time?"
+
+Realized P/L answers:
+
+"What actually happened?"
+
+Never replace historical EV with realized outcome.
+
+For binary markets:
+
+EV = P × O - 1
+
+where mathematically applicable.
+
+For AH and OU quarter/full lines:
+
+use the existing settlement-aware EV engine.
+
+==================================================
+13. CLV — CRITICAL
+==================================================
+
+Implement Closing Line Value.
+
+At prediction time store:
+
+opening/available prediction odds
+
+At closing store:
+
+closing odds
+
+and:
+
+closing_odds_timestamp
+
+Then calculate CLV using one canonical documented definition.
+
+At minimum preserve:
+
+prediction_odds
+closing_odds
+clv_absolute
+clv_percentage
+
+Also preserve:
+
+clv_status
+
+with:
+
+PENDING
+AVAILABLE
+UNAVAILABLE
+INVALID
+
+Never fabricate CLV when closing odds are missing.
+
+For a future match:
+
+CLV = PENDING
+
+until a valid closing observation exists.
+
+==================================================
+14. CLV MARKET SEMANTICS
+==================================================
+
+CLV must respect the actual market.
+
+For AH:
+
+line + price matter.
+
+For OU:
+
+line + price matter.
+
+For BTTS:
+
+YES/NO price matters.
+
+Do NOT calculate CLV by comparing unrelated markets.
+
+Do NOT compare:
+
+OU 2.25 prediction
+
+against
+
+OU 2.5 closing line
+
+as if they were identical.
+
+If line movement occurs, preserve both:
+
+prediction line
+closing line
+
+and calculate a clearly documented line-aware CLV metric.
+
+If exact apples-to-apples CLV cannot be established:
+
+CLV_STATUS = UNAVAILABLE
+
+rather than inventing a number.
+
+==================================================
+15. ODDS SNAPSHOTS
+==================================================
+
+Store immutable odds observations.
+
+At minimum:
+
+prediction_odds
+prediction_odds_timestamp
+closing_odds
+closing_odds_timestamp
+provider
+bookmaker
+market
+selection
+line
+
+Do not overwrite prediction odds with closing odds.
+
+Historical truth requires both.
+
+==================================================
+16. PERFORMANCE METRICS
+==================================================
+
+Build a canonical performance engine reporting:
+
+TOTAL PREDICTIONS
+SETTLED PREDICTIONS
+PENDING PREDICTIONS
+
+WINS
+LOSSES
+PUSHES
+HALF WINS
+HALF LOSSES
+VOID
+
+TOTAL STAKED
+TOTAL PROFIT
+TOTAL RETURN
+
+ROI
+YIELD
+
+AVERAGE ODDS
+MEDIAN ODDS
+
+AVERAGE MODEL PROBABILITY
+AVERAGE FAIR ODDS
+AVERAGE MARKET ODDS
+
+AVERAGE EV
+MEDIAN EV
+
+AVERAGE CLV
+MEDIAN CLV
+
+POSITIVE CLV RATE
+
+WIN RATE
+
+PUSH RATE
+
+LOSS RATE
+
+VALUE BET COUNT
+
+VALUE BET HIT RATE
+
+HIGH / MEDIUM / LOW performance
+
+==================================================
+17. MARKET BREAKDOWN
+==================================================
+
+Performance must be separately available for:
+
+AH
+BTTS
+OU
+
+And for:
+
+AH line families
+OU line families
+
+Examples:
+
+OU 1.5
+OU 2.0
+OU 2.25
+OU 2.5
+OU 2.75
+OU 3.0
+OU 3.25
+OU 3.5
+OU 3.75
+
+Do NOT aggregate quarter lines into half lines.
+
+==================================================
+18. SELECTION BREAKDOWN
+==================================================
+
+Report:
+
+AH HOME
+AH AWAY
+
+BTTS YES
+BTTS NO
+
+OU OVER
+OU UNDER
+
+Separately.
+
+==================================================
+19. LEAGUE BREAKDOWN
+==================================================
+
+Report performance by:
+
+league
+country
+competition
+season where available
+
+Minimum:
+
+predictions
+settled
+profit
+ROI
+yield
+CLV
+EV
+win rate
+
+Do not draw conclusions from tiny samples without showing sample size.
+
+==================================================
+20. BOOKMAKER / PROVIDER BREAKDOWN
+==================================================
+
+Report:
+
+provider
+bookmaker
+market
+prediction count
+settled count
+profit
+ROI
+CLV
+
+This allows detection of:
+
+bad feeds
+stale odds
+provider bias
+execution quality problems
+
+==================================================
+21. TIME BREAKDOWN
+==================================================
+
+Support:
+
+daily
+weekly
+monthly
+rolling 7-day
+rolling 30-day
+season
+all-time
+
+Every time range must have explicit denominator definitions.
+
+==================================================
+22. BANKROLL CURVE
+==================================================
+
+Create a chronological equity curve.
+
+Starting bankroll:
+
+configurable
+
+Default research bankroll:
+
+100 units
+
+For each settled prediction:
+
+bankroll += profit_loss
+
+Store:
+
+bankroll_before
+profit_loss
+bankroll_after
+
+Do not calculate performance from final bankroll alone.
+
+The ledger is the source of truth.
+
+==================================================
+23. DRAWDOWN
+==================================================
+
+Calculate:
+
+peak_bankroll
+current_bankroll
+drawdown
+maximum_drawdown
+maximum_drawdown_percentage
+
+Also identify:
+
+maximum losing streak
+maximum winning streak
+
+These are essential risk metrics.
+
+==================================================
+24. SHARPE / RISK METRICS
+==================================================
+
+Where sample size is sufficient, calculate:
+
+standard deviation of returns
+Sharpe ratio
+volatility
+
+Document assumptions.
+
+Do NOT present statistically meaningless Sharpe ratios on tiny samples.
+
+If insufficient:
+
+STATUS = INSUFFICIENT_SAMPLE
+
+==================================================
+25. CALIBRATION
+==================================================
+
+For model probability:
+
+bucket predictions, e.g.:
+
+0–10%
+10–20%
+20–30%
+...
+90–100%
+
+Report:
+
+predicted probability
+actual outcome frequency
+sample size
+calibration error
+Brier score
+
+Do this separately for:
+
+AH where settlement mapping permits
+BTTS
+OU where the probability definition is appropriate
+
+Do not treat quarter-line settlement as a simple binary event unless mathematically justified.
+
+==================================================
+26. EV VS REALIZED P/L
+==================================================
+
+Create explicit comparison:
+
+expected profit
+realized profit
+EV error
+
+Track cumulative:
+
+expected profit
+realized profit
+
+This allows detection of:
+
+variance
+model miscalibration
+pricing error
+bad odds
+execution problems
+
+==================================================
+27. VALUE BET ANALYTICS
+==================================================
+
+For every VALUE BET store:
+
+value_status
+EV
+model_probability
+fair_odds
+market_odds
+edge
+confidence
+
+Then measure:
+
+value bet count
+settled value bets
+value bet ROI
+value bet yield
+value bet CLV
+value bet hit rate
+average EV
+realized profit
+
+Do not define "value bet" retrospectively based on outcome.
+
+Value status is determined at prediction time.
+
+==================================================
+28. CLV VS PROFIT ANALYSIS
+==================================================
+
+Create a diagnostic matrix:
+
+POSITIVE CLV + PROFIT
+POSITIVE CLV + LOSS
+NEGATIVE CLV + PROFIT
+NEGATIVE CLV + LOSS
+
+This is important.
+
+A single losing prediction with positive CLV is not necessarily model failure.
+
+A winning prediction with negative CLV is not necessarily evidence of model quality.
+
+==================================================
+29. PENDING STATE
+==================================================
+
+Future predictions must remain:
+
+SETTLEMENT = PENDING
+
+and:
+
+CLV = PENDING
+
+until valid closing/result data exists.
+
+Never classify pending bets as losses.
+
+Never classify pending bets as wins.
+
+Never include pending bets in realized ROI.
+
+Clearly distinguish:
+
+PREDICTION PERFORMANCE
+
+from:
+
+SETTLED PERFORMANCE.
+
+==================================================
+30. DATA RECONCILIATION
+==================================================
+
+Enforce:
+
+TOTAL PREDICTIONS
+=
+SETTLED
++
+PENDING
++
+VOID/CANCELLED
+according to the documented lifecycle.
+
+Also:
+
+TOTAL PROFIT
+=
+SUM(individual prediction profit_loss)
+
+TOTAL STAKED
+=
+SUM(individual eligible stake)
+
+No dashboard may calculate these independently from the ledger.
+
+The ledger is the single source of truth.
+
+==================================================
+31. NO SILENT CORRECTIONS
+==================================================
+
+If a result source changes:
+
+DO NOT silently mutate history.
+
+Create:
+
+result_revision
+or
+
+settlement_revision
+
+with:
+
+old value
+new value
+timestamp
+source
+reason
+
+Historical audit trail must remain intact.
+
+==================================================
+32. DUPLICATE PROTECTION
+==================================================
+
+The same prediction must not be counted twice.
+
+Implement deterministic idempotency.
+
+Repeated ingestion of the same prediction:
+
+must produce:
+
+ONE ledger record.
+
+Repeated result ingestion:
+
+must not duplicate profit.
+
+Repeated CLV ingestion:
+
+must update the designated CLV observation safely without creating duplicate bets.
+
+==================================================
+33. MARKET-SPECIFIC ACCOUNTING TESTS
+==================================================
+
+Create deterministic settlement tests for:
+
+AH:
+
+- full win
+- half win
+- push
+- half loss
+- full loss
+
+OU:
+
+- full win
+- half win
+- push
+- half loss
+- full loss
+
+BTTS:
+
+- win
+- loss
+- void where applicable
+
+Verify exact P/L for 1-unit stake.
+
+==================================================
+34. PERFORMANCE TESTS
+==================================================
+
+Create known ledger fixtures and verify:
+
+profit
+ROI
+yield
+win rate
+drawdown
+CLV
+EV
+bankroll
+
+Example:
+
+10 × 1-unit bets
+
+must reconcile exactly.
+
+Test mixed:
+
+wins
+losses
+pushes
+half wins
+half losses
+
+Do not test only simple binary outcomes.
+
+==================================================
+35. CLV TESTS
+==================================================
+
+Create deterministic CLV fixtures for:
+
+price movement
+line movement
+no closing data
+invalid closing data
+same line
+different line
+
+Verify:
+
+CLV_AVAILABLE
+
+only when mathematically valid.
+
+Otherwise:
+
+CLV_UNAVAILABLE
+
+or:
+
+PENDING
+
+Never fabricate CLV.
+
+==================================================
+36. HISTORICAL BACKFILL
+==================================================
+
+After the ledger is correct:
+
+Backfill eligible historical production predictions if authoritative prediction records exist.
+
+DO NOT reconstruct fake historical predictions from final results.
+
+Only backfill if the original prediction snapshot is available.
+
+Otherwise:
+
+mark historical coverage gap explicitly.
+
+Do not manufacture missing odds.
+
+Do not manufacture missing prediction probabilities.
+
+==================================================
+37. LIVE INGESTION
+==================================================
+
+Every new production prediction must automatically enter the ledger.
+
+No manual CSV-only process as the canonical mechanism.
+
+Required flow:
+
+prediction generated
+→ ledger insert
+→ immutable snapshot
+→ CLV tracking
+→ result tracking
+→ settlement
+→ performance update
+
+==================================================
+38. DAILY RECONCILIATION JOB
+==================================================
+
+Create a deterministic reconciliation process that checks:
+
+predictions generated
+vs
+ledger records
+
+ledger records
+vs
+settlements
+
+settlements
+vs
+profit records
+
+prediction odds
+vs
+stored odds
+
+closing odds
+vs
+CLV
+
+Any mismatch must become:
+
+RECONCILIATION_FAILURE
+
+Do not silently repair it.
+
+==================================================
+39. SALMO PERFORMANCE SYNC
+==================================================
+
+Only after the HandicapLab ledger is verified:
+
+sync the canonical performance data into Salmo.
+
+Salmo must be able to display:
+
+prediction
+result
+settlement
+profit/loss
+EV
+value status
+ROI
+yield
+CLV
+confidence
+stake
+bankroll impact
+
+Do not duplicate calculation logic in Salmo.
+
+Salmo consumes canonical HandicapLab ledger/performance data.
+
+HandicapLab = source of truth.
+
+Salmo = presentation/consumer layer.
+
+==================================================
+40. SALMO PERFORMANCE CONTRACT
+==================================================
+
+Expose, at minimum:
+
+/predictions
+/settlements
+/performance
+/performance/markets
+/performance/leagues
+/performance/bookmakers
+/performance/timeseries
+/performance/clv
+/performance/calibration
+
+Use the project's existing API architecture where appropriate.
+
+Do not create unnecessary duplicate data stores.
+
+==================================================
+41. DASHBOARD REQUIREMENTS
+==================================================
+
+Create a production performance view containing:
+
+TOTAL PREDICTIONS
+SETTLED
+PENDING
+
+PROFIT
+ROI
+YIELD
+
+WIN RATE
+LOSS RATE
+PUSH RATE
+
+AVG EV
+AVG CLV
+
+VALUE BETS
+
+MAX DRAWDOWN
+CURRENT BANKROLL
+
+Then allow filters:
+
+market
+selection
+line
+league
+bookmaker
+confidence
+date range
+settlement status
+
+Every displayed number must come from the canonical ledger.
+
+==================================================
+42. AUDIT REPORT
+==================================================
+
+Create:
+
+docs/PREDICTION_LEDGER_PERFORMANCE_AUDIT.md
+
+Include:
+
+1. Executive Summary
+2. Ledger Architecture
+3. Prediction Lifecycle
+4. Immutable Snapshot
+5. Settlement Engine
+6. Profit/Loss Accounting
+7. ROI
+8. Yield
+9. EV
+10. CLV
+11. Value Bet Analytics
+12. Bankroll
+13. Drawdown
+14. Calibration
+15. Historical Coverage
+16. Reconciliation
+17. Duplicate Protection
+18. Market Breakdown
+19. League Breakdown
+20. Provider/Bookmaker Breakdown
+21. Test Results
+22. Salmo Sync
+23. Remaining Gaps
+24. Release Decision
+
+==================================================
+43. RELEASE GATE
+==================================================
+
+ALL MUST PASS:
+
+[ ] Every prediction recorded
+[ ] Immutable prediction snapshot
+[ ] Unique prediction ID
+[ ] AH settlement
+[ ] BTTS settlement
+[ ] OU settlement
+[ ] Quarter-line settlement
+[ ] Profit/loss accounting
+[ ] Stake accounting
+[ ] ROI
+[ ] Yield
+[ ] EV preservation
+[ ] CLV tracking
+[ ] CLV validity
+[ ] Pending state
+[ ] Result resolution
+[ ] Duplicate protection
+[ ] Historical immutability
+[ ] Reconciliation
+[ ] Bankroll
+[ ] Drawdown
+[ ] Value bet analytics
+[ ] Calibration
+[ ] Market analytics
+[ ] League analytics
+[ ] Bookmaker analytics
+[ ] Time-series analytics
+[ ] AH non-regression
+[ ] BTTS non-regression
+[ ] OU non-regression
+[ ] Full test suite
+[ ] Production dry run
+[ ] Salmo sync
+
+IF ANY ITEM FAILS:
+
+STATUS = BLOCKED
+
+DO NOT COMMIT.
+
+DO NOT DEPLOY.
+
+DO NOT SYNC.
+
+==================================================
+44. COMMIT TO HANDICAPLAB
+==================================================
+
+ONLY when every gate is PASS:
+
+1. inspect git status
+2. inspect complete git diff
+3. verify no unrelated changes
+4. run ledger tests
+5. run AH tests
+6. run BTTS tests
+7. run OU tests
+8. run full Vitest
+9. run reconciliation
+10. run secret scan
+11. run production dry run
+
+Then commit:
+
+feat(platform): canonical prediction ledger and betting performance accounting
+
+Push to origin/main.
+
+==================================================
+45. SALMO SYNCHRONIZATION
+==================================================
+
+ONLY after successful HandicapLab commit:
+
+sync canonical ledger/performance data to Salmo.
+
+Verify:
+
+prediction count matches
+settlement count matches
+profit matches
+ROI matches
+yield matches
+EV matches
+CLV matches
+
+Do not recalculate these metrics independently in Salmo.
+
+Perform checksum/count reconciliation.
+
+==================================================
+46. DEPLOYMENT
+==================================================
+
+ONLY after:
+
+HandicapLab commit = PASS
+Salmo sync = PASS
+all tests = PASS
+reconciliation = PASS
+
+deploy using the existing production deployment mechanism.
+
+After deployment run:
+
+prediction creation smoke test
+settlement smoke test
+P/L smoke test
+ROI smoke test
+CLV smoke test
+Salmo sync smoke test
+
+Verify no regression in:
+
+AH
+BTTS
+OU
+
+==================================================
+47. FINAL OUTPUT
+==================================================
+
+Return exactly:
+
+PREDICTION LEDGER: PASS/FAIL
+IMMUTABLE SNAPSHOT: PASS/FAIL
+SETTLEMENT ENGINE: PASS/FAIL
+PROFIT/LOSS: PASS/FAIL
+STAKE ACCOUNTING: PASS/FAIL
+ROI: PASS/FAIL
+YIELD: PASS/FAIL
+EV: PASS/FAIL
+CLV: PASS/FAIL
+VALUE BET ANALYTICS: PASS/FAIL
+BANKROLL: PASS/FAIL
+DRAWDOWN: PASS/FAIL
+CALIBRATION: PASS/FAIL
+RECONCILIATION: PASS/FAIL
+DUPLICATE PROTECTION: PASS/FAIL
+AH NON-REGRESSION: PASS/FAIL
+BTTS NON-REGRESSION: PASS/FAIL
+OU NON-REGRESSION: PASS/FAIL
+FULL TEST SUITE: PASS/FAIL
+PRODUCTION DRY RUN: PASS/FAIL
+SALMO SYNC: PASS/FAIL
+HANDICAPLAB COMMIT: PASS/FAIL
+DEPLOYMENT: PASS/FAIL
+
+OVERALL PERFORMANCE LEDGER STATUS: GO/BLOCKED
+
+If BLOCKED:
+
+STOP.
+
+Do not commit.
+Do not deploy.
+Do not sync.
+
+Report:
+
+1. exact failure
+2. root cause
+3. affected files
+4. required fix
+5. failed tests
+
+If GO:
+
+1. commit to HandicapLab
+2. push to origin/main
+3. sync to Salmo
+4. deploy
+5. run production smoke tests
+6. report commit hash
+7. report deployment status
+8. report reconciliation status
+
+FINAL PRINCIPLE:
+
+EVERY PREDICTION MUST BE ACCOUNTED FOR.
+
+EVERY LOSS MUST BE RECORDED.
+
+EVERY WIN MUST BE RECORDED.
+
+EVERY PUSH MUST BE RECORDED.
+
+EVERY HALF-WIN AND HALF-LOSS MUST BE RECORDED.
+
+EVERY ODDS SNAPSHOT MUST BE PRESERVED.
+
+EVERY VALID CLOSING LINE MUST BE RECORDED.
+
+EVERY PROFIT/LOSS MUST RECONCILE TO THE LEDGER.
+
+ROI, YIELD, EV AND CLV MUST NEVER BE FABRICATED.
+
+HANDICAPLАB IS THE SOURCE OF TRUTH.
+
+SALMO IS THE CONSUMER/PRESENTATION LAYER.
+
+NO COMMIT.
+NO DEPLOY.
+NO SALMO SYNC.
+
+UNTIL EVERYTHING IS GREEN.
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-09-30T01:30:35+07:00.
+</ADDITIONAL_METADATA>
