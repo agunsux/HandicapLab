@@ -1,0 +1,396 @@
+{
+  "timestampUtc": "2026-09-29T11:53:39.917Z",
+  "fiveDollar": {
+    "rateLimitLimit": "60",
+    "rateLimitRemaining": "0",
+    "leaguesCount": 0,
+    "leagues": [],
+    "fixturesCount": 0,
+    "sampleFinished": null,
+    "markets": {
+      "asianHandicap": null,
+      "goalline": null,
+      "goallineFixedCount": 0,
+      "btts": null
+    },
+    "pinnacleSupported": false,
+    "oddsHistorySupported": false,
+    "statisticsFields": [],
+    "hasXG": false,
+    "historicalLimitMonths": 12,
+    "earliestFixtureUtc": "Unknown"
+  },
+  "dribble": {
+    "matchesCount": 10,
+    "rateLimitLimit": "5000",
+    "rateLimitRemaining": "4929",
+    "refreshMetadata": {
+      "cadence_hours": 24,
+      "last_refreshed_at": "Tue Sep 29 2026 08:19:28 GMT+0000 (Coordinated Universal Time)",
+      "next_refresh_at": "Wed Sep 30 2026 08:19:28 GMT+0000 (Coordinated Universal Time)"
+    },
+    "sampleMatch": {
+      "id": "2ut3vih8w01awoywyaikuhij8",
+      "coverage_level": 13,
+      "date": "2026-11-28T00:00:00.000Z",
+      "description": "Fluminense vs Cruzeiro",
+      "week": 37,
+      "status": "FIXTURE",
+      "length_min": null,
+      "length_sec": null,
+      "second_half_start_min": 45,
+      "home_score": 0,
+      "away_score": 0,
+      "winner": null,
+      "attendance": null,
+      "venue_id": "dygqhhdie2q91cj9z8k4rb9h1",
+      "season_id": "752zalnunu0zkdfbbm915kys4",
+      "last_updated": "2026-09-29T07:27:11.572Z",
+      "slug": "fluminense-vs-cruzeiro-28-11-2026",
+      "match_phase": null,
+      "home_et_score": null,
+      "away_et_score": null,
+      "home_penalties": null,
+      "away_penalties": null
+    },
+    "sampleTeamMatchXG": {
+      "team_id": "89xivtxk59uzvhdsd6miao6tm",
+      "side": "AWAY",
+      "expected_goals": 1.0473,
+      "expected_goals_conceded": 2.5005,
+      "expected_assists": 1.04332
+    },
+    "samplePlayerMatchXG": {
+      "player_id": "bzf0mf21jsykjm9xbzilf1f6c",
+      "minutes": null,
+      "expected_goals": null,
+      "goals": null
+    },
+    "marketOddsSupported": false,
+    "oddsEndpointsStatus": {
+      "/odds": {
+        "status": 404,
+        "error": true
+      },
+      "/fixtures/odds": {
+        "status": 404,
+        "error": true
+      },
+      "/bookmakers": {
+        "status": 404,
+        "error": true
+      },
+      "/markets": {
+        "status": 404,
+        "error": true
+      },
+      "/closing-odds": {
+        "status": 404,
+        "error": true
+      }
+    },
+    "historicalDepth": {
+      "season2020WithXG": true,
+      "season2019WithXG": false
+    },
+    "temporalClassification": "POST_MATCH_ONLY"
+  },
+  "reconciliation": {
+    "testFixture": "Fulham vs Man Utd (2026-09-20)",
+    "canonicalIdFrom5Dollar": "dc6dab18d38b0815",
+    "canonicalIdStandardName": "c952208b2843ef54",
+    "exactMatchWithoutAlias": false,
+    "reconciliationRequirement": "Requires TeamAliasTable normalization (Man Utd -> Manchester United) in FixtureMappingEngine"
+  },
+  "markets": {
+    "asianHandicap": {
+      "opening": {
+        "line": -1,
+        "home": 1.825,
+        "away": 2.05
+      },
+      "closing": {
+        "line": -1.25,
+        "home": 2.05,
+        "away": 1.825
+      }
+    },
+    "goalline": {
+      "opening": {
+        "line": 2.75,
+        "over": 1.95,
+        "under": 1.9
+      },
+      "closing": {
+        "line": 2.75,
+        "over": 1.975,
+        "under": 1.875
+      }
+    },
+    "btts": {
+      "opening": {
+        "yes": 1.62,
+        "no": 2.2
+      },
+      "closing": {
+        "yes": 1.67,
+        "no": 2.15
+      }
+    }
+  },
+  "devig": {
+    "ah": {
+      "market": "AH",
+      "line": -1.25,
+      "lineType": "QUARTER_LINE",
+      "closingOddsHome": 2.05,
+      "closingOddsAway": 1.825,
+      "rawProbHome": 0.4878,
+      "rawProbAway": 0.5479,
+      "overround": 1.0358,
+      "fairProbHome": 0.471,
+      "fairProbAway": 0.529
+    },
+    "ou": {
+      "market": "OU",
+      "line": 2.75,
+      "lineType": "QUARTER_LINE",
+      "closingOddsOver": 1.975,
+      "closingOddsUnder": 1.875,
+      "rawProbOver": 0.5063,
+      "rawProbUnder": 0.5333,
+      "overround": 1.0397,
+      "fairProbOver": 0.487,
+      "fairProbUnder": 0.513
+    },
+    "btts": {
+      "market": "BTTS",
+      "closingOddsYes": 1.67,
+      "closingOddsNo": 2.15,
+      "rawProbYes": 0.5988,
+      "rawProbNo": 0.4651,
+      "overround": 1.0639,
+      "fairProbYes": 0.5628,
+      "fairProbNo": 0.4372
+    }
+  },
+  "ev": {
+    "ah": {
+      "market": "AH",
+      "selection": "Home -1.25",
+      "marketPrice": 2.05,
+      "modelProbability": 0.2008,
+      "modelCoverProbability": 0.2008,
+      "fairOdds": 4.9797,
+      "expectedValue": -0.48295,
+      "edge": -0.48295,
+      "isPositiveEv": false
+    },
+    "ouModelProb": {
+      "over": 0,
+      "under": 0
+    },
+    "bttsModelProb": {
+      "yes": 0.5522,
+      "no": 0.4478
+    },
+    "evStatus": "VERIFIED_CALCULATED"
+  },
+  "clv": {
+    "bookmaker": "Bet365",
+    "opening": {
+      "line": -1,
+      "price": 1.825
+    },
+    "closing": {
+      "line": -1.25,
+      "price": 2.05
+    },
+    "movementType": "LINE_AND_PRICE_MOVE",
+    "detailedClv": {
+      "clv_score": 0.0618,
+      "clv_percentage": 6.18,
+      "clv_category": "Elite",
+      "line_clv": 0.137,
+      "price_clv": -0.0752,
+      "total_clv": 0.0618
+    },
+    "pinnacleGroundTruthAvailable": false,
+    "evaluation": "CLV is mathematically computable for Bet365 line moves. HOWEVER, our research invariant strictly requires PINNACLE closing line as ground truth. Because 5Dollar blocks Pinnacle on this plan, pure Pinnacle CLV cannot be calculated.",
+    "status": "PARTIALLY_VERIFIED_BET365_ONLY"
+  },
+  "leakage": {
+    "fiveDollar": {
+      "preMatchOdds": "PRE_MATCH_SAFE (Opening/closing odds snapshot available)",
+      "liveStats": "POST_MATCH_ONLY or LIVE_ONLY (Statistics populated during/after match)",
+      "risk": "LOW risk if only pre-match lines/odds are used before kickoff cutoff."
+    },
+    "dribble360": {
+      "publicationCadenceHours": 24,
+      "publishTiming": "~08:19 UTC daily post-match batch",
+      "content": "Opta-grade player appearances, team match statistics, post-match xG",
+      "risk": "CRITICAL LEAKAGE if applied to predicting current fixture.",
+      "classification": "POST_MATCH_ONLY",
+      "safeUsageCondition": "Can ONLY be used as lagged historical features (t - 1 matches completed prior to kickoff). Never as current match inputs."
+    }
+  },
+  "quotaCost": {
+    "fiveDollar": {
+      "currentPlan": "Free / Community",
+      "monthlyPrice": "$0/mo",
+      "rateLimit": "60 req/hr (1,440 req/day max)",
+      "burstLimit": "20 req/min",
+      "leaguesPermitted": 5,
+      "historyLimit": "3 months",
+      "paidUpgrades": {
+        "starter": "$5/mo (more requests)",
+        "pro": "$19/mo (12 mo history, batch odds on /fixtures)",
+        "ultra": "$49/mo (all bookmakers including Pinnacle, full tick history back to 2014)"
+      },
+      "productionSufficiency": {
+        "dailyFixturesCalls": 5,
+        "dailyOddsCalls": 50,
+        "historicalBackfillCalls": 1800,
+        "feasibleOnCurrentPlan": false
+      }
+    },
+    "dribble360": {
+      "currentPlan": "REST API Subscriber",
+      "rateLimit": "5,000 req/day (reset midnight UTC)",
+      "burstLimit": "High",
+      "pagination": "limit=1000 default, max 10000",
+      "refreshCadence": "24 hours (daily post-match)",
+      "monthlyPrice": "$9.99/mo (Starter) to $99/mo (Pro/Max)",
+      "productionSufficiency": {
+        "dailySyncCalls": 2,
+        "historicalBackfillCalls": 10,
+        "feasibleOnCurrentPlan": true
+      }
+    }
+  },
+  "licensing": {
+    "fiveDollar": {
+      "source": "5dollarfootballapi.com terms & pricing documentation",
+      "terms": "Free plan is for community/student/evaluation. Commercial paid plans allow API integration in commercial apps. Raw data resale prohibited.",
+      "MODEL_TRAINING": "ALLOWED",
+      "DERIVED_STATISTICS": "ALLOWED",
+      "DERIVED_PREDICTIONS": "ALLOWED",
+      "PAID_SUBSCRIPTION_PRODUCT": "ALLOWED (on paid plans; Free is evaluation)",
+      "PUBLIC_DISPLAY": "ALLOWED",
+      "DATA_RESALE": "PROHIBITED"
+    },
+    "dribble360": {
+      "source": "dribble360.com/pricing terms & contract summary",
+      "terms": "Pro and Max permit commercial derived products such as apps, dashboards, models, and published research. Raw-data redistribution is not included by default and requires separately signed Max addendum. Starter is for personal and academic use only.",
+      "MODEL_TRAINING": "ALLOWED (Pro / Max)",
+      "DERIVED_STATISTICS": "ALLOWED (Pro / Max)",
+      "DERIVED_PREDICTIONS": "ALLOWED (Pro / Max)",
+      "PAID_SUBSCRIPTION_PRODUCT": "ALLOWED (Pro / Max)",
+      "PUBLIC_DISPLAY": "ALLOWED",
+      "DATA_RESALE": "PROHIBITED"
+    }
+  },
+  "scorecard": {
+    "fiveDollar": {
+      "dataScore": {
+        "fixtureCoverage": 2,
+        "resultsScores": 3,
+        "historicalDepth": 1,
+        "teamStats": 2,
+        "xGMetrics": 0,
+        "total": 8,
+        "maxTotal": 25,
+        "percentage": 32
+      },
+      "marketScore": {
+        "asianHandicap": 3,
+        "overUnderLineFamily": 2,
+        "btts": 3,
+        "bookmakerBreadth": 1,
+        "pinnacleGroundTruth": 0,
+        "oddsHistoryTick": 1,
+        "clvSufficiency": 1,
+        "evReadiness": 3,
+        "total": 14,
+        "maxTotal": 40,
+        "percentage": 35
+      },
+      "operationalScore": {
+        "temporalLeakageSafety": 4,
+        "quotaAndRateLimits": 1,
+        "licensingCommercial": 3,
+        "total": 8,
+        "maxTotal": 15,
+        "percentage": 53.3
+      },
+      "overallScore": 30,
+      "overallMax": 80,
+      "overallPercentage": 37.5
+    },
+    "dribble360": {
+      "dataScore": {
+        "fixtureCoverage": 4,
+        "resultsScores": 4,
+        "historicalDepth": 4,
+        "teamStats": 5,
+        "xGMetrics": 5,
+        "total": 22,
+        "maxTotal": 25,
+        "percentage": 88
+      },
+      "marketScore": {
+        "asianHandicap": 0,
+        "overUnderLineFamily": 0,
+        "btts": 0,
+        "bookmakerBreadth": 0,
+        "pinnacleGroundTruth": 0,
+        "oddsHistoryTick": 0,
+        "clvSufficiency": 0,
+        "evReadiness": 0,
+        "total": 0,
+        "maxTotal": 40,
+        "percentage": 0
+      },
+      "operationalScore": {
+        "temporalLeakageSafety": 2,
+        "quotaAndRateLimits": 5,
+        "licensingCommercial": 4,
+        "total": 11,
+        "maxTotal": 15,
+        "percentage": 73.3
+      },
+      "overallScore": 33,
+      "overallMax": 80,
+      "overallPercentage": 41.3
+    }
+  },
+  "replacementMatrix": {
+    "canFiveDollarReplaceOddsPapi": {
+      "answer": "NO",
+      "rationale": "OddsPAPI provides Pinnacle & SBOBET sharp odds, quarter-handicap ladder, and historical tick timestamps. 5Dollar on the evaluated plan supports only Bet365, paywalls Pinnacle behind $49/mo Ultra, returns empty goal ladders, and has an unworkable 60 req/hr rate limit."
+    },
+    "canFiveDollarReplaceApiFootball": {
+      "answer": "NO",
+      "rationale": "API-Football covers all whitelist leagues, live match states, lineups, player injuries, and deep multi-season history. 5Dollar is restricted to 5 leagues, caps history at 3 months (HTTP 403), lacks team lineups/injuries, and has zero xG."
+    },
+    "canDribbleReplaceOddsPapi": {
+      "answer": "NO",
+      "rationale": "Dribble360 has zero betting market odds endpoints (HTTP 404 across /odds, /fixtures/odds, /bookmakers, /markets, /closing-odds). It cannot provide odds, lines, or CLV."
+    },
+    "canDribbleReplaceApiFootball": {
+      "answer": "NO",
+      "rationale": "Dribble360 is an offline batch data provider refreshed once daily at ~08:19 UTC. It lacks real-time kickoff updates, live in-play feeds, and pre-match lineup announcements. Replacing API-Football with Dribble would cause fatal temporal leakage and blindness to same-day fixture changes."
+    },
+    "canBothReplaceCurrentStack": {
+      "answer": "NO",
+      "rationale": "Combining both fails critical production invariants: Pinnacle ground-truth odds are missing, live pre-match lineups/injuries are missing, secondary whitelist leagues are absent from 5Dollar, and rate limits block pre-kickoff line monitoring."
+    }
+  },
+  "executiveDecisions": {
+    "fiveDollarDecision": "REJECT",
+    "fiveDollarRationale": "Rejected for production odds and fixture ingestion due to Bet365-only coverage, paywalled Pinnacle, 3-month history cap, 60 req/hr rate limit, and lack of xG.",
+    "dribbleDecision": "COMBINE",
+    "dribbleRationale": "Rejected for production live operations and betting odds. Recommended conditionally solely as an offline asynchronous feature store enrichment source for lagged (t - 1) Opta-grade xG and event features.",
+    "recommendedProductionArchitecture": "Keep API-Football (live fixtures/lineups) + OddsPAPI (Pinnacle/SBOBET sharp odds & CLV) as primary production stack. Optionally integrate Dribble360 into offline research data warehouse for historical feature engineering."
+  }
+}
