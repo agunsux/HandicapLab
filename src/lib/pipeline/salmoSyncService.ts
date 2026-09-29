@@ -25,17 +25,20 @@ export interface SalmoDecisionCardPayload {
   awayTeam: string;
   competition: string;
   kickoffUtc: string;
-  market: 'AH' | 'OU';
+  market: 'AH' | 'OU' | 'BTTS';
   selection: string;
   line: number | null;
   odds: number;
+  fairOdds?: number;
   modelProbabilityPct: number;
   calibratedProbabilityPct: number;
   edgePct: number;
   expectedValuePct: number;
-  confidence: 'HIGH';
+  confidence: 'HIGH' | 'MEDIUM' | 'LOW';
   status: 'POTENTIAL_WINNING_BET';
+  clvStatus?: 'PENDING' | 'CALCULATED';
   predictionTimestampUtc: string;
+  dataTimestampUtc?: string;
   modelVersion: string;
   whyExplanation: string[];
   disclaimer: string;
@@ -216,6 +219,133 @@ export class SalmoSyncService {
       };
     } catch (err: any) {
       console.warn('[SalmoSyncService] Sync encountered error:', err.message);
+      return {
+        timestampUtc: nowIso,
+        status: 'SALMO_SYNC_FAILED',
+        totalHighConfidence: 0,
+        created: 0,
+        updated: 0,
+        unchanged: 0,
+        rejected: 0,
+        syncedDecisions: [],
+        errorMessage: err.message || 'Unknown sync error',
+      };
+    }
+  }
+
+  /**
+   * Synchronizes verified BTTS predictions that pass the production integrity gate.
+   */
+  public static async synchronizeBtts(
+    predictions: PredictionLedgerRecord[],
+    options: { nowMs?: number; simulateFailure?: boolean } = {}
+  ): Promise<SalmoSyncReport> {
+    const nowMs = options.nowMs || Date.now();
+    const nowIso = new Date(nowMs).toISOString();
+
+    if (options.simulateFailure) {
+      return {
+        timestampUtc: nowIso,
+        status: 'SALMO_SYNC_FAILED',
+        totalHighConfidence: 0,
+        created: 0,
+        updated: 0,
+        unchanged: 0,
+        rejected: 0,
+        syncedDecisions: [],
+        errorMessage: 'SIMULATED_NETWORK_TIMEOUT: Salmo downstream unreachable',
+      };
+    }
+
+    try {
+      // Filter predictions that pass BTTS production integrity gate:
+      // - market === 'BTTS'
+      // - valid real odds > 1.0
+      // - positive EV & edge
+      // - confidence HIGH or MEDIUM
+      const eligiblePicks = predictions.filter(
+        (p) =>
+          p.market === 'BTTS' &&
+          (p.selection === 'YES' || p.selection === 'NO' || p.selection === 'BTTS Yes' || p.selection === 'BTTS No') &&
+          typeof p.odds === 'number' &&
+          p.odds > 1.0 &&
+          p.expectedValue > 0 &&
+          p.edge > 0 &&
+          (p.confidence === 'HIGH' || p.confidence === 'MEDIUM' || p.status === 'HIGH_CONFIDENCE' || p.status === 'QUALIFIED')
+      );
+
+      const store = this.loadSyncedStore();
+      let created = 0;
+      let updated = 0;
+      let unchanged = 0;
+      const rejected = predictions.length - eligiblePicks.length;
+      const syncedDecisions: SalmoDecisionCardPayload[] = [];
+
+      for (const pick of eligiblePicks) {
+        const canonicalSelection = pick.selection.toUpperCase().includes('YES') ? 'YES' : 'NO';
+        const decisionId = `salmo_${crypto
+          .createHash('sha256')
+          .update(`${pick.canonicalMatchId}_BTTS_${canonicalSelection}`)
+          .digest('hex')
+          .slice(0, 16)}`;
+
+        const fairOdds = pick.modelProbability > 0 ? Number((1 / pick.modelProbability).toFixed(3)) : undefined;
+
+        const card: SalmoDecisionCardPayload = {
+          decisionId,
+          canonicalMatchId: pick.canonicalMatchId,
+          match: `${pick.homeTeam} vs ${pick.awayTeam}`,
+          homeTeam: pick.homeTeam,
+          awayTeam: pick.awayTeam,
+          competition: pick.competition,
+          kickoffUtc: pick.kickoffTimestamp,
+          market: 'BTTS',
+          selection: canonicalSelection,
+          line: null,
+          odds: pick.odds!,
+          fairOdds,
+          modelProbabilityPct: Number((pick.modelProbability * 100).toFixed(1)),
+          calibratedProbabilityPct: Number((pick.calibratedProbability * 100).toFixed(1)),
+          edgePct: Number((pick.edge * 100).toFixed(1)),
+          expectedValuePct: Number((pick.expectedValue * 100).toFixed(1)),
+          confidence: (pick.confidence === 'MEDIUM' ? 'MEDIUM' : 'HIGH') as 'HIGH' | 'MEDIUM',
+          status: 'POTENTIAL_WINNING_BET',
+          clvStatus: 'PENDING',
+          predictionTimestampUtc: pick.predictionTimestamp,
+          dataTimestampUtc: pick.oddsTimestamp,
+          modelVersion: pick.modelVersion,
+          whyExplanation: this.generateWhyExplanation(pick),
+          disclaimer: this.DISCLAIMER_TEXT,
+        };
+
+        const existing = store[decisionId];
+        if (!existing) {
+          store[decisionId] = card;
+          created++;
+        } else if (JSON.stringify(existing) !== JSON.stringify(card)) {
+          store[decisionId] = card;
+          updated++;
+        } else {
+          unchanged++;
+        }
+
+        syncedDecisions.push(card);
+      }
+
+      this.saveSyncedStore(store);
+
+      return {
+        timestampUtc: nowIso,
+        status: syncedDecisions.length > 0 ? 'SUCCESS' : 'NO_PICKS',
+        totalHighConfidence: eligiblePicks.length,
+        created,
+        updated,
+        unchanged,
+        rejected,
+        syncedDecisions,
+      };
+    } catch (err: any) {
+      console.warn('[SalmoSyncService] BTTS sync error:', err.message);
       return {
         timestampUtc: nowIso,
         status: 'SALMO_SYNC_FAILED',

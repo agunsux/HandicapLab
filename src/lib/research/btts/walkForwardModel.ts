@@ -11,6 +11,7 @@
 // ============================================================================
 
 import { BttsPreMatchFeatures, BttsProbabilities } from './types';
+import { calculateBtts } from '../bttsEngine';
 
 export const BTTS_WALKFORWARD_MODEL_VERSION = 'BTTS-poisson-shrinkage-v1.0.0';
 
@@ -75,16 +76,9 @@ export class BttsWalkForwardModel {
     const lambdaHome = Number(Math.max(0.2, Math.min(4.5, rawLambdaHome)).toFixed(4));
     const lambdaAway = Number(Math.max(0.2, Math.min(4.5, rawLambdaAway)).toFixed(4));
 
-    // 4. Probability of scoring at least 1 goal: P(X >= 1) = 1 - exp(-lambda)
-    const pHomeScore = 1.0 - Math.exp(-lambdaHome);
-    const pAwayScore = 1.0 - Math.exp(-lambdaAway);
-
-    // Baseline independent Poisson BTTS YES probability
-    let pYes = pHomeScore * pAwayScore;
-
-    // Small correlation adjustment for low-scoring match dependency (-0.02 to -0.04)
-    // Dixon-Coles effect slightly depresses 0-0 and elevates 1-1, slight net adjustment
-    pYes = Number(Math.max(0.01, Math.min(0.99, pYes)).toFixed(5));
+    // 4. Derive BTTS probability directly from canonical Dixon-Coles bivariate score distribution
+    const bttsEngineResult = calculateBtts(lambdaHome, lambdaAway, -0.04);
+    const pYes = Number(bttsEngineResult.probabilities.yes.toFixed(5));
     const pNo = Number((1.0 - pYes).toFixed(5));
 
     // 5. Baselines
