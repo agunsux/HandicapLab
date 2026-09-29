@@ -254,7 +254,7 @@ export class CanonicalBetLedgerService {
 
     // 1. Ingest from data/ledger/daily_prediction_ledger.json
     try {
-      const dailyPath = path.resolve('data/ledger/daily_prediction_ledger.json');
+      const dailyPath = path.join(process.cwd(), 'data', 'ledger', 'daily_prediction_ledger.json');
       if (fs.existsSync(dailyPath)) {
         const raw = fs.readFileSync(dailyPath, 'utf8');
         const data = JSON.parse(raw);
@@ -300,14 +300,14 @@ export class CanonicalBetLedgerService {
 
     // 2. Ingest from ah_daily_predictions.jsonl, ou_daily_predictions.jsonl, btts_daily_predictions.jsonl
     const jsonlFiles = [
-      { file: 'data/ledger/ah_daily_predictions.jsonl', market: 'AH' as MarketType },
-      { file: 'data/ledger/ou_daily_predictions.jsonl', market: 'OU' as MarketType },
-      { file: 'data/ledger/btts_daily_predictions.jsonl', market: 'BTTS' as MarketType },
+      { name: 'ah_daily_predictions.jsonl', market: 'AH' as MarketType },
+      { name: 'ou_daily_predictions.jsonl', market: 'OU' as MarketType },
+      { name: 'btts_daily_predictions.jsonl', market: 'BTTS' as MarketType },
     ];
 
     for (const jf of jsonlFiles) {
       try {
-        const p = path.resolve(jf.file);
+        const p = path.join(process.cwd(), 'data', 'ledger', jf.name);
         if (fs.existsSync(p)) {
           const lines = fs.readFileSync(p, 'utf8').split('\n');
           for (const line of lines) {
@@ -347,7 +347,7 @@ export class CanonicalBetLedgerService {
           }
         }
       } catch (e) {
-        console.warn(`[CanonicalBetLedgerService] Error importing ${jf.file}:`, e);
+        console.warn(`[CanonicalBetLedgerService] Error importing ${jf.name}:`, e);
       }
     }
 

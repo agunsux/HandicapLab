@@ -13,6 +13,8 @@ const nextConfig: NextConfig = {
       'archive/**/*',
       'tests/**/*',
       '.gemini/**/*',
+      'scripts/**/*',
+      'latest_user_prompt.txt',
       'node_modules/@next/swc*/**/*',
     ],
   },
@@ -97,6 +99,10 @@ const nextConfig: NextConfig = {
       {
         source: '/api/performance/leagues',
         destination: '/api/performance?view=leagues',
+      },
+      {
+        source: '/api/performance/summary',
+        destination: '/api/performance?view=summary',
       },
     ];
   },
