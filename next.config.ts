@@ -70,6 +70,22 @@ const nextConfig: NextConfig = {
         source: '/api/quota',
         destination: '/api/providers?view=quota',
       },
+      {
+        source: '/api/settlements',
+        destination: '/api/performance?view=settlements',
+      },
+      {
+        source: '/api/performance/bookmakers',
+        destination: '/api/performance?view=bookmakers',
+      },
+      {
+        source: '/api/performance/calibration',
+        destination: '/api/performance?view=calibration',
+      },
+      {
+        source: '/api/performance/timeseries',
+        destination: '/api/performance?view=timeseries',
+      },
     ];
   },
   async headers() {

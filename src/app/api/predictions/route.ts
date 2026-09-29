@@ -1,15 +1,17 @@
-import { NextResponse } from 'next/server';
+﻿import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase.server';
 import { getUserEntitlements } from '@/lib/pricing/entitlement';
 import { isRateLimited } from '@/lib/pricing/rate-limit';
 import { getUserDailyReveals, hashString } from '@/lib/pricing/access-logs';
 import { getCohortTag } from '@/lib/crons/cohortTag';
 import { ApiHelper } from '@/lib/utils/apiHelper';
+import { CanonicalBetLedgerService } from '@/lib/ledger/canonicalBetLedger';
 import { z } from 'zod';
 
 const predictionsQuerySchema = z.object({
   limit: z.preprocess((val) => val ? parseInt(val as string, 10) : undefined, z.number().min(1).max(100)).default(60),
   page: z.preprocess((val) => val ? parseInt(val as string, 10) : undefined, z.number().min(1).max(1000)).default(1),
+  source: z.string().optional(),
 });
 
 export async function GET(request: Request) {
@@ -28,8 +30,21 @@ export async function GET(request: Request) {
       );
     }
 
-    const { limit, page } = validated.data;
+    const { limit, page, source } = validated.data;
     const offset = (page - 1) * limit;
+
+    if (source === 'canonical') {
+      const all = CanonicalBetLedgerService.getAllPredictions();
+      const paginated = all.slice(offset, offset + limit);
+      return NextResponse.json({
+        success: true,
+        source: 'canonical',
+        total: all.length,
+        page,
+        limit,
+        predictions: paginated,
+      });
+    }
 
     const authHeader = request.headers.get('authorization');
     const token = authHeader?.split(' ')[1];

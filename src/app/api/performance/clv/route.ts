@@ -1,9 +1,23 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '../../../../lib/supabase.server';
 import { LEAGUE_REGISTRY } from '../../../../lib/crons/leagueRegistry';
+import { CanonicalPerformanceEngine } from '@/lib/ledger/canonicalPerformanceEngine';
 
 export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+    if (searchParams.get('source') === 'canonical') {
+      const report = CanonicalPerformanceEngine.generateReport();
+      return NextResponse.json({
+        success: true,
+        source: 'canonical',
+        averageClvPct: report.averageClvPct,
+        positiveClvRatePct: report.positiveClvRatePct,
+        totalClvAvailable: report.totalClvAvailable,
+        clvProfitMatrix: report.clvProfitMatrix,
+      });
+    }
+
     const { data: signals, error } = await supabase
       .from('signals')
       .select('*')
