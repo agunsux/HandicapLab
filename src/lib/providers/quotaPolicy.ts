@@ -16,7 +16,7 @@
 // Every enforcement point (gateway, native client, request counter, scheduler)
 // must route through this module.
 
-export type Provider = 'apifootball' | 'oddspapi' | 'thestatsapi';
+export type Provider = 'apifootball' | 'oddspapi' | 'thestatsapi' | 'dribble360';
 export type QuotaPeriodType = 'DAILY' | 'MONTHLY';
 
 /**
@@ -80,6 +80,7 @@ export const UNMETERED_ENDPOINTS: Record<Provider, readonly string[]> = {
   apifootball: [],
   oddspapi: ['historical-odds', 'account'],
   thestatsapi: [],
+  dribble360: [],
 };
 
 export function isUnmeteredEndpoint(provider: Provider, endpoint: string): boolean {
@@ -129,6 +130,12 @@ const DEFAULT_POLICIES: Record<Provider, Omit<ProviderQuotaPolicy, 'provider'>> 
     softLimit: 800,
     economyAtPctOfSoft: 80,
   },
+  dribble360: {
+    period: 'DAILY',
+    hardLimit: 5000,
+    softLimit: 4500,
+    economyAtPctOfSoft: 80,
+  },
 };
 
 const ENV_KEYS: Record<Provider, { hard: string[]; soft: string[] }> = {
@@ -143,6 +150,10 @@ const ENV_KEYS: Record<Provider, { hard: string[]; soft: string[] }> = {
   thestatsapi: {
     hard: ['THESTATSAPI_DAILY_HARD_LIMIT', 'QUOTA_THESTATSAPI_DAILY'],
     soft: ['THESTATSAPI_DAILY_SOFT_LIMIT'],
+  },
+  dribble360: {
+    hard: ['DRIBBLE360_DAILY_HARD_LIMIT', 'QUOTA_DRIBBLE360_DAILY'],
+    soft: ['DRIBBLE360_DAILY_SOFT_LIMIT'],
   },
 };
 

@@ -116,6 +116,13 @@ function getProviderRuntimeLimit(provider: Provider): ProviderRuntimeLimit {
       maxConcurrency: envInt('ODDSPAPI_MAX_CONCURRENCY', 3),
     };
   }
+  if (provider === 'dribble360') {
+    return {
+      maxRequests: envInt('DRIBBLE360_RATE_LIMIT_PER_MIN', 30),
+      windowMs: MINUTE,
+      maxConcurrency: envInt('DRIBBLE360_MAX_CONCURRENCY', 3),
+    };
+  }
   return {
     maxRequests: envInt('THESTATSAPI_RATE_LIMIT_PER_MIN', 60),
     windowMs: MINUTE,

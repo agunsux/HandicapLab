@@ -48,6 +48,15 @@ export const API_COST_REGISTRY: EndpointCost[] = [
   { provider: 'thestatsapi', endpoint: 'fixtures', cost: 1 },
   { provider: 'thestatsapi', endpoint: 'standings', cost: 1 },
   { provider: 'thestatsapi', endpoint: 'health', cost: 1 },
+  // Dribble360 — TRIAL_VALIDATION endpoints (discovered Stage A)
+  { provider: 'dribble360', endpoint: 'matches', cost: 1 },
+  { provider: 'dribble360', endpoint: 'teams', cost: 1 },
+  { provider: 'dribble360', endpoint: 'team_matches', cost: 1 },
+  { provider: 'dribble360', endpoint: 'player_matches', cost: 1 },
+  { provider: 'dribble360', endpoint: 'players', cost: 1 },
+  { provider: 'dribble360', endpoint: 'managers', cost: 1 },
+  { provider: 'dribble360', endpoint: 'referees', cost: 1 },
+  { provider: 'dribble360', endpoint: 'transfers', cost: 1 },
 ];
 
 function getCost(provider: Provider, endpoint: string): number {

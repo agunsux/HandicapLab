@@ -122,3 +122,8 @@ data/lakehouse/
 
 # Stray shell redirect artifact (captured CLI deprecation notice)
 0.26.0
+
+# Dribble360 Research and Harvest Data (NEVER commit raw provider captures)
+data/research/dribble360/
+data/cache/dribble_team_matches_cache.json
+
