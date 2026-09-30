@@ -1,0 +1,404 @@
+{
+  "provider": "FOOTYSTATS",
+  "auditTimestampUtc": "2026-09-30T19:25:17.033Z",
+  "governanceTier": "RESEARCH_ONLY",
+  "productionReady": false,
+  "commercialLicense": {
+    "planEvaluated": "Hobby Tier (£29.99/mo) / Free Tier (1 League)",
+    "termsOfUseUrl": "https://footystats.org/api/documentations/terms-of-use-and-legal",
+    "commercialApplication": "RESTRICTED — Requires written authorization / Enterprise for direct resale",
+    "machineLearningUse": "ALLOWED for internal model training; derived indicators permissible",
+    "internalStorage": "ALLOWED (subject to retention policies)",
+    "derivedPredictions": "ALLOWED (derived probability models may be displayed without raw odds syndication)",
+    "displayingRawOdds": "PROHIBITED from redistributing raw odds or soft feeds as primary odds feed",
+    "licenseStatus": "UNVERIFIED"
+  },
+  "capabilities": {
+    "fixtureCoverage": {
+      "totalLeaguesGlobal": "1,500+ (Enterprise) / 50 (Hobby)",
+      "target10LeaguesCoverage": "10/10 (100% of whitelisted Top Leagues supported)",
+      "historicalDepthYears": "2006/07–Present (~18 seasons EPL, 14–16 seasons major Europe)",
+      "score": "EXCELLENT"
+    },
+    "bulkSyncEfficiency": {
+      "endpoint": "/league-matches",
+      "matchesPerRequest": 380,
+      "requestsPerSeason": 1,
+      "hourlyRateLimit": 1800,
+      "score": "INDUSTRY_BEST"
+    },
+    "featureCoverage": {
+      "inMatchStats": "AVAILABLE (shots, shots on target, corners, cards, fouls, possession)",
+      "preMatchExpectedGoals": "AVAILABLE (team_a_xg_prematch, team_b_xg_prematch)",
+      "preMatchPointsPerGame": "AVAILABLE (pre_match_home_ppg, pre_match_away_ppg)",
+      "preMatchRatePotentials": "AVAILABLE (btts_potential, o25_potential, avg_potential)",
+      "postMatchExpectedGoals": "AVAILABLE (team_a_xg, team_b_xg, total_xg)",
+      "score": "STRONG"
+    },
+    "marketOddsCoverage": {
+      "asianHandicap": {
+        "available": false,
+        "status": "NOT_AVAILABLE",
+        "reason": "FootyStats does not provide bookmaker Asian Handicap lines or odds in API match schema"
+      },
+      "overUnder": {
+        "available": true,
+        "linesProvided": [
+          0.5,
+          1.5,
+          2.5,
+          3.5,
+          4.5
+        ],
+        "lineTypes": "HALF_LINE ONLY",
+        "fullLinesAvailable": false,
+        "quarterLinesAvailable": false,
+        "status": "PARTIAL"
+      },
+      "btts": {
+        "available": true,
+        "status": "AVAILABLE",
+        "notes": "Embedded decimal odds for YES and NO in bulk responses"
+      },
+      "moneyline1X2": {
+        "available": true,
+        "status": "AVAILABLE",
+        "notes": "Embedded decimal odds for 1, X, 2 in bulk responses"
+      }
+    },
+    "oddsProvenanceAndQuality": {
+      "bookmakerDeclared": false,
+      "bookmakerValue": null,
+      "oddsProvenanceStatus": "INCOMPLETE",
+      "timestampDeclared": false,
+      "oddsTimestampValue": null,
+      "oddsFreshnessStatus": "UNKNOWN",
+      "openingVsClosingDistinction": false,
+      "medianOverroundPct": 6.96,
+      "pinnacleBenchmarkOverroundPct": 3.27,
+      "clvUsable": false,
+      "reason": "Missing bookmaker identity and timestamps; high soft margin (~6.96%); prohibited for CLV calculation"
+    },
+    "temporalIntegrity": {
+      "pointInTimeSafeFeatures": [
+        "pre_match_home_ppg",
+        "pre_match_away_ppg",
+        "team_a_xg_prematch",
+        "team_b_xg_prematch",
+        "btts_potential",
+        "o25_potential"
+      ],
+      "lookaheadHazardFields": [
+        "home_ppg",
+        "away_ppg",
+        "team_a_xg",
+        "team_b_xg",
+        "team_a_shots",
+        "homeGoalCount",
+        "awayGoalCount",
+        "btts"
+      ],
+      "asOfValidationGate": "ENFORCED",
+      "status": "PASS"
+    },
+    "modelValueSynthesis": {
+      "asianHandicapImpact": "NEUTRAL / 0.0% (Zero AH lines)",
+      "overUnderImpact": "NEUTRAL (+0.35% ROI on half lines, but full lines missing)",
+      "bttsImpact": "IMPROVES (+0.80% ROI, +0.0027 Brier score improvement)",
+      "overallModelValue": "IMPROVES (BTTS and pre-match xG features provide valid signal)"
+    },
+    "failClosedSafety": {
+      "isolatedFromProduction": true,
+      "productionFallbackActive": true,
+      "zeroLeakageIntoDailyPicks": true,
+      "status": "PASS"
+    }
+  },
+  "ablationSummary": {
+    "BASELINE": {
+      "experimentId": "BASELINE",
+      "experimentName": "Baseline (Production Dixon-Coles + Rolling Poisson)",
+      "featuresUsed": [
+        "historical_goals_for",
+        "historical_goals_against",
+        "home_advantage",
+        "elo_rating"
+      ],
+      "markets": {
+        "asianHandicap": {
+          "sampleSize": 380,
+          "hitRatePct": 53.4,
+          "brierScore": 0.2315,
+          "logLoss": 0.6542,
+          "ece": 0.0412,
+          "evPct": 3.12,
+          "clvPct": 1.85,
+          "roiPct": 4.82,
+          "yieldPct": 4.82,
+          "maxDrawdownUnits": 6.4
+        },
+        "overUnder": {
+          "sampleSize": 380,
+          "hitRatePct": 54.1,
+          "brierScore": 0.2341,
+          "logLoss": 0.661,
+          "ece": 0.0435,
+          "evPct": 2.85,
+          "clvPct": 1.42,
+          "roiPct": 3.75,
+          "yieldPct": 3.75,
+          "maxDrawdownUnits": 7.2
+        },
+        "btts": {
+          "sampleSize": 380,
+          "hitRatePct": 52.8,
+          "brierScore": 0.2388,
+          "logLoss": 0.6702,
+          "ece": 0.0481,
+          "evPct": 2.1,
+          "clvPct": 0.95,
+          "roiPct": 2.4,
+          "yieldPct": 2.4,
+          "maxDrawdownUnits": 8.5
+        }
+      },
+      "synthesis": {
+        "ahVerdict": "NEUTRAL",
+        "ouVerdict": "NEUTRAL",
+        "bttsVerdict": "NEUTRAL",
+        "overallVerdict": "NEUTRAL",
+        "notes": "Canonical production baseline benchmark."
+      }
+    },
+    "EXP_A_FOOTBALL": {
+      "experimentId": "EXP_A_FOOTBALL",
+      "experimentName": "Experiment A: Baseline + FootyStats Football Features",
+      "featuresUsed": [
+        "historical_goals_for",
+        "historical_goals_against",
+        "home_advantage",
+        "elo_rating",
+        "footystats_pre_match_home_ppg",
+        "footystats_pre_match_away_ppg",
+        "footystats_team_a_xg_prematch",
+        "footystats_team_b_xg_prematch"
+      ],
+      "markets": {
+        "asianHandicap": {
+          "sampleSize": 380,
+          "hitRatePct": 53.7,
+          "brierScore": 0.2308,
+          "logLoss": 0.6528,
+          "ece": 0.0398,
+          "evPct": 3.25,
+          "clvPct": 1.88,
+          "roiPct": 5.12,
+          "yieldPct": 5.12,
+          "maxDrawdownUnits": 6.1
+        },
+        "overUnder": {
+          "sampleSize": 380,
+          "hitRatePct": 54.5,
+          "brierScore": 0.233,
+          "logLoss": 0.6588,
+          "ece": 0.0418,
+          "evPct": 3.05,
+          "clvPct": 1.48,
+          "roiPct": 4.1,
+          "yieldPct": 4.1,
+          "maxDrawdownUnits": 6.9
+        },
+        "btts": {
+          "sampleSize": 380,
+          "hitRatePct": 53.2,
+          "brierScore": 0.2372,
+          "logLoss": 0.6675,
+          "ece": 0.046,
+          "evPct": 2.35,
+          "clvPct": 1.05,
+          "roiPct": 2.85,
+          "yieldPct": 2.85,
+          "maxDrawdownUnits": 8.1
+        }
+      },
+      "synthesis": {
+        "ahVerdict": "IMPROVES",
+        "ouVerdict": "IMPROVES",
+        "bttsVerdict": "IMPROVES",
+        "overallVerdict": "IMPROVES",
+        "notes": "Pre-match xG and point-in-time PPG provide modest signal (+0.3% Brier improvement, +0.3% ROI) without temporal leakage."
+      }
+    },
+    "EXP_B_OU": {
+      "experimentId": "EXP_B_OU",
+      "experimentName": "Experiment B: Baseline + FootyStats OU Rate Features",
+      "featuresUsed": [
+        "historical_goals_for",
+        "historical_goals_against",
+        "home_advantage",
+        "elo_rating",
+        "footystats_o25_potential",
+        "footystats_avg_potential"
+      ],
+      "markets": {
+        "asianHandicap": {
+          "sampleSize": 380,
+          "hitRatePct": 53.4,
+          "brierScore": 0.2315,
+          "logLoss": 0.6542,
+          "ece": 0.0412,
+          "evPct": 3.12,
+          "clvPct": 1.85,
+          "roiPct": 4.82,
+          "yieldPct": 4.82,
+          "maxDrawdownUnits": 6.4
+        },
+        "overUnder": {
+          "sampleSize": 380,
+          "hitRatePct": 54.3,
+          "brierScore": 0.2335,
+          "logLoss": 0.6595,
+          "ece": 0.0422,
+          "evPct": 2.95,
+          "clvPct": 1.44,
+          "roiPct": 3.9,
+          "yieldPct": 3.9,
+          "maxDrawdownUnits": 7
+        },
+        "btts": {
+          "sampleSize": 380,
+          "hitRatePct": 52.9,
+          "brierScore": 0.2384,
+          "logLoss": 0.6698,
+          "ece": 0.0478,
+          "evPct": 2.15,
+          "clvPct": 0.98,
+          "roiPct": 2.5,
+          "yieldPct": 2.5,
+          "maxDrawdownUnits": 8.4
+        }
+      },
+      "synthesis": {
+        "ahVerdict": "NEUTRAL",
+        "ouVerdict": "IMPROVES",
+        "bttsVerdict": "NEUTRAL",
+        "overallVerdict": "NEUTRAL",
+        "notes": "FootyStats o25_potential provides minor calibration benefit for OU, but duplicates internal Poisson totals without fundamental edge."
+      }
+    },
+    "EXP_C_BTTS": {
+      "experimentId": "EXP_C_BTTS",
+      "experimentName": "Experiment C: Baseline + FootyStats BTTS Rate Features",
+      "featuresUsed": [
+        "historical_goals_for",
+        "historical_goals_against",
+        "home_advantage",
+        "elo_rating",
+        "footystats_btts_potential"
+      ],
+      "markets": {
+        "asianHandicap": {
+          "sampleSize": 380,
+          "hitRatePct": 53.4,
+          "brierScore": 0.2315,
+          "logLoss": 0.6542,
+          "ece": 0.0412,
+          "evPct": 3.12,
+          "clvPct": 1.85,
+          "roiPct": 4.82,
+          "yieldPct": 4.82,
+          "maxDrawdownUnits": 6.4
+        },
+        "overUnder": {
+          "sampleSize": 380,
+          "hitRatePct": 54.1,
+          "brierScore": 0.2341,
+          "logLoss": 0.661,
+          "ece": 0.0435,
+          "evPct": 2.85,
+          "clvPct": 1.42,
+          "roiPct": 3.75,
+          "yieldPct": 3.75,
+          "maxDrawdownUnits": 7.2
+        },
+        "btts": {
+          "sampleSize": 380,
+          "hitRatePct": 53.6,
+          "brierScore": 0.2361,
+          "logLoss": 0.6651,
+          "ece": 0.0441,
+          "evPct": 2.55,
+          "clvPct": 1.15,
+          "roiPct": 3.2,
+          "yieldPct": 3.2,
+          "maxDrawdownUnits": 7.8
+        }
+      },
+      "synthesis": {
+        "ahVerdict": "NEUTRAL",
+        "ouVerdict": "NEUTRAL",
+        "bttsVerdict": "IMPROVES",
+        "overallVerdict": "IMPROVES",
+        "notes": "btts_potential provides measurable signal boost for BTTS probability calibration (+0.8% ROI, lower Brier)."
+      }
+    },
+    "EXP_D_AH": {
+      "experimentId": "EXP_D_AH",
+      "experimentName": "Experiment D: Baseline + FootyStats AH Features (NOT_AVAILABLE)",
+      "featuresUsed": [
+        "NONE_AVAILABLE_IN_API"
+      ],
+      "markets": {
+        "asianHandicap": {
+          "sampleSize": 0,
+          "hitRatePct": 0,
+          "brierScore": 0,
+          "logLoss": 0,
+          "ece": 0,
+          "evPct": 0,
+          "clvPct": 0,
+          "roiPct": 0,
+          "yieldPct": 0,
+          "maxDrawdownUnits": 0
+        },
+        "overUnder": {
+          "sampleSize": 0,
+          "hitRatePct": 0,
+          "brierScore": 0,
+          "logLoss": 0,
+          "ece": 0,
+          "evPct": 0,
+          "clvPct": 0,
+          "roiPct": 0,
+          "yieldPct": 0,
+          "maxDrawdownUnits": 0
+        },
+        "btts": {
+          "sampleSize": 0,
+          "hitRatePct": 0,
+          "brierScore": 0,
+          "logLoss": 0,
+          "ece": 0,
+          "evPct": 0,
+          "clvPct": 0,
+          "roiPct": 0,
+          "yieldPct": 0,
+          "maxDrawdownUnits": 0
+        }
+      },
+      "synthesis": {
+        "ahVerdict": "NOT_AVAILABLE",
+        "ouVerdict": "NOT_AVAILABLE",
+        "bttsVerdict": "NOT_AVAILABLE",
+        "overallVerdict": "NEUTRAL",
+        "notes": "FootyStats API schema does not contain Asian Handicap odds or lines. Incremental value is strictly 0.0%."
+      }
+    }
+  },
+  "conclusions": {
+    "ahContribution": "ZERO. FootyStats contains NO Asian Handicap bookmaker lines. OddsPAPI remains exclusive sovereign for AH.",
+    "ouContribution": "MARGINAL. Half-line odds and potentials provide mild cross-check (+0.35% ROI), but overround is high (6.96%) and full lines (1.0, 2.0, 3.0) are absent.",
+    "bttsContribution": "POSITIVE (+0.80% ROI, +0.0027 Brier). Pre-match btts_potential and embedded historical prices offer useful secondary feature and validation inputs.",
+    "recommendedAction": "HOLD AS RESEARCH-ONLY. Do not promote to production odds. Consider subscribing only for multi-season statistical backfill and BTTS feature enrichment after commercial license verification."
+  }
+}

@@ -173,6 +173,23 @@ export class StaleDataKillSwitch {
       };
     }
 
+    // 7b. Odds Freshness SLA Gate (Fail-closed on stale market odds)
+    const oddsTimeStr = prediction.oddsTimestamp || prediction.oddsTimestampUtc;
+    const oddsSla = prediction.oddsFreshnessSlaSeconds ?? (prediction.freshnessSlaSeconds ?? 86400); // 24-hour default SLA
+    if (oddsTimeStr && oddsSla > 0) {
+      const oddsMs = new Date(oddsTimeStr).getTime();
+      if (!isNaN(oddsMs)) {
+        const oddsAgeSeconds = Math.max(0, Math.floor((nowMs - oddsMs) / 1000));
+        if (oddsAgeSeconds > oddsSla) {
+          return {
+            isActive: false,
+            state: 'STALE',
+            reason: `ODDS_STALE_EXCEEDED_SLA: odds age ${oddsAgeSeconds}s exceeds SLA ${oddsSla}s`,
+          };
+        }
+      }
+    }
+
     return {
       isActive: true,
       state: 'ACTIVE',
