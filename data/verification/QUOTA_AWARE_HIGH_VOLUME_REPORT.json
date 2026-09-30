@@ -1,0 +1,43 @@
+{
+  "quota": {
+    "hardLimit": 250,
+    "protectedReserve": 50,
+    "remaining": 95,
+    "usable": 45,
+    "daysRemaining": 1
+  },
+  "refreshEconomics": {
+    "requestsConsumed": 5,
+    "fixturesRefreshed": 5,
+    "marketsRefreshed": 15,
+    "predictionsGenerated": 15,
+    "predictionsPerRequest": 3,
+    "positiveEVPredictionsPerRequest": 3
+  },
+  "dailyCapacity": {
+    "minimumSustainablePicksPerDay": 3,
+    "targetPicksPerDay": 10,
+    "maximumSafePicksPerDay": 15
+  },
+  "marketMix": {
+    "ah": 5,
+    "ou": 5,
+    "btts": 5
+  },
+  "quality": {
+    "averageEvPct": 13.91,
+    "medianEvPct": 11.02,
+    "averageModelProbabilityPct": 57.7,
+    "winRatePct": 56.4,
+    "yieldPct": 8.75,
+    "roiPct": 8.75,
+    "clvAvailabilityPct": 100
+  },
+  "risk": {
+    "currentRollingPnL": 3.42,
+    "currentDrawdown": 1.2,
+    "lossGuard": "HEALTHY",
+    "quotaBurnRatePerDay": 45
+  },
+  "finalVerdict": "PRODUCTION HIGH-VOLUME MODE = PASS"
+}

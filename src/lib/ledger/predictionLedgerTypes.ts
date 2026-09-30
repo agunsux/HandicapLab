@@ -134,6 +134,16 @@ export interface CanonicalPredictionRecord {
   ev?: number;
   createdAt: string;
   updatedAt: string;
+
+  // Quota & Provenance metadata
+  qualificationTier?: 'TIER_A' | 'TIER_B' | 'TIER_C' | 'TIER_D';
+  quotaRequestId?: string;
+  quotaCost?: number;
+  sourceFeatures?: Record<string, any>;
+  kickoffUtc?: string;
+  predictionTimestampUtc?: string;
+  oddsTimestampUtc?: string;
+  oddsProvider?: string;
 }
 
 export interface BankrollCurvePoint {
