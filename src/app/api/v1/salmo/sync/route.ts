@@ -1,20 +1,21 @@
 // ============================================================================
-// CANONICAL SALMO SYNCHRONIZATION & INCREMENTAL CHANGE FEED API
+// CANONICAL SALMO SYNCHRONIZATION & REALTIME DATA SYNC ROUTE
 // ============================================================================
 // Location: src/app/api/v1/salmo/sync/route.ts
 //
-// Invariants enforced:
-// 1. Authoritative canonical contract: SALMO is strictly a consumer/presentation layer.
-// 2. Incremental sync support via 'since' parameter (returns updated_at > since).
-// 3. Dynamic Daily Picks projection (Today, Tomorrow, 7 Days) rolls with calendar.
-// 4. Zero synthetic/mock data. Fail-closed on missing inputs.
+// Invariants enforced (Section A, C, M):
+// 1. Authoritative canonical contract: HandicapLab is canonical source of truth;
+//    SALMO is strictly consumer/presentation UI.
+// 2. Stale Data Kill Switch: Daily picks strictly gated so kicked-off matches
+//    (kickoffUtc <= nowUtc) NEVER appear in active Daily Picks feed.
+// 3. Data states: 'REAL' | 'NO_QUALIFIED_PICKS' | 'DATA_TEMPORARILY_UNAVAILABLE'.
+//    If canonical source is unavailable, displays DATA_TEMPORARILY_UNAVAILABLE
+//    instead of serving stale historical fixtures or fallback mock data.
+// 4. Returns canonical dailyPicks, settledHistory, performance, and freshness.
 // ============================================================================
 
 import { NextRequest, NextResponse } from 'next/server';
-import crypto from 'crypto';
-import { PredictionArchiveService } from '@/lib/archive/predictionArchiveService';
-import { DailyPerformanceService } from '@/lib/ledger/dailyPerformanceService';
-import { SalmoSyncResponse } from '@/lib/archive/types';
+import { SalmoProductionSyncService } from '@/lib/salmo/salmoProductionSyncService';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -23,73 +24,28 @@ export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
     const sinceParam = searchParams.get('since') || undefined;
-    const view = searchParams.get('view') || 'all'; // 'all' | 'daily_picks' | 'history' | 'performance'
-    const horizonParam = (searchParams.get('horizon')?.toUpperCase() || 'ALL') as 'TODAY' | 'TOMORROW' | 'NEXT_7_DAYS' | 'ALL';
+    const viewParam = (searchParams.get('view') || 'all') as any;
+    const horizonParam = (searchParams.get('horizon')?.toUpperCase() || 'ALL') as any;
     const marketParam = searchParams.get('market')?.toUpperCase() as any;
 
     const nowMs = Date.now();
-    const nowIso = new Date(nowMs).toISOString();
 
-    // 1. Load dynamic daily picks projection
-    const dailyPicks = PredictionArchiveService.getDailyPicksProjection({
+    const payload = SalmoProductionSyncService.generateSyncPayload({
       nowMs,
-      horizon: horizonParam === 'ALL' ? undefined : horizonParam,
-      market: ['AH', 'OU', 'ML', 'BTTS'].includes(marketParam) ? marketParam : undefined,
+      since: sinceParam,
+      view: viewParam,
+      horizon: horizonParam,
+      market: ['AH', 'OU', 'BTTS'].includes(marketParam) ? marketParam : undefined,
     });
 
-    // 2. Load incremental archive records
-    let predictions = PredictionArchiveService.getIncrementalUpdates(sinceParam);
-    if (marketParam && ['AH', 'OU', 'ML', 'BTTS'].includes(marketParam)) {
-      predictions = predictions.filter((p) => p.market === marketParam);
-    }
+    const httpStatus = payload.dataState === 'DATA_TEMPORARILY_UNAVAILABLE' ? 503 : 200;
 
-    // 3. Load comprehensive performance report
-    const performance = DailyPerformanceService.getArchivePerformanceReport({ nowMs });
-
-    // 4. Compute Counts & State
-    const allArchived = Object.values(PredictionArchiveService.loadArchive());
-    const totalArchived = allArchived.length;
-    const settledCount = allArchived.filter((p) => p.status === 'SETTLED' || p.status === 'VOID').length;
-    const pendingCount = allArchived.filter((p) => p.status === 'ACTIVE' || p.status === 'GENERATED' || p.status === 'KICKED_OFF').length;
-
-    let dataState: 'REAL' | 'CACHED' | 'NO_FIXTURES' | 'NO_QUALIFIED_PICKS' | 'DATA_UNAVAILABLE' = 'REAL';
-    if (totalArchived === 0) {
-      dataState = 'NO_FIXTURES';
-    } else if (dailyPicks.length === 0 && pendingCount === 0) {
-      dataState = 'NO_QUALIFIED_PICKS';
-    }
-
-    // 5. Generate deterministic sync checksum
-    const checksumPayload = JSON.stringify({
-      totalArchived,
-      settledCount,
-      dailyPicksCount: dailyPicks.length,
-      latestUpdated: predictions[0]?.updatedAt || nowIso,
-    });
-    const syncChecksum = crypto.createHash('sha256').update(checksumPayload).digest('hex');
-
-    const responsePayload: SalmoSyncResponse = {
-      success: true,
-      timestampUtc: nowIso,
-      syncChecksum,
-      dataState,
-      counts: {
-        totalArchived,
-        dailyPicks: dailyPicks.length,
-        settled: settledCount,
-        pending: pendingCount,
-      },
-      dailyPicks: (view === 'all' || view === 'daily_picks') ? dailyPicks : [],
-      predictions: (view === 'all' || view === 'history') ? predictions : [],
-      performance: (view === 'all' || view === 'performance') ? performance : ({} as any),
-    };
-
-    return NextResponse.json(responsePayload, {
-      status: 200,
+    return NextResponse.json(payload, {
+      status: httpStatus,
       headers: {
         'Cache-Control': 'no-store, no-cache, must-revalidate',
-        'X-HandicapLab-Sync-Checksum': syncChecksum,
-        'X-Data-State': dataState,
+        'X-HandicapLab-Sync-Checksum': payload.syncChecksum,
+        'X-Data-State': payload.dataState,
       },
     });
   } catch (err: any) {
@@ -100,10 +56,21 @@ export async function GET(request: NextRequest) {
         timestampUtc: new Date().toISOString(),
         error: 'INTERNAL_SYNC_ERROR',
         message: err.message || 'Failed to generate canonical SALMO sync payload.',
-        dataState: 'DATA_UNAVAILABLE',
+        dataState: 'DATA_TEMPORARILY_UNAVAILABLE',
+        counts: { totalArchived: 0, dailyPicks: 0, settled: 0, pending: 0 },
+        dailyPicks: [],
+        settledHistory: [],
+        performance: {},
+        freshness: {
+          fixtureFreshnessSlaSeconds: 3600,
+          oddsFreshnessSlaSeconds: 3600,
+          lastSyncTimestampUtc: new Date().toISOString(),
+          upcomingFixturesCount: 0,
+          activeDailyPicksCount: 0,
+          status: 'STALE',
+        },
       },
-      { status: 500 }
+      { status: 503 }
     );
   }
 }
-

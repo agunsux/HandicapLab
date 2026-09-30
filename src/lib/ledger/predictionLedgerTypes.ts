@@ -21,7 +21,7 @@ export type PredictionConfidence = 'HIGH' | 'MEDIUM' | 'LOW' | 'PASS';
 
 export type ValueStatus = 'VALUE' | 'NO_VALUE' | 'DATA_UNAVAILABLE' | 'QUALIFIED' | 'RESEARCH_ONLY';
 
-export type PredictionStatus = 'PENDING' | 'SETTLED' | 'VOID' | 'CANCELLED';
+export type PredictionStatus = 'PENDING' | 'SETTLED' | 'VOID' | 'CANCELLED' | 'REJECTED';
 
 export type SettlementOutcome =
   | 'WIN'

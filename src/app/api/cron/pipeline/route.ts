@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
   const hour = new Date().getUTCHours();
   const windowLabel = WINDOW_LABELS[hour] ?? `hour_${hour}`;
 
-  const isMutationMode = ['full', 'daily', 'reconcile', 'publishing-reconcile', 'settle', 'settle-predictions', 'sync', 'salmo-sync'].includes(mode);
+  const isMutationMode = ['full', 'daily', 'reconcile', 'publishing-reconcile', 'settle', 'settle-predictions', 'auto-settle', 'canonical-settle', 'sync', 'salmo-sync'].includes(mode);
   let leaseId: string | undefined;
 
   if (isMutationMode) {
@@ -116,6 +116,25 @@ export async function GET(request: NextRequest) {
           success: false,
           error: error.message || 'Unknown settlement error',
         },
+        { status: 500 }
+      );
+    }
+  }
+
+  // 2b. Canonical Automatic Settlement mode
+  if (mode === 'auto-settle' || mode === 'canonical-settle') {
+    const { AutomaticSettlementJob } = await import('@/lib/ledger/automaticSettlementJob');
+    try {
+      const result = await AutomaticSettlementJob.execute();
+      return NextResponse.json({
+        success: true,
+        timestampUtc: new Date().toISOString(),
+        result,
+      });
+    } catch (error: any) {
+      console.error('[Pipeline Cron - AutoSettle] Error:', error);
+      return NextResponse.json(
+        { success: false, error: error.message || 'Auto-settle execution failed' },
         { status: 500 }
       );
     }

@@ -3,14 +3,26 @@
 // ============================================================================
 // Location: src/app/api/health/pipeline/route.ts
 //
-// Invariants enforced (Epic Section 30 & 31):
+// Invariants enforced (Section N & Epic Section 30 & 31):
 // 1. Returns machine-readable health metrics across all stages:
 //    - last_run, last_success, next_run
 //    - API-Football status & remaining quota
 //    - OddsPAPI status & remaining quota
 //    - Fixture ingestion, odds ingestion, prediction generation, settlement, Salmo sync
-// 2. Stale Detection: If no successful run in 26 hours, returns HTTP 503 (STALE).
-// 3. Fail-Closed: Never displays stale predictions or failing systems as healthy.
+// 2. Canonical Telemetry & Monitoring:
+//    - handicaplab_fixtures_total
+//    - handicaplab_fixtures_upcoming
+//    - handicaplab_fixtures_stale
+//    - handicaplab_predictions_total
+//    - handicaplab_predictions_active
+//    - handicaplab_predictions_settled
+//    - handicaplab_predictions_pending_settlement
+//    - handicaplab_odds_freshness_seconds
+//    - handicaplab_salmo_sync_status
+//    - handicaplab_salmo_last_sync_timestamp
+//    - handicaplab_reconciliation_issues_total
+// 3. Stale Detection: If no successful run in 26 hours, returns HTTP 503 (STALE).
+// 4. Fail-Closed: Never displays stale predictions or failing systems as healthy.
 // ============================================================================
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -20,12 +32,29 @@ import { OddsPapiQuotaAllocator } from '@/lib/providers/oddspapiQuotaAllocator';
 import { DailyPredictionLedgerService } from '@/lib/pipeline/dailyPredictionLedger';
 import { DurableLedgerStore } from '@/lib/ledger/durableLedgerStore';
 import { SalmoSyncService } from '@/lib/pipeline/salmoSyncService';
+import { PipelineFreshnessTelemetry } from '@/lib/telemetry/pipelineFreshnessTelemetry';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export async function GET(request: NextRequest) {
   try {
+    const searchParams = request.nextUrl.searchParams;
+    const format = searchParams.get('format');
+
+    const telemetry = PipelineFreshnessTelemetry.getTelemetryReport();
+
+    if (format === 'prometheus') {
+      const prometheusOutput = PipelineFreshnessTelemetry.toPrometheusMetrics(telemetry);
+      return new NextResponse(prometheusOutput, {
+        status: 200,
+        headers: {
+          'Content-Type': 'text/plain; version=0.0.4; charset=utf-8',
+          'Cache-Control': 'no-store, no-cache, must-revalidate',
+        },
+      });
+    }
+
     const healthCheck = RunIdentityService.isPipelineHealthy(26); // 26 hours tolerance
     const lastRun = RunIdentityService.getLatestRun();
     const lastSuccess = RunIdentityService.getLastSuccessfulRun();
@@ -84,15 +113,20 @@ export async function GET(request: NextRequest) {
       },
     };
 
+    const overallHealthy = healthCheck.healthy && telemetry.status !== 'CRITICAL';
+    const httpStatus = overallHealthy ? 200 : 503;
+
     const responsePayload = {
-      status: healthCheck.status,
-      healthy: healthCheck.healthy,
+      status: telemetry.status,
+      healthy: overallHealthy,
       lastRun: lastRun?.runId || null,
       lastRunTimestamp: lastRun?.startedAt || null,
       lastSuccess: lastSuccess?.runId || null,
       lastSuccessTimestamp: lastSuccess?.finishedAt || lastSuccess?.startedAt || null,
       hoursSinceLastSuccess: healthCheck.hoursSinceLastSuccess,
       nextScheduledRun: nextRun,
+      telemetry: telemetry.metrics,
+      reconciliation: telemetry.reconciliationAudit,
       providers: {
         apiFootball: {
           healthy: apifootball?.healthy ?? true,
@@ -112,20 +146,18 @@ export async function GET(request: NextRequest) {
       timestampUtc: new Date().toISOString(),
     };
 
-    const httpStatus = healthCheck.healthy ? 200 : 503;
-
     return NextResponse.json(responsePayload, {
       status: httpStatus,
       headers: {
         'Cache-Control': 'no-store, no-cache, must-revalidate',
-        'X-Pipeline-Status': healthCheck.status,
+        'X-Pipeline-Status': telemetry.status,
       },
     });
   } catch (err: any) {
     console.error('[API /api/health/pipeline] Internal error:', err);
     return NextResponse.json(
       {
-        status: 'FAILED',
+        status: 'CRITICAL',
         healthy: false,
         error: err.message || 'Pipeline health check failed',
         timestampUtc: new Date().toISOString(),
