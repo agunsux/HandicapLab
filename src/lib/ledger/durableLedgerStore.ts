@@ -22,13 +22,10 @@ import {
 import { supabase } from '@/lib/supabase.server';
 
 function getLedgerPath(): string {
-  return process.env.NODE_ENV === 'test'
-    ? path.resolve('data/test_ledger/high_confidence_ledger.json')
-    : path.resolve('data/ledger/high_confidence_ledger.json');
   if (process.env.NODE_ENV === 'test') {
     return path.resolve('data/test_ledger/high_confidence_ledger.json');
   }
-  if (process.env.VERCEL) {
+  if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
     const os = require('os');
     return path.join(os.tmpdir(), 'handicaplab_high_confidence_ledger.json');
   }
@@ -36,13 +33,10 @@ function getLedgerPath(): string {
 }
 
 function getSettlementsPath(): string {
-  return process.env.NODE_ENV === 'test'
-    ? path.resolve('data/test_ledger/settlements.json')
-    : path.resolve('data/ledger/settlements.json');
   if (process.env.NODE_ENV === 'test') {
     return path.resolve('data/test_ledger/settlements.json');
   }
-  if (process.env.VERCEL) {
+  if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
     const os = require('os');
     return path.join(os.tmpdir(), 'handicaplab_settlements.json');
   }
@@ -50,13 +44,10 @@ function getSettlementsPath(): string {
 }
 
 function getDailyPerfPath(): string {
-  return process.env.NODE_ENV === 'test'
-    ? path.resolve('data/test_ledger/daily_performance.json')
-    : path.resolve('data/ledger/daily_performance.json');
   if (process.env.NODE_ENV === 'test') {
     return path.resolve('data/test_ledger/daily_performance.json');
   }
-  if (process.env.VERCEL) {
+  if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
     const os = require('os');
     return path.join(os.tmpdir(), 'handicaplab_daily_performance.json');
   }
@@ -64,13 +55,10 @@ function getDailyPerfPath(): string {
 }
 
 function getEventsPath(): string {
-  return process.env.NODE_ENV === 'test'
-    ? path.resolve('data/test_ledger/ledger_events.jsonl')
-    : path.resolve('data/ledger/ledger_events.jsonl');
   if (process.env.NODE_ENV === 'test') {
     return path.resolve('data/test_ledger/ledger_events.jsonl');
   }
-  if (process.env.VERCEL) {
+  if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
     const os = require('os');
     return path.join(os.tmpdir(), 'handicaplab_ledger_events.jsonl');
   }

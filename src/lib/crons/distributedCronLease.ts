@@ -11,6 +11,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
+import * as os from 'os';
 import crypto from 'crypto';
 
 export interface CronLease {
@@ -28,10 +29,29 @@ export interface LeaseAcquireResult {
   existingLease?: CronLease;
 }
 
-function getLeaseDir(): string {
-  return process.env.NODE_ENV === 'test'
-    ? path.resolve('data/test_cache/cron_leases')
-    : path.resolve('data/cache/cron_leases');
+export function isServerlessEnvironment(): boolean {
+  return Boolean(
+    process.env.VERCEL ||
+    process.env.AWS_LAMBDA_FUNCTION_NAME ||
+    process.env.LAMBDA_TASK_ROOT ||
+    process.env.NETLIFY
+  );
+}
+
+export function getLeaseDir(): string {
+  const isServerless = isServerlessEnvironment();
+  if (process.env.NODE_ENV === 'test') {
+    if (process.env.FORCE_SERVERLESS_TEST === 'true' || process.env.VERCEL === '1' || process.env.VERCEL === 'true') {
+      return path.join(os.tmpdir(), 'cron_leases');
+    }
+    return path.resolve('data/test_cache/cron_leases');
+  }
+
+  if (isServerless) {
+    return path.join(os.tmpdir(), 'cron_leases');
+  }
+
+  return path.resolve('data/cache/cron_leases');
 }
 
 function getLeaseFilePath(jobName: string): string {
@@ -39,8 +59,17 @@ function getLeaseFilePath(jobName: string): string {
   return path.join(getLeaseDir(), `${sanitized}.lease.json`);
 }
 
+function getFallbackLeaseFilePath(jobName: string): string {
+  const sanitized = jobName.replace(/[^a-zA-Z0-9_-]/g, '_');
+  return path.join(os.tmpdir(), 'cron_leases', `${sanitized}.lease.json`);
+}
+
 export class DistributedCronLease {
   private static readonly DEFAULT_TTL_MS = 5 * 60 * 1000; // 5 minutes default TTL
+
+  public static getLeaseDirectory(): string {
+    return getLeaseDir();
+  }
 
   /**
    * Attempts to acquire an exclusive distributed lease for the given job.
@@ -50,10 +79,19 @@ export class DistributedCronLease {
     jobName: string,
     ttlMs: number = DistributedCronLease.DEFAULT_TTL_MS
   ): Promise<LeaseAcquireResult> {
-    const filePath = getLeaseFilePath(jobName);
-    const dir = path.dirname(filePath);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
+    let filePath = getLeaseFilePath(jobName);
+    let dir = path.dirname(filePath);
+    try {
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+    } catch {
+      // Serverless read-only filesystem fallback
+      filePath = getFallbackLeaseFilePath(jobName);
+      dir = path.dirname(filePath);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
     }
 
     const now = Date.now();
@@ -116,8 +154,10 @@ export class DistributedCronLease {
    * Releases an acquired lease if the leaseId matches.
    */
   public static async releaseLease(jobName: string, leaseId: string): Promise<boolean> {
-    const filePath = getLeaseFilePath(jobName);
-    if (!fs.existsSync(filePath)) return true;
+    const primaryPath = getLeaseFilePath(jobName);
+    const fallbackPath = getFallbackLeaseFilePath(jobName);
+    const filePath = fs.existsSync(primaryPath) ? primaryPath : fs.existsSync(fallbackPath) ? fallbackPath : null;
+    if (!filePath) return true;
 
     try {
       const raw = fs.readFileSync(filePath, 'utf8');
@@ -130,7 +170,7 @@ export class DistributedCronLease {
       return false;
     } catch {
       try {
-        if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+        if (filePath && fs.existsSync(filePath)) fs.unlinkSync(filePath);
       } catch {}
       return true;
     }

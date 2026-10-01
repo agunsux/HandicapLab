@@ -37,7 +37,11 @@ function getClient(): SupabaseClient {
   }
 }
 
-export const supabase: SupabaseClient = new Proxy({} as unknown as SupabaseClient, {
+export const supabase: SupabaseClient = new Proxy({
+  from: () => {},
+  rpc: () => {},
+  auth: {},
+} as unknown as SupabaseClient, {
   get(_target, prop: string | symbol) {
     const client = getClient();
     const value = (client as any)[prop];

@@ -412,7 +412,7 @@ export class PredictionArchiveService {
     const nowIso = new Date().toISOString();
     record.status = settlement.outcome === 'VOID' ? 'VOID' : 'SETTLED';
     record.settlement = settlement;
-    record.updatedAt = nowIso;
+    record.updatedAt = settlement.settledAt || nowIso;
 
     this.saveArchive(store);
 

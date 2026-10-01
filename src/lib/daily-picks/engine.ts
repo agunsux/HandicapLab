@@ -1174,14 +1174,24 @@ export class DailyPicksEngine {
 
       // Try reading persisted daily_picks from Supabase as fallback
       try {
+        const nowIso = new Date().toISOString();
         const { data: dbPicks } = await supabase
           .from('daily_picks')
           .select('*')
+          .gt('kickoff_utc', nowIso)
           .order('kickoff_utc', { ascending: true })
           .limit(20);
 
-        if (dbPicks && dbPicks.length > 0) {
-          const mapped: DailyPickRecord[] = dbPicks.map((p: any) => ({
+        const validPicks = (dbPicks || []).filter((p: any) => {
+          if (!p.kickoff_utc) return false;
+          const kickMs = new Date(p.kickoff_utc).getTime();
+          if (isNaN(kickMs) || kickMs <= Date.now()) return false;
+          if (p.market_odds && Number(p.market_odds) <= 1.0) return false;
+          return true;
+        });
+
+        if (validPicks.length > 0) {
+          const mapped: DailyPickRecord[] = validPicks.map((p: any) => ({
             predictionId: `db_${p.fixture_id}_${p.market_type}`,
             fixtureId: p.fixture_id,
             homeTeam: p.home_team,

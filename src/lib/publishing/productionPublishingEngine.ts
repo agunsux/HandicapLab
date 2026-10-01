@@ -40,13 +40,10 @@ import { CanonicalOrchestrator, CompetitionProfileEngine } from '@/lib/pipeline/
 import { supabase } from '@/lib/supabase.server';
 
 function getStorePath(): string {
-  return process.env.NODE_ENV === 'test'
-    ? path.resolve('data/test_cache/canonical_published_signals.json')
-    : path.resolve('data/cache/canonical_published_signals.json');
   if (process.env.NODE_ENV === 'test') {
     return path.resolve('data/test_cache/canonical_published_signals.json');
   }
-  if (process.env.VERCEL) {
+  if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
     const os = require('os');
     return path.join(os.tmpdir(), 'handicaplab_canonical_published_signals.json');
   }
@@ -57,7 +54,7 @@ function getAuditLogPath(): string {
   if (process.env.NODE_ENV === 'test') {
     return path.resolve('data/test_cache/publishing_audit_log.jsonl');
   }
-  if (process.env.VERCEL) {
+  if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
     const os = require('os');
     return path.join(os.tmpdir(), 'handicaplab_publishing_audit_log.jsonl');
   }

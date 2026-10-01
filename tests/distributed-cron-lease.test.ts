@@ -73,5 +73,65 @@ describe('DistributedCronLease Concurrency Protection', () => {
     expect(after.acquired).toBe(true);
     await DistributedCronLease.releaseLease(jobName, after.leaseId!);
   });
+
+  it('resolves lease path to writable runtime temp directory when VERCEL=true', () => {
+    const oldVercel = process.env.VERCEL;
+    try {
+      process.env.VERCEL = 'true';
+      const dir = DistributedCronLease.getLeaseDirectory();
+      const os = require('os');
+      expect(dir).toBe(path.join(os.tmpdir(), 'cron_leases'));
+    } finally {
+      if (oldVercel !== undefined) {
+        process.env.VERCEL = oldVercel;
+      } else {
+        delete process.env.VERCEL;
+      }
+    }
+  });
+
+  it('resolves lease path to local cache directory when VERCEL is unset', () => {
+    const oldVercel = process.env.VERCEL;
+    const oldLambda = process.env.AWS_LAMBDA_FUNCTION_NAME;
+    try {
+      delete process.env.VERCEL;
+      delete process.env.AWS_LAMBDA_FUNCTION_NAME;
+      const dir = DistributedCronLease.getLeaseDirectory();
+      expect(dir).toBe(path.resolve('data/test_cache/cron_leases'));
+    } finally {
+      if (oldVercel !== undefined) process.env.VERCEL = oldVercel;
+      if (oldLambda !== undefined) process.env.AWS_LAMBDA_FUNCTION_NAME = oldLambda;
+    }
+  });
+
+  it('acquires and releases lease seamlessly in simulated serverless mode', async () => {
+    const oldVercel = process.env.VERCEL;
+    try {
+      process.env.VERCEL = '1';
+      const sJob = 'test_serverless_lease_job';
+      const res = await DistributedCronLease.acquireLease(sJob, 60000);
+      expect(res.acquired).toBe(true);
+      expect(res.leaseId).toBeDefined();
+
+      // Concurrent acquisition must be rejected
+      const concurrent = await DistributedCronLease.acquireLease(sJob, 60000);
+      expect(concurrent.acquired).toBe(false);
+
+      // Release
+      const released = await DistributedCronLease.releaseLease(sJob, res.leaseId!);
+      expect(released).toBe(true);
+
+      // Can acquire again
+      const after = await DistributedCronLease.acquireLease(sJob, 60000);
+      expect(after.acquired).toBe(true);
+      await DistributedCronLease.releaseLease(sJob, after.leaseId!);
+    } finally {
+      if (oldVercel !== undefined) {
+        process.env.VERCEL = oldVercel;
+      } else {
+        delete process.env.VERCEL;
+      }
+    }
+  });
 });
 

@@ -31,12 +31,18 @@ function getCanonicalLedgerPath(): string {
   if (process.env.NODE_ENV === 'test') {
     return path.join(process.cwd(), 'data', 'test_ledger', 'canonical_prediction_ledger.json');
   }
+  if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME || process.env.LAMBDA_TASK_ROOT) {
+    return path.join(os.tmpdir(), 'handicaplab_canonical_prediction_ledger.json');
+  }
   return path.join(process.cwd(), 'data', 'ledger', 'canonical_prediction_ledger.json');
 }
 
 function getCanonicalJsonlPath(): string {
   if (process.env.NODE_ENV === 'test') {
     return path.join(process.cwd(), 'data', 'test_ledger', 'canonical_prediction_ledger.jsonl');
+  }
+  if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME || process.env.LAMBDA_TASK_ROOT) {
+    return path.join(os.tmpdir(), 'handicaplab_canonical_prediction_ledger.jsonl');
   }
   return path.join(process.cwd(), 'data', 'ledger', 'canonical_prediction_ledger.jsonl');
 }
@@ -55,14 +61,15 @@ export class CanonicalBetLedgerService {
   private static cachedLedger: Record<string, CanonicalPredictionRecord> | null = null;
 
   public static loadLedger(): Record<string, CanonicalPredictionRecord> {
-    if (this.cachedLedger) return this.cachedLedger;
+    if (this.cachedLedger !== null) return this.cachedLedger;
 
+    // 1. Try primary path
     try {
       const p = getCanonicalLedgerPath();
       if (fs.existsSync(p)) {
         const raw = fs.readFileSync(p, 'utf8');
         const parsed = JSON.parse(raw);
-        if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
+        if (parsed && typeof parsed === 'object') {
           this.cachedLedger = parsed;
           return parsed;
         }
@@ -71,7 +78,22 @@ export class CanonicalBetLedgerService {
       console.warn('[CanonicalBetLedgerService] Failed to load ledger:', e);
     }
 
-    // In non-test environments (production / serverless), fallback to bundled ledger
+    // 2. Try temp fallback if non-test environment
+    if (process.env.NODE_ENV !== 'test') {
+      try {
+        const fallback = path.join(os.tmpdir(), 'handicaplab_canonical_prediction_ledger.json');
+        if (fs.existsSync(fallback)) {
+          const raw = fs.readFileSync(fallback, 'utf8');
+          const parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === 'object') {
+            this.cachedLedger = parsed;
+            return parsed;
+          }
+        }
+      } catch {}
+    }
+
+    // In non-test environments (production / serverless), fallback to bundled ledger base
     if (process.env.NODE_ENV !== 'test') {
       if (BUNDLED_CANONICAL_LEDGER && typeof BUNDLED_CANONICAL_LEDGER === 'object' && Object.keys(BUNDLED_CANONICAL_LEDGER).length > 0) {
         this.cachedLedger = { ...BUNDLED_CANONICAL_LEDGER };
@@ -85,17 +107,18 @@ export class CanonicalBetLedgerService {
   }
 
   public static saveLedger(ledger: Record<string, CanonicalPredictionRecord>): void {
+    this.cachedLedger = ledger;
     try {
       const p = getCanonicalLedgerPath();
       const dir = path.dirname(p);
       if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
       fs.writeFileSync(p, JSON.stringify(ledger, null, 2), 'utf8');
-      this.cachedLedger = ledger;
     } catch (e) {
       try {
         const fallback = path.join(os.tmpdir(), 'handicaplab_canonical_prediction_ledger.json');
+        const dir = path.dirname(fallback);
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
         fs.writeFileSync(fallback, JSON.stringify(ledger, null, 2), 'utf8');
-        this.cachedLedger = ledger;
       } catch (err) {
         console.warn('[CanonicalBetLedgerService] Failed to save ledger:', e);
       }
@@ -214,7 +237,150 @@ export class CanonicalBetLedgerService {
     this.saveLedger(ledger);
     this.appendJsonLine(newRecord);
 
+    if (process.env.NODE_ENV !== 'test') {
+      // Asynchronously persist durable record to Supabase
+      (async () => {
+        try {
+          const { supabase } = await import('@/lib/supabase.server');
+          await supabase.from('daily_picks').upsert({
+            prediction_id: newRecord.predictionId,
+            fixture_id: newRecord.canonicalFixtureId,
+            league: newRecord.competition || newRecord.league,
+            home_team: newRecord.homeTeam,
+            away_team: newRecord.awayTeam,
+            kickoff_utc: newRecord.kickoffTimestamp,
+            market_type: newRecord.market === 'AH' ? 'ASIAN_HANDICAP' : newRecord.market === 'OU' ? 'OVER_UNDER' : 'BTTS',
+            prediction: newRecord.selection,
+            model_probability: newRecord.modelProbability,
+            fair_odds: newRecord.fairOdds,
+            market_odds: newRecord.marketOdds,
+            market_bookmaker: newRecord.bookmaker || 'Pinnacle',
+            edge_pct: newRecord.edge ? Number((newRecord.edge * 100).toFixed(2)) : 0,
+            confidence: newRecord.confidenceScore || (newRecord.confidence === 'HIGH' ? 85 : 70),
+            verdict: newRecord.confidence === 'HIGH' ? 'LAYAK' : newRecord.confidence === 'MEDIUM' ? 'PANTAU' : 'LEWATI',
+            status: newRecord.status,
+            source: 'HandicapLab-Canonical',
+            created_at: nowIso,
+          }, { onConflict: 'fixture_id, market_type, source' });
+        } catch (dbErr) {
+          console.warn('[CanonicalBetLedgerService] Background Supabase sync notice:', dbErr);
+        }
+      })();
+    }
+
     return { record: newRecord, isNew: true };
+  }
+
+  /**
+   * Synchronizes persisted predictions and settlements from Supabase into memory ledger.
+   * Ensures newly created records survive serverless container cycling.
+   */
+  public static async syncFromDatabase(): Promise<number> {
+    if (process.env.NODE_ENV === 'test') return 0;
+    try {
+      const { supabase } = await import('@/lib/supabase.server');
+      const { data: picks, error } = await supabase
+        .from('daily_picks')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(100);
+
+      if (error || !picks || picks.length === 0) return 0;
+
+      const ledger = this.loadLedger();
+      let added = 0;
+
+      for (const p of picks) {
+        const predId = p.prediction_id || `pred_${p.fixture_id}_${p.market_type}`;
+        if (!ledger[predId]) {
+          const rec: CanonicalPredictionRecord = {
+            predictionId: predId,
+            canonicalFixtureId: p.fixture_id,
+            fixture: `${p.home_team} vs ${p.away_team}`,
+            competition: p.league,
+            league: p.league,
+            homeTeam: p.home_team,
+            awayTeam: p.away_team,
+            kickoffTimestamp: p.kickoff_utc,
+            market: p.market_type === 'ASIAN_HANDICAP' ? 'AH' : p.market_type === 'OVER_UNDER' ? 'OU' : 'BTTS',
+            selection: p.prediction,
+            line: null,
+            lineType: 'NONE',
+            provider: 'OddsPapi',
+            bookmaker: p.market_bookmaker || 'Pinnacle',
+            marketOdds: Number(p.market_odds) || 1.95,
+            oddsTimestamp: p.created_at,
+            modelProbability: Number(p.model_probability) || 0.5,
+            calibratedProbability: Number(p.model_probability) || 0.5,
+            fairOdds: Number(p.fair_odds) || 2.0,
+            edge: Number(p.edge_pct || 0) / 100,
+            expectedValue: 0.05,
+            confidence: p.verdict === 'LAYAK' ? 'HIGH' : p.verdict === 'PANTAU' ? 'MEDIUM' : 'LOW',
+            confidenceScore: Number(p.confidence) || 75,
+            valueStatus: 'VALUE',
+            status: p.status === 'SETTLED' ? 'SETTLED' : 'PENDING',
+            settlement: p.status === 'SETTLED' && p.actual_score ? {
+              settlementId: `stl_${predId}`,
+              predictionId: predId,
+              canonicalFixtureId: p.fixture_id,
+              homeGoals: Number(p.actual_score.split('-')[0]) || 0,
+              awayGoals: Number(p.actual_score.split('-')[1]) || 0,
+              totalGoals: 0,
+              matchStatus: 'FT',
+              outcome: p.profit_loss > 0 ? 'WIN' : p.profit_loss < 0 ? 'LOSS' : 'PUSH',
+              stakeUnits: 1.0,
+              profitUnits: Number(p.profit_loss) || 0,
+              returnUnits: (Number(p.profit_loss) || 0) + 1.0,
+              settledAt: p.settled_at || new Date().toISOString(),
+              resultProvider: 'api-football',
+              resultReceivedAt: p.settled_at || new Date().toISOString(),
+            } : null,
+            rawPredictionPayloadHash: 'db_synced',
+            inputSnapshotHash: 'db_synced',
+            clvRecord: null,
+            revisions: [],
+            predictionTimestamp: p.created_at,
+            featureTimestamp: p.created_at,
+            modelVersion: 'dixon-coles-v1.0',
+            pipelineVersion: 'production-v1.0',
+            dataVersion: 'supabase-v1.0',
+            createdAt: p.created_at,
+            updatedAt: p.created_at,
+          };
+          ledger[predId] = rec;
+          added++;
+        } else if (p.status === 'SETTLED' && ledger[predId].status !== 'SETTLED') {
+          ledger[predId].status = 'SETTLED';
+          if (p.actual_score) {
+            ledger[predId].settlement = {
+              settlementId: `stl_${predId}`,
+              predictionId: predId,
+              canonicalFixtureId: p.fixture_id,
+              homeGoals: Number(p.actual_score.split('-')[0]) || 0,
+              awayGoals: Number(p.actual_score.split('-')[1]) || 0,
+              totalGoals: 0,
+              matchStatus: 'FT',
+              outcome: p.profit_loss > 0 ? 'WIN' : p.profit_loss < 0 ? 'LOSS' : 'PUSH',
+              stakeUnits: 1.0,
+              profitUnits: Number(p.profit_loss) || 0,
+              returnUnits: (Number(p.profit_loss) || 0) + 1.0,
+              settledAt: p.settled_at || new Date().toISOString(),
+              resultProvider: 'api-football',
+              resultReceivedAt: p.settled_at || new Date().toISOString(),
+            };
+          }
+          added++;
+        }
+      }
+
+      if (added > 0) {
+        this.saveLedger(ledger);
+      }
+      return added;
+    } catch (e) {
+      console.warn('[CanonicalBetLedgerService] syncFromDatabase error:', e);
+      return 0;
+    }
   }
 
   /**
@@ -366,11 +532,15 @@ export class CanonicalBetLedgerService {
     this.cachedLedger = {};
     const p1 = getCanonicalLedgerPath();
     const p2 = getCanonicalJsonlPath();
+    const fallback = path.join(os.tmpdir(), 'handicaplab_canonical_prediction_ledger.json');
     if (fs.existsSync(p1)) {
       try { fs.unlinkSync(p1); } catch {}
     }
     if (fs.existsSync(p2)) {
       try { fs.unlinkSync(p2); } catch {}
+    }
+    if (fs.existsSync(fallback)) {
+      try { fs.unlinkSync(fallback); } catch {}
     }
   }
 }

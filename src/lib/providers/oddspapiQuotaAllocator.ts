@@ -87,15 +87,25 @@ export interface OddsPapiCallRecord {
 }
 
 function getStateFilePath(): string {
-  return process.env.NODE_ENV === 'test'
-    ? path.resolve('data/test_cache/oddspapi_quota_allocator_state.json')
-    : path.resolve('data/cache/oddspapi_quota_allocator_state.json');
+  if (process.env.NODE_ENV === 'test') {
+    return path.resolve('data/test_cache/oddspapi_quota_allocator_state.json');
+  }
+  if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
+    const os = require('os');
+    return path.join(os.tmpdir(), 'handicaplab_oddspapi_quota_allocator_state.json');
+  }
+  return path.resolve('data/cache/oddspapi_quota_allocator_state.json');
 }
 
 function getAuditLogPath(): string {
-  return process.env.NODE_ENV === 'test'
-    ? path.resolve('data/test_ledger/oddspapi_call_audit.jsonl')
-    : path.resolve('data/ledger/oddspapi_call_audit.jsonl');
+  if (process.env.NODE_ENV === 'test') {
+    return path.resolve('data/test_ledger/oddspapi_call_audit.jsonl');
+  }
+  if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
+    const os = require('os');
+    return path.join(os.tmpdir(), 'handicaplab_oddspapi_call_audit.jsonl');
+  }
+  return path.resolve('data/ledger/oddspapi_call_audit.jsonl');
 }
 
 export class OddsPapiQuotaAllocator {

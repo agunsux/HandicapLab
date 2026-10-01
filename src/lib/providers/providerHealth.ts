@@ -62,6 +62,10 @@ export class ProviderHealthMonitor {
     try {
       // Dynamic require to prevent client-side bundler errors
       const pathMod = eval('require')('path');
+      if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
+        const osMod = eval('require')('os');
+        return pathMod.join(osMod.tmpdir(), `handicaplab_provider_health_${this.provider}.json`);
+      }
       return pathMod.resolve(`data/cache/provider_health_${this.provider}.json`);
     } catch {
       return null;
