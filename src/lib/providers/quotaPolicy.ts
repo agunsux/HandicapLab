@@ -169,6 +169,18 @@ const ENV_KEYS: Record<Provider, { hard: string[]; soft: string[] }> = {
 };
 
 export function getProviderQuotaPolicy(provider: Provider): ProviderQuotaPolicy {
+  if (provider === 'dribble360' && process.env.DRIBBLE_SIMULATED_PLAN?.toUpperCase() === 'LITE') {
+    const monthlyHard = envInt(['DRIBBLE_SIMULATED_MONTHLY_BUDGET', 'DRIBBLE360_MONTHLY_HARD_LIMIT']) ?? 500;
+    const monthlySoft = Math.floor(monthlyHard * 0.9); // 450
+    return {
+      provider,
+      period: 'MONTHLY',
+      hardLimit: monthlyHard,
+      softLimit: monthlySoft,
+      economyAtPctOfSoft: 80,
+    };
+  }
+
   const defaults = DEFAULT_POLICIES[provider];
   const envKeys = ENV_KEYS[provider];
 

@@ -65,7 +65,8 @@ function getCost(provider: Provider, endpoint: string): number {
 
 function getPeriod(provider: Provider): { type: QuotaType; start: Date; end: Date } {
   const now = new Date();
-  if (provider === 'oddspapi' || provider === 'the-odds-api') {
+  const policy = getProviderQuotaPolicy(provider);
+  if (policy.period === 'MONTHLY' || provider === 'oddspapi' || provider === 'the-odds-api') {
     const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
     const end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 0, 23, 59, 59, 999));
     return { type: 'MONTHLY', start, end };

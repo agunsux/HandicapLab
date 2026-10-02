@@ -21,6 +21,7 @@
 import { globalGateway } from './providerGateway';
 import { logger } from '@/lib/logger';
 import type { Provider } from './quotaPolicy';
+import { DribbleLiteQuotaGuard } from './dribbleLiteQuotaGuard';
 import * as crypto from 'crypto';
 
 // ============================================================================
@@ -283,6 +284,13 @@ export class Dribble360Provider {
       .digest('hex')
       .slice(0, 12);
 
+    // Enforce Simulated Lite Quota Guard BEFORE making requests
+    const liteReceipt = DribbleLiteQuotaGuard.reserve(endpoint, purpose, 1);
+    if (!liteReceipt.ok) {
+      this.log.warn('dribble360_lite_budget_blocked', { endpoint, reason: liteReceipt.reason });
+      return { data: null, status: 429, latencyMs: 0, error: 'RATE_LIMIT' };
+    }
+
     try {
       const response = await globalGateway.fetch(
         this.PROVIDER,
@@ -313,6 +321,11 @@ export class Dribble360Provider {
       const recordsReturned = this.countRecords(data);
       const errorClass = response.ok ? null : classifyError(response.status);
 
+      // Confirm consumption in simulated Lite budget
+      if (liteReceipt.reservationId) {
+        DribbleLiteQuotaGuard.confirm(liteReceipt.reservationId, 1);
+      }
+
       // Record in usage ledger (EPIC §18)
       this.usageLedger.push({
         timestamp: new Date().toISOString(),
@@ -340,6 +353,10 @@ export class Dribble360Provider {
 
       return { data, status: response.status, latencyMs, error: errorClass };
     } catch (err: any) {
+      if (liteReceipt.reservationId) {
+        DribbleLiteQuotaGuard.rollback(liteReceipt.reservationId);
+      }
+
       const latencyMs = Date.now() - startMs;
       const errorClass = classifyError(0, err);
 
