@@ -1,0 +1,698 @@
+{
+  "timestampUtc": "2026-10-02T17:41:58.917Z",
+  "probe": "oddspapi-v4-batch-parity",
+  "base": "https://api.oddspapi.io/v4",
+  "calls": [
+    {
+      "label": "account(before)",
+      "endpoint": "/account",
+      "httpStatus": 200,
+      "latencyMs": 327,
+      "byteLength": 24465,
+      "error": null,
+      "topLevelShape": {
+        "__object": true,
+        "keys": [
+          "api_key",
+          "created_at",
+          "language_code",
+          "language_name",
+          "email",
+          "current_subscription_id",
+          "customer_segment",
+          "subscriptions"
+        ]
+      }
+    },
+    {
+      "label": "fixtures(7d,hasOdds)",
+      "endpoint": "/fixtures?sportId=10&from=2026-10-02&to=2026-10-09&hasOdds=true",
+      "httpStatus": 200,
+      "latencyMs": 874,
+      "byteLength": 1658633,
+      "error": null,
+      "topLevelShape": {
+        "__array": true,
+        "length": 1867,
+        "itemKeys": [
+          "fixtureId",
+          "participant1Id",
+          "participant2Id",
+          "sportId",
+          "tournamentId",
+          "seasonId",
+          "statusId",
+          "hasOdds",
+          "startTime",
+          "trueStartTime",
+          "trueEndTime",
+          "updatedAt",
+          "externalProviders",
+          "statusName",
+          "participant1Name",
+          "participant1ShortName",
+          "participant1Abbr",
+          "participant2Name",
+          "participant2ShortName",
+          "participant2Abbr",
+          "sportName",
+          "tournamentSlug",
+          "categorySlug",
+          "categoryName",
+          "tournamentName"
+        ]
+      }
+    },
+    {
+      "label": "odds?fixtureId=id1000054472505176",
+      "endpoint": "/odds?fixtureId=id1000054472505176",
+      "httpStatus": 200,
+      "latencyMs": 900,
+      "byteLength": 4185950,
+      "error": null,
+      "topLevelShape": {
+        "__object": true,
+        "keys": [
+          "fixtureId",
+          "participant1Id",
+          "participant2Id",
+          "sportId",
+          "tournamentId",
+          "seasonId",
+          "statusId",
+          "hasOdds",
+          "startTime",
+          "trueStartTime",
+          "trueEndTime",
+          "updatedAt",
+          "bookmakerOdds"
+        ]
+      }
+    },
+    {
+      "label": "odds?fixtureId=id1000054472505178",
+      "endpoint": "/odds?fixtureId=id1000054472505178",
+      "httpStatus": 200,
+      "latencyMs": 747,
+      "byteLength": 3274558,
+      "error": null,
+      "topLevelShape": {
+        "__object": true,
+        "keys": [
+          "fixtureId",
+          "participant1Id",
+          "participant2Id",
+          "sportId",
+          "tournamentId",
+          "seasonId",
+          "statusId",
+          "hasOdds",
+          "startTime",
+          "trueStartTime",
+          "trueEndTime",
+          "updatedAt",
+          "bookmakerOdds"
+        ]
+      }
+    },
+    {
+      "label": "odds-by-tournaments(pinnacle)",
+      "endpoint": "/odds-by-tournaments?tournamentIds=544&bookmaker=pinnacle&oddsFormat=decimal",
+      "httpStatus": 200,
+      "latencyMs": 541,
+      "byteLength": 1185486,
+      "error": null,
+      "topLevelShape": {
+        "__array": true,
+        "length": 45,
+        "itemKeys": [
+          "fixtureId",
+          "participant1Id",
+          "participant2Id",
+          "sportId",
+          "tournamentId",
+          "seasonId",
+          "statusId",
+          "hasOdds",
+          "startTime",
+          "trueStartTime",
+          "trueEndTime",
+          "updatedAt",
+          "bookmakerOdds"
+        ]
+      }
+    },
+    {
+      "label": "account(after)",
+      "endpoint": "/account",
+      "httpStatus": 200,
+      "latencyMs": 219,
+      "byteLength": 24465,
+      "error": null,
+      "topLevelShape": {
+        "__object": true,
+        "keys": [
+          "api_key",
+          "created_at",
+          "language_code",
+          "language_name",
+          "email",
+          "current_subscription_id",
+          "customer_segment",
+          "subscriptions"
+        ]
+      }
+    }
+  ],
+  "quota": {
+    "before": {
+      "httpStatus": 200,
+      "request_limit": 250,
+      "request_count": 29,
+      "valid_until": null,
+      "is_active": true,
+      "bookmakerCount": 388
+    },
+    "after": {
+      "httpStatus": 200,
+      "request_limit": 250,
+      "request_count": 33,
+      "valid_until": null,
+      "is_active": true,
+      "bookmakerCount": 388
+    },
+    "meteredCallsObserved": 4,
+    "requestsIssued": 6
+  },
+  "parity": {
+    "fixturesCompared": 2,
+    "fixturesInBothPaths": 2,
+    "fixturesMissingFromBatch": [],
+    "identity": {
+      "compared": 2,
+      "matches": 0,
+      "mismatches": [
+        {
+          "fixtureId": "id1000054472505176",
+          "mismatch": [
+            {
+              "field": "participant1Name",
+              "legacy": "CD Basconia"
+            },
+            {
+              "field": "participant2Name",
+              "legacy": "UD Llanera"
+            }
+          ]
+        },
+        {
+          "fixtureId": "id1000054472505178",
+          "mismatch": [
+            {
+              "field": "participant1Name",
+              "legacy": "Bergantinos FC"
+            },
+            {
+              "field": "participant2Name",
+              "legacy": "Coruxo FC"
+            }
+          ]
+        }
+      ]
+    },
+    "bookmakerPresence": {
+      "id1000054472505176": {
+        "legacyBookmakerCount": 128,
+        "legacyHasPinnacle": true,
+        "legacyHasSbobet": false,
+        "batchBookmakers": [
+          "pinnacle"
+        ]
+      },
+      "id1000054472505178": {
+        "legacyBookmakerCount": 94,
+        "legacyHasPinnacle": true,
+        "legacyHasSbobet": false,
+        "batchBookmakers": [
+          "pinnacle"
+        ]
+      }
+    },
+    "perBookmaker": {
+      "pinnacle": {
+        "fixturesCompared": 2,
+        "pointsCompared": 169,
+        "priceMatches": 169,
+        "priceMismatches": 0,
+        "changedAtMatches": 169,
+        "changedAtMismatches": 0,
+        "missingMarkets": [],
+        "extraMarkets": [],
+        "missingOutcomes": [],
+        "extraOutcomes": [],
+        "legacyCoreCoverage": {
+          "asianHandicap": 8,
+          "overUnder": 7,
+          "btts": 0,
+          "quarterLineAh": 4,
+          "unknownMarketIds": []
+        },
+        "batchCoreCoverage": {
+          "asianHandicap": 8,
+          "overUnder": 7,
+          "btts": 0,
+          "quarterLineAh": 4,
+          "unknownMarketIds": []
+        }
+      }
+    }
+  },
+  "verdict": {
+    "valueParityOnOverlap": false,
+    "fullWindowReplaceable": false,
+    "batchCoverageComplete": true,
+    "identityMismatch": 2,
+    "totalPriceMismatch": 0,
+    "totalMissingMarkets": 0,
+    "totalMissingOutcomes": 0,
+    "totalExtraMarkets": 0,
+    "coreMarketsPresentInBatch": true,
+    "meteredCallsThisProbe": 4
+  },
+  "discovery": {
+    "fixturesWithOdds": 1867,
+    "tournaments": 311,
+    "chosenTournamentId": 544,
+    "chosenTournamentName": "Segunda Federacion",
+    "targetFixtureIds": [
+      "id1000054472505176",
+      "id1000054472505178"
+    ]
+  },
+  "marketDictionarySize": 33115,
+  "identityFields": {
+    "legacyFixturesIndex": [
+      "fixtureId",
+      "tournamentId",
+      "participant1Name",
+      "participant2Name",
+      "startTime",
+      "sportId"
+    ],
+    "legacyOddsByFixture": [
+      "fixtureId",
+      "tournamentId",
+      "startTime",
+      "sportId"
+    ],
+    "batchByBookmaker": {
+      "pinnacle": [
+        "fixtureId",
+        "tournamentId",
+        "startTime",
+        "sportId"
+      ]
+    },
+    "note": "The pipelines consume participant1Name/participant2Name from /v4/fixtures for canonical matching; /v4/odds-by-tournaments omits them."
+  },
+  "batchIntrospection": {
+    "pinnacle": {
+      "httpStatus": 200,
+      "errorCode": null,
+      "returnedCount": 45,
+      "returned": [
+        {
+          "fixtureId": "id1000054473760332",
+          "tournamentId": 544,
+          "startTime": "2026-10-03T14:00:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        },
+        {
+          "fixtureId": "id1000054472507464",
+          "tournamentId": 544,
+          "startTime": "2026-10-03T14:15:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        },
+        {
+          "fixtureId": "id1000054472505190",
+          "tournamentId": 544,
+          "startTime": "2026-10-03T14:30:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        },
+        {
+          "fixtureId": "id1000054472505176",
+          "tournamentId": 544,
+          "startTime": "2026-10-03T15:00:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        },
+        {
+          "fixtureId": "id1000054472505188",
+          "tournamentId": 544,
+          "startTime": "2026-10-03T15:00:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        },
+        {
+          "fixtureId": "id1000054472506712",
+          "tournamentId": 544,
+          "startTime": "2026-10-03T15:00:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        },
+        {
+          "fixtureId": "id1000054473493038",
+          "tournamentId": 544,
+          "startTime": "2026-10-03T15:00:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        },
+        {
+          "fixtureId": "id1000054472505182",
+          "tournamentId": 544,
+          "startTime": "2026-10-03T16:00:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        },
+        {
+          "fixtureId": "id1000054472506706",
+          "tournamentId": 544,
+          "startTime": "2026-10-03T16:00:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        },
+        {
+          "fixtureId": "id1000054472509344",
+          "tournamentId": 544,
+          "startTime": "2026-10-03T16:00:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        },
+        {
+          "fixtureId": "id1000054472509352",
+          "tournamentId": 544,
+          "startTime": "2026-10-03T16:00:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        },
+        {
+          "fixtureId": "id1000054472508392",
+          "tournamentId": 544,
+          "startTime": "2026-10-03T17:00:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        },
+        {
+          "fixtureId": "id1000054473760484",
+          "tournamentId": 544,
+          "startTime": "2026-10-03T17:30:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        },
+        {
+          "fixtureId": "id1000054472507470",
+          "tournamentId": 544,
+          "startTime": "2026-10-04T09:00:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        },
+        {
+          "fixtureId": "id1000054472507476",
+          "tournamentId": 544,
+          "startTime": "2026-10-04T09:30:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        },
+        {
+          "fixtureId": "id1000054472508400",
+          "tournamentId": 544,
+          "startTime": "2026-10-04T09:30:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        },
+        {
+          "fixtureId": "id1000054472507462",
+          "tournamentId": 544,
+          "startTime": "2026-10-04T09:45:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        },
+        {
+          "fixtureId": "id1000054472507460",
+          "tournamentId": 544,
+          "startTime": "2026-10-04T10:00:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        },
+        {
+          "fixtureId": "id1000054472507466",
+          "tournamentId": 544,
+          "startTime": "2026-10-04T10:00:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        },
+        {
+          "fixtureId": "id1000054472507468",
+          "tournamentId": 544,
+          "startTime": "2026-10-04T10:00:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        },
+        {
+          "fixtureId": "id1000054472508398",
+          "tournamentId": 544,
+          "startTime": "2026-10-04T10:00:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        },
+        {
+          "fixtureId": "id1000054472508402",
+          "tournamentId": 544,
+          "startTime": "2026-10-04T10:00:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        },
+        {
+          "fixtureId": "id1000054472508406",
+          "tournamentId": 544,
+          "startTime": "2026-10-04T10:00:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        },
+        {
+          "fixtureId": "id1000054472509350",
+          "tournamentId": 544,
+          "startTime": "2026-10-04T10:00:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        },
+        {
+          "fixtureId": "id1000054472509354",
+          "tournamentId": 544,
+          "startTime": "2026-10-04T10:00:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        },
+        {
+          "fixtureId": "id1000054472509356",
+          "tournamentId": 544,
+          "startTime": "2026-10-04T10:00:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        },
+        {
+          "fixtureId": "id1000054472509358",
+          "tournamentId": 544,
+          "startTime": "2026-10-04T10:00:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        },
+        {
+          "fixtureId": "id1000054472508404",
+          "tournamentId": 544,
+          "startTime": "2026-10-04T11:00:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        },
+        {
+          "fixtureId": "id1000054472505178",
+          "tournamentId": 544,
+          "startTime": "2026-10-04T15:00:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        },
+        {
+          "fixtureId": "id1000054472505180",
+          "tournamentId": 544,
+          "startTime": "2026-10-04T15:00:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        },
+        {
+          "fixtureId": "id1000054472505184",
+          "tournamentId": 544,
+          "startTime": "2026-10-04T15:00:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        },
+        {
+          "fixtureId": "id1000054472505186",
+          "tournamentId": 544,
+          "startTime": "2026-10-04T15:00:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        },
+        {
+          "fixtureId": "id1000054472506704",
+          "tournamentId": 544,
+          "startTime": "2026-10-04T15:00:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        },
+        {
+          "fixtureId": "id1000054472506708",
+          "tournamentId": 544,
+          "startTime": "2026-10-04T15:00:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        },
+        {
+          "fixtureId": "id1000054472506714",
+          "tournamentId": 544,
+          "startTime": "2026-10-04T15:00:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        },
+        {
+          "fixtureId": "id1000054472506720",
+          "tournamentId": 544,
+          "startTime": "2026-10-04T15:00:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        },
+        {
+          "fixtureId": "id1000054472508396",
+          "tournamentId": 544,
+          "startTime": "2026-10-04T15:00:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        },
+        {
+          "fixtureId": "id1000054472509346",
+          "tournamentId": 544,
+          "startTime": "2026-10-04T15:00:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        },
+        {
+          "fixtureId": "id1000054472509360",
+          "tournamentId": 544,
+          "startTime": "2026-10-04T15:00:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        },
+        {
+          "fixtureId": "id1000054473760246",
+          "tournamentId": 544,
+          "startTime": "2026-10-04T15:00:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        },
+        {
+          "fixtureId": "id1000054472506716",
+          "tournamentId": 544,
+          "startTime": "2026-10-04T16:00:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        },
+        {
+          "fixtureId": "id1000054472506718",
+          "tournamentId": 544,
+          "startTime": "2026-10-04T16:00:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        },
+        {
+          "fixtureId": "id1000054472507472",
+          "tournamentId": 544,
+          "startTime": "2026-10-04T16:00:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        },
+        {
+          "fixtureId": "id1000054472508390",
+          "tournamentId": 544,
+          "startTime": "2026-10-04T16:30:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        },
+        {
+          "fixtureId": "id1000054473760416",
+          "tournamentId": 544,
+          "startTime": "2026-10-04T17:00:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        }
+      ]
+    }
+  },
+  "batchCoverageOfDiscovery": {
+    "tournamentId": 544,
+    "discoveryFixtureCount": 45,
+    "pinnacle": {
+      "returnedByBatch": 45,
+      "discoveryCovered": 45,
+      "discoveryMissing": 0,
+      "coveragePct": 100,
+      "missingSample": []
+    }
+  }
+}

@@ -18,6 +18,11 @@ import {
 } from '@/lib/research/ou/ouProbabilityEngine';
 import { SalmoSyncService } from './salmoSyncService';
 import { DailyPredictionLedgerService, PredictionLedgerRecord } from './dailyPredictionLedger';
+import {
+  fetchOddsPapiFixtureIndex,
+  primeTournamentOdds,
+  getBatchedFixtureOdds,
+} from './tournamentOddsBatch';
 
 export interface OuMarketLineQuote {
   line: number;
@@ -246,11 +251,14 @@ export class OuLivePipelineService {
     const toStr = new Date(now.getTime() + 7 * 24 * 3600 * 1000).toISOString().slice(0, 10);
 
     console.log(`\n[Phase 2] Discovering fixtures from ${todayStr} to ${toStr}...`);
-    // 1 call to OddsPAPI to get all upcoming fixtures with odds
-    const opFixUrl = `https://api.oddspapi.io/v4/fixtures?sportId=10&from=${todayStr}&to=${toStr}&hasOdds=true&apiKey=${opKey}`;
-    const opFixRes = await fetch(opFixUrl);
-    const opFixtures: any[] = await opFixRes.json();
-    console.log(`[OddsPAPI] Total fixtures with hasOdds=true: ${Array.isArray(opFixtures) ? opFixtures.length : 0}`);
+    // 1 METERED call to OddsPAPI for upcoming fixtures with odds. Routed through
+    // the quota manager (NativeOddsClient) — never a raw unmetered fetch.
+    const opIndex = await fetchOddsPapiFixtureIndex({ from: todayStr, to: toStr });
+    const opFixtures: any[] = opIndex.fixtures;
+    console.log(
+      `[OddsPAPI] Total fixtures with hasOdds=true: ${opFixtures.length} ` +
+        `(discovery=${opIndex.status}${opIndex.error ? ` error=${opIndex.error}` : ''})`
+    );
 
     // Query API-Football for dates in the 7-day window
     const discoveredAfFixtures: any[] = [];
@@ -275,6 +283,8 @@ export class OuLivePipelineService {
       canonicalId: string;
       afFixtureId: number;
       opFixtureId: string;
+      /** OddsPapi tournamentId — required for batch (/v4/odds-by-tournaments). */
+      opTournamentId: number | null;
       leagueId: number;
       leagueName: string;
       country: string;
@@ -319,6 +329,7 @@ export class OuLivePipelineService {
             canonicalId,
             afFixtureId: af.fixture.id,
             opFixtureId: opMatch.fixtureId,
+            opTournamentId: opMatch.tournamentId ?? null,
             leagueId: af.league.id,
             leagueName: af.league.name,
             country: af.league.country,
@@ -355,6 +366,27 @@ export class OuLivePipelineService {
     let sbobetOuCount = 0;
     let totalOuOddsCount = 0;
 
+    // ── P0 QUOTA ARCHITECTURE ────────────────────────────────────────────────
+    // One shared /v4/odds-by-tournaments batch per consumed bookmaker replaces
+    // the previous 12 x /v4/odds?fixtureId= fan-out. Quota-aware (reserve ->
+    // call -> confirm via NativeOddsClient) and fail-safe: if the batch cannot
+    // be obtained we degrade to DATA_UNAVAILABLE instead of fanning out.
+    const opTournamentIds = [
+      ...new Set(
+        targetFixtures
+          .map((f) => f.opTournamentId)
+          .filter((v): v is number => typeof v === 'number' && Number.isFinite(v))
+      ),
+    ];
+    const batchResult = await primeTournamentOdds({ tournamentIds: opTournamentIds });
+    console.log(
+      `[Odds Quota Discipline] Batch prime: status=${batchResult.status} ` +
+        `tournaments=${opTournamentIds.length} fixtures=${batchResult.fixtureCount} ` +
+        `bookmakers=${batchResult.bookmakersWithData.join('+') || 'none'} ` +
+        `meteredCalls=${batchResult.meteredCalls}${batchResult.fromCache ? ' (cache hit)' : ''}` +
+        `${batchResult.error ? ` error=${batchResult.error}` : ''}`
+    );
+
     for (const fixture of targetFixtures) {
       const kickoffMs = new Date(fixture.kickoffUtc).getTime();
       const cutoffUtc = new Date(kickoffMs - 30 * 60 * 1000).toISOString();
@@ -366,16 +398,10 @@ export class OuLivePipelineService {
       const hasDribbleCoverage = homeDribble.coverageStatus !== 'UNAVAILABLE' || awayDribble.coverageStatus !== 'UNAVAILABLE';
       const dataQuality: 'READY' | 'PARTIAL' | 'UNAVAILABLE' = hasDribbleCoverage ? 'READY' : 'PARTIAL';
 
-      // Sharp Odds Ingestion from OddsPAPI (1 call per fixture)
-      let oddsData: any = null;
-      try {
-        const oddsRes = await fetch(`https://api.oddspapi.io/v4/odds?fixtureId=${fixture.opFixtureId}&apiKey=${opKey}`);
-        if (oddsRes.ok) {
-          oddsData = await oddsRes.json();
-        }
-      } catch (err: any) {
-        console.warn(`[OddsPAPI] Odds fetch warning for ${fixture.canonicalId}:`, err.message);
-      }
+      // Sharp Odds Ingestion from the shared tournament batch — ZERO provider
+      // calls per fixture. OddsPapi remains the sole odds authority; the payload
+      // is the provider's own bookmakerOdds object, unchanged.
+      const oddsData: any = getBatchedFixtureOdds(fixture.opFixtureId);
 
       // Check if oddsData contains bookmakerOdds
       if (!oddsData || !oddsData.bookmakerOdds) {
@@ -595,7 +621,7 @@ export class OuLivePipelineService {
           timestampUtc: q.timestamp,
           provenance: {
             source: 'oddspapi',
-            endpoint: `/v4/odds?fixtureId=${fixture.opFixtureId}`,
+            endpoint: `/v4/odds-by-tournaments?tournamentIds=${fixture.opTournamentId}&bookmaker=pinnacle,sbobet`,
           },
         });
       }

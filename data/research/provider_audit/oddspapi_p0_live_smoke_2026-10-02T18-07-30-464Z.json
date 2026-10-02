@@ -1,0 +1,191 @@
+{
+  "timestampUtc": "2026-10-02T18:07:30.464Z",
+  "probe": "oddspapi-p0-live-smoke",
+  "discovery": {
+    "status": "READY",
+    "fixtures": 1832,
+    "meteredCalls": 1,
+    "error": null
+  },
+  "selection": {
+    "tournaments": [
+      544,
+      20782,
+      23755
+    ]
+  },
+  "batch": {
+    "status": "READY",
+    "fixtureCount": 73,
+    "bookmakersWithData": [
+      "pinnacle",
+      "sbobet"
+    ],
+    "meteredCalls": 2,
+    "fromCache": false,
+    "error": null
+  },
+  "resolution": {
+    "pairs": 12,
+    "sample": [
+      {
+        "fixtureId": "id1002078268344870",
+        "tournamentId": 20782,
+        "startTime": "2026-10-02T17:00:00.000Z",
+        "bookmaker": "pinnacle",
+        "marketCount": 40,
+        "coreMarkets": {
+          "asianHandicap": 8,
+          "overUnder": 12,
+          "btts": 0,
+          "unknown": 20
+        }
+      },
+      {
+        "fixtureId": "id1002078268344870",
+        "tournamentId": 20782,
+        "startTime": "2026-10-02T17:00:00.000Z",
+        "bookmaker": "sbobet",
+        "marketCount": 26,
+        "coreMarkets": {
+          "asianHandicap": 4,
+          "overUnder": 6,
+          "btts": 0,
+          "unknown": 16
+        }
+      },
+      {
+        "fixtureId": "id1002078268378080",
+        "tournamentId": 20782,
+        "startTime": "2026-10-02T17:00:00.000Z",
+        "bookmaker": "pinnacle",
+        "marketCount": 44,
+        "coreMarkets": {
+          "asianHandicap": 9,
+          "overUnder": 14,
+          "btts": 0,
+          "unknown": 21
+        }
+      },
+      {
+        "fixtureId": "id1002078268378080",
+        "tournamentId": 20782,
+        "startTime": "2026-10-02T17:00:00.000Z",
+        "bookmaker": "sbobet",
+        "marketCount": 27,
+        "coreMarkets": {
+          "asianHandicap": 3,
+          "overUnder": 8,
+          "btts": 0,
+          "unknown": 16
+        }
+      },
+      {
+        "fixtureId": "id1002078268378084",
+        "tournamentId": 20782,
+        "startTime": "2026-10-02T17:00:00.000Z",
+        "bookmaker": "pinnacle",
+        "marketCount": 32,
+        "coreMarkets": {
+          "asianHandicap": 9,
+          "overUnder": 7,
+          "btts": 0,
+          "unknown": 16
+        }
+      },
+      {
+        "fixtureId": "id1002375568931482",
+        "tournamentId": 23755,
+        "startTime": "2026-10-02T18:45:00.000Z",
+        "bookmaker": "pinnacle",
+        "marketCount": 112,
+        "coreMarkets": {
+          "asianHandicap": 10,
+          "overUnder": 9,
+          "btts": 1,
+          "unknown": 92
+        }
+      },
+      {
+        "fixtureId": "id1002375568931482",
+        "tournamentId": 23755,
+        "startTime": "2026-10-02T18:45:00.000Z",
+        "bookmaker": "sbobet",
+        "marketCount": 33,
+        "coreMarkets": {
+          "asianHandicap": 4,
+          "overUnder": 5,
+          "btts": 0,
+          "unknown": 24
+        }
+      },
+      {
+        "fixtureId": "id1002375568931484",
+        "tournamentId": 23755,
+        "startTime": "2026-10-02T18:45:00.000Z",
+        "bookmaker": "pinnacle",
+        "marketCount": 125,
+        "coreMarkets": {
+          "asianHandicap": 10,
+          "overUnder": 11,
+          "btts": 1,
+          "unknown": 103
+        }
+      },
+      {
+        "fixtureId": "id1002375568931484",
+        "tournamentId": 23755,
+        "startTime": "2026-10-02T18:45:00.000Z",
+        "bookmaker": "sbobet",
+        "marketCount": 31,
+        "coreMarkets": {
+          "asianHandicap": 4,
+          "overUnder": 5,
+          "btts": 0,
+          "unknown": 22
+        }
+      },
+      {
+        "fixtureId": "id1002375568932366",
+        "tournamentId": 23755,
+        "startTime": "2026-10-02T18:45:00.000Z",
+        "bookmaker": "pinnacle",
+        "marketCount": 91,
+        "coreMarkets": {
+          "asianHandicap": 10,
+          "overUnder": 7,
+          "btts": 1,
+          "unknown": 73
+        }
+      },
+      {
+        "fixtureId": "id1002375568932366",
+        "tournamentId": 23755,
+        "startTime": "2026-10-02T18:45:00.000Z",
+        "bookmaker": "sbobet",
+        "marketCount": 22,
+        "coreMarkets": {
+          "asianHandicap": 4,
+          "overUnder": 4,
+          "btts": 0,
+          "unknown": 14
+        }
+      },
+      {
+        "fixtureId": "id1002375568932618",
+        "tournamentId": 23755,
+        "startTime": "2026-10-02T18:45:00.000Z",
+        "bookmaker": "pinnacle",
+        "marketCount": 112,
+        "coreMarkets": {
+          "asianHandicap": 10,
+          "overUnder": 8,
+          "btts": 1,
+          "unknown": 93
+        }
+      }
+    ]
+  },
+  "totalMeteredCallsForThisCycle": 3,
+  "legacyEquivalentMeteredCalls": 37
+}

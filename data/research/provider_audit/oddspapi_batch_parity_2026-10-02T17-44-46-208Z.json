@@ -1,0 +1,500 @@
+{
+  "timestampUtc": "2026-10-02T17:44:26.679Z",
+  "probe": "oddspapi-v4-batch-parity",
+  "base": "https://api.oddspapi.io/v4",
+  "calls": [
+    {
+      "label": "account(before)",
+      "endpoint": "/account",
+      "httpStatus": 200,
+      "latencyMs": 370,
+      "byteLength": 24465,
+      "error": null,
+      "topLevelShape": {
+        "__object": true,
+        "keys": [
+          "api_key",
+          "created_at",
+          "language_code",
+          "language_name",
+          "email",
+          "current_subscription_id",
+          "customer_segment",
+          "subscriptions"
+        ]
+      }
+    },
+    {
+      "label": "fixtures(7d,hasOdds)",
+      "endpoint": "/fixtures?sportId=10&from=2026-10-02&to=2026-10-09&hasOdds=true",
+      "httpStatus": 200,
+      "latencyMs": 949,
+      "byteLength": 1631131,
+      "error": null,
+      "topLevelShape": {
+        "__array": true,
+        "length": 1836,
+        "itemKeys": [
+          "fixtureId",
+          "participant1Id",
+          "participant2Id",
+          "sportId",
+          "tournamentId",
+          "seasonId",
+          "statusId",
+          "hasOdds",
+          "startTime",
+          "trueStartTime",
+          "trueEndTime",
+          "updatedAt",
+          "externalProviders",
+          "statusName",
+          "participant1Name",
+          "participant1ShortName",
+          "participant1Abbr",
+          "participant2Name",
+          "participant2ShortName",
+          "participant2Abbr",
+          "sportName",
+          "tournamentSlug",
+          "categorySlug",
+          "categoryName",
+          "tournamentName"
+        ]
+      }
+    },
+    {
+      "label": "odds?fixtureId=id1000070172346904",
+      "endpoint": "/odds?fixtureId=id1000070172346904",
+      "httpStatus": 200,
+      "latencyMs": 952,
+      "byteLength": 3552298,
+      "error": null,
+      "topLevelShape": {
+        "__object": true,
+        "keys": [
+          "fixtureId",
+          "participant1Id",
+          "participant2Id",
+          "sportId",
+          "tournamentId",
+          "seasonId",
+          "statusId",
+          "hasOdds",
+          "startTime",
+          "trueStartTime",
+          "trueEndTime",
+          "updatedAt",
+          "bookmakerOdds"
+        ]
+      }
+    },
+    {
+      "label": "odds?fixtureId=id1000070172346906",
+      "endpoint": "/odds?fixtureId=id1000070172346906",
+      "httpStatus": 200,
+      "latencyMs": 867,
+      "byteLength": 3507936,
+      "error": null,
+      "topLevelShape": {
+        "__object": true,
+        "keys": [
+          "fixtureId",
+          "participant1Id",
+          "participant2Id",
+          "sportId",
+          "tournamentId",
+          "seasonId",
+          "statusId",
+          "hasOdds",
+          "startTime",
+          "trueStartTime",
+          "trueEndTime",
+          "updatedAt",
+          "bookmakerOdds"
+        ]
+      }
+    },
+    {
+      "label": "odds?fixtureId=id1000070172346908",
+      "endpoint": "/odds?fixtureId=id1000070172346908",
+      "httpStatus": 200,
+      "latencyMs": 856,
+      "byteLength": 3445290,
+      "error": null,
+      "topLevelShape": {
+        "__object": true,
+        "keys": [
+          "fixtureId",
+          "participant1Id",
+          "participant2Id",
+          "sportId",
+          "tournamentId",
+          "seasonId",
+          "statusId",
+          "hasOdds",
+          "startTime",
+          "trueStartTime",
+          "trueEndTime",
+          "updatedAt",
+          "bookmakerOdds"
+        ]
+      }
+    },
+    {
+      "label": "odds?fixtureId=id1000070172346910",
+      "endpoint": "/odds?fixtureId=id1000070172346910",
+      "httpStatus": 200,
+      "latencyMs": 719,
+      "byteLength": 2962694,
+      "error": null,
+      "topLevelShape": {
+        "__object": true,
+        "keys": [
+          "fixtureId",
+          "participant1Id",
+          "participant2Id",
+          "sportId",
+          "tournamentId",
+          "seasonId",
+          "statusId",
+          "hasOdds",
+          "startTime",
+          "trueStartTime",
+          "trueEndTime",
+          "updatedAt",
+          "bookmakerOdds"
+        ]
+      }
+    },
+    {
+      "label": "odds?fixtureId=id1000070172346912",
+      "endpoint": "/odds?fixtureId=id1000070172346912",
+      "httpStatus": 200,
+      "latencyMs": 795,
+      "byteLength": 2925070,
+      "error": null,
+      "topLevelShape": {
+        "__object": true,
+        "keys": [
+          "fixtureId",
+          "participant1Id",
+          "participant2Id",
+          "sportId",
+          "tournamentId",
+          "seasonId",
+          "statusId",
+          "hasOdds",
+          "startTime",
+          "trueStartTime",
+          "trueEndTime",
+          "updatedAt",
+          "bookmakerOdds"
+        ]
+      }
+    },
+    {
+      "label": "odds?fixtureId=id1000070172346914",
+      "endpoint": "/odds?fixtureId=id1000070172346914",
+      "httpStatus": 200,
+      "latencyMs": 780,
+      "byteLength": 3024254,
+      "error": null,
+      "topLevelShape": {
+        "__object": true,
+        "keys": [
+          "fixtureId",
+          "participant1Id",
+          "participant2Id",
+          "sportId",
+          "tournamentId",
+          "seasonId",
+          "statusId",
+          "hasOdds",
+          "startTime",
+          "trueStartTime",
+          "trueEndTime",
+          "updatedAt",
+          "bookmakerOdds"
+        ]
+      }
+    },
+    {
+      "label": "odds?fixtureId=id1000070172346916",
+      "endpoint": "/odds?fixtureId=id1000070172346916",
+      "httpStatus": 200,
+      "latencyMs": 966,
+      "byteLength": 4375641,
+      "error": null,
+      "topLevelShape": {
+        "__object": true,
+        "keys": [
+          "fixtureId",
+          "participant1Id",
+          "participant2Id",
+          "sportId",
+          "tournamentId",
+          "seasonId",
+          "statusId",
+          "hasOdds",
+          "startTime",
+          "trueStartTime",
+          "trueEndTime",
+          "updatedAt",
+          "bookmakerOdds"
+        ]
+      }
+    },
+    {
+      "label": "odds?fixtureId=id1000070172346918",
+      "endpoint": "/odds?fixtureId=id1000070172346918",
+      "httpStatus": 200,
+      "latencyMs": 710,
+      "byteLength": 2898660,
+      "error": null,
+      "topLevelShape": {
+        "__object": true,
+        "keys": [
+          "fixtureId",
+          "participant1Id",
+          "participant2Id",
+          "sportId",
+          "tournamentId",
+          "seasonId",
+          "statusId",
+          "hasOdds",
+          "startTime",
+          "trueStartTime",
+          "trueEndTime",
+          "updatedAt",
+          "bookmakerOdds"
+        ]
+      }
+    },
+    {
+      "label": "odds-by-tournaments(pinnacle)",
+      "endpoint": "/odds-by-tournaments?tournamentIds=701&bookmaker=pinnacle&oddsFormat=decimal",
+      "httpStatus": 200,
+      "latencyMs": 208,
+      "byteLength": 24377,
+      "error": null,
+      "topLevelShape": {
+        "__array": true,
+        "length": 1,
+        "itemKeys": [
+          "fixtureId",
+          "participant1Id",
+          "participant2Id",
+          "sportId",
+          "tournamentId",
+          "seasonId",
+          "statusId",
+          "hasOdds",
+          "startTime",
+          "trueStartTime",
+          "trueEndTime",
+          "updatedAt",
+          "bookmakerOdds"
+        ]
+      }
+    },
+    {
+      "label": "account(after)",
+      "endpoint": "/account",
+      "httpStatus": 200,
+      "latencyMs": 219,
+      "byteLength": 24465,
+      "error": null,
+      "topLevelShape": {
+        "__object": true,
+        "keys": [
+          "api_key",
+          "created_at",
+          "language_code",
+          "language_name",
+          "email",
+          "current_subscription_id",
+          "customer_segment",
+          "subscriptions"
+        ]
+      }
+    }
+  ],
+  "quota": {
+    "before": {
+      "httpStatus": 200,
+      "request_limit": 250,
+      "request_count": 58,
+      "valid_until": null,
+      "is_active": true,
+      "bookmakerCount": 388
+    },
+    "after": {
+      "httpStatus": 200,
+      "request_limit": 250,
+      "request_count": 68,
+      "valid_until": null,
+      "is_active": true,
+      "bookmakerCount": 388
+    },
+    "meteredCallsObserved": 10,
+    "requestsIssued": 12
+  },
+  "parity": {
+    "fixturesCompared": 8,
+    "fixturesInBothPaths": 1,
+    "fixturesMissingFromBatch": [],
+    "fixturesAbsentInBothPaths": [
+      "id1000070172346904",
+      "id1000070172346906",
+      "id1000070172346908",
+      "id1000070172346910",
+      "id1000070172346912",
+      "id1000070172346914",
+      "id1000070172346918"
+    ],
+    "identity": {
+      "compared": 1,
+      "matches": 1,
+      "mismatches": [],
+      "batchOmitsFields": [
+        "participant1Name",
+        "participant2Name"
+      ]
+    },
+    "bookmakerPresence": {
+      "id1000070172346916": {
+        "legacyBookmakerCount": 130,
+        "legacyHasPinnacle": true,
+        "legacyHasSbobet": false,
+        "batchBookmakers": [
+          "pinnacle"
+        ]
+      }
+    },
+    "perBookmaker": {
+      "pinnacle": {
+        "fixturesCompared": 1,
+        "pointsCompared": 65,
+        "priceMatches": 65,
+        "priceMismatches": 0,
+        "changedAtMatches": 65,
+        "changedAtMismatches": 0,
+        "missingMarkets": [],
+        "extraMarkets": [],
+        "missingOutcomes": [],
+        "extraOutcomes": [],
+        "legacyCoreCoverage": {
+          "asianHandicap": 9,
+          "overUnder": 7,
+          "btts": 0,
+          "quarterLineAh": 5,
+          "unknownMarketIds": []
+        },
+        "batchCoreCoverage": {
+          "asianHandicap": 9,
+          "overUnder": 7,
+          "btts": 0,
+          "quarterLineAh": 5,
+          "unknownMarketIds": []
+        }
+      }
+    }
+  },
+  "verdict": {
+    "valueParityOnOverlap": true,
+    "presenceParityPass": null,
+    "batchCoverageComplete": false,
+    "fullWindowReplaceable": false,
+    "identityMismatch": 0,
+    "totalPriceMismatch": 0,
+    "totalMissingMarkets": 0,
+    "totalMissingOutcomes": 0,
+    "totalExtraMarkets": 0,
+    "coreMarketsPresentInBatch": true,
+    "meteredCallsThisProbe": 10
+  },
+  "discovery": {
+    "fixturesWithOdds": 1836,
+    "tournaments": 307,
+    "chosenTournamentId": 701,
+    "chosenTournamentName": "Championship",
+    "targetFixtureIds": [
+      "id1000070172346904",
+      "id1000070172346906",
+      "id1000070172346908",
+      "id1000070172346910",
+      "id1000070172346912",
+      "id1000070172346914",
+      "id1000070172346916",
+      "id1000070172346918"
+    ]
+  },
+  "marketDictionarySize": 33115,
+  "identityFields": {
+    "legacyFixturesIndex": [
+      "fixtureId",
+      "tournamentId",
+      "participant1Name",
+      "participant2Name",
+      "startTime",
+      "sportId"
+    ],
+    "legacyOddsByFixture": [
+      "fixtureId",
+      "tournamentId",
+      "startTime",
+      "sportId"
+    ],
+    "batchByBookmaker": {
+      "pinnacle": [
+        "fixtureId",
+        "tournamentId",
+        "startTime",
+        "sportId"
+      ]
+    },
+    "note": "The pipelines consume participant1Name/participant2Name from /v4/fixtures for canonical matching; /v4/odds-by-tournaments omits them."
+  },
+  "batchIntrospection": {
+    "pinnacle": {
+      "httpStatus": 200,
+      "errorCode": null,
+      "returnedCount": 1,
+      "returned": [
+        {
+          "fixtureId": "id1000070172346916",
+          "tournamentId": 701,
+          "startTime": "2026-10-02T18:45:00.000Z",
+          "bookmakerKeys": [
+            "pinnacle"
+          ]
+        }
+      ]
+    }
+  },
+  "batchCoverageOfDiscovery": {
+    "tournamentId": 701,
+    "discoveryFixtureCount": 8,
+    "pinnacle": {
+      "returnedByBatch": 1,
+      "discoveryCovered": 1,
+      "discoveryMissing": 7,
+      "coveragePct": 12.5,
+      "missingSample": [
+        "id1000070172346904",
+        "id1000070172346906",
+        "id1000070172346908",
+        "id1000070172346910",
+        "id1000070172346912",
+        "id1000070172346918",
+        "id1000070172346914"
+      ]
+    }
+  },
+  "presenceParity": {
+    "swept": false,
+    "discoveryFixtures": 8,
+    "perBookmaker": {}
+  }
+}
