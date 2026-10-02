@@ -3,7 +3,8 @@
 **Sprint:** Provider Execution Gate · **Phase:** P0 · **Date:** 2026-10-02
 **Scope:** Production odds acquisition path only. No model, feature, confidence-gate,
 payment or deployment change.
-**Result:** `P0 = PASS — READY FOR DEPLOY (not deployed)`
+**Result:** `P0 = PASS — DEPLOYED TO PRODUCTION (2026-10-02)` — see §10 and
+`SALMO_P0_DEPLOYMENT_RECORD.md`.
 
 ---
 
@@ -350,11 +351,17 @@ disclosed rather than fudged.
 ## 10. Deployment status
 
 ```
-READY FOR DEPLOY — NOT DEPLOYED
+DEPLOYED TO PRODUCTION — 2026-10-02
 ```
 
-No `git push`, no `vercel deploy`, no production migration, no provider purchase, no
-subscription change, no payment-code touch. Files changed by P0:
+Deployment: `handicap-j7kkg76ft-shinerva.vercel.app` → production alias `handicaplab.dev`
+(`Ready`, 4m build). Deployed from a clean worktree pinned to commit `5d340ac` via the Vercel
+CLI — the Vercel project has **no Git integration**, so no `git push` was performed. Post-deploy
+smoke: **PASS**, 3 metered calls/cycle, account quota `88 → 91` (exactly `+3`). Full audit
+trail: `SALMO_P0_DEPLOYMENT_RECORD.md`.
+
+No `git push`, no production migration, no provider purchase, no subscription change, no
+payment-code touch. Files changed by P0:
 
 ```
  M src/lib/data/providers/core/config.ts          (lazy credential resolution — §6.1)
@@ -516,8 +523,8 @@ reconciles exactly.
 
 ```
 P0 COMMIT       = GO
-P0 DEPLOYMENT   = READY, NOT DEPLOYED  (awaiting explicit human authorisation)
-P0 PRODUCTION   = BLOCKED until deployment is authorised and prod smoke is run
+P0 DEPLOYMENT   = DEPLOYED 2026-10-02 (handicap-j7kkg76ft-shinerva → handicaplab.dev)
+P0 PRODUCTION   = PASS (post-deploy smoke: 3 metered calls/cycle; quota 88 → 91)
 ```
 
 
