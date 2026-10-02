@@ -40,10 +40,11 @@ export class Dribble360Adapter {
     if (!raw) return '';
     return raw
       .toLowerCase()
-      .replace(/\bc\.?\s*f\.?\b/gi, '')
-      .replace(/\ba\.?\s*f\.?\s*c\.?\b/gi, '')
-      .replace(/\bf\.?\s*c\.?\b/gi, '')
+      .trim()
       .replace(/[\.\-_']/g, ' ')
+      .replace(/\bfc\b/g, '')
+      .replace(/\bafc\b/g, '')
+      .replace(/\bc\s*f\b/g, '')
       .replace(/\s+/g, ' ')
       .trim();
   }

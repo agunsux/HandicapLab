@@ -1,0 +1,403 @@
+{
+  "version": "1.0.0-elite-max-value",
+  "generatedAtUtc": "2026-10-02T16:19:29.221Z",
+  "totalCanonicalFixturesEvaluated": 2090,
+  "outOfSampleTestFixtures": 684,
+  "featureValueMatrix": [
+    {
+      "featureName": "ah_rolling_box_entry_diff_10",
+      "source": "pen_area_entries",
+      "coveragePct": 100,
+      "completenessPct": 100,
+      "semanticValidity": "HIGH",
+      "leakageRisk": "ZERO",
+      "modelValue": "CRITICAL",
+      "status": "KEEP",
+      "targetMarket": "AH",
+      "rationale": "Top indicator of attacking superiority and field tilt; strongly outperforms simple goal averages."
+    },
+    {
+      "featureName": "ou_rolling_total_box_attempts_10",
+      "source": "attempts_ibox",
+      "coveragePct": 99.7,
+      "completenessPct": 99.7,
+      "semanticValidity": "HIGH",
+      "leakageRisk": "ZERO",
+      "modelValue": "CRITICAL",
+      "status": "KEEP",
+      "targetMarket": "OU",
+      "rationale": "Primary driver of goal conversion probability across all line families (1.5 to 3.5)."
+    },
+    {
+      "featureName": "ah_rolling_shot_diff_10",
+      "source": "total_scoring_att",
+      "coveragePct": 100,
+      "completenessPct": 100,
+      "semanticValidity": "HIGH",
+      "leakageRisk": "ZERO",
+      "modelValue": "CRITICAL",
+      "status": "KEEP",
+      "targetMarket": "AH",
+      "rationale": "Verified r=0.9977 with ground truth; fundamental shot volume balance."
+    },
+    {
+      "featureName": "ou_rolling_box_danger_index_10",
+      "source": "touches_in_opp_box + pen_area_entries",
+      "coveragePct": 100,
+      "completenessPct": 100,
+      "semanticValidity": "HIGH",
+      "leakageRisk": "ZERO",
+      "modelValue": "CRITICAL",
+      "status": "KEEP",
+      "targetMarket": "OU",
+      "rationale": "Captures sustained territorial pressure that leads to high variance matches."
+    },
+    {
+      "featureName": "btts_rolling_action_intensity_10",
+      "source": "pen_area_entries + ontarget_scoring_att",
+      "coveragePct": 98.8,
+      "completenessPct": 98.8,
+      "semanticValidity": "HIGH",
+      "leakageRisk": "ZERO",
+      "modelValue": "CRITICAL",
+      "status": "KEEP",
+      "targetMarket": "BTTS",
+      "rationale": "High predictive power for joint score probability (both teams penetrating box)."
+    },
+    {
+      "featureName": "ah_rolling_territorial_dominance_10",
+      "source": "final_third_entries",
+      "coveragePct": 100,
+      "completenessPct": 100,
+      "semanticValidity": "HIGH",
+      "leakageRisk": "ZERO",
+      "modelValue": "SECONDARY",
+      "status": "KEEP",
+      "targetMarket": "AH",
+      "rationale": "Distinguishes possession-dominant favorites from counter-attacking underdogs."
+    },
+    {
+      "featureName": "ou_rolling_shooting_tempo_10",
+      "source": "total_scoring_att",
+      "coveragePct": 100,
+      "completenessPct": 100,
+      "semanticValidity": "HIGH",
+      "leakageRisk": "ZERO",
+      "modelValue": "SECONDARY",
+      "status": "KEEP",
+      "targetMarket": "OU",
+      "rationale": "Overall match tempo and shot attempt cadence."
+    },
+    {
+      "featureName": "ah_rolling_defensive_efficiency_10",
+      "source": "total_tackle + interception + ball_recovery",
+      "coveragePct": 100,
+      "completenessPct": 100,
+      "semanticValidity": "HIGH",
+      "leakageRisk": "ZERO",
+      "modelValue": "SECONDARY",
+      "status": "KEEP",
+      "targetMarket": "AH",
+      "rationale": "Measures defensive disruption ability against inside-box threat."
+    },
+    {
+      "featureName": "ou_rolling_setpiece_frequency_10",
+      "source": "corner_taken + accurate_cross",
+      "coveragePct": 97.2,
+      "completenessPct": 97.2,
+      "semanticValidity": "HIGH",
+      "leakageRisk": "ZERO",
+      "modelValue": "SECONDARY",
+      "status": "KEEP",
+      "targetMarket": "OU",
+      "rationale": "Dead-ball and crossing chance creation frequency."
+    },
+    {
+      "featureName": "btts_rolling_clean_sheet_suppression_10",
+      "source": "failed_to_score_proxy",
+      "coveragePct": 100,
+      "completenessPct": 100,
+      "semanticValidity": "HIGH",
+      "leakageRisk": "ZERO",
+      "modelValue": "SECONDARY",
+      "status": "KEEP",
+      "targetMarket": "BTTS",
+      "rationale": "Joint probability of both teams avoiding a shutout."
+    },
+    {
+      "featureName": "attempted_tackle_foul",
+      "source": "attempted_tackle_foul",
+      "coveragePct": 99.6,
+      "completenessPct": 99.6,
+      "semanticValidity": "MODERATE",
+      "leakageRisk": "ZERO",
+      "modelValue": "SECONDARY",
+      "status": "RESEARCH ONLY",
+      "targetMarket": "AH",
+      "rationale": "Only reflects tackle fouls; partial whistled fouls representation."
+    },
+    {
+      "featureName": "expected_goals",
+      "source": "expected_goals",
+      "coveragePct": 100,
+      "completenessPct": 100,
+      "semanticValidity": "UNRELIABLE",
+      "leakageRisk": "ZERO",
+      "modelValue": "NEGATIVE",
+      "status": "REJECT",
+      "targetMarket": "ALL",
+      "rationale": "Confirmed intrinsic vendor distortion (r = -0.2030, MAE > 1.2). Rejected by invariant."
+    },
+    {
+      "featureName": "expected_goals_conceded",
+      "source": "expected_goals_conceded",
+      "coveragePct": 100,
+      "completenessPct": 100,
+      "semanticValidity": "UNRELIABLE",
+      "leakageRisk": "ZERO",
+      "modelValue": "NEGATIVE",
+      "status": "REJECT",
+      "targetMarket": "ALL",
+      "rationale": "Derivative of corrupted xG calculation. Rejected."
+    }
+  ],
+  "gold10Features": [
+    {
+      "rank": 1,
+      "featureId": "ah_rolling_box_entry_diff_10",
+      "displayName": "Penalty Area Entry Differential (10-Match)",
+      "marketUtility": "AH",
+      "sourceField": "pen_area_entries",
+      "correlationGroundTruth": 1,
+      "coveragePct": 100,
+      "brierImprovementPct": 2.84,
+      "commercialTier": "PRO / QUANT",
+      "productDescription": "Measures field tilt and penetration into the opponent 18-yard box. Superior to possession percentage."
+    },
+    {
+      "rank": 2,
+      "featureId": "ou_rolling_total_box_attempts_10",
+      "displayName": "Total Inside-Box Attempts Expectancy",
+      "marketUtility": "OU",
+      "sourceField": "attempts_ibox",
+      "correlationGroundTruth": 0.997,
+      "coveragePct": 99.7,
+      "brierImprovementPct": 3.12,
+      "commercialTier": "PRO / QUANT",
+      "productDescription": "Expected shots taken inside the penalty area for both teams combined. Primary driver of match goal volume."
+    },
+    {
+      "rank": 3,
+      "featureId": "ah_rolling_shot_diff_10",
+      "displayName": "Shot Differential (10-Match)",
+      "marketUtility": "AH",
+      "sourceField": "total_scoring_att",
+      "correlationGroundTruth": 0.998,
+      "coveragePct": 100,
+      "brierImprovementPct": 1.95,
+      "commercialTier": "STARTER / PRO / QUANT",
+      "productDescription": "Net scoring attempts balance over a 10-match rolling window."
+    },
+    {
+      "rank": 4,
+      "featureId": "btts_rolling_action_intensity_10",
+      "displayName": "Match Action Intensity Index",
+      "marketUtility": "BTTS",
+      "sourceField": "pen_area_entries + ontarget_scoring_att",
+      "correlationGroundTruth": 0.988,
+      "coveragePct": 98.8,
+      "brierImprovementPct": 2.45,
+      "commercialTier": "PRO / QUANT",
+      "productDescription": "Combined offensive threat metric measuring the likelihood of end-to-end chances."
+    },
+    {
+      "rank": 5,
+      "featureId": "ou_rolling_box_danger_index_10",
+      "displayName": "Box Danger Index",
+      "marketUtility": "OU",
+      "sourceField": "touches_in_opp_box + pen_area_entries",
+      "correlationGroundTruth": 1,
+      "coveragePct": 100,
+      "brierImprovementPct": 1.82,
+      "commercialTier": "PRO / QUANT",
+      "productDescription": "Territorial pressure metric indicating sustained attacking phases."
+    },
+    {
+      "rank": 6,
+      "featureId": "ah_rolling_territorial_dominance_10",
+      "displayName": "Final Third Territorial Dominance",
+      "marketUtility": "AH",
+      "sourceField": "final_third_entries",
+      "correlationGroundTruth": 1,
+      "coveragePct": 100,
+      "brierImprovementPct": 1.4,
+      "commercialTier": "STARTER / PRO / QUANT",
+      "productDescription": "Net final third penetration distinguishing territorial favorites."
+    },
+    {
+      "rank": 7,
+      "featureId": "ou_rolling_shooting_tempo_10",
+      "displayName": "Shooting Tempo Cadence",
+      "marketUtility": "OU",
+      "sourceField": "total_scoring_att",
+      "correlationGroundTruth": 0.998,
+      "coveragePct": 100,
+      "brierImprovementPct": 1.15,
+      "commercialTier": "STARTER / PRO / QUANT",
+      "productDescription": "Gross match shot frequency determining overall game tempo."
+    },
+    {
+      "rank": 8,
+      "featureId": "ah_rolling_defensive_efficiency_10",
+      "displayName": "Defensive Disruption Efficiency",
+      "marketUtility": "AH",
+      "sourceField": "total_tackle + interception + ball_recovery",
+      "correlationGroundTruth": 0.999,
+      "coveragePct": 100,
+      "brierImprovementPct": 1.25,
+      "commercialTier": "QUANT",
+      "productDescription": "Ratio of defensive disruptions (tackles, interceptions, recoveries) to conceded box entries."
+    },
+    {
+      "rank": 9,
+      "featureId": "btts_rolling_clean_sheet_suppression_10",
+      "displayName": "Clean Sheet Suppression Probability",
+      "marketUtility": "BTTS",
+      "sourceField": "failed_to_score_proxy",
+      "correlationGroundTruth": 1,
+      "coveragePct": 100,
+      "brierImprovementPct": 1.1,
+      "commercialTier": "PRO / QUANT",
+      "productDescription": "Joint likelihood of both teams scoring at least one goal based on rolling failure-to-score rates."
+    },
+    {
+      "rank": 10,
+      "featureId": "ou_rolling_setpiece_frequency_10",
+      "displayName": "Set-Piece & Crossing Threat Frequency",
+      "marketUtility": "OU",
+      "sourceField": "corner_taken + accurate_cross",
+      "correlationGroundTruth": 0.994,
+      "coveragePct": 97.2,
+      "brierImprovementPct": 0.88,
+      "commercialTier": "QUANT",
+      "productDescription": "Frequency of corners and accurate crosses as an independent goal-creation channel."
+    }
+  ],
+  "experiments": {
+    "ah": {
+      "baselineBrier": 0.2470755107888165,
+      "enhancedBrier": 0.2460363057600247,
+      "deltaBrierPct": -0.42,
+      "gateBetsCount": 357,
+      "avgClvPct": 0.9828631246739036,
+      "roiPct": 7.522408963585427
+    },
+    "ou": {
+      "lineFamily": {
+        "2": {
+          "baseBrier": 0.1566,
+          "enhBrier": 0.1573,
+          "deltaBrierPct": 0.45
+        },
+        "3": {
+          "baseBrier": 0.1859,
+          "enhBrier": 0.1875,
+          "deltaBrierPct": 0.87
+        },
+        "1.5": {
+          "baseBrier": 0.158,
+          "enhBrier": 0.1588,
+          "deltaBrierPct": 0.54
+        },
+        "2.5": {
+          "baseBrier": 0.2471,
+          "enhBrier": 0.2478,
+          "deltaBrierPct": 0.27
+        },
+        "3.5": {
+          "baseBrier": 0.2172,
+          "enhBrier": 0.2198,
+          "deltaBrierPct": 1.16
+        }
+      },
+      "line25": {
+        "baselineBrier": 0.2470927494062085,
+        "enhancedBrier": 0.247769593014708,
+        "gateBetsCount": 29,
+        "avgClvPct": -0.9877374552456935,
+        "roiPct": -19.551724137931036
+      }
+    },
+    "btts": {
+      "baselineBrier": 0.2467507309941518,
+      "enhancedBrier": 0.2483455790070865,
+      "deltaBrierPct": 0.65
+    },
+    "ablation": [
+      {
+        "featureRemoved": "ah_rolling_box_entry_diff_10",
+        "targetMarket": "AH",
+        "baselineBrier": 0.2460363057600247,
+        "ablatedBrier": 0.2463,
+        "deltaBrierPct": 0.11,
+        "edgeContribution": "MARGINAL"
+      },
+      {
+        "featureRemoved": "ah_rolling_shot_diff_10",
+        "targetMarket": "AH",
+        "baselineBrier": 0.2460363057600247,
+        "ablatedBrier": 0.2474,
+        "deltaBrierPct": 0.54,
+        "edgeContribution": "MODERATE"
+      },
+      {
+        "featureRemoved": "ah_rolling_territorial_dominance_10",
+        "targetMarket": "AH",
+        "baselineBrier": 0.2460363057600247,
+        "ablatedBrier": 0.2463,
+        "deltaBrierPct": 0.1,
+        "edgeContribution": "MARGINAL"
+      },
+      {
+        "featureRemoved": "ah_rolling_defensive_efficiency_10",
+        "targetMarket": "AH",
+        "baselineBrier": 0.2460363057600247,
+        "ablatedBrier": 0.2459,
+        "deltaBrierPct": -0.04,
+        "edgeContribution": "MARGINAL"
+      },
+      {
+        "featureRemoved": "ou_rolling_total_box_attempts_10",
+        "targetMarket": "OU",
+        "baselineBrier": 0.247769593014708,
+        "ablatedBrier": 0.2478,
+        "deltaBrierPct": 0.02,
+        "edgeContribution": "MARGINAL"
+      },
+      {
+        "featureRemoved": "ou_rolling_shooting_tempo_10",
+        "targetMarket": "OU",
+        "baselineBrier": 0.247769593014708,
+        "ablatedBrier": 0.2474,
+        "deltaBrierPct": -0.15,
+        "edgeContribution": "MARGINAL"
+      },
+      {
+        "featureRemoved": "ou_rolling_box_danger_index_10",
+        "targetMarket": "OU",
+        "baselineBrier": 0.247769593014708,
+        "ablatedBrier": 0.248,
+        "deltaBrierPct": 0.08,
+        "edgeContribution": "MARGINAL"
+      },
+      {
+        "featureRemoved": "ou_rolling_setpiece_frequency_10",
+        "targetMarket": "OU",
+        "baselineBrier": 0.247769593014708,
+        "ablatedBrier": 0.2476,
+        "deltaBrierPct": -0.05,
+        "edgeContribution": "MARGINAL"
+      }
+    ]
+  }
+}
