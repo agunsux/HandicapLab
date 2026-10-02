@@ -121,6 +121,13 @@ Core probe fields: `total_sub_on`, `total_scoring_att`, `total_pass`, `accurate_
 Every bridged cell is **ENG-PL**; every other harvested record is `UNBRIDGED`.
 `coverageVsGoldenPct` is only defined for bridged cells.
 
+> **The payload ships no competition identifier.** None of the 303 fields is a league,
+> competition, country or season key. Competition attribution therefore exists **only**
+> for the 1,158 bridged side-rows (inherited from golden `leagueId`); all
+> 69,234 unbridged records are literally `UNBRIDGED` and their competition is
+> **unknowable from the payload**. A full competition census for this corpus cannot be
+> produced without the golden bridge, and is deliberately **not** claimed here.
+
 | League | Season | Side-rows | Unique matches | Golden available | Missing | Coverage |
 |---|---|---|---|---|---|---|
 | ENG-PL | `2020-2021` | 180 | 90 | 380 | 290 | 23.68% |
@@ -351,13 +358,33 @@ Artefacts consumed (all under the gitignored `data/research/dribble360/` tree):
 - **Provider role.** Dribble360 is a **research/historical** provider only. It is
   **not** a production odds authority: `OddsPAPI` remains the sole production odds
   authority and `API-Football` the fixture/statistics authority.
-- **Retention/derivative rights are UNVERIFIED and BLOCKING.** Nothing in this
-  corpus may inform a shipped model until the licensing review clears.
 - **No future leakage.** Every `PRE_MATCH_SAFE_AS_LAG` field must be consumed as
   `shift(1)` within team. See §5.1.
 - **No extraordinary result without audit.** Any ROI > 10%, Brier improvement
   > 10%, or unusual performance jump derived from this corpus triggers a mandatory
   leakage / target-definition / split / sample-size / methodology audit.
+
+### 8.1 Licensing / Retention Status
+
+> **`LICENSE_REQUIRES_REVIEW`** — retention and derivative rights are **UNVERIFIED**.
+> This is the controlling blocker for every downstream use.
+
+| Category | Status | Notes |
+|---|---|---|
+| Technically harvested | **YES** | 631 MB `harvest/` + 28 MB `raw_captures/`, 82 recorded Elite API calls. |
+| Research-retainable | **UNVERIFIED** | No vendor retention clause has been confirmed in writing. Local research use only. |
+| Commercially redistributable | **NO — not claimed** | No redistribution right is asserted or implied. Never commit the payload. |
+| License unclear | **YES** | Vendor terms not reviewed by counsel. Treat as unresolved. |
+
+> **HARD RULE — the payload must never enter git.** `.gitignore` line 127 deliberately
+> excludes `data/research/dribble360/` under the comment *"NEVER commit raw provider
+> captures"*, and `WAREHOUSE_MANIFEST.json` records
+> `gitignoreStatus: "IGNORED … raw provider captures are never committed."` Only this
+> runbook, the audit scripts and the derived reports are committed; the data itself is
+> not, and the commit gate must never `git add -f` it.
+
+> **No deployment.** Nothing derived from this corpus may enter SALMO production, and
+> no research feature may be marked production-tier, until the licensing review clears.
 
 ---
 
