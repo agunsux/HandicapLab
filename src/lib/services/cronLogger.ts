@@ -1,5 +1,22 @@
 import { supabase } from '@/lib/supabase.server';
 
+/**
+ * Cron / job-run observability.
+ *
+ * IMPORTANT (production state recovery, 2026-10-02):
+ * The legacy `cron_runs` table does NOT exist in production (HTTP 404 /
+ * PGRST205) and the only migration definition of it uses a different column
+ * set. Cron execution was therefore completely unobservable — `start()`
+ * silently returned null.
+ *
+ * This logger now writes to the existing `live_validation_job_runs` table,
+ * which is purpose-built for job-run records:
+ *   job_name, status, started_at, finished_at, duration_ms,
+ *   items_discovered, items_processed, items_failed, error_message,
+ *   correlation_id
+ */
+export const CRON_RUN_TABLE = 'live_validation_job_runs';
+
 export interface CronRunLog {
   id?: string;
   cron_name: string;
@@ -90,17 +107,21 @@ export class CronLogger {
     try {
       const startTime = new Date().toISOString();
       const { data, error } = await supabase
-        .from('cron_runs')
+        .from(CRON_RUN_TABLE)
         .insert({
-          cron_name: cronName,
-          start_time: startTime,
-          records_processed: 0
+          job_name: cronName,
+          status: 'RUNNING',
+          started_at: startTime,
+          correlation_id: `${cronName}:${startTime}`,
+          items_discovered: 0,
+          items_processed: 0,
+          items_failed: 0,
         })
         .select('id')
         .single();
 
       if (error) {
-        console.error(`[CronLogger] Failed to start log for ${cronName}:`, error);
+        console.error(`[CronLogger] Failed to start log for ${cronName}:`, error.message);
         return null;
       }
       return data?.id || null;
@@ -120,16 +141,18 @@ export class CronLogger {
       const endTime = new Date().toISOString();
       const sanitizedError = errors ? sanitizeAndCategorizeError(errors) : null;
       const { error } = await supabase
-        .from('cron_runs')
+        .from(CRON_RUN_TABLE)
         .update({
-          end_time: endTime,
-          records_processed: recordsProcessed,
-          errors: sanitizedError
+          status: sanitizedError ? 'FAILED' : 'SUCCESS',
+          finished_at: endTime,
+          items_processed: recordsProcessed,
+          items_failed: sanitizedError ? 1 : 0,
+          error_message: sanitizedError,
         })
         .eq('id', logId);
 
       if (error) {
-        console.error(`[CronLogger] Failed to end log for logId ${logId}:`, error);
+        console.error(`[CronLogger] Failed to end log for logId ${logId}:`, error.message);
       }
     } catch (err) {
       console.error(`[CronLogger] Exception ending log for logId ${logId}:`, err);
@@ -142,27 +165,32 @@ export class CronLogger {
     recentRuns: any[];
   }> {
     const { data: runs } = await supabase
-      .from('cron_runs')
+      .from(CRON_RUN_TABLE)
       .select('*')
-      .eq('cron_name', cronName)
-      .order('start_time', { ascending: false });
+      .eq('job_name', cronName)
+      .order('started_at', { ascending: false });
 
-    const recentRuns = (runs || []).map(r => {
-      const started = new Date(r.start_time).getTime();
-      const finished = r.end_time ? new Date(r.end_time).getTime() : null;
+    const recentRuns = (runs || []).map((r: any) => {
+      const started = new Date(r.started_at).getTime();
+      const finished = r.finished_at ? new Date(r.finished_at).getTime() : null;
       const duration = finished ? (finished - started) / 1000 : 0;
       return {
-        run_id: r.id,
-        started_at: r.start_time,
-        finished_at: r.end_time || null,
+        run_id: r.correlation_id || r.id,
+        started_at: r.started_at,
+        finished_at: r.finished_at || null,
         duration,
-        status: r.errors ? 'failed' : (r.end_time ? 'success' : 'running'),
-        error_message: r.errors || null
+        status:
+          r.status === 'FAILED'
+            ? 'failed'
+            : r.status === 'SUCCESS'
+              ? 'success'
+              : 'running',
+        error_message: r.error_message || null,
       };
     });
 
-    const failureCount = recentRuns.filter(r => r.status === 'failed').length;
-    const successRun = recentRuns.find(r => r.status === 'success');
+    const failureCount = recentRuns.filter((r) => r.status === 'failed').length;
+    const successRun = recentRuns.find((r) => r.status === 'success');
     const lastSuccessfulRun = successRun ? successRun.started_at : null;
 
     return {

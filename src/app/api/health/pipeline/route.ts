@@ -33,6 +33,10 @@ import { DailyPredictionLedgerService } from '@/lib/pipeline/dailyPredictionLedg
 import { DurableLedgerStore } from '@/lib/ledger/durableLedgerStore';
 import { SalmoSyncService } from '@/lib/pipeline/salmoSyncService';
 import { PipelineFreshnessTelemetry } from '@/lib/telemetry/pipelineFreshnessTelemetry';
+import {
+  readLatestDurableState,
+  isDurableStateRequired,
+} from '@/lib/durability/productionDurableState';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -78,6 +82,25 @@ export async function GET(request: NextRequest) {
     const salmoCount = Object.keys(salmoSynced).length;
 
     const now = Date.now();
+
+    // ──────────────────────────────────────────────────────────────────────
+    // DURABLE PRODUCTION STATE (authoritative read model)
+    // On Vercel the durable Supabase state is the only source allowed to
+    // represent live freshness. Build-time bundles must never masquerade.
+    // ──────────────────────────────────────────────────────────────────────
+    const durableRequired = isDurableStateRequired();
+    const durable = await readLatestDurableState(now);
+    const durableDegraded = durableRequired && !durable.available;
+    const durableOddsFreshnessSeconds =
+      durable.latestOddsTimestampUtc
+        ? Math.max(
+            0,
+            Math.round(
+              (now - new Date(durable.latestOddsTimestampUtc).getTime()) / 1000
+            )
+          )
+        : telemetry.metrics.handicaplab_odds_freshness_seconds;
+
     const nextRun = `${new Date(now + 24 * 3600 * 1000).toISOString().slice(0, 10)}T04:00:00Z`;
 
     const stages = {
@@ -113,11 +136,11 @@ export async function GET(request: NextRequest) {
       },
     };
 
-    const overallHealthy = healthCheck.healthy && telemetry.status !== 'CRITICAL';
+    const overallHealthy = healthCheck.healthy && telemetry.status !== 'CRITICAL' && !durableDegraded;
     const httpStatus = overallHealthy ? 200 : 503;
 
     const responsePayload = {
-      status: telemetry.status,
+      status: durableDegraded ? 'DEGRADED' : telemetry.status,
       healthy: overallHealthy,
       lastRun: lastRun?.runId || null,
       lastRunTimestamp: lastRun?.startedAt || null,
@@ -125,7 +148,35 @@ export async function GET(request: NextRequest) {
       lastSuccessTimestamp: lastSuccess?.finishedAt || lastSuccess?.startedAt || null,
       hoursSinceLastSuccess: healthCheck.hoursSinceLastSuccess,
       nextScheduledRun: nextRun,
-      telemetry: telemetry.metrics,
+      telemetry: {
+        ...telemetry.metrics,
+        // Durable metrics take precedence — a git-committed bundle must never
+        // be reported as live production freshness.
+        ...(durableRequired && durable.available
+          ? {
+              handicaplab_predictions_total: durable.predictionCount,
+              handicaplab_odds_freshness_seconds: durableOddsFreshnessSeconds,
+            }
+          : {}),
+      },
+      /**
+       * Persistence status. `bundledFallbackInUse=true` while durable state is
+       * required means no fresh production state is available — treat as
+       * degraded, never as live.
+       */
+      persistence: {
+        required: durableRequired,
+        available: durable.available,
+        degraded: durable.degraded,
+        reason: durable.reason,
+        dataSource: durableRequired ? durable.dataSource : 'LOCAL_FILES',
+        bundledFallbackInUse: durableRequired ? !durable.available : false,
+        latestDurableOddsTimestampUtc: durable.latestOddsTimestampUtc,
+        latestDurablePredictionTimestampUtc: durable.latestPredictionTimestampUtc,
+        durablePredictionCount: durable.predictionCount,
+        durableUpcomingFixtureCount: durable.upcomingFixtureCount,
+        latestDurableRun: durable.latestRun,
+      },
       reconciliation: telemetry.reconciliationAudit,
       providers: {
         apiFootball: {

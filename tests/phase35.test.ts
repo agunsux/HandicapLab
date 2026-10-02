@@ -28,7 +28,7 @@ vi.mock('../src/lib/supabase.server', () => {
       if (chain._currentTable === 'signals') {
         return Promise.resolve({ data: mockSignals[0] || null, error: null });
       }
-      if (chain._currentTable === 'cron_runs') {
+      if (chain._currentTable === 'live_validation_job_runs') {
         return Promise.resolve({ data: mockCronRuns[0] || null, error: null });
       }
       return Promise.resolve({ data: null, error: null });
@@ -40,7 +40,7 @@ vi.mock('../src/lib/supabase.server', () => {
         resolve({ data: mockOdds, error: null });
       } else if (chain._currentTable === 'signals') {
         resolve({ data: mockSignals, error: null });
-      } else if (chain._currentTable === 'cron_runs') {
+      } else if (chain._currentTable === 'live_validation_job_runs') {
         resolve({ data: mockCronRuns, error: null });
       } else {
         resolve({ data: [], error: null });
@@ -83,9 +83,12 @@ describe('Phase 35.1: Production Hardening Integration tests', () => {
 
   describe('Part 2: Cron Reliability', () => {
     it('should compute durations, status flags, and last successful run timestamp', async () => {
+      // Cron observability now lives in live_validation_job_runs.
+      // The legacy `cron_runs` table does not exist in production — see
+      // docs/providers/SALMO_DURABLE_STATE_RECOVERY_PLAN.md.
       mockCronRuns = [
-        { id: 'run-1', cron_name: 'generate-signals', start_time: new Date(Date.now() - 5000).toISOString(), end_time: new Date().toISOString(), errors: null },
-        { id: 'run-2', cron_name: 'generate-signals', start_time: new Date(Date.now() - 10000).toISOString(), end_time: new Date().toISOString(), errors: 'Quota Exceeded' }
+        { id: 'run-1', job_name: 'generate-signals', status: 'SUCCESS', started_at: new Date(Date.now() - 5000).toISOString(), finished_at: new Date().toISOString(), items_processed: 12, error_message: null },
+        { id: 'run-2', job_name: 'generate-signals', status: 'FAILED', started_at: new Date(Date.now() - 10000).toISOString(), finished_at: new Date().toISOString(), items_processed: 0, error_message: 'API_QUOTA_EXCEEDED' }
       ];
 
       const metrics = await CronLogger.getCronMetrics('generate-signals');

@@ -17,6 +17,10 @@ import { PredictionArchiveService } from '@/lib/archive/predictionArchiveService
 import { DurableLedgerStore } from '@/lib/ledger/durableLedgerStore';
 import { DailyPerformanceService } from '@/lib/ledger/dailyPerformanceService';
 import { getProviderHealth } from '@/lib/providers/quotaManager';
+import {
+  readLatestDurableState,
+  isDurableStateRequired,
+} from '@/lib/durability/productionDurableState';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -25,6 +29,15 @@ export async function GET(request: NextRequest) {
   try {
     const nowMs = Date.now();
     const nowIso = new Date(nowMs).toISOString();
+
+    // ──────────────────────────────────────────────────────────────────────
+    // DURABLE PRODUCTION STATE (authoritative read model)
+    // Replaces the previous behaviour where a cold /tmp caused the read model
+    // to fall back to git-committed build artifacts and report frozen
+    // timestamps as live production freshness.
+    // ──────────────────────────────────────────────────────────────────────
+    const durableRequired = isDurableStateRequired();
+    const durable = await readLatestDurableState(nowMs);
 
     const archive = PredictionArchiveService.loadArchive();
     const records = Object.values(archive);
@@ -77,6 +90,16 @@ export async function GET(request: NextRequest) {
       });
     }
 
+    // Contradiction 5: durable production state required but unavailable.
+    // Prevents a build-time bundle from being presented as live freshness.
+    if (durableRequired && !durable.available) {
+      contradictions.push({
+        code: 'DURABLE_STATE_UNAVAILABLE',
+        message: `Durable production state is required but unavailable (${durable.reason ?? 'no reason provided'}). Live freshness cannot be established.`,
+        severity: 'CRITICAL',
+      });
+    }
+
     const providerHealth = await getProviderHealth().catch(() => []);
 
     const healthReport = {
@@ -85,20 +108,43 @@ export async function GET(request: NextRequest) {
       contradictions,
       telemetry: {
         timestamps: {
+          // Durable values take precedence on Vercel: the git-committed archive
+          // bundle must never be presented as current production freshness.
           latestFixtureIngestion: upcomingRecords[0]?.oddsTimestamp || null,
-          latestOddsIngestion: upcomingRecords[0]?.oddsTimestamp || null,
-          latestPredictionGeneration: records[0]?.predictionTimestamp || null,
+          latestOddsIngestion:
+            durableRequired && durable.available
+              ? durable.latestOddsTimestampUtc
+              : upcomingRecords[0]?.oddsTimestamp || null,
+          latestPredictionGeneration:
+            durableRequired && durable.available
+              ? durable.latestPredictionTimestampUtc
+              : records[0]?.predictionTimestamp || null,
           latestDailyPickUpdate: dailyPicks[0]?.updatedAtUtc || null,
           latestResultUpdate: settledRecords[0]?.settlement?.settledAt || null,
           latestSettlement: settledRecords[0]?.settlement?.settledAt || null,
           latestClosingSnapshot: clvRecords[0]?.settlement?.settledAt || null,
           latestClvCalculation: clvRecords[0]?.settlement?.settledAt || null,
-          latestSalmoSync: nowIso,
+          latestSalmoSync: durableRequired ? (durable.latestRun?.finishedAt ?? null) : nowIso,
+        },
+        persistence: {
+          required: durableRequired,
+          available: durable.available,
+          degraded: durable.degraded,
+          reason: durable.reason,
+          dataSource: durableRequired ? durable.dataSource : 'LOCAL_FILES',
+          bundledFallbackInUse: durableRequired ? !durable.available : false,
+          durablePredictionCount: durable.predictionCount,
+          durableUpcomingFixtureCount: durable.upcomingFixtureCount,
+          latestDurableRun: durable.latestRun,
         },
         counts: {
-          upcomingFixtureCount: new Set(upcomingRecords.map((r) => r.fixtureId)).size,
+          upcomingFixtureCount:
+            durableRequired && durable.available
+              ? durable.upcomingFixtureCount
+              : new Set(upcomingRecords.map((r) => r.fixtureId)).size,
           oddsCoveredFixtureCount: new Set(upcomingRecords.filter((r) => r.marketOdds > 1).map((r) => r.fixtureId)).size,
-          predictionCount: records.length,
+          predictionCount:
+            durableRequired && durable.available ? durable.predictionCount : records.length,
           activePickCount: dailyPicks.length,
           pendingSettlementCount: pendingSettlementRecords.length,
           settledPredictionCount: settledRecords.length,

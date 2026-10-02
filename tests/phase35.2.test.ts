@@ -28,8 +28,8 @@ vi.mock('../src/lib/supabase.server', () => {
       if (chain._currentTable === 'signals') {
         return Promise.resolve({ data: mockSignals[0] || null, error: null });
       }
-      if (chain._currentTable === 'cron_runs') {
-        const filtered = mockCronRuns.filter(r => r.cron_name === chain._eqVal);
+      if (chain._currentTable === 'live_validation_job_runs') {
+        const filtered = mockCronRuns.filter(r => r.job_name === chain._eqVal);
         return Promise.resolve({ data: filtered[0] || null, error: null });
       }
       return Promise.resolve({ data: null, error: null });
@@ -41,8 +41,8 @@ vi.mock('../src/lib/supabase.server', () => {
         resolve({ data: mockOdds, error: null });
       } else if (chain._currentTable === 'signals') {
         resolve({ data: mockSignals, error: null });
-      } else if (chain._currentTable === 'cron_runs') {
-        const filtered = mockCronRuns.filter(r => r.cron_name === chain._eqVal);
+      } else if (chain._currentTable === 'live_validation_job_runs') {
+        const filtered = mockCronRuns.filter(r => r.job_name === chain._eqVal);
         resolve({ data: filtered, error: null });
       } else {
         resolve({ data: [], error: null });
@@ -94,9 +94,11 @@ describe('Phase 35.2: Live Production Dry Run tests', () => {
 
   describe('Part 4: Cron Simulation Auditing', () => {
     it('should verify that cronLogger tracks success, failures, and durations correctly', async () => {
+      // Cron observability now lives in live_validation_job_runs
+      // (`cron_runs` does not exist in production).
       mockCronRuns = [
-        { id: 'run-1', cron_name: 'capture-odds', start_time: new Date(Date.now() - 5000).toISOString(), end_time: new Date().toISOString(), errors: null },
-        { id: 'run-2', cron_name: 'generate-signals', start_time: new Date(Date.now() - 10000).toISOString(), end_time: new Date().toISOString(), errors: 'Stale odds key' }
+        { id: 'run-1', job_name: 'capture-odds', status: 'SUCCESS', started_at: new Date(Date.now() - 5000).toISOString(), finished_at: new Date().toISOString(), items_processed: 8, error_message: null },
+        { id: 'run-2', job_name: 'generate-signals', status: 'FAILED', started_at: new Date(Date.now() - 10000).toISOString(), finished_at: new Date().toISOString(), items_processed: 0, error_message: 'NETWORK_TIMEOUT' }
       ];
 
       const oddsMetrics = await CronLogger.getCronMetrics('capture-odds');

@@ -30,6 +30,14 @@ import { ProductionSettlementService } from '@/lib/ledger/productionSettlementSe
 import { DailyPerformanceService } from '@/lib/ledger/dailyPerformanceService';
 import { PredictionArchiveService } from '@/lib/archive/predictionArchiveService';
 import {
+  persistDailyPredictions,
+  startDurableRun,
+  completeDurableRun,
+  isDurableStateRequired,
+  JOB_NAME_DAILY_PIPELINE,
+  type DurablePersistResult,
+} from '@/lib/durability/productionDurableState';
+import {
   buildScoreGrid,
   calculateAsianHandicapProbability,
   calculateOverUnderProbability,
@@ -75,6 +83,19 @@ export interface DailyPipelineReport {
     jsonPath: string;
     mdPath: string;
   };
+  /**
+   * Durable production persistence outcome (Phase 3 recovery).
+   * `required=true` + `failed>0` means production state did NOT fully persist.
+   */
+  durability: {
+    runRecordId: string | null;
+    required: boolean;
+    skipped: boolean;
+    submitted: number;
+    written: number;
+    failed: number;
+    errors: string[];
+  };
 }
 
 export class DailyPipelineOrchestrator {
@@ -99,6 +120,22 @@ export class DailyPipelineOrchestrator {
       forceNew: options.forceNew,
     });
     const runId = run.runId;
+
+    // ────────────────────────────────────────────────────────────────────────
+    // DURABLE RUN IDENTITY (Phase 3) — production persistence recovery
+    // On Vercel this records the run in durable Supabase state so cron
+    // execution is observable and survives cold instances. No-op elsewhere.
+    // ────────────────────────────────────────────────────────────────────────
+    const durableRunId = await startDurableRun(runId, JOB_NAME_DAILY_PIPELINE, run.startedAt);
+    let durablePersist: DurablePersistResult = {
+      attempted: false,
+      submitted: 0,
+      written: 0,
+      failed: 0,
+      errors: [],
+      skipped: true,
+      skipReason: 'not attempted',
+    };
 
     console.log(`[DailyPipeline] Starting Run ${runId} for date ${dateStr}...`);
 
@@ -533,9 +570,34 @@ export class DailyPipelineOrchestrator {
       for (const rec of generatedLedgerRecords) {
         DailyPredictionLedgerService.recordPrediction(rec);
       }
+
+      // ──────────────────────────────────────────────────────────────────────
+      // DURABLE PERSISTENCE — the fix for the ephemeral /tmp defect.
+      // Writes predictions to durable Supabase state (daily_picks) using the
+      // existing UNIQUE (fixture_id, market_type, source) key for idempotency.
+      // FAIL CLOSED: a partial durable write is surfaced, never swallowed.
+      // ──────────────────────────────────────────────────────────────────────
+      durablePersist = await persistDailyPredictions(generatedLedgerRecords, runId);
+      const durableFailed = durablePersist.attempted && durablePersist.failed > 0;
+      if (durableFailed) {
+        console.error(
+          `[DailyPipeline] DURABLE PERSISTENCE FAILED for run ${runId}: ` +
+            `${durablePersist.failed} record(s) not persisted ` +
+            `(submitted=${durablePersist.submitted}, written=${durablePersist.written}).`,
+          durablePersist.errors.slice(0, 5)
+        );
+      }
+
       RunIdentityService.updateStage(runId, 'phase_10_persist_ledger', {
-        status: 'SUCCESS',
+        status: durableFailed ? 'PARTIAL' : 'SUCCESS',
         recordsCount: generatedLedgerRecords.length,
+        details: {
+          durableRequired: isDurableStateRequired(),
+          durableSkipped: durablePersist.skipped,
+          durableSubmitted: durablePersist.submitted,
+          durableWritten: durablePersist.written,
+          durableFailed: durablePersist.failed,
+        },
         finishedAt: new Date().toISOString(),
       });
 
@@ -771,8 +833,22 @@ export class DailyPipelineOrchestrator {
         details: reportPaths,
       });
 
-      // Complete Run
-      RunIdentityService.completeDailyRun(runId, 'SUCCESS', {
+      // Complete Run — durable run record (production) + local run identity
+      const runDurationMs = Date.now() - startTimeMs;
+      const runFinalStatus: 'SUCCESS' | 'PARTIAL' = durableFailed ? 'PARTIAL' : 'SUCCESS';
+      await completeDurableRun(durableRunId, {
+        status: runFinalStatus,
+        finishedAt: new Date().toISOString(),
+        durationMs: runDurationMs,
+        itemsDiscovered: fixtures.length,
+        itemsProcessed: durablePersist.attempted
+          ? durablePersist.written
+          : generatedLedgerRecords.length,
+        itemsFailed: durablePersist.failed,
+        errorMessage: durableFailed ? durablePersist.errors.slice(0, 3).join(' | ') : null,
+      });
+
+      RunIdentityService.completeDailyRun(runId, runFinalStatus, {
         fixturesScanned: fixtures.length,
         predictionsGenerated: generatedLedgerRecords.length,
         qualifiedPicks: totalQual,
@@ -783,7 +859,7 @@ export class DailyPipelineOrchestrator {
           apiFootball: 1,
           oddsPapi: 1,
         },
-      });
+      }, durableFailed ? `Durable persistence partial: ${durablePersist.failed} record(s)` : undefined);
 
       console.log(`[DailyPipeline] Run ${runId} completed successfully in ${Date.now() - startTimeMs}ms.`);
 
@@ -821,9 +897,26 @@ export class DailyPipelineOrchestrator {
         salmoSync: salmoSyncReport,
         modelHealth: modelHealthSummary,
         reportPaths,
+        durability: {
+          runRecordId: durableRunId,
+          required: isDurableStateRequired(),
+          skipped: durablePersist.skipped,
+          submitted: durablePersist.submitted,
+          written: durablePersist.written,
+          failed: durablePersist.failed,
+          errors: durablePersist.errors.slice(0, 5),
+        },
       };
     } catch (err: any) {
       console.error(`[DailyPipeline] Fatal error in run ${runId}:`, err);
+      await completeDurableRun(durableRunId, {
+        status: 'FAILED',
+        finishedAt: new Date().toISOString(),
+        durationMs: Date.now() - startTimeMs,
+        itemsProcessed: durablePersist.written,
+        itemsFailed: durablePersist.failed,
+        errorMessage: err?.message || 'Unknown error',
+      });
       RunIdentityService.completeDailyRun(runId, 'FAILED', undefined, err.message);
       throw err;
     }

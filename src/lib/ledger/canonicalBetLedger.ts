@@ -57,6 +57,25 @@ export function classifyLineType(line: number | null): LineType {
   return 'NONE';
 }
 
+/**
+ * Maps a canonical prediction lifecycle status to the `daily_picks` status
+ * domain. MUST satisfy the live CHECK constraint:
+ *   status IN ('PENDING','WON','LOST','PUSH')
+ *
+ * Returns null when the record should not be projected into daily_picks
+ * (cancelled / rejected records are not picks).
+ */
+export function toDailyPickStatus(
+  status: PredictionStatus,
+  outcome?: string | null
+): 'PENDING' | 'WON' | 'LOST' | 'PUSH' | null {
+  if (status === 'CANCELLED' || status === 'REJECTED') return null;
+  if (outcome === 'WIN' || outcome === 'HALF_WIN') return 'WON';
+  if (outcome === 'LOSS' || outcome === 'HALF_LOSS') return 'LOST';
+  if (outcome === 'PUSH' || outcome === 'VOID') return 'PUSH';
+  return 'PENDING';
+}
+
 export class CanonicalBetLedgerService {
   private static cachedLedger: Record<string, CanonicalPredictionRecord> | null = null;
 
@@ -238,34 +257,54 @@ export class CanonicalBetLedgerService {
     this.appendJsonLine(newRecord);
 
     if (process.env.NODE_ENV !== 'test') {
-      // Asynchronously persist durable record to Supabase
-      (async () => {
-        try {
-          const { supabase } = await import('@/lib/supabase.server');
-          await supabase.from('daily_picks').upsert({
-            prediction_id: newRecord.predictionId,
-            fixture_id: newRecord.canonicalFixtureId,
-            league: newRecord.competition || newRecord.league,
-            home_team: newRecord.homeTeam,
-            away_team: newRecord.awayTeam,
-            kickoff_utc: newRecord.kickoffTimestamp,
-            market_type: newRecord.market === 'AH' ? 'ASIAN_HANDICAP' : newRecord.market === 'OU' ? 'OVER_UNDER' : 'BTTS',
-            prediction: newRecord.selection,
-            model_probability: newRecord.modelProbability,
-            fair_odds: newRecord.fairOdds,
-            market_odds: newRecord.marketOdds,
-            market_bookmaker: newRecord.bookmaker || 'Pinnacle',
-            edge_pct: newRecord.edge ? Number((newRecord.edge * 100).toFixed(2)) : 0,
-            confidence: newRecord.confidenceScore || (newRecord.confidence === 'HIGH' ? 85 : 70),
-            verdict: newRecord.confidence === 'HIGH' ? 'LAYAK' : newRecord.confidence === 'MEDIUM' ? 'PANTAU' : 'LEWATI',
-            status: newRecord.status,
-            source: 'HandicapLab-Canonical',
-            created_at: nowIso,
-          }, { onConflict: 'fixture_id, market_type, source' });
-        } catch (dbErr) {
-          console.warn('[CanonicalBetLedgerService] Background Supabase sync notice:', dbErr);
-        }
-      })();
+      // Durable persistence to Supabase (production state recovery).
+      // Values MUST satisfy the live daily_picks CHECK constraints:
+      //   source IN ('live','backtest') | status IN ('PENDING','WON','LOST','PUSH')
+      //   verdict IN ('LAYAK','PANTAU','LEWATI')
+      //   market_type IN ('ASIAN_HANDICAP','OVER_UNDER','MONEYLINE','BTTS')
+      // Idempotent via UNIQUE (fixture_id, market_type, source).
+      const durableStatus = toDailyPickStatus(newRecord.status, newRecord.settlement?.outcome);
+      if (durableStatus) {
+        (async () => {
+          try {
+            const { supabase } = await import('@/lib/supabase.server');
+            const { error } = await supabase.from('daily_picks').upsert({
+              prediction_id: newRecord.predictionId,
+              fixture_id: newRecord.canonicalFixtureId,
+              league: newRecord.competition || newRecord.league,
+              home_team: newRecord.homeTeam,
+              away_team: newRecord.awayTeam,
+              kickoff_utc: newRecord.kickoffTimestamp,
+              market_type: newRecord.market === 'AH' ? 'ASIAN_HANDICAP' : newRecord.market === 'OU' ? 'OVER_UNDER' : 'BTTS',
+              prediction: newRecord.selection,
+              model_probability: newRecord.calibratedProbability ?? newRecord.modelProbability,
+              fair_odds: newRecord.fairOdds,
+              market_odds: newRecord.marketOdds,
+              market_bookmaker: newRecord.bookmaker || 'Pinnacle',
+              edge_pct: newRecord.edge ? Number((newRecord.edge * 100).toFixed(2)) : 0,
+              confidence: Math.round(
+                newRecord.confidenceScore || (newRecord.confidence === 'HIGH' ? 85 : 70)
+              ),
+              verdict: newRecord.confidence === 'HIGH' ? 'LAYAK' : newRecord.confidence === 'MEDIUM' ? 'PANTAU' : 'LEWATI',
+              status: durableStatus,
+              source: 'live',
+              created_at: nowIso,
+            }, { onConflict: 'fixture_id, market_type, source' });
+
+            if (error) {
+              // Fail LOUD. A swallowed durable-write failure is precisely how
+              // the production state defect stayed invisible.
+              console.error(
+                `[CanonicalBetLedgerService] Durable daily_picks upsert FAILED for ${newRecord.predictionId}: ${error.message} (code=${error.code})`
+              );
+            }
+          } catch (dbErr: any) {
+            console.error(
+              `[CanonicalBetLedgerService] Durable daily_picks upsert threw for ${newRecord.predictionId}: ${dbErr?.message || dbErr}`
+            );
+          }
+        })();
+      }
     }
 
     return { record: newRecord, isNew: true };
