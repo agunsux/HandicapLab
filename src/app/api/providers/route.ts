@@ -10,6 +10,8 @@ import { ProviderRegistry } from '@/lib/data-platform/providerRegistry';
 import { DailyPicksEngine } from '@/lib/daily-picks/engine';
 import { getQuotaSnapshot } from '@/lib/providers/quotaManagerV4';
 import { supabase } from '@/lib/supabase.server';
+import { TheOddsApiQuotaManager } from '@/lib/providers/theOddsApiQuotaManager';
+import { hasOddsApiKey } from '@/lib/providers/providerKey';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -29,10 +31,14 @@ export async function GET(request: NextRequest) {
       const oddspapiLive = await DailyPicksEngine.getOddsPapiQuotaStatus();
       const oddspapiDbSnapshot = await getQuotaSnapshot('oddspapi').catch(() => null);
 
-      // 3. FootyStats connection check (Discontinued per Single Source of Truth policy)
+      // 3. The Odds API quota check
+      const theOddsApiStatus = TheOddsApiQuotaManager.getStatus();
+      const theOddsApiDbSnapshot = await getQuotaSnapshot('the-odds-api').catch(() => null);
+
+      // 4. FootyStats connection check (Discontinued per Single Source of Truth policy)
       const footyStatsConnected = false;
 
-      // 4. Supabase DB Check
+      // 5. Supabase DB Check
       let supabaseStatus = 'CONNECTED';
       try {
         const { error } = await supabase.from('daily_picks').select('id').limit(1);
@@ -78,6 +84,24 @@ export async function GET(request: NextRequest) {
               reserved: oddspapiDbSnapshot.reserved,
               hardRemaining: oddspapiDbSnapshot.hardRemaining,
               mode: oddspapiDbSnapshot.mode,
+            } : null,
+          },
+          theOddsApi: {
+            name: 'The Odds API v4',
+            tier: 'Free / Supplementary (500 req/month)',
+            period: 'monthly',
+            hardLimit: 500,
+            softCeiling: 400,
+            reserveFloor: 50,
+            used: theOddsApiStatus.used,
+            remaining: theOddsApiStatus.remaining,
+            usableRemaining: theOddsApiStatus.usableRemaining,
+            status: theOddsApiStatus.status,
+            dbSnapshot: theOddsApiDbSnapshot ? {
+              consumed: theOddsApiDbSnapshot.consumed,
+              reserved: theOddsApiDbSnapshot.reserved,
+              hardRemaining: theOddsApiDbSnapshot.hardRemaining,
+              mode: theOddsApiDbSnapshot.mode,
             } : null,
           },
           footyStats: {
@@ -139,6 +163,15 @@ export async function GET(request: NextRequest) {
         monthlyLimit: oddspapiLive.limit,
         monthlyRemaining: oddspapiLive.remaining,
         capabilities: ['pinnacle-ah', 'pinnacle-ou', 'pinnacle-btts'],
+      },
+      {
+        id: 'the-odds-api',
+        name: 'The Odds API v4 (Supplementary & Historical Odds)',
+        type: 'supplementary-market-odds',
+        status: hasOddsApiKey() ? 'ONLINE' : 'NOT_CONFIGURED',
+        monthlyLimit: 500,
+        monthlyRemaining: TheOddsApiQuotaManager.getStatus().remaining,
+        capabilities: ['asian-handicap', 'over-under', 'btts', 'historical-odds'],
       },
       {
         id: 'footystats',

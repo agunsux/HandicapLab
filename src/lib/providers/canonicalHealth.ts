@@ -1,7 +1,7 @@
 // Canonical Provider Health Evaluator
 // Location: src/lib/providers/canonicalHealth.ts
 
-import { getApiFootballKey } from './providerKey';
+import { getApiFootballKey, getOddsApiKey } from './providerKey';
 import { globalGateway } from './providerGateway';
 
 export type ProviderHealthStatusEnum =
@@ -28,6 +28,7 @@ export interface CanonicalProviderHealthReport {
   timestamp: string;
   apiFootball: ProviderDiagnostic;
   oddsPapi: ProviderDiagnostic;
+  theOddsApi: ProviderDiagnostic;
 }
 
 export async function evaluateCanonicalProviderHealth(timeoutMs: number = 5000): Promise<CanonicalProviderHealthReport> {
@@ -156,9 +157,60 @@ export async function evaluateCanonicalProviderHealth(timeoutMs: number = 5000):
     }
   }
 
+  // 3. The Odds API
+  const toaKey = getOddsApiKey().trim();
+  const toaBaseUrl = 'https://api.the-odds-api.com/v4';
+  let toaDiagnostic: ProviderDiagnostic = {
+    configured: !!toaKey,
+    authenticated: false,
+    dataAvailable: false,
+    baseUrl: toaBaseUrl,
+    status: toaKey ? 'CONFIGURED' : 'NOT_CONFIGURED',
+    latencyMs: 0,
+    error: toaKey ? null : 'Missing ODDS_API_KEY / THE_ODDS_API_KEY',
+  };
+
+  if (toaKey) {
+    const start = Date.now();
+    try {
+      const controller = new AbortController();
+      const id = setTimeout(() => controller.abort(), timeoutMs);
+      const res = await globalGateway.fetch(
+        'the-odds-api',
+        'sports',
+        `${toaBaseUrl}/sports?apiKey=${toaKey}`,
+        {
+          headers: { 'Accept': 'application/json' },
+          signal: controller.signal,
+          cacheTtlMs: 300_000,
+          quotaPriority: 10,
+        }
+      );
+      clearTimeout(id);
+      toaDiagnostic.latencyMs = Date.now() - start;
+
+      if (res.status === 200) {
+        toaDiagnostic.authenticated = true;
+        toaDiagnostic.dataAvailable = true;
+        toaDiagnostic.status = 'DATA_AVAILABLE';
+      } else if (res.status === 401 || res.status === 403) {
+        toaDiagnostic.status = 'AUTH_FAILED';
+        toaDiagnostic.error = `HTTP ${res.status}: Unauthorized`;
+      } else {
+        toaDiagnostic.status = 'API_UNAVAILABLE';
+        toaDiagnostic.error = `HTTP ${res.status}`;
+      }
+    } catch (err: any) {
+      toaDiagnostic.latencyMs = Date.now() - start;
+      toaDiagnostic.status = 'API_UNAVAILABLE';
+      toaDiagnostic.error = err.message || String(err);
+    }
+  }
+
   return {
     timestamp,
     apiFootball: afDiagnostic,
     oddsPapi: opDiagnostic,
+    theOddsApi: toaDiagnostic,
   };
 }

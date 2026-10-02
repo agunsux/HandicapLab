@@ -38,3 +38,35 @@ export function getApiFootballKeySource(): ApiFootballKeySource {
 export function hasApiFootballKey(): boolean {
   return getApiFootballKey().length > 0;
 }
+
+// ----------------------------------------------------------------------------
+// The Odds API credential resolution (canonical: ODDS_API_KEY, fallback: THE_ODDS_API_KEY)
+// ----------------------------------------------------------------------------
+export const CANONICAL_ODDS_API_KEY_VAR = 'ODDS_API_KEY';
+export const LEGACY_ODDS_API_KEY_VAR = 'THE_ODDS_API_KEY';
+
+export type OddsApiKeySource = 'ODDS_API_KEY' | 'THE_ODDS_API_KEY' | 'MISSING';
+
+/** Resolve The Odds API key (canonical first, legacy fallback). Never logs the value. */
+export function getOddsApiKey(): string {
+  const canonical = process.env.ODDS_API_KEY;
+  if (canonical && canonical.trim() && !canonical.includes('[SENSITIVE]')) return canonical.trim();
+
+  const legacy = process.env.THE_ODDS_API_KEY;
+  if (legacy && legacy.trim() && !legacy.includes('[SENSITIVE]')) return legacy.trim();
+
+  return '';
+}
+
+/** Secret-free description of where the key came from (safe for logs/health). */
+export function getOddsApiKeySource(): OddsApiKeySource {
+  const canonical = process.env.ODDS_API_KEY;
+  if (canonical && canonical.trim() && !canonical.includes('[SENSITIVE]')) return 'ODDS_API_KEY';
+  const legacy = process.env.THE_ODDS_API_KEY;
+  if (legacy && legacy.trim() && !legacy.includes('[SENSITIVE]')) return 'THE_ODDS_API_KEY';
+  return 'MISSING';
+}
+
+export function hasOddsApiKey(): boolean {
+  return getOddsApiKey().length > 0;
+}

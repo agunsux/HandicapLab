@@ -17,11 +17,13 @@ import { CanonicalBetLedgerService } from '@/lib/ledger/canonicalBetLedger';
 import { CanonicalSettlementEngine } from '@/lib/ledger/canonicalSettlementEngine';
 import { CanonicalSettlementRecord } from './predictionLedgerTypes';
 import { CanonicalFixtureFreshnessGate, CanonicalFixtureRecord } from '@/lib/services/canonicalFixtureFreshnessGate';
+import { CanonicalResultSyncBridge } from './canonicalResultSyncBridge';
 
 export interface AutomaticSettlementJobOptions {
   nowMs?: number;
   batchSize?: number;
   competition?: string;
+  skipResultSync?: boolean;
 }
 
 export interface AutomaticSettlementJobResult {
@@ -55,6 +57,14 @@ export class AutomaticSettlementJob {
     };
 
     try {
+      if (!options.skipResultSync) {
+        try {
+          await CanonicalResultSyncBridge.syncCompletedFixtures({ nowMs });
+        } catch (syncErr: any) {
+          console.warn('[AutomaticSettlementJob] Result sync bridge warning:', syncErr?.message);
+        }
+      }
+
       const fixtureRegistry = CanonicalFixtureFreshnessGate.loadRegistry();
       const allPredictions = CanonicalBetLedgerService.getAllPredictions();
 

@@ -16,7 +16,7 @@
 // Every enforcement point (gateway, native client, request counter, scheduler)
 // must route through this module.
 
-export type Provider = 'apifootball' | 'oddspapi' | 'thestatsapi' | 'dribble360';
+export type Provider = 'apifootball' | 'oddspapi' | 'thestatsapi' | 'dribble360' | 'the-odds-api';
 export type QuotaPeriodType = 'DAILY' | 'MONTHLY';
 
 /**
@@ -81,6 +81,7 @@ export const UNMETERED_ENDPOINTS: Record<Provider, readonly string[]> = {
   oddspapi: ['historical-odds', 'account'],
   thestatsapi: [],
   dribble360: [],
+  'the-odds-api': ['sports'],
 };
 
 export function isUnmeteredEndpoint(provider: Provider, endpoint: string): boolean {
@@ -136,6 +137,12 @@ const DEFAULT_POLICIES: Record<Provider, Omit<ProviderQuotaPolicy, 'provider'>> 
     softLimit: 4500,
     economyAtPctOfSoft: 80,
   },
+  'the-odds-api': {
+    period: 'MONTHLY',
+    hardLimit: 500,
+    softLimit: 400,
+    economyAtPctOfSoft: 80,
+  },
 };
 
 const ENV_KEYS: Record<Provider, { hard: string[]; soft: string[] }> = {
@@ -154,6 +161,10 @@ const ENV_KEYS: Record<Provider, { hard: string[]; soft: string[] }> = {
   dribble360: {
     hard: ['DRIBBLE360_DAILY_HARD_LIMIT', 'QUOTA_DRIBBLE360_DAILY'],
     soft: ['DRIBBLE360_DAILY_SOFT_LIMIT'],
+  },
+  'the-odds-api': {
+    hard: ['THE_ODDS_API_MONTHLY_HARD_LIMIT', 'ODDS_API_HARD_LIMIT'],
+    soft: ['THE_ODDS_API_MONTHLY_SOFT_LIMIT', 'ODDS_API_SOFT_LIMIT'],
   },
 };
 

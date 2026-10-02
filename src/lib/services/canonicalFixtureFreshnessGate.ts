@@ -20,6 +20,7 @@ import * as path from 'path';
 import * as os from 'os';
 import crypto from 'crypto';
 import { normalizeTeamName } from '@/lib/identity/fixtureMapping';
+import { BUNDLED_CANONICAL_FIXTURES } from './canonicalFixtureData';
 
 export type CanonicalLifecycleStatus =
   | 'SCHEDULED'
@@ -63,7 +64,7 @@ function getFixtureRegistryPath(): string {
   if (process.env.NODE_ENV === 'test') {
     return path.resolve('data/test_ledger/canonical_match_registry.json');
   }
-  if (process.env.VERCEL) {
+  if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
     return path.join(os.tmpdir(), 'handicaplab_canonical_match_registry.json');
   }
   return path.resolve('data/ledger/canonical_match_registry.json');
@@ -161,8 +162,27 @@ export class CanonicalFixtureFreshnessGate {
           return parsed;
         }
       }
+
+      // Check fallback path in local repo if running locally
+      const localPath = path.resolve('data/ledger/canonical_match_registry.json');
+      if (fs.existsSync(localPath)) {
+        const raw = fs.readFileSync(localPath, 'utf8');
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object') {
+          this.cachedRegistry = parsed;
+          return parsed;
+        }
+      }
     } catch (e) {
       console.warn('[CanonicalFixtureFreshnessGate] Failed to load registry:', e);
+    }
+
+    // In non-test environments, fallback to bundled canonical fixtures
+    if (process.env.NODE_ENV !== 'test') {
+      if (BUNDLED_CANONICAL_FIXTURES && typeof BUNDLED_CANONICAL_FIXTURES === 'object' && Object.keys(BUNDLED_CANONICAL_FIXTURES).length > 0) {
+        this.cachedRegistry = { ...BUNDLED_CANONICAL_FIXTURES };
+        return this.cachedRegistry;
+      }
     }
 
     const empty: Record<string, CanonicalFixtureRecord> = {};

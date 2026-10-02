@@ -4,6 +4,7 @@
 import { OddsProvider } from './providerInterface';
 import { MockOddsProvider } from './mockAdapter';
 import { FileOddsProvider } from './fileAdapter';
+import { TheOddsApiAdapter } from './theOddsApiAdapter';
 
 export class ProviderRegistry {
   private static registry = new Map<string, OddsProvider>();
@@ -14,6 +15,7 @@ export class ProviderRegistry {
       this.register('mock', new MockOddsProvider());
     }
     this.register('file', new FileOddsProvider());
+    this.register('the-odds-api', new TheOddsApiAdapter());
   }
 
   /**
