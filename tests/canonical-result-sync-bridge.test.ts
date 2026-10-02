@@ -68,8 +68,7 @@ describe('CanonicalResultSyncBridge', () => {
     } as any);
 
     // Temporarily mock environment to allow mock execution
-    const prevNodeEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'production';
+    vi.stubEnv('NODE_ENV', 'production');
     process.env.APIFOOTBALL_KEY = 'test_key';
 
     try {
@@ -82,7 +81,7 @@ describe('CanonicalResultSyncBridge', () => {
       expect(updated?.homeGoals).toBe(2);
       expect(updated?.awayGoals).toBe(0);
     } finally {
-      process.env.NODE_ENV = prevNodeEnv;
+      vi.unstubAllEnvs();
       delete process.env.APIFOOTBALL_KEY;
     }
   });

@@ -17,7 +17,21 @@ import { normalizeRecord, canonicalIdOf } from './normalize';
 
 export const MARKET_INGESTION_VERSION = 'europe-odds-v1';
 export const DATASET_VERSION_REF = 'europe-dataset-v1';
-const OUTPUT_DIR = path.join(process.cwd(), 'data', 'golden', 'europe');
+/** Production-loaded gold directory. Loaded into Supabase `historical_odds`. */
+export const MARKET_ODDS_OUTPUT_DIR = path.join(process.cwd(), 'data', 'golden', 'europe');
+const OUTPUT_DIR = MARKET_ODDS_OUTPUT_DIR;
+
+/**
+ * SAFETY CONTRACT: `data/golden/europe/market_odds.jsonl` is prod-loaded. Callers
+ * other than the sanctioned CLI (oddsRun.ts) must pass `persist: false` or an
+ * isolated research `outputDir`.
+ */
+export interface BuildMarketOddsOptions {
+  /** When false the build performs ZERO filesystem writes. */
+  persist?: boolean;
+  /** Output directory override. Defaults to the production-loaded directory. */
+  outputDir?: string;
+}
 
 export type MarketCode = 'ML' | 'AH' | 'OU';
 export type ObservationCode = 'opening' | 'closing';
@@ -153,7 +167,9 @@ export interface MarketOddsManifest {
   hash: string;
 }
 
-export function buildMarketOddsDataset(): MarketOddsManifest {
+export function buildMarketOddsDataset(options: BuildMarketOddsOptions = {}): MarketOddsManifest {
+  const persist = options.persist !== false;
+  const outputDir = options.outputDir ?? OUTPUT_DIR;
   const rows: MarketOddsRow[] = [];
   const leagueStats = new Map<string, { matches: Set<string>; ml: Set<string>; ah: Set<string>; ou: Set<string>; rows: number; mlRows: number; ahRows: number; ouRows: number }>();
   // Cross-source dedup: the same canonical match appears in multiple roots
@@ -235,9 +251,25 @@ export function buildMarketOddsDataset(): MarketOddsManifest {
     hash,
   };
 
-  fs.mkdirSync(OUTPUT_DIR, { recursive: true });
-  fs.writeFileSync(path.join(OUTPUT_DIR, 'market_odds.jsonl'), rows.map((r) => JSON.stringify(r)).join('\n') + (rows.length ? '\n' : ''));
-  fs.writeFileSync(path.join(OUTPUT_DIR, 'market_odds_manifest.json'), JSON.stringify(manifest, null, 2));
+  // ─── Persist (suppressed for pure/test/research builds; unchanged for CLI) ───
+  if (persist) writeMarketOddsArtifacts(rows, manifest, outputDir);
 
   return manifest;
+}
+
+/**
+ * Persist the market-observation layer. Exported so an isolated research
+ * namespace can reuse the identical serialization into its own directory.
+ */
+export function writeMarketOddsArtifacts(
+  rows: MarketOddsRow[],
+  manifest: MarketOddsManifest,
+  outputDir: string
+): string[] {
+  fs.mkdirSync(outputDir, { recursive: true });
+  const jsonl = path.join(outputDir, 'market_odds.jsonl');
+  fs.writeFileSync(jsonl, rows.map((r) => JSON.stringify(r)).join('\n') + (rows.length ? '\n' : ''));
+  const manifestFile = path.join(outputDir, 'market_odds_manifest.json');
+  fs.writeFileSync(manifestFile, JSON.stringify(manifest, null, 2));
+  return [jsonl, manifestFile];
 }

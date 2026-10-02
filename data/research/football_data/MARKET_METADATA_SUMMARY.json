@@ -1,0 +1,125 @@
+{
+  "generated_at": "2026-10-02T17:05:26.920Z",
+  "version": "fd-research-market-meta-v1",
+  "rows": 77471,
+  "clv_eligible_rows": 54038,
+  "vetoed_rows": 23433,
+  "vetoReasons": [
+    {
+      "reason": "AGGREGATE_PRICE",
+      "rows": 11716
+    },
+    {
+      "reason": "ERA_IMPOSSIBLE_PROVENANCE",
+      "rows": 11716
+    },
+    {
+      "reason": "MISSING_LINE",
+      "rows": 1
+    }
+  ],
+  "byMarket": [
+    {
+      "market": "AH",
+      "snapshot": "closing",
+      "rows": 6079,
+      "clv_eligible": 6079,
+      "meanOverround": 0.02523
+    },
+    {
+      "market": "AH",
+      "snapshot": "opening",
+      "rows": 17785,
+      "clv_eligible": 6068,
+      "meanOverround": 0.03443
+    },
+    {
+      "market": "ML",
+      "snapshot": "closing",
+      "rows": 11936,
+      "clv_eligible": 11936,
+      "meanOverround": 0.0327
+    },
+    {
+      "market": "ML",
+      "snapshot": "opening",
+      "rows": 17796,
+      "clv_eligible": 17796,
+      "meanOverround": 0.03756
+    },
+    {
+      "market": "OU",
+      "snapshot": "closing",
+      "rows": 6080,
+      "clv_eligible": 6080,
+      "meanOverround": 0.04113
+    },
+    {
+      "market": "OU",
+      "snapshot": "opening",
+      "rows": 17795,
+      "clv_eligible": 6079,
+      "meanOverround": 0.05164
+    }
+  ],
+  "byLineType": [
+    {
+      "lineType": "ML",
+      "rows": 29732
+    },
+    {
+      "lineType": "OU_HALF",
+      "rows": 23875
+    },
+    {
+      "lineType": "AH_QUARTER",
+      "rows": 11646
+    },
+    {
+      "lineType": "AH_WHOLE",
+      "rows": 6814
+    },
+    {
+      "lineType": "AH_HALF",
+      "rows": 5404
+    }
+  ],
+  "meanOverroundByMarket": [
+    {
+      "market": "AH",
+      "snapshot": "closing",
+      "meanOverround": 0.02523
+    },
+    {
+      "market": "AH",
+      "snapshot": "opening",
+      "meanOverround": 0.03443
+    },
+    {
+      "market": "ML",
+      "snapshot": "closing",
+      "meanOverround": 0.0327
+    },
+    {
+      "market": "ML",
+      "snapshot": "opening",
+      "meanOverround": 0.03756
+    },
+    {
+      "market": "OU",
+      "snapshot": "closing",
+      "meanOverround": 0.04113
+    },
+    {
+      "market": "OU",
+      "snapshot": "opening",
+      "meanOverround": 0.05164
+    }
+  ],
+  "notes": [
+    "raw_overround is the bookmaker margin of the observation; fair_odds_* are margin-free.",
+    "ML uses Shin (1993) with proportional fallback; AH/OU use proportional two-way de-vig.",
+    "clv_eligible=false rows are preserved but MUST NOT enter CLV/EV aggregation (finding D5).",
+    "Only two snapshots exist in the source: opening and closing. No T-minus horizon grid."
+  ]
+}

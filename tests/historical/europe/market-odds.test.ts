@@ -80,7 +80,7 @@ describe('Null handling and provenance', () => {
 
 describe('Full dataset build (real sources, deterministic)', () => {
   it('builds every observation as its own row without (canonical,market,obs,bookmaker) duplicates', () => {
-    const m = buildMarketOddsDataset();
+    const m = buildMarketOddsDataset({ persist: false });
     expect(m.dataset_version).toBe('europe-dataset-v1');
     expect(m.odds_row_count).toBeGreaterThan(0);
     const keys = new Set<string>();
@@ -92,7 +92,7 @@ describe('Full dataset build (real sources, deterministic)', () => {
   });
 
   it('covers all 8,898 canonical matches and gives ML 100% coverage per league', () => {
-    const m = buildMarketOddsDataset();
+    const m = buildMarketOddsDataset({ persist: false });
     const totalMatches = m.by_league.reduce((s, l) => s + l.matches, 0);
     expect(totalMatches).toBe(8898);
     for (const l of m.by_league) {
@@ -103,8 +103,8 @@ describe('Full dataset build (real sources, deterministic)', () => {
   });
 
   it('is idempotent — two builds produce identical row count and digest', () => {
-    const a = buildMarketOddsDataset();
-    const b = buildMarketOddsDataset();
+    const a = buildMarketOddsDataset({ persist: false });
+    const b = buildMarketOddsDataset({ persist: false });
     expect(b.odds_row_count).toBe(a.odds_row_count);
     expect(b.hash).toBe(a.hash);
   });

@@ -127,3 +127,11 @@ data/lakehouse/
 data/research/dribble360/
 data/cache/dribble_team_matches_cache.json
 
+# football-data.co.uk research evidence layer (SALMO research namespace)
+# Derived rows are reproducible via `npm run research:fd:meta`; only the small
+# audited evidence artifacts are tracked.
+data/research/football_data/*
+!data/research/football_data/SOURCE_REALITY_AUDIT.json
+!data/research/football_data/MARKET_METADATA_SUMMARY.json
+!data/research/football_data/README.md
+

@@ -135,7 +135,7 @@ describe('4. No synthetic data — missing odds stay null', () => {
 
 describe('5. Duplicate detection + source priority (real overlapping EPL files)', () => {
   it('EPL seasons exist in both bronze roots and dedup keeps the highest priority', () => {
-    const { dedupDecisions } = buildHistoricalDataset();
+    const { dedupDecisions } = buildHistoricalDataset({ persist: false });
     const engDups = dedupDecisions.filter((d) => d.canonicalId.startsWith('ENG-PL|'));
     // 2016-2017..2019-2020 EPL seasons exist in BOTH roots → duplicates resolved.
     expect(engDups.length).toBeGreaterThanOrEqual(4);
@@ -148,15 +148,15 @@ describe('5. Duplicate detection + source priority (real overlapping EPL files)'
 
 describe('6. Determinism — two runs produce identical canonical output', () => {
   it('produces a stable hash and identical canonical id list', () => {
-    const first = buildHistoricalDataset();
-    const second = buildHistoricalDataset();
+    const first = buildHistoricalDataset({ persist: false });
+    const second = buildHistoricalDataset({ persist: false });
     expect(second.manifest.hash).toBe(first.manifest.hash);
     expect(first.matches.map((m) => m.canonicalId)).toEqual(second.matches.map((m) => m.canonicalId));
     expect(first.matches.length).toBe(second.matches.length);
   });
 
   it('cluster A leagues all have real, validated data', () => {
-    const { leagues } = buildHistoricalDataset();
+    const { leagues } = buildHistoricalDataset({ persist: false });
     const aIds = ['ENG-PL', 'ESP-LALIGA', 'DEU-BUNDESLIGA', 'ITA-SERIEA', 'FRA-LIGUE1'];
     for (const id of aIds) {
       const l = leagues.find((x) => x.leagueId === id);
@@ -170,7 +170,7 @@ describe('6. Determinism — two runs produce identical canonical output', () =>
 describe('7. Coverage helper sanity', () => {
   it('computes usable market counts and readiness from records', () => {
     const { match } = normalizeRecord(rawRow(), league('ENG-PL'));
-    const { leagues } = buildHistoricalDataset();
+    const { leagues } = buildHistoricalDataset({ persist: false });
     const eng = leagues.find((x) => x.leagueId === 'ENG-PL')!;
     expect(eng.name).toBe('Premier League');
     expect(eng.coverage.ml).toBeGreaterThan(0);

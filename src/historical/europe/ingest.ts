@@ -42,13 +42,78 @@ function readRowsForDiv(descriptor: { filePath: string; season: string }, div: s
 export interface BuildSummary {
   matches: import('./types').CanonicalMatch[];
   leagues: LeagueCoverage[];
+  clusters: import('./types').ClusterCoverage[];
   manifest: HistoricalManifest;
   dedupDecisions: DedupDecision[];
   rejections: Array<{ leagueId: string; reason: string; count: number }>;
   parseErrors: Array<{ filePath: string; error: string }>;
+  leagueSources: Record<string, string[]>;
 }
 
-export function buildHistoricalDataset(): BuildSummary {
+/**
+ * Build options. The build is pure unless `persist` is explicitly left enabled.
+ *
+ * SAFETY CONTRACT (research isolation): `data/golden/europe/` is loaded into the
+ * production Supabase gold tables. Any caller that is NOT the sanctioned CLI
+ * (run.ts / oddsRun.ts) must pass `persist: false`, or pass an `outputDir` that
+ * is an isolated research path — never the production gold directory.
+ */
+export interface BuildHistoricalOptions {
+  /** When false the build performs ZERO filesystem writes (pure, side-effect free). */
+  persist?: boolean;
+  /** Output directory override. Defaults to the production-loaded OUTPUT_DIR. */
+  outputDir?: string;
+}
+
+/**
+ * Persist the canonical layer artifacts. Exported so an isolated research
+ * namespace can reuse the exact same serialization into its own directory
+ * without re-implementing (or mutating) the production path.
+ */
+export function writeHistoricalArtifacts(summary: BuildSummary, outputDir: string): string[] {
+  const files: string[] = [];
+  const canonical = path.join(outputDir, 'canonical_matches.jsonl');
+  writeJsonl(canonical, summary.matches);
+  files.push(canonical);
+
+  fs.mkdirSync(outputDir, { recursive: true });
+
+  const leagues = path.join(outputDir, 'leagues.json');
+  fs.writeFileSync(leagues, JSON.stringify(summary.leagues, null, 2));
+  files.push(leagues);
+
+  const clusters = path.join(outputDir, 'clusters.json');
+  fs.writeFileSync(clusters, JSON.stringify(summary.clusters, null, 2));
+  files.push(clusters);
+
+  const readiness = path.join(outputDir, 'readiness.json');
+  fs.writeFileSync(readiness, JSON.stringify(
+    summary.leagues.map((l) => ({ leagueId: l.leagueId, name: l.name, cluster: l.cluster, status: l.status, readiness: l.readiness })),
+    null, 2
+  ));
+  files.push(readiness);
+
+  const audit = path.join(outputDir, 'audit.json');
+  fs.writeFileSync(audit, JSON.stringify({
+    dedupDecisions: summary.dedupDecisions,
+    rejections: summary.rejections,
+    parseErrors: summary.parseErrors,
+    leagueSources: summary.leagueSources,
+    excluded: EUROPEAN_LEAGUE_REGISTRY.filter((l) => l.status === 'EXCLUDED')
+      .map((l) => ({ leagueId: l.leagueId, cluster: l.cluster, reason: l.excludeReason })),
+  }, null, 2));
+  files.push(audit);
+
+  const manifest = path.join(outputDir, 'manifest.json');
+  fs.writeFileSync(manifest, JSON.stringify(summary.manifest, null, 2));
+  files.push(manifest);
+
+  return files;
+}
+
+export function buildHistoricalDataset(options: BuildHistoricalOptions = {}): BuildSummary {
+  const persist = options.persist !== false;
+  const outputDir = options.outputDir ?? OUTPUT_DIR;
   const included = EUROPEAN_LEAGUE_REGISTRY.filter((l) => l.status === 'INCLUDED');
 
   const candidates: Candidate[] = [];
@@ -196,26 +261,21 @@ export function buildHistoricalDataset(): BuildSummary {
     hash,
   };
 
-  // ─── Persist ───
-  writeJsonl(path.join(OUTPUT_DIR, 'canonical_matches.jsonl'), matches);
-  fs.mkdirSync(OUTPUT_DIR, { recursive: true });
-  fs.writeFileSync(path.join(OUTPUT_DIR, 'leagues.json'), JSON.stringify(allLeagues, null, 2));
-  fs.writeFileSync(path.join(OUTPUT_DIR, 'clusters.json'), JSON.stringify(clusterCovs, null, 2));
-  fs.writeFileSync(path.join(OUTPUT_DIR, 'readiness.json'), JSON.stringify(
-    allLeagues.map((l) => ({ leagueId: l.leagueId, name: l.name, cluster: l.cluster, status: l.status, readiness: l.readiness })),
-    null, 2
-  ));
-  fs.writeFileSync(path.join(OUTPUT_DIR, 'audit.json'), JSON.stringify({
+  const summary: BuildSummary = {
+    matches,
+    leagues: allLeagues,
+    clusters: clusterCovs,
+    manifest,
     dedupDecisions,
     rejections,
     parseErrors,
     leagueSources,
-    excluded: EUROPEAN_LEAGUE_REGISTRY.filter((l) => l.status === 'EXCLUDED')
-      .map((l) => ({ leagueId: l.leagueId, cluster: l.cluster, reason: l.excludeReason })),
-  }, null, 2));
-  fs.writeFileSync(path.join(OUTPUT_DIR, 'manifest.json'), JSON.stringify(manifest, null, 2));
+  };
 
-  return { matches, leagues: allLeagues, manifest, dedupDecisions, rejections, parseErrors };
+  // ─── Persist (suppressed for pure/test/research builds; unchanged for CLI) ───
+  if (persist) writeHistoricalArtifacts(summary, outputDir);
+
+  return summary;
 }
 
 export function getLeagueByIdOrUndefined(leagueId: string) {
