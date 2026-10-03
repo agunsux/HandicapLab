@@ -40,6 +40,8 @@ import { NativeOddsResponseSchema } from '@/lib/data/providers/odds/native';
 
 /** Bookmakers SALMO consumes. Pinnacle is the AGENTS.md ground truth; SBOBET is
  *  the mandated secondary comparison. Nothing else is requested (quota). */
+export const MAX_TOURNAMENTS_PER_BATCH_REQUEST = 5;
+
 export const CONSUMED_BOOKMAKERS = ['pinnacle', 'sbobet'] as const;
 
 /** Shared cache window. The three pipelines run back-to-back in one cycle and
@@ -114,7 +116,14 @@ function cacheKey(tournamentIds: Array<number | string>, bookmakers: string[]): 
 export async function primeTournamentOdds(options: BatchPrimeOptions): Promise<BatchPrimeResult> {
   const bookmakers = (options.bookmakers ?? [...CONSUMED_BOOKMAKERS]).map((b) => b.toLowerCase());
   const ttl = options.cacheTtlMs ?? DEFAULT_CACHE_TTL_MS;
-  const ids = options.tournamentIds.filter((v) => v !== null && v !== undefined && String(v).length > 0);
+  const rawIds = options.tournamentIds ?? [];
+  const ids = Array.from(
+    new Set(
+      rawIds
+        .map((v) => String(v).trim())
+        .filter((v) => v.length > 0 && v !== 'null' && v !== 'undefined')
+    )
+  ).sort((a, b) => (Number(a) || 0) - (Number(b) || 0) || a.localeCompare(b));
 
   if (ids.length === 0) {
     lastResult = {
@@ -138,60 +147,70 @@ export async function primeTournamentOdds(options: BatchPrimeOptions): Promise<B
     return cached;
   }
 
-  const tournamentIds = ids.join(',');
+  // Chunk tournament IDs into slices of MAX_TOURNAMENTS_PER_BATCH_REQUEST (5)
+  const chunks: string[][] = [];
+  for (let i = 0; i < ids.length; i += MAX_TOURNAMENTS_PER_BATCH_REQUEST) {
+    chunks.push(ids.slice(i, i + MAX_TOURNAMENTS_PER_BATCH_REQUEST));
+  }
+
   const index = new Map<string, MergedBatchFixture>();
-  const bookmakersWithData: string[] = [];
-  const failures: Array<{ bookmaker: string; error: string; code?: string }> = [];
+  const bookmakersWithData = new Set<string>();
+  const failures: Array<{ bookmaker: string; chunk?: string; error: string; code?: string }> = [];
   let meteredCalls = 0;
+  let cycleAborted = false;
 
   for (const slug of bookmakers) {
-    try {
-      const res = await client().get(
-        '/odds-by-tournaments',
-        { tournamentIds, bookmaker: slug, oddsFormat: 'decimal', language: 'en' },
-        NativeOddsResponseSchema,
-        'odds-by-tournaments'
-      );
-      meteredCalls += 1;
-      const arr = Array.isArray(res.data) ? res.data : res.data ? [res.data] : [];
-      if (arr.length === 0) {
-        failures.push({ bookmaker: slug, error: 'empty response' });
-        continue;
-      }
-      bookmakersWithData.push(slug);
-      for (const fx of arr as any[]) {
-        if (!fx?.fixtureId) continue;
-        const id = String(fx.fixtureId);
-        const incoming = fx.bookmakerOdds ?? {};
-        const existing = index.get(id);
-        if (existing) {
-          existing.bookmakerOdds = { ...existing.bookmakerOdds, ...incoming };
-        } else {
-          index.set(id, {
-            fixtureId: id,
-            tournamentId: fx.tournamentId,
-            startTime: fx.startTime,
-            participant1Id: fx.participant1Id ?? null,
-            participant2Id: fx.participant2Id ?? null,
-            participant1Name: fx.participant1Name ?? null,
-            participant2Name: fx.participant2Name ?? null,
-            bookmakerOdds: { ...incoming },
-          });
-        }
-      }
-    } catch (err) {
-      if (err instanceof OddsPapiError) {
-        // A per-bookmaker 404 means "this bookmaker has no odds for these
-        // tournaments" — documented behaviour, not a fault.
-        if (err.errorCode === 'FIXTURE_NOT_FOUND' || err.httpStatus === 404) {
-          failures.push({ bookmaker: slug, error: 'no odds for tournaments', code: 'FIXTURE_NOT_FOUND' });
+    if (cycleAborted) break;
+    for (const chunk of chunks) {
+      const tournamentIds = chunk.join(',');
+      try {
+        const res = await client().get(
+          '/odds-by-tournaments',
+          { tournamentIds, bookmaker: slug, oddsFormat: 'decimal', language: 'en' },
+          NativeOddsResponseSchema,
+          'odds-by-tournaments'
+        );
+        meteredCalls += 1;
+        const arr = Array.isArray(res.data) ? res.data : res.data ? [res.data] : [];
+        if (arr.length === 0) {
+          failures.push({ bookmaker: slug, chunk: tournamentIds, error: 'empty response' });
           continue;
         }
-        failures.push({ bookmaker: slug, error: err.message, code: err.kind });
-        // QUOTA / INVALID_KEY are terminal for the whole cycle — stop spending.
-        if (err.kind === 'QUOTA' || err.kind === 'INVALID_KEY') break;
-      } else {
-        failures.push({ bookmaker: slug, error: err instanceof Error ? err.message : String(err) });
+        bookmakersWithData.add(slug);
+        for (const fx of arr as any[]) {
+          if (!fx?.fixtureId) continue;
+          const id = String(fx.fixtureId);
+          const incoming = fx.bookmakerOdds ?? {};
+          const existing = index.get(id);
+          if (existing) {
+            existing.bookmakerOdds = { ...existing.bookmakerOdds, ...incoming };
+          } else {
+            index.set(id, {
+              fixtureId: id,
+              tournamentId: fx.tournamentId,
+              startTime: fx.startTime,
+              participant1Id: fx.participant1Id ?? null,
+              participant2Id: fx.participant2Id ?? null,
+              participant1Name: fx.participant1Name ?? null,
+              participant2Name: fx.participant2Name ?? null,
+              bookmakerOdds: { ...incoming },
+            });
+          }
+        }
+      } catch (err) {
+        if (err instanceof OddsPapiError) {
+          if (err.errorCode === 'FIXTURE_NOT_FOUND' || err.httpStatus === 404) {
+            failures.push({ bookmaker: slug, chunk: tournamentIds, error: 'no odds for tournaments', code: 'FIXTURE_NOT_FOUND' });
+            continue;
+          }
+          failures.push({ bookmaker: slug, chunk: tournamentIds, error: err.message, code: err.kind });
+          if (err.kind === 'QUOTA' || err.kind === 'INVALID_KEY') {
+            cycleAborted = true;
+            break;
+          }
+        } else {
+          failures.push({ bookmaker: slug, chunk: tournamentIds, error: err instanceof Error ? err.message : String(err) });
+        }
       }
     }
   }
@@ -210,7 +229,7 @@ export async function primeTournamentOdds(options: BatchPrimeOptions): Promise<B
   const result: BatchPrimeResult = {
     status,
     bookmakersRequested: bookmakers,
-    bookmakersWithData,
+    bookmakersWithData: Array.from(bookmakersWithData),
     fixtureCount: index.size,
     meteredCalls,
     fromCache: false,

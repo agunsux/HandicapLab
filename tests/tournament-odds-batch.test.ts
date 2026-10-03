@@ -134,12 +134,33 @@ describe('primeTournamentOdds — parsing, merging and fixture mapping', () => {
     );
   });
 
-  it('passes tournamentIds through verbatim and sets decimal odds format', async () => {
+  it('passes tournamentIds through chunked into max 5 per request and sets decimal odds format', async () => {
     const client = makeClient(() => ok([ahFixture('fx-1', 1.9, 'T')]));
     __setBatchClientForTests(client);
-    await primeTournamentOdds({ tournamentIds: [17, 701] });
+    await primeTournamentOdds({ tournamentIds: [17, 701], bookmakers: ['pinnacle'] });
+    expect(client.get).toHaveBeenCalledTimes(1);
     expect(client.get.mock.calls[0][1].tournamentIds).toBe('17,701');
     expect(client.get.mock.calls[0][1].oddsFormat).toBe('decimal');
+  });
+
+  it('chunks 6 tournament IDs into 2 requests per bookmaker (5 + 1)', async () => {
+    const client = makeClient(() => ok([ahFixture('fx-1', 1.9, 'T')]));
+    __setBatchClientForTests(client);
+    const res = await primeTournamentOdds({ tournamentIds: [1, 2, 3, 4, 5, 6], bookmakers: ['pinnacle'] });
+    expect(res.status).toBe('READY');
+    expect(client.get).toHaveBeenCalledTimes(2);
+    expect(client.get.mock.calls[0][1].tournamentIds).toBe('1,2,3,4,5');
+    expect(client.get.mock.calls[1][1].tournamentIds).toBe('6');
+  });
+
+  it('deduplicates, trims, and sorts tournament IDs before chunking', async () => {
+    const client = makeClient(() => ok([ahFixture('fx-1', 1.9, 'T')]));
+    __setBatchClientForTests(client);
+    await primeTournamentOdds({ tournamentIds: [' 5 ', '2', 2, '5', '1', 10, '3', '4'], bookmakers: ['pinnacle'] });
+    // Unique sorted: 1, 2, 3, 4, 5, 10 -> chunk 1: 1,2,3,4,5; chunk 2: 10
+    expect(client.get).toHaveBeenCalledTimes(2);
+    expect(client.get.mock.calls[0][1].tournamentIds).toBe('1,2,3,4,5');
+    expect(client.get.mock.calls[1][1].tournamentIds).toBe('10');
   });
 });
 

@@ -21,24 +21,24 @@ export async function GET(request: Request) {
     const isPro = entitlements.hasFullEdgeData;
 
     let query = supabase
-      .from('prediction_ledger_v3')
-      .select('*, matches!inner(id, home_team, away_team, league, kickoff, status)')
+      .from('daily_picks')
+      .select('*')
       .eq('market_type', 'BTTS')
-      .order('expected_value', { ascending: false });
+      .order('edge_pct', { ascending: false });
 
     const now = new Date();
     if (dateParam === 'today') {
       const startOfDay = new Date(now.setHours(0, 0, 0, 0)).toISOString();
       const endOfDay = new Date(now.setHours(23, 59, 59, 999)).toISOString();
-      query = query.gte('matches.kickoff', startOfDay).lte('matches.kickoff', endOfDay);
+      query = query.gte('kickoff_utc', startOfDay).lte('kickoff_utc', endOfDay);
     } else if (dateParam === 'tomorrow') {
       const tomorrow = new Date(now);
       tomorrow.setDate(tomorrow.getDate() + 1);
       const startOfDay = new Date(tomorrow.setHours(0, 0, 0, 0)).toISOString();
       const endOfDay = new Date(tomorrow.setHours(23, 59, 59, 999)).toISOString();
-      query = query.gte('matches.kickoff', startOfDay).lte('matches.kickoff', endOfDay);
+      query = query.gte('kickoff_utc', startOfDay).lte('kickoff_utc', endOfDay);
     } else {
-      query = query.gt('matches.kickoff', new Date().toISOString());
+      query = query.gt('kickoff_utc', new Date().toISOString());
     }
 
     const { data, error } = await query;
@@ -46,37 +46,36 @@ export async function GET(request: Request) {
 
     const rows = (data || []).map((row: any, index: number) => {
       const isLocked = !isPro && index >= FREE_VISIBLE_SIGNALS;
-      const match = row.matches;
-      const p = row.calibrated_probability || 0.5;
-      const odds = row.market_odds || 1.85;
-      const ev = row.expected_value ?? (p * odds - 1);
-      const fairOdds = p > 0 ? Number((1 / p).toFixed(2)) : null;
+      const p = row.model_probability !== null && row.model_probability !== undefined ? Number(row.model_probability) : 0.5;
+      const odds = row.market_odds !== null && row.market_odds !== undefined ? Number(row.market_odds) : null;
+      const ev = row.edge_pct !== null && row.edge_pct !== undefined ? Number((row.edge_pct / 100).toFixed(4)) : (odds ? Number((p * odds - 1).toFixed(4)) : null);
+      const fairOdds = row.fair_odds !== null && row.fair_odds !== undefined ? Number(row.fair_odds) : (p > 0 ? Number((1 / p).toFixed(2)) : null);
 
       if (isLocked) {
         return {
           id: row.id,
-          home: match?.home_team || 'Home',
-          away: match?.away_team || 'Away',
-          league: match?.league || 'League',
-          kickoff: match?.kickoff || row.prediction_timestamp,
+          home: row.home_team || 'Home',
+          away: row.away_team || 'Away',
+          league: row.league || 'League',
+          kickoff: row.kickoff_utc || row.created_at,
           market: 'BTTS',
-          selection: row.selection || 'Yes',
+          selection: row.prediction || 'Yes',
           locked: true,
         };
       }
 
       return {
         id: row.id,
-        home: match?.home_team || 'Home',
-        away: match?.away_team || 'Away',
-        league: match?.league || 'League',
-        kickoff: match?.kickoff || row.prediction_timestamp,
+        home: row.home_team || 'Home',
+        away: row.away_team || 'Away',
+        league: row.league || 'League',
+        kickoff: row.kickoff_utc || row.created_at,
         market: 'BTTS',
-        selection: row.selection || 'Yes',
+        selection: row.prediction || 'Yes',
         modelProb: p,
         marketOdds: odds,
         fairOdds: fairOdds,
-        ev: Number(ev.toFixed(4)),
+        ev: ev,
         tier: isPro ? 'PRO' : 'FREE',
         locked: false,
       };
