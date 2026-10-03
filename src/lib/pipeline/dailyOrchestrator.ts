@@ -94,7 +94,22 @@ export interface DailyPipelineReport {
     submitted: number;
     written: number;
     failed: number;
+    /** Ledger records folded into an existing (fixture, market) row. */
+    collapsed: number;
     errors: string[];
+  };
+  /**
+   * Phase 4 freshness truth. `ok=false` means NO fresh OddsPapi odds were
+   * obtained and the run status is therefore degraded — never silently SUCCESS.
+   */
+  oddsFreshness: {
+    ok: boolean;
+    fixtureCount: number;
+    meteredCalls: number;
+    tournaments: number;
+    bookmakersWithData: string[];
+    error: string | null;
+    errorCode: string | null;
   };
 }
 
@@ -132,6 +147,7 @@ export class DailyPipelineOrchestrator {
       submitted: 0,
       written: 0,
       failed: 0,
+      collapsed: 0,
       errors: [],
       skipped: true,
       skipReason: 'not attempted',
@@ -155,6 +171,20 @@ export class DailyPipelineOrchestrator {
     let fixturesToday = 0;
     let fixturesTomorrow = 0;
     let fixtures7Days = 0;
+
+    /**
+     * Phase 4 freshness truth. Declared outside the try so the returned run
+     * status can never claim SUCCESS while odds retrieval failed (D4).
+     */
+    let oddsRetrieval: {
+      ok: boolean;
+      count: number;
+      meteredCalls: number;
+      tournamentIds: number[];
+      bookmakersWithData: string[];
+      error?: string;
+      errorCode?: string;
+    } = { ok: false, count: 0, meteredCalls: 0, tournamentIds: [], bookmakersWithData: [] };
 
     const todayDateStr = dateStr;
     const tomorrowDateStr = new Date(startTimeMs + 24 * 3600 * 1000).toISOString().slice(0, 10);
@@ -236,19 +266,49 @@ export class DailyPipelineOrchestrator {
         status: 'RUNNING',
       });
       let rawOdds: any[] = [];
+      // Freshness truth for this run (Phase 4). The odds stage — and the final
+      // run status — may only be SUCCESS when fresh odds were actually retrieved.
       if (options.customOdds) {
         rawOdds = options.customOdds;
       } else {
-        try {
-          const { DailyPicksEngine } = await import('@/lib/daily-picks/engine');
-          rawOdds = await DailyPicksEngine.fetchOddsPapiPinnacle();
-        } catch (e) {
-          console.warn('[DailyPipeline] Odds retrieval warning, falling back to cached snapshots:', e);
+        const { DailyPicksEngine } = await import('@/lib/daily-picks/engine');
+        // Target fixtures are passed so the OddsPapi tournament ids are derived
+        // from our own fixtures instead of the invalid legacy default '17'.
+        const oddsResult = await DailyPicksEngine.retrieveOddsPapiPinnacle(fixtures);
+        rawOdds = oddsResult.fixtures;
+        oddsRetrieval = {
+          ok: oddsResult.ok,
+          count: oddsResult.fixtures.length,
+          meteredCalls: oddsResult.meteredCalls,
+          tournamentIds: oddsResult.tournamentIds,
+          bookmakersWithData: oddsResult.bookmakersWithData,
+          error: oddsResult.error,
+          errorCode: oddsResult.errorCode,
+        };
+        if (!oddsResult.ok) {
+          // FAIL CLOSED — observable, never swallowed as a successful stage.
+          console.error(
+            `[DailyPipeline] PHASE 4 FAILED — OddsPapi retrieval error: ` +
+              `${oddsResult.error ?? 'unknown'} (${oddsResult.errorCode ?? 'n/a'}) ` +
+              `tournaments=${oddsResult.tournamentIds.length} meteredCalls=${oddsResult.meteredCalls}`
+          );
         }
       }
+
+      // The stage is SUCCESS only when fresh odds exist. A degraded/empty
+      // retrieval is reported as FAILED — the previous behaviour reported
+      // SUCCESS with recordsCount:0, which is how the freshness incident hid.
+      const oddsStageOk = rawOdds.length > 0;
       RunIdentityService.updateStage(runId, 'phase_04_retrieve_odds', {
-        status: 'SUCCESS',
+        status: oddsStageOk ? 'SUCCESS' : 'FAILED',
         recordsCount: rawOdds.length,
+        details: {
+          meteredCalls: oddsRetrieval.meteredCalls ?? 0,
+          tournaments: oddsRetrieval.tournamentIds?.length ?? 0,
+          bookmakersWithData: oddsRetrieval.bookmakersWithData ?? [],
+          error: oddsRetrieval.error ?? null,
+          errorCode: oddsRetrieval.errorCode ?? null,
+        },
         finishedAt: new Date().toISOString(),
       });
 
@@ -583,7 +643,8 @@ export class DailyPipelineOrchestrator {
         console.error(
           `[DailyPipeline] DURABLE PERSISTENCE FAILED for run ${runId}: ` +
             `${durablePersist.failed} record(s) not persisted ` +
-            `(submitted=${durablePersist.submitted}, written=${durablePersist.written}).`,
+            `(submitted=${durablePersist.submitted}, written=${durablePersist.written}, ` +
+            `collapsed=${durablePersist.collapsed}).`,
           durablePersist.errors.slice(0, 5)
         );
       }
@@ -835,7 +896,19 @@ export class DailyPipelineOrchestrator {
 
       // Complete Run — durable run record (production) + local run identity
       const runDurationMs = Date.now() - startTimeMs;
-      const runFinalStatus: 'SUCCESS' | 'PARTIAL' = durableFailed ? 'PARTIAL' : 'SUCCESS';
+      // D4 — the externally returned status MUST reflect reality. A run may only
+      // report SUCCESS when durable persistence completed AND fresh odds were
+      // retrieved; otherwise it is PARTIAL (degraded, observable).
+      const runDegradedReasons: string[] = [];
+      if (durableFailed) {
+        runDegradedReasons.push(`durable persistence incomplete: ${durablePersist.failed} record(s) not persisted`);
+      }
+      if (!oddsStageOk) {
+        runDegradedReasons.push(
+          `odds retrieval failed: ${oddsRetrieval.error ?? 'no fresh odds returned'} (${oddsRetrieval.errorCode ?? 'n/a'})`
+        );
+      }
+      const runFinalStatus: 'SUCCESS' | 'PARTIAL' = runDegradedReasons.length > 0 ? 'PARTIAL' : 'SUCCESS';
       await completeDurableRun(durableRunId, {
         status: runFinalStatus,
         finishedAt: new Date().toISOString(),
@@ -845,7 +918,7 @@ export class DailyPipelineOrchestrator {
           ? durablePersist.written
           : generatedLedgerRecords.length,
         itemsFailed: durablePersist.failed,
-        errorMessage: durableFailed ? durablePersist.errors.slice(0, 3).join(' | ') : null,
+        errorMessage: runDegradedReasons.length > 0 ? runDegradedReasons.join(' | ') : null,
       });
 
       RunIdentityService.completeDailyRun(runId, runFinalStatus, {
@@ -859,14 +932,15 @@ export class DailyPipelineOrchestrator {
           apiFootball: 1,
           oddsPapi: 1,
         },
-      }, durableFailed ? `Durable persistence partial: ${durablePersist.failed} record(s)` : undefined);
+      }, runDegradedReasons.length > 0 ? runDegradedReasons.join(' | ') : undefined);
 
       console.log(`[DailyPipeline] Run ${runId} completed successfully in ${Date.now() - startTimeMs}ms.`);
 
       return {
         runId,
         dateStr,
-        status: 'SUCCESS',
+        // D4 — truthful: PARTIAL whenever durability or odds retrieval degraded.
+        status: runFinalStatus,
         durationMs: Date.now() - startTimeMs,
         fixturesCount: {
           today: fixturesToday,
@@ -904,7 +978,17 @@ export class DailyPipelineOrchestrator {
           submitted: durablePersist.submitted,
           written: durablePersist.written,
           failed: durablePersist.failed,
+          collapsed: durablePersist.collapsed,
           errors: durablePersist.errors.slice(0, 5),
+        },
+        oddsFreshness: {
+          ok: oddsStageOk,
+          fixtureCount: rawOdds.length,
+          meteredCalls: oddsRetrieval.meteredCalls,
+          tournaments: oddsRetrieval.tournamentIds.length,
+          bookmakersWithData: oddsRetrieval.bookmakersWithData,
+          error: oddsRetrieval.error ?? null,
+          errorCode: oddsRetrieval.errorCode ?? null,
         },
       };
     } catch (err: any) {

@@ -38,11 +38,147 @@ export const DURABLE_BOOKMAKER = 'Pinnacle';
 /** Bind status. MUST satisfy daily_picks CHECK (status IN ('PENDING','WON','LOST','PUSH')). */
 export const DURABLE_INITIAL_STATUS = 'PENDING';
 
-export const JOB_NAME_DAILY_PIPELINE = 'daily-pipeline';
+/**
+ * D2 — job_name contract.
+ * MUST satisfy live_validation_job_runs CHECK
+ *   (job_name IN ('scheduler','settlement','metrics','archive'))
+ * (migration 00000000000036_live_validation_ops.sql). The daily production
+ * pipeline is the scheduler job; 'daily-pipeline' violated the DDL and caused
+ * startDurableRun() to fail silently, leaving live_validation_job_runs empty.
+ */
+export const JOB_NAME_DAILY_PIPELINE = 'scheduler';
 
 export type DurableDataSource = 'DURABLE' | 'UNAVAILABLE';
 
+/**
+ * D3 — status contract.
+ * MUST satisfy live_validation_job_runs CHECK
+ *   (status IN ('running','succeeded','failed','skipped')).
+ * Internal pipeline states are translated by toDurableJobRunStatus(); the DB
+ * payload is always the lower-case contract, never the rich internal label.
+ */
+export type DurableJobRunStatus = 'running' | 'succeeded' | 'failed' | 'skipped';
+
+export const DURABLE_JOB_RUN_STATUSES: readonly DurableJobRunStatus[] = [
+  'running',
+  'succeeded',
+  'failed',
+  'skipped',
+];
+
+/**
+ * Explicit internal-state -> database-contract mapping (D3).
+ * Fail-closed: an unknown or missing state maps to 'failed' so a failure can
+ * never be recorded as a success.
+ *
+ *   RUNNING       -> running
+ *   SUCCESS       -> succeeded
+ *   PARTIAL       -> failed      (durable writes / odds retrieval incomplete)
+ *   FAILED/ERROR  -> failed
+ *   QUOTA_BLOCKED -> skipped
+ *   SKIPPED       -> skipped
+ */
+export function toDurableJobRunStatus(status: string | null | undefined): DurableJobRunStatus {
+  switch (String(status ?? '').trim().toUpperCase()) {
+    case 'RUNNING':
+      return 'running';
+    case 'SUCCESS':
+    case 'SUCCEEDED':
+    case 'SYNCED':
+      return 'succeeded';
+    case 'SKIPPED':
+    case 'QUOTA_BLOCKED':
+    case 'NO_PICKS':
+      return 'skipped';
+    case 'PARTIAL':
+    case 'FAILED':
+    case 'ERROR':
+      return 'failed';
+    default:
+      return 'failed';
+  }
+}
+
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * D1 — canonical fixture identity space.
+ * CanonicalFixtureRegistry.generateCanonicalFixtureId() returns
+ *   sha256(`${competitionId}:${season}:${home}:${away}:${date}`).slice(0,16)
+ * i.e. exactly 16 lower-case hex characters (optionally `cm_` prefixed in the
+ * bundled fixture data). This is NOT a UUID.
+ *
+ * VERIFIED SCHEMA REALITY: public.daily_picks.fixture_id is `UUID NOT NULL`
+ * with NO foreign key to public.matches (migration 00000000000053 declares no
+ * REFERENCES; PostgREST confirms "no relationship between 'daily_picks' and
+ * 'matches'"). It is therefore a *fixture identity key*, not a relational
+ * pointer, and the only invariants that matter are:
+ *   1. the column type must be uuid (satisfied by derivation), and
+ *   2. the SAME real fixture must always map to the SAME uuid, because
+ *      daily_picks_UNIQUE (fixture_id, market_type, source) makes writes idempotent.
+ *
+ * Resolving through the `matches` table was rejected as the primary path: that
+ * table is incomplete/stale and volatile, so the same fixture would resolve to
+ * different ids over time and silently duplicate rows, breaking idempotency.
+ * A pure function of the canonical identity is the only time-stable option.
+ */
+const CANONICAL_ID_RE = /^(?:cm_)?[0-9a-f]{16}$/i;
+
+/**
+ * Fixed RFC 4122 namespace for the canonical-fixture -> daily_picks identity
+ * derivation. CONSTANT BY CONTRACT: changing it re-keys every durable row.
+ */
+export const CANONICAL_FIXTURE_UUID_NAMESPACE = '7a6f2b1c-9d4e-5a37-8b21-c4f0d9e63a55';
+
+/** Deterministic RFC 4122 UUIDv5 (SHA-1, namespaced) of a canonical fixture id. */
+export function canonicalFixtureIdToUuid(canonicalId: string): string {
+  const nsBytes = Buffer.from(CANONICAL_FIXTURE_UUID_NAMESPACE.replace(/-/g, ''), 'hex');
+  const nameBytes = Buffer.from(String(canonicalId).trim().toLowerCase(), 'utf8');
+  const digest = crypto.createHash('sha1').update(Buffer.concat([nsBytes, nameBytes])).digest();
+  const b = Buffer.from(digest.subarray(0, 16));
+  b[6] = (b[6] & 0x0f) | 0x50; // version 5
+  b[8] = (b[8] & 0x3f) | 0x80; // RFC 4122 variant
+  const hex = b.toString('hex');
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
+
+export interface DurableFixtureIdentity {
+  /** uuid written to daily_picks.fixture_id. */
+  fixtureId: string;
+  /** How the uuid was obtained — carried into provenance for audit. */
+  source: 'uuid' | 'canonical-derived';
+  /** The authoritative canonical fixture id the row was generated from. */
+  canonicalId: string;
+}
+
+/**
+ * Explicit, deterministic, auditable fixture identity resolution (D1).
+ * Returns null (fail closed) when the record carries no resolvable identity.
+ * Never fabricates an id from team names or fuzzy matching.
+ */
+export function resolveDurableFixtureId(
+  rec: Pick<PredictionLedgerRecord, 'canonicalMatchId'>
+): DurableFixtureIdentity | null {
+  const raw = String(rec?.canonicalMatchId ?? '').trim();
+  if (!raw) return null;
+
+  // Already a UUID (e.g. a record enriched from public.matches) — use verbatim.
+  if (UUID_RE.test(raw)) {
+    return { fixtureId: raw.toLowerCase(), source: 'uuid', canonicalId: raw };
+  }
+
+  // Canonical 16-hex identity (with or without the `cm_` prefix).
+  if (CANONICAL_ID_RE.test(raw)) {
+    const canonicalId = raw.replace(/^cm_/i, '').toLowerCase();
+    return {
+      fixtureId: canonicalFixtureIdToUuid(canonicalId),
+      source: 'canonical-derived',
+      canonicalId,
+    };
+  }
+
+  return null;
+}
 
 // ---------------------------------------------------------------------------
 // Types
@@ -57,6 +193,13 @@ export interface DurablePersistResult {
   written: number;
   /** Number of records that failed to persist (fail-closed signal). */
   failed: number;
+  /**
+   * Records folded into an existing (fixture, market) row because
+   * daily_picks_UNIQUE (fixture_id, market_type, source) permits exactly ONE
+   * pick per fixture per market. Informational, never counted as a failure —
+   * but always reported so the collapse is observable, never silent.
+   */
+  collapsed: number;
   errors: string[];
   /** Set when persistence was intentionally skipped (non-production). */
   skipped: boolean;
@@ -65,7 +208,8 @@ export interface DurablePersistResult {
 
 export interface DurableRunRecord {
   runId: string;
-  status: 'RUNNING' | 'SUCCESS' | 'FAILED' | 'PARTIAL' | 'QUOTA_BLOCKED';
+  /** Always the database contract (D3), never the rich internal label. */
+  status: DurableJobRunStatus;
   startedAt: string;
   finishedAt?: string | null;
   durationMs?: number | null;
@@ -117,10 +261,41 @@ function skipped(reason: string): DurablePersistResult {
     submitted: 0,
     written: 0,
     failed: 0,
+    collapsed: 0,
     errors: [],
     skipped: true,
     skipReason: reason,
   };
+}
+
+/** The upsert key enforced by daily_picks_UNIQUE (fixture_id, market_type, source). */
+function durableUpsertKey(row: Record<string, unknown>): string {
+  return `${String(row.fixture_id)}|${String(row.market_type)}|${String(row.source)}`;
+}
+
+/**
+ * Deterministic representative selection for records that share one
+ * daily_picks upsert key. PostgREST/Postgres rejects a single INSERT/upsert
+ * statement that hits the same conflict target twice
+ * ("ON CONFLICT DO UPDATE command cannot affect row a second time"), so the
+ * batch MUST be collapsed first.
+ *
+ * Selection order (fully deterministic, no randomness):
+ *   1. higher confidence
+ *   2. higher edge_pct
+ *   3. higher model_probability
+ *   4. lexicographically smaller prediction (stable tie-break)
+ */
+function isBetterRepresentative(candidate: Record<string, unknown>, incumbent: Record<string, unknown>): boolean {
+  const num = (v: unknown) => (typeof v === 'number' && isFinite(v) ? v : -Infinity);
+  const str = (v: unknown) => (v === null || v === undefined ? '\uffff' : String(v));
+  const byConfidence = num(candidate.confidence) - num(incumbent.confidence);
+  if (byConfidence !== 0) return byConfidence > 0;
+  const byEdge = num(candidate.edge_pct) - num(incumbent.edge_pct);
+  if (byEdge !== 0) return byEdge > 0;
+  const byProb = num(candidate.model_probability) - num(incumbent.model_probability);
+  if (byProb !== 0) return byProb > 0;
+  return str(candidate.prediction) < str(incumbent.prediction);
 }
 
 async function getSupabase() {
@@ -181,8 +356,12 @@ export function toDailyPicksRow(
   rec: PredictionLedgerRecord,
   runId: string
 ): Record<string, unknown> | null {
-  const fixtureId = String(rec.canonicalMatchId || '').trim();
-  if (!UUID_RE.test(fixtureId)) return null;
+  // D1 — deterministic canonical -> uuid fixture identity resolution.
+  // Fails closed (null) when the record carries no resolvable identity; it never
+  // fabricates an id and never silently drops a 16-hex canonical id.
+  const identity = resolveDurableFixtureId(rec);
+  if (!identity) return null;
+  const fixtureId = identity.fixtureId;
 
   const marketType = toDailyPicksMarketType(rec.market);
   if (!marketType) return null;
@@ -216,6 +395,8 @@ export function toDailyPicksRow(
   const reasoning = JSON.stringify({
     runId,
     predictionId: rec.predictionId,
+    canonicalMatchId: identity.canonicalId,
+    fixtureIdSource: identity.source,
     market: rec.market,
     line: rec.line,
     oddsTimestamp: oddsTs,
@@ -297,19 +478,42 @@ export async function persistDailyPredictions(
     if (!row) {
       invalid++;
       errors.push(
-        `Unrepresentable record skipped: predictionId=${rec?.predictionId ?? 'unknown'} market=${rec?.market ?? 'unknown'}`
+        `Unrepresentable record skipped: predictionId=${rec?.predictionId ?? 'unknown'} ` +
+          `canonicalMatchId=${rec?.canonicalMatchId ?? 'none'} market=${rec?.market ?? 'unknown'}`
       );
       continue;
     }
     rows.push(row);
   }
 
-  if (rows.length === 0) {
+  // Collapse records that share the daily_picks unique key. The ledger emits a
+  // LINE FAMILY per market (OU 1.0/1.5/.../4.0), while the schema — by design,
+  // per migration 53 — stores ONE pick per fixture per market per source.
+  // A single upsert statement cannot touch the same conflict target twice, so
+  // without this collapse Postgres rejects the entire batch.
+  const byKey = new Map<string, Record<string, unknown>>();
+  const order: string[] = [];
+  let collapsed = 0;
+  for (const row of rows) {
+    const key = durableUpsertKey(row);
+    const incumbent = byKey.get(key);
+    if (!incumbent) {
+      byKey.set(key, row);
+      order.push(key);
+      continue;
+    }
+    collapsed++;
+    if (isBetterRepresentative(row, incumbent)) byKey.set(key, row);
+  }
+  const deduped = order.map((k) => byKey.get(k)!);
+
+  if (deduped.length === 0) {
     return {
       attempted: true,
       submitted: 0,
       written: 0,
       failed: invalid,
+      collapsed: 0,
       errors,
       skipped: false,
     };
@@ -319,15 +523,16 @@ export async function persistDailyPredictions(
     const supabase = await getSupabase();
     const { error } = await supabase
       .from('daily_picks')
-      .upsert(rows, { onConflict: 'fixture_id,market_type,source' });
+      .upsert(deduped, { onConflict: 'fixture_id,market_type,source' });
 
     if (error) {
       errors.push(`daily_picks upsert failed: ${error.message}`);
       return {
         attempted: true,
-        submitted: rows.length,
+        submitted: deduped.length,
         written: 0,
-        failed: rows.length + invalid,
+        failed: deduped.length + invalid,
+        collapsed,
         errors,
         skipped: false,
       };
@@ -335,9 +540,10 @@ export async function persistDailyPredictions(
 
     return {
       attempted: true,
-      submitted: rows.length,
-      written: rows.length,
+      submitted: deduped.length,
+      written: deduped.length,
       failed: invalid,
+      collapsed,
       errors,
       skipped: false,
     };
@@ -345,9 +551,10 @@ export async function persistDailyPredictions(
     errors.push(`daily_picks upsert threw: ${err?.message || String(err)}`);
     return {
       attempted: true,
-      submitted: rows.length,
+      submitted: deduped.length,
       written: 0,
-      failed: rows.length + invalid,
+      failed: deduped.length + invalid,
+      collapsed,
       errors,
       skipped: false,
     };
@@ -374,7 +581,8 @@ export async function startDurableRun(
       .from('live_validation_job_runs')
       .insert({
         job_name: jobName,
-        status: 'RUNNING',
+        // D3 — contract value, never 'RUNNING'.
+        status: toDurableJobRunStatus('RUNNING'),
         started_at: startedAt ?? new Date().toISOString(),
         correlation_id: runId,
         items_discovered: 0,
@@ -398,7 +606,10 @@ export async function startDurableRun(
 /** Completes a previously started durable run record. */
 export async function completeDurableRun(
   id: string | null,
-  result: Omit<DurableRunRecord, 'runId' | 'startedAt'>
+  result: Omit<DurableRunRecord, 'runId' | 'startedAt' | 'status'> & {
+    /** Internal pipeline label (SUCCESS/PARTIAL/QUOTA_BLOCKED/...) or contract value. */
+    status: DurableJobRunStatus | string;
+  }
 ): Promise<boolean> {
   if (!isDurableStateRequired() || !id) return false;
   try {
@@ -407,7 +618,8 @@ export async function completeDurableRun(
     const { error } = await supabase
       .from('live_validation_job_runs')
       .update({
-        status: result.status,
+        // D3 — translate internal state into the live_validation_job_runs CHECK contract.
+        status: toDurableJobRunStatus(result.status),
         finished_at: finishedAt,
         duration_ms: result.durationMs ?? null,
         items_discovered: result.itemsDiscovered ?? 0,
@@ -523,7 +735,7 @@ export async function readLatestDurableState(
         const r = data[0] as Record<string, any>;
         latestRun = {
           runId: String(r.correlation_id ?? r.id ?? ''),
-          status: (r.status ?? 'RUNNING') as DurableRunRecord['status'],
+          status: toDurableJobRunStatus(r.status),
           startedAt: r.started_at ?? capturedAtUtc,
           finishedAt: r.finished_at ?? null,
           durationMs: r.duration_ms ?? null,

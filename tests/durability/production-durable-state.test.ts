@@ -132,7 +132,12 @@ import {
   toDailyPicksRow,
   toDailyPicksMarketType,
   toDailyPicksVerdict,
+  toDurableJobRunStatus,
+  resolveDurableFixtureId,
+  canonicalFixtureIdToUuid,
   DURABLE_DAILY_PICKS_SOURCE,
+  DURABLE_JOB_RUN_STATUSES,
+  CANONICAL_FIXTURE_UUID_NAMESPACE,
   JOB_NAME_DAILY_PIPELINE,
 } from '@/lib/durability/productionDurableState';
 import { CronLogger } from '@/lib/services/cronLogger';
@@ -393,7 +398,9 @@ describe('E. Health read model reads durable state', () => {
     expect(snap.latestPredictionTimestampUtc).toBe('2026-10-02T04:10:00.000Z');
     expect(snap.predictionCount).toBe(30);
     expect(snap.upcomingFixtureCount).toBe(756);
-    expect(snap.latestRun?.status).toBe('SUCCESS');
+    // D3 — the durable read model exposes the DATABASE contract value
+    // ('succeeded'), not the rich internal label ('SUCCESS').
+    expect(snap.latestRun?.status).toBe('succeeded');
     expect(snap.latestRun?.runId).toBe('daily-2026-10-02T04:00Z');
     expect(snap.latestRun?.itemsProcessed).toBe(70);
 
@@ -493,6 +500,13 @@ describe('G. live_validation_job_runs records execution status', () => {
     expect(insert.table).toBe('live_validation_job_runs');
     expect(insert.payload.job_name).toBe(JOB_NAME_DAILY_PIPELINE);
     expect(insert.payload.correlation_id).toBe('daily-2026-10-02T04:00Z');
+    // D2 — must satisfy live_validation_job_runs CHECK
+    //      (job_name IN ('scheduler','settlement','metrics','archive')).
+    expect(insert.payload.job_name).toBe('scheduler');
+    expect(['scheduler', 'settlement', 'metrics', 'archive']).toContain(insert.payload.job_name);
+    // D3 — inserted status must be the contract value, never 'RUNNING'.
+    expect(insert.payload.status).toBe('running');
+    expect(['running', 'succeeded', 'failed', 'skipped']).toContain(insert.payload.status);
 
     const ok = await completeDurableRun('job-row-1', {
       status: 'PARTIAL',
@@ -504,9 +518,168 @@ describe('G. live_validation_job_runs records execution status', () => {
     expect(ok).toBe(true);
     const update = calls.filter((c) => c.op === 'update').pop()!;
     expect(update.table).toBe('live_validation_job_runs');
-    expect(update.payload.status).toBe('PARTIAL');
+    // D3 — internal 'PARTIAL' must be translated to the DB contract; writing the
+    // raw 'PARTIAL' violated CHECK (status IN ('running','succeeded','failed','skipped'))
+    // and silently left live_validation_job_runs empty.
+    expect(update.payload.status).toBe('failed');
+    expect(['running', 'succeeded', 'failed', 'skipped']).toContain(update.payload.status);
     expect(update.payload.items_failed).toBe(2);
     expect(update.payload.error_message).toBe('durable persistence partial');
+  });
+
+  it('maps every internal pipeline state to the database status contract (D3)', () => {
+    expect(toDurableJobRunStatus('RUNNING')).toBe('running');
+    expect(toDurableJobRunStatus('SUCCESS')).toBe('succeeded');
+    expect(toDurableJobRunStatus('PARTIAL')).toBe('failed');
+    expect(toDurableJobRunStatus('FAILED')).toBe('failed');
+    expect(toDurableJobRunStatus('ERROR')).toBe('failed');
+    expect(toDurableJobRunStatus('QUOTA_BLOCKED')).toBe('skipped');
+    expect(toDurableJobRunStatus('SKIPPED')).toBe('skipped');
+    // Fail-closed: unknown / missing states can never be recorded as success.
+    expect(toDurableJobRunStatus('SOMETHING_NEW')).toBe('failed');
+    expect(toDurableJobRunStatus('')).toBe('failed');
+    expect(toDurableJobRunStatus(undefined)).toBe('failed');
+    expect(toDurableJobRunStatus(null)).toBe('failed');
+
+    // Already-contract values pass through unchanged (idempotent).
+    for (const s of DURABLE_JOB_RUN_STATUSES) {
+      expect(toDurableJobRunStatus(s)).toBe(s);
+    }
+  });
+
+  it('exposes the scheduler job name that the DDL actually permits (D2)', () => {
+    expect(JOB_NAME_DAILY_PIPELINE).toBe('scheduler');
+    expect(['scheduler', 'settlement', 'metrics', 'archive']).toContain(JOB_NAME_DAILY_PIPELINE);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// D1. Canonical fixture identity resolution (16-hex -> uuid)
+// ---------------------------------------------------------------------------
+
+describe('D1. Canonical fixture -> daily_picks uuid resolution', () => {
+  /** Shape produced by CanonicalFixtureRegistry.generateCanonicalFixtureId(). */
+  const CANONICAL = '5fa317b406c41c5c';
+
+  it('derives a deterministic UUIDv5 from a 16-hex canonical id', () => {
+    const a = resolveDurableFixtureId({ canonicalMatchId: CANONICAL } as any)!;
+    const b = resolveDurableFixtureId({ canonicalMatchId: CANONICAL } as any)!;
+    expect(a).not.toBeNull();
+    expect(a.source).toBe('canonical-derived');
+    expect(a.fixtureId).toBe(b.fixtureId); // deterministic
+    expect(a.canonicalId).toBe(CANONICAL);
+    // RFC 4122 v5 shape.
+    expect(a.fixtureId).toMatch(
+      /^[0-9a-f]{8}-[0-9a-f]{4}-5[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/
+    );
+    expect(a.fixtureId).toBe(canonicalFixtureIdToUuid(CANONICAL));
+  });
+
+  it('keeps the derivation namespace constant (changing it re-keys every durable row)', () => {
+    expect(CANONICAL_FIXTURE_UUID_NAMESPACE).toBe('7a6f2b1c-9d4e-5a37-8b21-c4f0d9e63a55');
+  });
+
+  it('separates distinct canonical fixtures', () => {
+    const ids = ['5fa317b406c41c5c', 'bc702550dbd31ea0', '023ddb1a425b5e38'].map(
+      (c) => resolveDurableFixtureId({ canonicalMatchId: c } as any)!.fixtureId
+    );
+    expect(new Set(ids).size).toBe(3);
+  });
+
+  it('accepts the cm_ prefixed form used by the bundled fixture data', () => {
+    const bare = resolveDurableFixtureId({ canonicalMatchId: '0944a6295a7435eb' } as any)!;
+    const prefixed = resolveDurableFixtureId({ canonicalMatchId: 'cm_0944a6295a7435eb' } as any)!;
+    expect(prefixed.fixtureId).toBe(bare.fixtureId);
+    expect(prefixed.canonicalId).toBe('0944a6295a7435eb');
+  });
+
+  it('passes an existing UUID through unchanged', () => {
+    const r = resolveDurableFixtureId({ canonicalMatchId: FIXTURE_ID } as any)!;
+    expect(r.source).toBe('uuid');
+    expect(r.fixtureId).toBe(FIXTURE_ID);
+  });
+
+  it('fails closed when no resolvable identity is present', () => {
+    expect(resolveDurableFixtureId({ canonicalMatchId: '' } as any)).toBeNull();
+    expect(resolveDurableFixtureId({ canonicalMatchId: 'not-a-uuid' } as any)).toBeNull();
+    expect(resolveDurableFixtureId({ canonicalMatchId: 'RANDOM-STRING' } as any)).toBeNull();
+    expect(resolveDurableFixtureId({ canonicalMatchId: '5fa317b406c41c5X' } as any)).toBeNull();
+    expect(toDailyPicksRow(makeRecord({ canonicalMatchId: 'not-a-uuid' }), 'run')).toBeNull();
+  });
+
+  it('maps a canonical 16-hex record into a uuid daily_picks row (the D1 fix)', () => {
+    // Before the fix this returned null (UUID_RE rejected the 16-hex canonical
+    // id), which is exactly why production reported submitted:0 / written:0.
+    const row = toDailyPicksRow(makeRecord({ canonicalMatchId: CANONICAL }), 'run-d1')!;
+    expect(row).not.toBeNull();
+    expect(String(row.fixture_id)).toMatch(
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
+    );
+    const reasoning = JSON.parse(row.reasoning as string);
+    expect(reasoning.canonicalMatchId).toBe(CANONICAL);
+    expect(reasoning.fixtureIdSource).toBe('canonical-derived');
+  });
+
+  it('is idempotent: the same canonical fixture always maps to the same uuid', () => {
+    const first = toDailyPicksRow(makeRecord({ canonicalMatchId: CANONICAL }), 'run-1')!;
+    const second = toDailyPicksRow(makeRecord({ canonicalMatchId: CANONICAL }), 'run-2')!;
+    // Same upsert key -> no duplicate row on retry.
+    expect(second.fixture_id).toBe(first.fixture_id);
+    expect(second.market_type).toBe(first.market_type);
+    expect(second.source).toBe(first.source);
+  });
+
+  it('collapses a line family into one row per (fixture, market, source)', async () => {
+    process.env.VERCEL = '1';
+    control.upsertError = null;
+    const base = makeRecord({ canonicalMatchId: CANONICAL });
+    const res = await persistDailyPredictions(
+      [
+        { ...base, predictionId: 'p1', line: 1.5, selection: 'Over 1.5', odds: 1.9, modelProbability: 0.6, calibratedProbability: 0.6, confidenceScore: 60, confidence: 'LOW' },
+        { ...base, predictionId: 'p2', line: 2.5, selection: 'Over 2.5', odds: 1.9, modelProbability: 0.72, calibratedProbability: 0.72, confidenceScore: 88, confidence: 'HIGH' },
+        { ...base, predictionId: 'p3', line: 3.5, selection: 'Over 3.5', odds: 1.9, modelProbability: 0.4, calibratedProbability: 0.4, confidenceScore: 45, confidence: 'PASS' },
+      ],
+      'run-dedupe'
+    );
+
+    // A single upsert statement cannot touch the same conflict target twice —
+    // Postgres rejects the whole batch. Collapsing is mandatory.
+    expect(res.attempted).toBe(true);
+    expect(res.collapsed).toBe(2);
+    expect(res.submitted).toBe(1);
+    expect(res.written).toBe(1);
+    expect(res.failed).toBe(0);
+
+    const upsert = calls.filter((c) => c.op === 'upsert').pop()!;
+    expect(upsert.payload).toHaveLength(1);
+    // Highest confidence wins; the choice is deterministic.
+    expect(upsert.payload[0].prediction).toBe('Over 2.5');
+    expect(upsert.payload[0].confidence).toBe(88);
+    expect(upsert.options.onConflict).toBe('fixture_id,market_type,source');
+  });
+
+  it('keeps distinct (fixture, market) pairs and reports zero collapse', async () => {
+    process.env.VERCEL = '1';
+    control.upsertError = null;
+    const res = await persistDailyPredictions(
+      [
+        makeRecord({ canonicalMatchId: CANONICAL, market: 'OU' }),
+        makeRecord({ canonicalMatchId: CANONICAL, market: 'BTTS', selection: 'BTTS YES' }),
+        makeRecord({ canonicalMatchId: CANONICAL, market: 'AH', selection: 'HOME -0.5', line: -0.5 }),
+      ],
+      'run-distinct'
+    );
+    expect(res.collapsed).toBe(0);
+    expect(res.submitted).toBe(3);
+    expect(res.written).toBe(3);
+    expect(res.failed).toBe(0);
+  });
+
+  it('reports collapsed=0 and skips nothing on the non-production path', async () => {
+    const res = await persistDailyPredictions([makeRecord()], 'run-np');
+    expect(res.skipped).toBe(true);
+    expect(res.collapsed).toBe(0);
+    expect(res.submitted).toBe(0);
   });
 });
 

@@ -35,7 +35,13 @@ import {
   type PredictionLifecycleStage,
   type PredictionHorizonBucket
 } from './types';
-import { OddsPapiQuotaAllocator } from '@/lib/providers/oddspapiQuotaAllocator';
+import {
+  fetchOddsPapiFixtureIndex,
+  primeTournamentOdds,
+  getBatchedFixtures,
+  CONSUMED_BOOKMAKERS,
+  type FixtureIndexEntry,
+} from '@/lib/pipeline/tournamentOddsBatch';
 import { CANONICAL_15_LEAGUES } from '@/lib/config/multiLeagueRegistry';
 
 interface CachedPicksData {
@@ -43,6 +49,25 @@ interface CachedPicksData {
   picks: DailyPickRecord[];
   matches: UpcomingMatchDTO[];
   meta: any;
+}
+
+/**
+ * Structured outcome of an OddsPapi retrieval. The odds stage may only be
+ * reported as SUCCESS when `ok === true` AND `fixtures.length > 0`.
+ */
+export interface OddsRetrievalResult {
+  ok: boolean;
+  /** OddsPapi batch fixtures, in the shape the reconciler already consumes
+   *  (`fixtureId`, `startTime`, `participant1Id/2Id`, `bookmakerOdds`). */
+  fixtures: any[];
+  tournamentIds: number[];
+  bookmakersRequested: string[];
+  bookmakersWithData: string[];
+  discoveredFixtures: number;
+  /** Metered OddsPapi calls issued by this retrieval (0 when fully cached). */
+  meteredCalls: number;
+  error?: string;
+  errorCode?: string;
 }
 
 export class DailyPicksEngine {
@@ -301,50 +326,205 @@ export class DailyPicksEngine {
   }
 
   /**
-   * Fetches live Pinnacle market odds for target tournaments from OddsPapi v4.
-   * Uses QuotaManager pre-flight check and quota allocator.
+   * Retrieves live Pinnacle market odds from OddsPapi v4 through the SAME
+   * proven P0 batch path the AH/OU/BTTS live pipelines use.
+   *
+   * ── REQUEST-CONSTRUCTION FIX (production freshness incident) ──────────────
+   * The previous implementation issued a raw fetch to
+   *   GET /v4/odds-by-tournaments?tournamentIds=17&bookmakers=pinnacle,bet365
+   * which OddsPapi rejects with HTTP 400 (reproduced against the live API):
+   *   {"error":{"code":"INVALID_PARAMETER",
+   *             "message":"Invalid number of bookmakers specified.",
+   *             "details":"Please provide exactly one bookmaker using the
+   *                        'bookmaker' query parameter."}}
+   * Three independent defects produced that request:
+   *   1. `bookmakers` (PLURAL, comma separated) is not a valid parameter — the
+   *      documented parameter is `bookmaker` (SINGULAR, exactly one per request).
+   *      The batch path therefore issues one call per consumed bookmaker.
+   *   2. `tournamentIds` defaulted to the legacy '17', which is NOT in the
+   *      OddsPapi v4 tournament id space (verified ids: 701 Championship,
+   *      544, 20782, 23755).
+   *   3. It used a raw `fetch` plus a *second* legacy quota allocator, bypassing
+   *      QuotaManagerV4 — so those billable 400s were never recorded in
+   *      `quota_state` (provider truth: 96/250 used vs quota_state 12).
+   *
+   * The replacement is quota-accounted, fail-safe and semantics-preserving:
+   *   1 x /v4/fixtures                (discovery, 1 metered call)
+   *   N x /v4/odds-by-tournaments     (1 metered call per consumed bookmaker)
+   * Nothing about markets, DTOs, bookmaker semantics or the model is changed.
    */
-  public static async fetchOddsPapiPinnacle(tournamentIds?: number[]): Promise<any[]> {
-    const quotaDecision = OddsPapiQuotaAllocator.canAcquire({
-      leagueId: 'MULTI_LEAGUE',
-      tier: 'A',
-      priority: 'HIGH',
-      cost: 1,
-    });
-
-    if (!quotaDecision.allowed) {
-      console.warn(`[DailyPicksEngine] OddsPapi quota allocator rejected: ${quotaDecision.reason}`);
-      return [];
-    }
-
-    const apiKey = this.getEnvKey('ODDS_PAPI_KEY') || this.getEnvKey('ODDSPAPI_KEY');
-    if (!apiKey) return [];
-
-    const idsParam = tournamentIds && tournamentIds.length > 0
-      ? tournamentIds.join(',')
-      : '17';
+  public static async retrieveOddsPapiPinnacle(
+    targetFixtures?: Array<Pick<CanonicalFixture, 'homeTeam' | 'awayTeam' | 'kickoffUtc'>>,
+    explicitTournamentIds?: number[]
+  ): Promise<OddsRetrievalResult> {
+    const bookmakersRequested = [...CONSUMED_BOOKMAKERS];
 
     try {
-      const url = `https://api.oddspapi.io/v4/odds-by-tournaments?apiKey=${apiKey}&tournamentIds=${idsParam}&bookmakers=pinnacle,bet365`;
-      const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
-      if (!res.ok) {
-        console.error(`[DailyPicksEngine] OddsPapi HTTP ${res.status}`);
-        return [];
+      let tournamentIds: number[] = [];
+      let discoveredFixtures = 0;
+      let discoveryCalls = 0;
+
+      if (explicitTournamentIds && explicitTournamentIds.length > 0) {
+        tournamentIds = [...new Set(explicitTournamentIds.filter((v) => Number.isFinite(v)))];
+      } else {
+        // STEP 1 — metered discovery (1 call): OddsPapi's authoritative id space.
+        const nowMs = Date.now();
+        const from = new Date(nowMs).toISOString().slice(0, 10);
+        const to = new Date(nowMs + 7 * 24 * 3600 * 1000).toISOString().slice(0, 10);
+        const index = await fetchOddsPapiFixtureIndex({ from, to });
+        discoveredFixtures = index.fixtures.length;
+        discoveryCalls = index.meteredCalls;
+
+        if (index.status !== 'READY') {
+          return {
+            ok: false,
+            fixtures: [],
+            tournamentIds: [],
+            bookmakersRequested,
+            bookmakersWithData: [],
+            discoveredFixtures,
+            meteredCalls: discoveryCalls,
+            error: index.error ?? 'OddsPapi fixture discovery failed',
+            errorCode: index.errorCode ?? 'DISCOVERY_FAILED',
+          };
+        }
+
+        // STEP 2 — deterministic tournament-id derivation.
+        tournamentIds = DailyPicksEngine.deriveOddsPapiTournamentIds(index.fixtures, targetFixtures);
       }
-      const raw = await res.json();
-      OddsPapiQuotaAllocator.recordUsage({
-        leagueId: 'ENG-PL',
-        tier: 'A',
-        cost: 1,
-        endpoint: 'odds-by-tournaments',
-        reservationId: quotaDecision.reservationToken,
-        billable: true,
-      });
-      return Array.isArray(raw) ? raw : [];
-    } catch (err) {
-      console.error('[DailyPicksEngine] OddsPapi fetch error:', err);
-      return [];
+
+      if (tournamentIds.length === 0) {
+        return {
+          ok: false,
+          fixtures: [],
+          tournamentIds: [],
+          bookmakersRequested,
+          bookmakersWithData: [],
+          discoveredFixtures,
+          meteredCalls: discoveryCalls,
+          error: 'No OddsPapi tournament ids resolvable for the target fixtures',
+          errorCode: 'NO_TOURNAMENTS',
+        };
+      }
+
+      // STEP 3 — metered batch: one /v4/odds-by-tournaments call per bookmaker.
+      const batch = await primeTournamentOdds({ tournamentIds });
+      const fixtures = getBatchedFixtures();
+
+      if (batch.status !== 'READY' || fixtures.length === 0) {
+        return {
+          ok: false,
+          fixtures,
+          tournamentIds,
+          bookmakersRequested: batch.bookmakersRequested,
+          bookmakersWithData: batch.bookmakersWithData,
+          discoveredFixtures,
+          meteredCalls: discoveryCalls + batch.meteredCalls,
+          error: batch.error ?? `OddsPapi batch status=${batch.status}`,
+          errorCode: batch.errorCode ?? batch.status,
+        };
+      }
+
+      return {
+        ok: true,
+        fixtures,
+        tournamentIds,
+        bookmakersRequested: batch.bookmakersRequested,
+        bookmakersWithData: batch.bookmakersWithData,
+        discoveredFixtures,
+        meteredCalls: discoveryCalls + batch.meteredCalls,
+      };
+    } catch (err: any) {
+      const message = err?.message || String(err);
+      console.error('[DailyPicksEngine] OddsPapi retrieval error:', message);
+      return {
+        ok: false,
+        fixtures: [],
+        tournamentIds: [],
+        bookmakersRequested,
+        bookmakersWithData: [],
+        discoveredFixtures: 0,
+        meteredCalls: 0,
+        error: message,
+        errorCode: err?.name ?? 'RETRIEVAL_ERROR',
+      };
     }
+  }
+
+
+  /**
+   * Deterministically derives the OddsPapi v4 tournament ids relevant to the
+   * canonical fixtures.
+   *
+   * No fuzzy matching: participant names are compared with the exact same
+   * `matchTeams()` predicate already used for odds reconciliation, and the
+   * kickoff must fall inside the same +/-2h window.
+   *
+   * When no target fixtures are supplied (or none reconcile), it falls back
+   * deterministically to the tournaments that actually carry odds, ordered by
+   * eligible-fixture count desc then tournamentId asc (stable across runs).
+   */
+  public static deriveOddsPapiTournamentIds(
+    index: FixtureIndexEntry[],
+    targetFixtures?: Array<Pick<CanonicalFixture, 'homeTeam' | 'awayTeam' | 'kickoffUtc'>>,
+    maxTournaments = 40
+  ): number[] {
+    const withIds = (Array.isArray(index) ? index : []).filter(
+      (f) => typeof f.tournamentId === 'number' && Number.isFinite(f.tournamentId)
+    );
+    if (withIds.length === 0) return [];
+
+    if (targetFixtures && targetFixtures.length > 0) {
+      const matched = new Set<number>();
+      for (const fx of targetFixtures) {
+        const tKick = new Date(fx.kickoffUtc).getTime();
+        if (!isFinite(tKick)) continue;
+        for (const op of withIds) {
+          const id = op.tournamentId as number;
+          if (matched.has(id) || !op.startTime) continue;
+          const oTime = new Date(op.startTime).getTime();
+          if (!isFinite(oTime) || Math.abs(oTime - tKick) > 2 * 60 * 60 * 1000) continue;
+          if (
+            DailyPicksEngine.matchTeams(fx.homeTeam, op.participant1Name ?? '') &&
+            DailyPicksEngine.matchTeams(fx.awayTeam, op.participant2Name ?? '')
+          ) {
+            matched.add(id);
+          }
+        }
+      }
+      if (matched.size > 0) {
+        return [...matched].sort((a, b) => a - b).slice(0, maxTournaments);
+      }
+    }
+
+    // Deterministic fallback (stable: count desc, then id asc).
+    const counts = new Map<number, number>();
+    for (const f of withIds) {
+      const id = f.tournamentId as number;
+      counts.set(id, (counts.get(id) ?? 0) + 1);
+    }
+    return [...counts.entries()]
+      .sort((a, b) => b[1] - a[1] || a[0] - b[0])
+      .slice(0, maxTournaments)
+      .map(([id]) => id);
+  }
+
+  /**
+   * Backwards-compatible entry point.
+   *
+   * IMPORTANT: this NO LONGER SWALLOWS FAILURES. A failed/empty retrieval
+   * throws, so a caller can never report the odds stage as SUCCESS while
+   * holding zero fresh odds — the exact failure mode of the freshness incident.
+   */
+  public static async fetchOddsPapiPinnacle(tournamentIds?: number[]): Promise<any[]> {
+    const result = await DailyPicksEngine.retrieveOddsPapiPinnacle(undefined, tournamentIds);
+    if (!result.ok) {
+      throw new Error(
+        `[DailyPicksEngine] OddsPapi retrieval failed: ${result.error ?? 'unknown'}` +
+          `${result.errorCode ? ` (${result.errorCode})` : ''}`
+      );
+    }
+    return result.fixtures;
   }
 
   /**

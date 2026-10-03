@@ -72,6 +72,15 @@ export interface MergedBatchFixture {
   fixtureId: string;
   tournamentId?: number;
   startTime?: string;
+  /**
+   * OddsPapi participant identity (names + ids) carried through from the batch
+   * response so consumers can reconcile a batch fixture against a canonical
+   * fixture WITHOUT issuing another provider call.
+   */
+  participant1Id?: number | null;
+  participant2Id?: number | null;
+  participant1Name?: string | null;
+  participant2Name?: string | null;
   bookmakerOdds: Record<string, any>;
 }
 
@@ -162,6 +171,10 @@ export async function primeTournamentOdds(options: BatchPrimeOptions): Promise<B
             fixtureId: id,
             tournamentId: fx.tournamentId,
             startTime: fx.startTime,
+            participant1Id: fx.participant1Id ?? null,
+            participant2Id: fx.participant2Id ?? null,
+            participant1Name: fx.participant1Name ?? null,
+            participant2Name: fx.participant2Name ?? null,
             bookmakerOdds: { ...incoming },
           });
         }
@@ -222,6 +235,15 @@ export async function primeTournamentOdds(options: BatchPrimeOptions): Promise<B
 export function getBatchedFixtureOdds(fixtureId: string | number): MergedBatchFixture | null {
   if (!cache) return null;
   return cache.index.get(String(fixtureId)) ?? null;
+}
+
+/**
+ * Every fixture currently held in the primed batch index.
+ * Pure read of the shared cache — NEVER triggers a provider call. Returns an
+ * empty array when no batch has been primed (or the last prime degraded).
+ */
+export function getBatchedFixtures(): MergedBatchFixture[] {
+  return cache ? Array.from(cache.index.values()) : [];
 }
 
 /** The result of the most recent prime() call (null before the first call). */

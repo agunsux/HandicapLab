@@ -185,21 +185,29 @@ export class SalmoPredictionEngine {
   }
 
   /**
-   * Fetches live Pinnacle market odds for tournament 17 (Premier League) from OddsPapi v4.
+   * Fetches live Pinnacle market odds from OddsPapi v4.
+   *
+   * REQUEST-CONSTRUCTION FIX — this method carried the SAME defect as
+   * DailyPicksEngine.fetchOddsPapiPinnacle():
+   *   GET /v4/odds-by-tournaments?tournamentIds=17&bookmakers=pinnacle
+   * `bookmakers` (plural) is not a valid parameter — OddsPapi requires
+   * `bookmaker` (singular, exactly one per request) — and `tournamentIds=17`
+   * is not in the OddsPapi v4 id space. OddsPapi therefore answered HTTP 400
+   * ("Invalid number of bookmakers specified.").
+   *
+   * It also used a raw fetch, bypassing QuotaManagerV4. It now delegates to the
+   * single approved P0 batch path (one odds authority, one quota system).
    */
   public static async fetchOddsPapiPinnacle(): Promise<any[]> {
-    const apiKey = this.getEnvKey('ODDS_PAPI_KEY') || this.getEnvKey('ODDSPAPI_KEY');
-    if (!apiKey) throw new Error('[SalmoPredictionEngine] ODDS_PAPI_KEY is missing');
-
-    const res = await fetch(`https://api.oddspapi.io/v4/odds-by-tournaments?apiKey=${apiKey}&tournamentIds=17&bookmakers=pinnacle`, {
-      headers: { 'Accept': 'application/json' },
-    });
-
-    if (!res.ok) {
-      throw new Error(`[SalmoPredictionEngine] OddsPapi HTTP ${res.status}`);
+    const { DailyPicksEngine } = await import('@/lib/daily-picks/engine');
+    const result = await DailyPicksEngine.retrieveOddsPapiPinnacle();
+    if (!result.ok) {
+      throw new Error(
+        `[SalmoPredictionEngine] OddsPapi retrieval failed: ${result.error ?? 'unknown'}` +
+          `${result.errorCode ? ` (${result.errorCode})` : ''}`
+      );
     }
-
-    return await res.json();
+    return result.fixtures;
   }
 
   /**

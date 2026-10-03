@@ -403,15 +403,21 @@ export class ProductionPublishingEngine {
     }
 
     // 3. Fetch Real Odds
+    // FAIL CLOSED: a failed/empty OddsPapi retrieval must be observable. The
+    // previous version swallowed the error into console.warn and continued with
+    // `rawOdds = []`, which silently produced odds-less "predictions".
     let rawOdds: any[] = [];
     if (options.customOdds) {
       rawOdds = options.customOdds;
     } else {
-      try {
-        const { DailyPicksEngine } = await import('@/lib/daily-picks/engine');
-        rawOdds = await DailyPicksEngine.fetchOddsPapiPinnacle();
-      } catch (e) {
-        console.warn('[ProductionPublishingEngine] Failed to fetch odds:', e);
+      const { DailyPicksEngine } = await import('@/lib/daily-picks/engine');
+      const oddsResult = await DailyPicksEngine.retrieveOddsPapiPinnacle();
+      rawOdds = oddsResult.fixtures;
+      if (!oddsResult.ok) {
+        console.error(
+          `[ProductionPublishingEngine] OddsPapi retrieval FAILED: ` +
+            `${oddsResult.error ?? 'unknown'} (${oddsResult.errorCode ?? 'n/a'})`
+        );
       }
     }
 
