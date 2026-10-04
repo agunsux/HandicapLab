@@ -1,0 +1,79 @@
+{
+  "checkpoint": "STAGE_A_ODDS_PATH_AUDIT",
+  "generated_at": "2026-10-04T04:08:00.000Z",
+  "run_id": "RUN-RESCUE-1791084905581",
+  "model_version": "poisson_v1_rescue",
+  "namespace": "src/lib/pipeline/rescue/",
+  "cron_governance": {
+    "approved_schedule": "0 7 * * *",
+    "route": "/api/cron/rescue-pipeline",
+    "vercel_config_verified": true,
+    "production_cron_enabled": false,
+    "status": "AWAITING_FINAL_GO_FROM_JURAGAN"
+  },
+  "initial_run_classification": "REAL_FIXTURES_NO_USABLE_ODDS",
+  "initial_run_telemetry": {
+    "fixture_count": 9,
+    "prediction_count": 414,
+    "odds_count": 0,
+    "picks_generated": 0,
+    "quota_remaining": 142
+  },
+  "odds_path_investigation": {
+    "oddspapi_actually_called": true,
+    "requests_attempted": 4,
+    "quotamanager_reservations": [
+      { "id": "08428741-ed6b-4a19-866a-d57f45dc8df3", "endpoint": "odds-by-tournaments", "status": "CONFIRMED", "cost": 1 },
+      { "id": "ee14dc25-60bb-427e-9d9b-0e40481f1ffb", "endpoint": "odds-by-tournaments", "status": "ROLLED_BACK", "cost": 0 },
+      { "id": "9e444268-4f0f-43d4-a992-868d94adb598", "endpoint": "odds-by-tournaments", "status": "ROLLED_BACK", "cost": 0 },
+      { "id": "58f74122-810a-48a6-b7cf-9ec1e0d0d4c7", "endpoint": "odds-by-tournaments", "status": "ROLLED_BACK", "cost": 0 }
+    ],
+    "root_cause_for_odds_count_zero": [
+      "ID Namespace Mismatch: API-Football competition IDs were sent to primeTournamentOdds rather than OddsPapi tournament IDs",
+      "Lookup Key Mismatch: Ingestion keyed matches by API-Football fixtureId (e.g. 1507076) while getBatchedFixtureOdds is indexed by OddsPapi fixtureId (e.g. id1002056073929298)",
+      "Odds Schema Mismatch: OddsPapi batch market data is a dictionary indexed by marketId requiring marketMap resolution rather than a simple array"
+    ],
+    "reconciliation_proof_verified": {
+      "fixture_id": "id1002056073929298",
+      "match": "Barito Putera vs Persela Lamongan",
+      "bookmaker": "pinnacle",
+      "market": "AH",
+      "line": -0.5,
+      "real_market_odds": 1.99,
+      "model_probability": 0.4642,
+      "calculated_ev": -0.0762,
+      "confidence_gate_verdict": "LEWATI",
+      "is_pick": false,
+      "gate_rejection_reasons": [
+        "PROBABILITY_BELOW_GATE: calibrated probability 46.4% <= minimum 65%",
+        "NEGATIVE_OR_ZERO_EDGE: edge -3.83% <= 0%",
+        "NEGATIVE_OR_ZERO_EV: EV -7.62% <= 0%"
+      ]
+    }
+  },
+  "architecture_non_duplication": {
+    "authoritative_production": {
+      "fixture_ingestion": "DailyPipelineOrchestrator",
+      "odds_authority": "OddsPapi (via NativeOddsClient / QuotaManagerV4)",
+      "picks_table": "daily_picks",
+      "settlement": "ProductionSettlementService"
+    },
+    "rescue_pipeline_scope": {
+      "role": "Isolated contingency & mathematical research shadow",
+      "model_version": "poisson_v1_rescue",
+      "ledger": "data/ledger/rescue_prediction_ledger.jsonl",
+      "competing_source_of_truth": false
+    }
+  },
+  "test_suite": {
+    "files": [
+      "tests/rescue/poisson-rescue.test.ts",
+      "tests/rescue/poisson-rescue-cron.test.ts"
+    ],
+    "tests_total": 21,
+    "tests_passed": 21,
+    "tests_failed": 0,
+    "typescript_errors": 0
+  },
+  "verdict": "AUDIT_COMPLETE_AWAITING_GO"
+}
