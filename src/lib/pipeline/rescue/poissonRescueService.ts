@@ -15,6 +15,7 @@ import { RescueQuotaGuard } from './quotaGuard';
 import { RescueFixtureIngestion } from './fixtureIngestion';
 import { RescueSettlementEngine, FinalMatchScore } from './settlementEngine';
 import { RescuePredictionGenerator } from './predictionGenerator';
+import { GcsLedgerStorage } from './gcsLedgerStorage';
 import {
   getBatchedFixtureOdds,
   primeTournamentOdds,
@@ -58,6 +59,9 @@ export class PoissonRescueService {
     console.log(`STARTING SALMO RESCUE PIPELINE [${runId}]`);
     console.log(`Model Version: ${this.MODEL_VERSION} | Target Date: ${targetDate}`);
     console.log(`============================================================`);
+
+    // Ensure container has latest canonical ledger from GCS if running in cloud
+    await GcsLedgerStorage.pullLatestLedger(this.getLedgerFilePath());
 
     // OPERATION 0: QUOTA GUARD
     const quotaResult = await RescueQuotaGuard.checkOddsPapiQuota(options.apiKeyOverride);
@@ -153,6 +157,9 @@ export class PoissonRescueService {
       const content = finalPredictions.map((row) => JSON.stringify(row)).join('\n') + '\n';
       fs.appendFileSync(ledgerPath, content, 'utf8');
       console.log(`[Ledger] Persisted ${finalPredictions.length} predictions to ${ledgerPath}`);
+
+      // Async GCS durable cloud persistence when running on Cloud Run
+      await GcsLedgerStorage.persistLedgerToGcs(ledgerPath);
     } catch (e: any) {
       console.error('[Ledger] Failed to write to JSONL ledger:', e?.message);
     }

@@ -2,12 +2,10 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { PoissonRescueService } from '@/lib/pipeline/rescue/poissonRescueService';
 
 function verifyCronAuth(request: NextRequest): boolean {
-  const cronSecret = process.env.CRON_SECRET;
-  if (!cronSecret) return true;
-  const authHeader = request.headers.get('authorization');
-  if (authHeader === `Bearer ${cronSecret}`) return true;
-  const token = request.nextUrl.searchParams.get('token');
-  return token === cronSecret;
+  const cronSecret = process.env.CRON_SECRET?.trim();
+  if (!cronSecret) return false;
+  const authHeader = request.headers.get('authorization')?.trim();
+  return authHeader === `Bearer ${cronSecret}`;
 }
 
 export async function GET(request: NextRequest) {

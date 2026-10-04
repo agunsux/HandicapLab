@@ -1,0 +1,51 @@
+.gcloudignore
+.git/
+.gitignore
+
+# Secrets - NEVER UPLOAD
+.env*
+*.env
+
+# Build & Dependency Artifacts
+/node_modules/
+/.next/
+/.turbo/
+/.vercel/
+/coverage/
+
+# Large non-code root directories
+/.cursor/
+/.freebuff/
+/.gemini/
+/.github/
+/.kilo/
+/.playwright-mcp/
+/.vscode/
+/artifacts/
+/docs/
+/handicaplab-pipeline/
+/python_engine/
+/reports/
+/research/
+/scraper/
+/scratch/
+*.log
+*.tsbuildinfo
+
+# Heavy data folders in /data (retain data/ledger, data/registry, config/, services/)
+/data/historical/
+/data/gold/
+/data/golden/
+/data/research/
+/data/cache/
+/data/silver/
+/data/backups/
+/data/phase2b/
+/data/features/
+/data/lakehouse/
+/data/verification/
+/data/raw/
+/data/bronze/
+/data/test_ledger/
+/data/walkforward/
+
