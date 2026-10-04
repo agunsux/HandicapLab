@@ -27,6 +27,8 @@ export async function GET(request: NextRequest) {
     const viewParam = (searchParams.get('view') || 'all') as any;
     const horizonParam = (searchParams.get('horizon')?.toUpperCase() || 'ALL') as any;
     const marketParam = searchParams.get('market')?.toUpperCase() as any;
+    const modelVersionParam =
+      searchParams.get('modelVersion') || searchParams.get('model_version') || undefined;
 
     const nowMs = Date.now();
 
@@ -36,6 +38,7 @@ export async function GET(request: NextRequest) {
       view: viewParam,
       horizon: horizonParam,
       market: ['AH', 'OU', 'BTTS'].includes(marketParam) ? marketParam : undefined,
+      modelVersion: modelVersionParam,
     });
 
     const httpStatus = payload.dataState === 'DATA_TEMPORARILY_UNAVAILABLE' ? 503 : 200;
