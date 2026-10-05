@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
 
     const nowMs = Date.now();
 
-    const payload = SalmoProductionSyncService.generateSyncPayload({
+    const payload = await SalmoProductionSyncService.generateSyncPayloadAsync({
       nowMs,
       since: sinceParam,
       view: viewParam,
