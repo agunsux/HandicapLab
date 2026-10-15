@@ -21,6 +21,7 @@ import { ReconciliationService } from '@/lib/archive/reconciliationService';
 import { ModelVersionRegistry } from '@/lib/archive/modelVersionRegistry';
 import { DistributedCronLease } from '@/lib/crons/distributedCronLease';
 import { DailyPipelineOrchestrator } from '@/lib/pipeline/dailyOrchestrator';
+import { verifyCronRequest } from '@/lib/auth/cronAuth';
 
 const WINDOW_LABELS: Record<number, string> = {
   6: 'morning',
@@ -29,27 +30,20 @@ const WINDOW_LABELS: Record<number, string> = {
   22: 'postmatch',
 };
 
-function verifyCronAuth(request: NextRequest): boolean {
-  const cronSecret = process.env.CRON_SECRET;
-  if (!cronSecret) return true;
-  const authHeader = request.headers.get('authorization');
-  if (authHeader === `Bearer ${cronSecret}`) return true;
-  const token = request.nextUrl.searchParams.get('token');
-  return token === cronSecret;
-}
-
 export async function GET(request: NextRequest) {
-  if (!verifyCronAuth(request)) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const auth = await verifyCronRequest(request);
+  if (!auth.authorized) {
+    return NextResponse.json({ error: 'Unauthorized', reason: auth.reason }, { status: 401 });
   }
 
-  const searchParams = request.nextUrl.searchParams;
+  const searchParams = request.nextUrl?.searchParams ?? new URL(request.url).searchParams;
   const mode = searchParams.get('mode') || 'daily';
   const hour = new Date().getUTCHours();
   const windowLabel = WINDOW_LABELS[hour] ?? `hour_${hour}`;
 
   const isMutationMode = ['full', 'daily', 'reconcile', 'publishing-reconcile', 'settle', 'settle-predictions', 'auto-settle', 'canonical-settle', 'sync', 'salmo-sync'].includes(mode);
   let leaseId: string | undefined;
+  let leaseGeneration: string | undefined;
 
   if (isMutationMode) {
     const lease = await DistributedCronLease.acquireLease(`cron_${mode}`, 5 * 60 * 1000);
@@ -61,6 +55,7 @@ export async function GET(request: NextRequest) {
       }, { status: 409 });
     }
     leaseId = lease.leaseId;
+    leaseGeneration = lease.generation;
   }
 
   try {
@@ -382,7 +377,7 @@ export async function GET(request: NextRequest) {
   }
 } finally {
   if (leaseId) {
-    await DistributedCronLease.releaseLease(`cron_${mode}`, leaseId);
+    await DistributedCronLease.releaseLease(`cron_${mode}`, leaseId, leaseGeneration);
   }
 }
 }

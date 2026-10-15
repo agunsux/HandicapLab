@@ -19,8 +19,8 @@ export const metadata: Metadata = {
 };
 
 export default async function DailyPicksPage() {
-  // Pre-load live daily picks on the server side
-  const initialData = await DailyPicksEngine.getDailyPicks({ forceRefresh: false });
+  // Pre-load live daily picks on the server side (strictly read-only, no provider calls triggered by SSR)
+  const initialData = await DailyPicksEngine.getDailyPicks({ forceRefresh: false, allowProviderCalls: false });
 
   return <DailyPicksClient initialData={initialData} />;
 }

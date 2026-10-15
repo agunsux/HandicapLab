@@ -102,6 +102,12 @@ export class GcsLedgerStorage {
       return process.env.GCS_AUTH_TOKEN;
     }
 
+    // Short-circuit when running in Vercel or non-GCP serverless environments
+    // where metadata.google.internal is unroutable.
+    if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
+      return null;
+    }
+
     try {
       const res = await fetch(
         'http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token',

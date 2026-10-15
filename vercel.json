@@ -1,13 +1,4 @@
 {
   "framework": "nextjs",
-  "crons": [
-    {
-      "path": "/api/cron/pipeline",
-      "schedule": "0 4 * * *"
-    },
-    {
-      "path": "/api/cron/rescue-pipeline",
-      "schedule": "0 7 * * *"
-    }
-  ]
+  "crons": []
 }

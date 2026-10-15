@@ -27,12 +27,24 @@ function getClient(): SupabaseClient {
     throw new Error('[FAIL CLOSED] Authentication failed: SUPABASE_SERVICE_ROLE_KEY is missing, empty, or malformed. No Supabase connection was established.');
   }
 
+  const clientOptions = {
+    global: {
+      fetch: (url: any, init?: any) => {
+        const timeoutMs = process.env.VERCEL ? 5000 : 30_000;
+        return fetch(url, {
+          ...init,
+          signal: init?.signal || AbortSignal.timeout(timeoutMs),
+        });
+      },
+    },
+  };
+
   try {
     const supabaseServiceKey = validateCredential('SUPABASE_SERVICE_ROLE_KEY', rawKey, 'jwt');
-    cachedClient = createClient(supabaseUrl, supabaseServiceKey);
+    cachedClient = createClient(supabaseUrl, supabaseServiceKey, clientOptions);
     return cachedClient;
   } catch {
-    cachedClient = createClient(supabaseUrl, rawKey);
+    cachedClient = createClient(supabaseUrl, rawKey, clientOptions);
     return cachedClient;
   }
 }

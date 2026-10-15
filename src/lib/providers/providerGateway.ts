@@ -306,8 +306,9 @@ export class ProviderGateway {
     }
 
     // 4. RATE LIMIT + CONCURRENCY (bounded; never an unbounded retry loop)
+    const acquireTimeoutMs = process.env.VERCEL ? 2500 : 30_000;
     const limiter = this.getRateLimiter(provider);
-    const gotToken = await limiter.acquire(30_000);
+    const gotToken = await limiter.acquire(acquireTimeoutMs);
     if (!gotToken) {
       await rollbackQuota(receipt.reservationId);
       record({ statusCode: null, classification: 'RATE_LIMITED', errorClass: 'LOCAL_RATE_LIMIT_TIMEOUT' });
@@ -315,7 +316,7 @@ export class ProviderGateway {
     }
 
     const semaphore = this.getSemaphore(provider);
-    const gotSlot = await semaphore.acquire(30_000);
+    const gotSlot = await semaphore.acquire(acquireTimeoutMs);
     if (!gotSlot) {
       await rollbackQuota(receipt.reservationId);
       record({ statusCode: null, classification: 'RATE_LIMITED', errorClass: 'CONCURRENCY_LIMIT_TIMEOUT' });

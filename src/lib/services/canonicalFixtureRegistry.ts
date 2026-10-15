@@ -478,8 +478,10 @@ export class CanonicalFixtureRegistry {
     limit?: number;
     forceRefresh?: boolean;
     leagueIds?: number[];
+    readOnly?: boolean;
   } = {}): Promise<CanonicalFixtureRegistryResponse> {
     const { horizon = 'NEXT_7_DAYS', limit = 50, forceRefresh = false, leagueIds } = options;
+    const readOnly = options.readOnly ?? Boolean(process.env.VERCEL);
 
     let horizonMs = 21 * 24 * 60 * 60 * 1000;
     if (horizon === 'NEXT_7_DAYS') horizonMs = 7 * 24 * 60 * 60 * 1000;
@@ -487,8 +489,46 @@ export class CanonicalFixtureRegistry {
     else if (horizon === 'NEXT_30_DAYS') horizonMs = 30 * 24 * 60 * 60 * 1000;
     else if (horizon === 'ALL_UPCOMING') horizonMs = 60 * 24 * 60 * 60 * 1000;
 
-    const horizonDays = Math.max(21, Math.ceil(horizonMs / (24 * 60 * 60 * 1000)));
-    const syncResult = await this.syncUpcomingFixtures({ forceRefresh, horizonDays, leagueIds });
+    let syncResult: { fixtures: CanonicalFixture[]; dataState: FixtureDataState; providerState: string };
+
+    if (readOnly) {
+      // READ-ONLY PATH: Strictly serve from cache or database, zero external provider calls or writes
+      if (this.memoryCache && this.memoryCache.data.length > 0) {
+        syncResult = {
+          fixtures: this.memoryCache.data,
+          dataState: 'CACHED',
+          providerState: 'READ_ONLY',
+        };
+      } else {
+        const disk = this.readDiskCache();
+        if (disk && disk.fixtures.length > 0) {
+          syncResult = {
+            fixtures: disk.fixtures,
+            dataState: 'STALE',
+            providerState: 'READ_ONLY',
+          };
+        } else {
+          const dbFixtures = await this.loadUpcomingFromDatabase();
+          if (dbFixtures.length > 0) {
+            syncResult = {
+              fixtures: dbFixtures,
+              dataState: 'CACHED',
+              providerState: 'READ_ONLY',
+            };
+          } else {
+            syncResult = {
+              fixtures: [],
+              dataState: 'DATA_UNAVAILABLE',
+              providerState: 'READ_ONLY',
+            };
+          }
+        }
+      }
+    } else {
+      const horizonDays = Math.max(21, Math.ceil(horizonMs / (24 * 60 * 60 * 1000)));
+      syncResult = await this.syncUpcomingFixtures({ forceRefresh, horizonDays, leagueIds });
+    }
+
     const now = new Date();
     const nowTime = now.getTime();
     const windowEndTime = nowTime + horizonMs;

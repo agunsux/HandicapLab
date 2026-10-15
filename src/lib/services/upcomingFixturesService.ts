@@ -53,8 +53,9 @@ export class UpcomingFixturesService {
     forceRefresh?: boolean;
     leagueCode?: string;
     limit?: number;
+    readOnly?: boolean;
   } = {}): Promise<UpcomingFixturesResult> {
-    const { daysAhead = 7, forceRefresh = false, leagueCode, limit } = options;
+    const { daysAhead = 7, forceRefresh = false, leagueCode, limit, readOnly } = options;
 
     let horizon: 'TODAY' | 'TOMORROW' | 'NEXT_7_DAYS' = 'NEXT_7_DAYS';
     if (daysAhead === 1) horizon = 'TODAY';
@@ -64,6 +65,7 @@ export class UpcomingFixturesService {
       horizon: daysAhead >= 3 ? 'NEXT_7_DAYS' : horizon,
       limit: limit || 50,
       forceRefresh,
+      readOnly,
     });
 
     const mappedFixtures: PublicUpcomingFixture[] = registryRes.fixtures.map((f) => ({
