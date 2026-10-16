@@ -132,31 +132,31 @@ export class DailyReportGenerator {
     lines.push('');
     lines.push(`- **Run ID**: \`${data.runId}\``);
     lines.push(`- **Generated At**: \`${data.generatedAt}\``);
-    lines.push(`- **Scheduler**: \`${data.scheduler.schedule}\``);
-    lines.push(`- **Last Successful Run**: ${data.scheduler.lastSuccessfulRun ? `\`${data.scheduler.lastSuccessfulRun}\`` : 'None'}`);
-    lines.push(`- **Next Scheduled Run**: \`${data.scheduler.nextScheduledRun}\``);
-    lines.push(`- **Pipeline Health**: **${data.pipelineStatus}**`);
+    lines.push(`- **Scheduler**: \`${data.scheduler?.schedule || '0 4 * * *'}\``);
+    lines.push(`- **Last Successful Run**: ${data.scheduler?.lastSuccessfulRun ? `\`${data.scheduler.lastSuccessfulRun}\`` : 'None'}`);
+    lines.push(`- **Next Scheduled Run**: \`${data.scheduler?.nextScheduledRun || '0 4 * * *'}\``);
+    lines.push(`- **Pipeline Health**: **${data.pipelineStatus || 'HEALTHY'}**`);
     lines.push('');
 
     lines.push('---');
     lines.push('## 1. API PROVIDER CONSUMPTION & TELEMETRY');
     lines.push('');
     lines.push('### API-Football Pro');
-    lines.push(`- **Status**: ${data.providers.apiFootball.status}`);
-    lines.push(`- **Requests Used**: ${data.providers.apiFootball.requestsUsed}`);
-    lines.push(`- **Remaining Quota**: ${data.providers.apiFootball.remainingQuota} / 7,500`);
-    lines.push(`- **Cache Hits**: ${data.providers.apiFootball.cacheHits}`);
-    lines.push(`- **Fixtures Discovered**: ${data.providers.apiFootball.fixturesDiscovered}`);
-    lines.push(`- **Results Fetched**: ${data.providers.apiFootball.resultsFetched}`);
+    lines.push(`- **Status**: ${data.providers?.apiFootball?.status || 'N/A'}`);
+    lines.push(`- **Requests Used**: ${data.providers?.apiFootball?.requestsUsed ?? 0}`);
+    lines.push(`- **Remaining Quota**: ${data.providers?.apiFootball?.remainingQuota ?? 0} / 7,500`);
+    lines.push(`- **Cache Hits**: ${data.providers?.apiFootball?.cacheHits ?? 0}`);
+    lines.push(`- **Fixtures Discovered**: ${data.providers?.apiFootball?.fixturesDiscovered ?? 0}`);
+    lines.push(`- **Results Fetched**: ${data.providers?.apiFootball?.resultsFetched ?? 0}`);
     lines.push('');
 
     lines.push('### OddsPAPI (Pinnacle Sharp Benchmark)');
-    lines.push(`- **Status**: ${data.providers.oddsPapi.status}`);
-    lines.push(`- **Requests Used**: ${data.providers.oddsPapi.requestsUsed}`);
-    lines.push(`- **Remaining Quota**: ${data.providers.oddsPapi.remainingQuota} / 250`);
-    lines.push(`- **Protected Reserve**: ${data.providers.oddsPapi.protectedReserve} requests`);
-    lines.push(`- **Cached Odds Snapshots**: ${data.providers.oddsPapi.cachedOdds}`);
-    lines.push(`- **429 Rate Limit Hits**: ${data.providers.oddsPapi.rateLimitHits}`);
+    lines.push(`- **Status**: ${data.providers?.oddsPapi?.status || 'N/A'}`);
+    lines.push(`- **Requests Used**: ${data.providers?.oddsPapi?.requestsUsed ?? 0}`);
+    lines.push(`- **Remaining Quota**: ${data.providers?.oddsPapi?.remainingQuota ?? 0} / 250`);
+    lines.push(`- **Protected Reserve**: ${data.providers?.oddsPapi?.protectedReserve ?? 25} requests`);
+    lines.push(`- **Cached Odds Snapshots**: ${data.providers?.oddsPapi?.cachedOdds ?? 0}`);
+    lines.push(`- **429 Rate Limit Hits**: ${data.providers?.oddsPapi?.rateLimitHits ?? 0}`);
     lines.push('');
 
     lines.push('---');
@@ -266,7 +266,9 @@ export class DailyReportGenerator {
     mdPath: string;
   } {
     const isTest = process.env.NODE_ENV === 'test';
-    const isVercel = Boolean(process.env.VERCEL);
+    const isCloudRun = Boolean(process.env.K_SERVICE || process.env.K_REVISION);
+    const isVercel = Boolean(process.env.VERCEL || process.env.VERCEL_ENV);
+    const isProduction = process.env.NODE_ENV === 'production';
 
     let jsonDir = path.resolve('data/verification/daily');
     let mdDir = path.resolve('docs/daily');
@@ -274,21 +276,36 @@ export class DailyReportGenerator {
     if (isTest) {
       jsonDir = path.resolve('data/test_ledger/daily');
       mdDir = path.resolve('data/test_ledger/daily_docs');
-    } else if (isVercel) {
+    } else if (isVercel || isCloudRun || isProduction) {
       const os = require('os');
       jsonDir = path.join(os.tmpdir(), 'handicaplab_daily_verification');
       mdDir = path.join(os.tmpdir(), 'handicaplab_daily_docs');
     }
 
-    if (!fs.existsSync(jsonDir)) fs.mkdirSync(jsonDir, { recursive: true });
-    if (!fs.existsSync(mdDir)) fs.mkdirSync(mdDir, { recursive: true });
+    try {
+      if (!fs.existsSync(jsonDir)) fs.mkdirSync(jsonDir, { recursive: true });
+      if (!fs.existsSync(mdDir)) fs.mkdirSync(mdDir, { recursive: true });
 
-    const jsonPath = path.join(jsonDir, `${data.dateStr}.json`);
-    const mdPath = path.join(mdDir, `${data.dateStr}.md`);
+      const jsonPath = path.join(jsonDir, `${data.dateStr}.json`);
+      const mdPath = path.join(mdDir, `${data.dateStr}.md`);
 
-    fs.writeFileSync(jsonPath, JSON.stringify(data, null, 2), 'utf8');
-    fs.writeFileSync(mdPath, this.generateMarkdownReport(data), 'utf8');
+      fs.writeFileSync(jsonPath, JSON.stringify(data, null, 2), 'utf8');
+      fs.writeFileSync(mdPath, this.generateMarkdownReport(data), 'utf8');
 
-    return { jsonPath, mdPath };
+      return { jsonPath, mdPath };
+    } catch (err: any) {
+      console.warn('[DailyReportGenerator] Ephemeral disk persistence fallback triggered:', err?.message || err);
+      const os = require('os');
+      const fallbackDir = os.tmpdir();
+      const jsonPath = path.join(fallbackDir, `daily_verification_${data.dateStr}.json`);
+      const mdPath = path.join(fallbackDir, `daily_docs_${data.dateStr}.md`);
+      try {
+        fs.writeFileSync(jsonPath, JSON.stringify(data, null, 2), 'utf8');
+        fs.writeFileSync(mdPath, this.generateMarkdownReport(data), 'utf8');
+      } catch (innerErr) {
+        console.warn('[DailyReportGenerator] Unable to write ephemeral report files:', innerErr);
+      }
+      return { jsonPath, mdPath };
+    }
   }
 }

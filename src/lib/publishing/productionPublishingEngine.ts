@@ -43,7 +43,14 @@ function getStorePath(): string {
   if (process.env.NODE_ENV === 'test') {
     return path.resolve('data/test_cache/canonical_published_signals.json');
   }
-  if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
+  if (
+    process.env.VERCEL ||
+    process.env.VERCEL_ENV ||
+    process.env.K_SERVICE ||
+    process.env.K_REVISION ||
+    process.env.AWS_LAMBDA_FUNCTION_NAME ||
+    (process.env.NODE_ENV === 'production' && !process.env.LOCAL_DEV)
+  ) {
     const os = require('os');
     return path.join(os.tmpdir(), 'handicaplab_canonical_published_signals.json');
   }
@@ -54,7 +61,14 @@ function getAuditLogPath(): string {
   if (process.env.NODE_ENV === 'test') {
     return path.resolve('data/test_cache/publishing_audit_log.jsonl');
   }
-  if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
+  if (
+    process.env.VERCEL ||
+    process.env.VERCEL_ENV ||
+    process.env.K_SERVICE ||
+    process.env.K_REVISION ||
+    process.env.AWS_LAMBDA_FUNCTION_NAME ||
+    (process.env.NODE_ENV === 'production' && !process.env.LOCAL_DEV)
+  ) {
     const os = require('os');
     return path.join(os.tmpdir(), 'handicaplab_publishing_audit_log.jsonl');
   }

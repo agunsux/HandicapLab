@@ -57,7 +57,13 @@ function getLedgerPath(): string {
   if (process.env.NODE_ENV === 'test') {
     return path.resolve('data/test_ledger/daily_prediction_ledger.json');
   }
-  if (process.env.VERCEL) {
+  if (
+    process.env.VERCEL ||
+    process.env.VERCEL_ENV ||
+    process.env.K_SERVICE ||
+    process.env.K_REVISION ||
+    (process.env.NODE_ENV === 'production' && !process.env.LOCAL_DEV)
+  ) {
     const os = require('os');
     return path.join(os.tmpdir(), 'handicaplab_daily_prediction_ledger.json');
   }
@@ -68,7 +74,13 @@ function getLedgerJsonlPath(): string {
   if (process.env.NODE_ENV === 'test') {
     return path.resolve('data/test_ledger/daily_prediction_ledger.jsonl');
   }
-  if (process.env.VERCEL) {
+  if (
+    process.env.VERCEL ||
+    process.env.VERCEL_ENV ||
+    process.env.K_SERVICE ||
+    process.env.K_REVISION ||
+    (process.env.NODE_ENV === 'production' && !process.env.LOCAL_DEV)
+  ) {
     const os = require('os');
     return path.join(os.tmpdir(), 'handicaplab_daily_prediction_ledger.jsonl');
   }

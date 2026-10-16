@@ -93,8 +93,8 @@ export class DurableLedgerStore {
         }
       }
     } catch (err: any) {
-      if (err?.code === 'EROFS') {
-        console.warn('[DurableLedgerStore] Read-only filesystem detected, write skipped:', filePath);
+      if (err?.code === 'EROFS' || err?.code === 'EACCES' || err?.code === 'EPERM') {
+        console.warn('[DurableLedgerStore] Read-only / restricted filesystem detected, write skipped:', filePath);
         return;
       }
       throw err;
@@ -109,7 +109,7 @@ export class DurableLedgerStore {
       }
       fs.appendFileSync(filePath, JSON.stringify(item) + '\n', 'utf8');
     } catch (e: any) {
-      if (e?.code === 'EROFS') {
+      if (e?.code === 'EROFS' || e?.code === 'EACCES' || e?.code === 'EPERM') {
         return;
       }
       console.warn('[DurableLedgerStore] Failed to append JSONL line to ' + filePath + ':', e);

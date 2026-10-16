@@ -200,7 +200,7 @@ export class CanonicalFixtureRegistry {
         'utf-8'
       );
     } catch (e: any) {
-      if (e?.code !== 'EROFS') {
+      if (e?.code !== 'EROFS' && e?.code !== 'EACCES' && e?.code !== 'EPERM') {
         console.warn('[CanonicalFixtureRegistry] Disk cache write error:', e);
       }
     }

@@ -238,14 +238,16 @@ export interface DurableStateSnapshot {
 // ---------------------------------------------------------------------------
 
 /**
- * Durable production state is REQUIRED when running on Vercel.
- *
- * Deliberately excludes AWS_LAMBDA_FUNCTION_NAME because production is Vercel;
- * the ephemeral-file resolvers may still treat other serverless runtimes
- * locally, but this adapter only activates where the incident was observed.
+ * Durable production state is REQUIRED when running on Vercel or Cloud Run.
  */
 export function isDurableStateRequired(): boolean {
-  return Boolean(process.env.VERCEL || process.env.VERCEL_ENV);
+  return Boolean(
+    process.env.VERCEL ||
+    process.env.VERCEL_ENV ||
+    process.env.K_SERVICE ||
+    process.env.K_REVISION ||
+    (process.env.NODE_ENV === 'production' && !process.env.LOCAL_DEV)
+  );
 }
 
 /** Path prefix that MUST NEVER be used as durable storage. */
