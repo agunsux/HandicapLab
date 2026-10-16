@@ -16,11 +16,32 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { SalmoProductionSyncService } from '@/lib/salmo/salmoProductionSyncService';
+import { verifyContractSyncRequest } from '@/lib/auth/cronAuth';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export async function GET(request: NextRequest) {
+  // P0 Security: Enforce cryptographic OIDC or Bearer API key authentication
+  const authResult = await verifyContractSyncRequest(request);
+  if (!authResult.authorized) {
+    return NextResponse.json(
+      {
+        success: false,
+        timestampUtc: new Date().toISOString(),
+        error: 'UNAUTHORIZED',
+        message: 'Missing or invalid authorization credentials for HandicapLab sync contract',
+        reason: authResult.reason,
+      },
+      {
+        status: 401,
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate',
+        },
+      }
+    );
+  }
+
   try {
     const searchParams = request.nextUrl.searchParams;
     const sinceParam = searchParams.get('since') || undefined;

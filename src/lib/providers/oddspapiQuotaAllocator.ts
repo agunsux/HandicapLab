@@ -199,12 +199,23 @@ export class OddsPapiQuotaAllocator {
     this.cachedState = state;
   }
 
+  public static isPaused(): boolean {
+    return (
+      process.env.ODDSPAPI_PAUSED === 'true' ||
+      process.env.PAUSE_ODDSPAPI === 'true' ||
+      process.env.ODDS_PAPI_PAUSED === 'true'
+    );
+  }
+
   /**
    * Reconciles allocator state with live unmetered /v4/account.
    */
   public static async syncFromProviderAccount(apiKey?: string): Promise<QuotaAllocationStatus> {
-    const now = Date.now();
     const state = this.loadState();
+    if (this.isPaused()) {
+      return state;
+    }
+    const now = Date.now();
 
     if (now - this.lastAccountFetchMs < this.ACCOUNT_TTL_MS) {
       return state;
@@ -268,6 +279,17 @@ export class OddsPapiQuotaAllocator {
     cost?: number;
   }): QuotaAcquireDecision {
     const { leagueId, tier, priority, cost = 1 } = params;
+    if (this.isPaused()) {
+      return {
+        allowed: false,
+        reason: 'ODDSPAPI_PAUSED: OddsPapi provider is PAUSED pending quota reset verification.',
+        priority,
+        leagueId,
+        tier,
+        cost,
+        usableRemaining: 0,
+      };
+    }
     const state = this.loadState();
     const usable = Math.max(0, state.totalRemaining - this.RESERVE_FLOOR);
 

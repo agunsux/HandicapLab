@@ -22,14 +22,16 @@ export interface SharpBookConfig {
 }
 
 export const SHARP_BOOKS: SharpBookConfig[] = [
-  // S1 — primary sharp reference
-  { key: 'pinnacle',      title: 'Pinnacle',          enabled: true,  tier: 'S1', weight: 1.0 },
-  { key: 'sbobet',        title: 'SBOBet',            enabled: true,  tier: 'S1', weight: 0.8 },
-  { key: 'betfair_ex_eu', title: 'Betfair Exchange',  enabled: true,  tier: 'S1', weight: 0.8, isExchange: true },
-  // S2 — secondary reference
-  { key: 'singbet',       title: 'Singbet / IBC',     enabled: true,  tier: 'S2', weight: 0.5 },
-  { key: 'marathonbet',   title: 'Marathonbet',       enabled: true,  tier: 'S2', weight: 0.4 },
-  // Inactive (retained for future expansion, not removed)
+  // Primary sharp benchmark
+  { key: 'pinnacle',      title: 'Pinnacle',          enabled: true,  tier: 'S1', weight: 1.0, note: 'Sharp reference benchmark' },
+  // Soft retail comparison benchmark
+  { key: 'bet365',        title: 'Bet365',            enabled: true,  tier: 'S2', weight: 0.6, note: 'Soft retail benchmark' },
+  // Inactive at launch — reserved for future expansion
+  { key: '1xbet',         title: '1xBet',             enabled: false, tier: 'S2', weight: 0.6, note: 'Inactive at launch — reserved for future expansion' },
+  { key: 'sbobet',        title: 'SBOBet',            enabled: false, tier: 'S1', weight: 0.8, note: 'Inactive at launch — reserved for future expansion' },
+  { key: 'betfair_ex_eu', title: 'Betfair Exchange',  enabled: false, tier: 'S1', weight: 0.8, isExchange: true, note: 'Inactive at launch' },
+  { key: 'singbet',       title: 'Singbet / IBC',     enabled: false, tier: 'S2', weight: 0.5, note: 'Inactive at launch' },
+  { key: 'marathonbet',   title: 'Marathonbet',       enabled: false, tier: 'S2', weight: 0.4, note: 'Inactive at launch' },
   { key: 'circa',         title: 'Circa Sports',      enabled: false, tier: 'S2', weight: 0.5, note: 'Flag inactive — enable for NBA/Tennis' },
 ];
 

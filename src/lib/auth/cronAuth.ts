@@ -74,6 +74,19 @@ export async function verifyCronRequest(
     };
   }
 
+  // 2. Query-parameter authentication is strictly prohibited
+  try {
+    const url = new URL(request.url);
+    if (url.searchParams.has('token') || url.searchParams.has('key') || url.searchParams.has('secret')) {
+      return {
+        authorized: false,
+        reason: 'QUERY_PARAMETER_AUTH_PROHIBITED',
+      };
+    }
+  } catch {
+    // Non-standard request object, continue
+  }
+
   const token = authHeader.slice(7).trim();
   if (!token) {
     return {
@@ -166,4 +179,57 @@ export async function verifyCronRequest(
       reason: `CRYPTOGRAPHIC_VERIFICATION_FAILED: ${error?.message || 'invalid token'}`,
     };
   }
+}
+
+/**
+ * Authenticates an incoming contract sync request (/api/v1/salmo/sync).
+ * Accepts:
+ * A) Bearer token matching HANDICAPLAB_API_KEY, SALMO_SYNC_API_KEY, or CRON_SECRET (timing-safe).
+ * B) Cryptographically verified Google Cloud Scheduler OIDC ID Token.
+ */
+export async function verifyContractSyncRequest(
+  request: NextRequest | Request,
+  expectedAudience: string = process.env.CLOUD_RUN_AUDIENCE || CANONICAL_CLOUD_RUN_AUDIENCE,
+  authorizedEmail: string = process.env.CRON_SERVICE_ACCOUNT_EMAIL || CANONICAL_SCHEDULER_SA
+): Promise<CronAuthResult> {
+  // Query-parameter authentication is strictly prohibited
+  try {
+    const url = new URL(request.url);
+    if (url.searchParams.has('token') || url.searchParams.has('key') || url.searchParams.has('secret')) {
+      return {
+        authorized: false,
+        reason: 'QUERY_PARAMETER_AUTH_PROHIBITED',
+      };
+    }
+  } catch {
+    // Non-standard request object, continue to header checks
+  }
+
+  const authHeader = request.headers.get('authorization')?.trim();
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return {
+      authorized: false,
+      reason: 'MISSING_OR_MALFORMED_AUTHORIZATION_HEADER',
+    };
+  }
+
+  const token = authHeader.slice(7).trim();
+  if (!token) {
+    return {
+      authorized: false,
+      reason: 'EMPTY_BEARER_TOKEN',
+    };
+  }
+
+  // 1. Direct match with configured API keys (timing-safe)
+  const syncApiKey = (process.env.HANDICAPLAB_API_KEY || process.env.SALMO_SYNC_API_KEY || process.env.CRON_SECRET)?.trim();
+  if (syncApiKey && timingSafeCompare(token, syncApiKey)) {
+    return {
+      authorized: true,
+      identity: 'bearer_api_key',
+    };
+  }
+
+  // 2. Fall back to OIDC verification for Cloud Scheduler / Service Accounts
+  return verifyCronRequest(request, expectedAudience, authorizedEmail);
 }

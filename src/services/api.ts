@@ -73,6 +73,13 @@ export const oddsPapi = {
     if (typeof window !== 'undefined') {
       throw new Error('PROVIDER_ACCESS_DENIED: browser must not call providers directly.');
     }
+    if (
+      process.env.ODDSPAPI_PAUSED === 'true' ||
+      process.env.PAUSE_ODDSPAPI === 'true' ||
+      process.env.ODDS_PAPI_PAUSED === 'true'
+    ) {
+      throw new Error('ODDSPAPI_PAUSED: OddsPapi provider is PAUSED pending quota reset verification.');
+    }
     const baseURL = 'https://api.oddspapi.io/v4';
     const params = new URLSearchParams(config?.params || {});
     const apiKey = process.env.ODDS_PAPI_KEY || '';
