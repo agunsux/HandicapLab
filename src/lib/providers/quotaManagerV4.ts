@@ -11,6 +11,7 @@ import {
   evaluateQuotaPressure,
   getProviderQuotaPolicy,
   isPriorityAllowed,
+  isUnmeteredEndpoint,
   quotaStatusLabel,
 } from './quotaPolicy';
 
@@ -48,6 +49,11 @@ export const API_COST_REGISTRY: EndpointCost[] = [
   { provider: 'thestatsapi', endpoint: 'fixtures', cost: 1 },
   { provider: 'thestatsapi', endpoint: 'standings', cost: 1 },
   { provider: 'thestatsapi', endpoint: 'health', cost: 1 },
+  // The Odds API v4 (documented: sports, events, health = 0 credits)
+  { provider: 'the-odds-api', endpoint: 'sports', cost: 0 },
+  { provider: 'the-odds-api', endpoint: 'events', cost: 0 },
+  { provider: 'the-odds-api', endpoint: 'health', cost: 0 },
+  { provider: 'the-odds-api', endpoint: 'odds', cost: 2 }, // Default for 1 region x 2 markets
   // Dribble360 — TRIAL_VALIDATION endpoints (discovered Stage A)
   { provider: 'dribble360', endpoint: 'matches', cost: 1 },
   { provider: 'dribble360', endpoint: 'teams', cost: 1 },
@@ -58,6 +64,18 @@ export const API_COST_REGISTRY: EndpointCost[] = [
   { provider: 'dribble360', endpoint: 'referees', cost: 1 },
   { provider: 'dribble360', endpoint: 'transfers', cost: 1 },
 ];
+
+/**
+ * Calculates conservative cost for The Odds API requests based on
+ * provider documented billing formula: (regions requested) * (markets requested).
+ */
+export function calculateTheOddsApiCost(regions?: string, markets?: string): number {
+  const regStr = regions !== undefined ? regions : 'eu';
+  const mktStr = markets !== undefined ? markets : 'spreads,totals';
+  const regCount = regStr ? regStr.split(',').map((s) => s.trim()).filter(Boolean).length : 1;
+  const mktCount = mktStr ? mktStr.split(',').map((s) => s.trim()).filter(Boolean).length : 1;
+  return Math.max(1, regCount * mktCount);
+}
 
 function getCost(provider: Provider, endpoint: string): number {
   return API_COST_REGISTRY.find((e) => e.provider === provider && e.endpoint === endpoint)?.cost ?? 1;
@@ -95,13 +113,31 @@ export async function reserveQuota(
   provider: Provider,
   endpoint: string,
   priority: number, // 0-100
-  requestId?: string
+  requestId?: string,
+  explicitCost?: number
 ): Promise<AcquireReceipt> {
-  const cost = getCost(provider, endpoint);
   const policy = getProviderQuotaPolicy(provider);
-  const { type, start, end } = getPeriod(provider);
 
-  // The RPC's safe_limit is the provider HARD limit (safety reserve = 0).
+  // Zero-credit endpoints (unmetered, e.g. /v4/sports or /v4/events on The Odds API)
+  if (isUnmeteredEndpoint(provider, endpoint)) {
+    return {
+      ok: true,
+      reason: 'UNMETERED_ENDPOINT',
+      cost: 0,
+      provider,
+      endpoint,
+      mode: 'NORMAL',
+      softLimit: policy.softLimit,
+      hardLimit: policy.hardLimit,
+      statusLabel: 'NORMAL',
+    };
+  }
+
+  const cost = explicitCost !== undefined ? explicitCost : getCost(provider, endpoint);
+  const { type, start, end } = getPeriod(provider);
+  const safetyReservePct = provider === 'the-odds-api' ? 30 : 0; // 30% of 500 = 150 reserve
+
+  // The RPC's safe_limit is the provider HARD limit minus safety reserve.
   // Application-level soft-limit rationing happens below via the policy.
   const { data, error } = await supabase.rpc('reserve_quota', {
     p_provider: provider,
@@ -112,7 +148,7 @@ export async function reserveQuota(
     p_endpoint: endpoint,
     p_request_id: requestId || null,
     p_default_limit: policy.hardLimit,
-    p_safety_reserve_pct: 0,
+    p_safety_reserve_pct: safetyReservePct,
   });
 
   if (error || !data) {

@@ -1,22 +1,29 @@
 // ============================================================================
-// THE ODDS API FREE-QUOTA ALLOCATOR & USAGE MANAGER
+// THE ODDS API FREE-QUOTA ALLOCATOR & USAGE MANAGER (ATOMIC & CONCURRENCY-SAFE)
 // ============================================================================
 // Location: src/lib/providers/theOddsApiQuotaManager.ts
 //
-// Invariants enforced:
+// Invariants enforced (Phase 2 Quota Policy):
 // 1. Hard Monthly Limit: 500 requests/month (Free Tier).
-// 2. Protected Safety Floor: 50 requests (untouchable reserve).
-// 3. Usable Operational Remaining = Math.max(0, totalRemaining - 50).
-// 4. Request Authorization: Every request must be pre-authorized before dispatch.
-// 5. Atomic Audit Logging: Records provider, endpoint, timestamp, credits,
-//    success/failure, HTTP status, and remaining quota.
-// 6. Zero Mock Quota: Headers (x-requests-remaining, x-requests-used) are used
-//    as live ground truth whenever returned by provider.
+// 2. Operational Ceiling: 350 requests/month.
+// 3. Protected Contingency Reserve: 150 requests (untouchable by routine crons).
+// 4. Soft Warning Threshold: 300 requests consumed (200 remaining).
+// 5. Usable Operational Remaining = Math.max(0, totalRemaining - 150).
+// 6. Concurrency-Safe: Atomic reservation via Supabase reserve_quota RPC (FOR UPDATE).
+// 7. Fallback-Safe: In-memory/file fallback if DB unavailable (e.g. offline tests).
+// 8. Unmetered Endpoints: /v4/sports, /v4/sports/{sport}/events, /health = 0 credits.
 // ============================================================================
 
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
+import {
+  reserveQuota,
+  confirmQuota,
+  rollbackQuota,
+  type AcquireReceipt,
+} from './quotaManagerV4';
+import { isUnmeteredEndpoint } from './quotaPolicy';
 
 export type TheOddsApiQuotaStatus =
   | 'NORMAL'
@@ -52,7 +59,9 @@ export interface TheOddsApiQuotaState {
 }
 
 const DEFAULT_BUDGET = 500;
-const RESERVE_FLOOR = 50;
+const OPERATIONAL_CEILING = 350;
+const RESERVE_FLOOR = 150; // 500 - 350 = 150 protected reserve
+const WARNING_THRESHOLD = 300; // soft warning at 300 consumed
 
 function getStateFilePath(): string {
   if (process.env.NODE_ENV === 'test') {
@@ -96,7 +105,7 @@ export class TheOddsApiQuotaManager {
         const raw = fs.readFileSync(p, 'utf8');
         const parsed = JSON.parse(raw);
         if (parsed && typeof parsed === 'object') {
-          this.cachedState = { ...defaultState, ...parsed };
+          this.cachedState = { ...defaultState, ...parsed, reserveFloor: RESERVE_FLOOR };
           return this.cachedState!;
         }
       }
@@ -126,17 +135,22 @@ export class TheOddsApiQuotaManager {
   }
 
   /**
-   * Pre-authorizes an outbound request against the safety quota floor.
+   * Pre-authorizes an outbound request against the 150-credit reserve floor.
+   * Synchronous check against local/in-memory state.
    */
-  public static authorizeRequest(endpoint: string, priority: number = 50): {
+  public static authorizeRequest(
+    endpoint: string,
+    priority: number = 50,
+    expectedCost: number = 1
+  ): {
     allowed: boolean;
     reason?: string;
     state: TheOddsApiQuotaState;
   } {
     const state = this.loadState();
 
-    // Endpoints that cost 0 (unmetered, e.g. /v4/sports or health) are always allowed if not hard stop
-    if (endpoint === 'sports' || endpoint === 'health') {
+    // Endpoints that cost 0 (unmetered, e.g. /v4/sports or /events) are always allowed
+    if (isUnmeteredEndpoint('the-odds-api', endpoint) || endpoint === 'sports' || endpoint === 'events' || endpoint === 'health') {
       return { allowed: true, state };
     }
 
@@ -144,11 +158,15 @@ export class TheOddsApiQuotaManager {
       return { allowed: false, reason: 'MONTHLY_QUOTA_EXHAUSTED', state };
     }
 
+    if (state.remaining < expectedCost) {
+      return { allowed: false, reason: `INSUFFICIENT_CREDITS: remaining ${state.remaining} < cost ${expectedCost}`, state };
+    }
+
     if (state.remaining <= 5) {
       return { allowed: false, reason: 'HARD_STOP_ACTIVE', state };
     }
 
-    // Safety floor protection: reserve 50 requests for P0/Critical operations
+    // Safety floor protection: reserve 150 credits for critical / manual recovery operations
     if (state.remaining <= state.reserveFloor && priority < 90) {
       return {
         allowed: false,
@@ -157,11 +175,199 @@ export class TheOddsApiQuotaManager {
       };
     }
 
+    // Check if expected cost would breach into reserve floor
+    if (state.remaining - expectedCost < state.reserveFloor && priority < 90) {
+      return {
+        allowed: false,
+        reason: `RESERVE_FLOOR_BREACH: request cost ${expectedCost} would reduce balance to ${state.remaining - expectedCost} (< ${state.reserveFloor} reserve floor)`,
+        state,
+      };
+    }
+
     return { allowed: true, state };
   }
 
   /**
-   * Records an executed call and updates quota state based on reported response headers.
+   * Concurrency-safe atomic reservation via database RPC (reserve_quota).
+   * Falls back to authorizeRequest if database RPC is not configured.
+   */
+  public static async reserveAtomic(params: {
+    endpoint: string;
+    priority: number;
+    requestId: string;
+    expectedCost: number;
+  }): Promise<{
+    allowed: boolean;
+    reservationId?: string;
+    reason?: string;
+    state: TheOddsApiQuotaState;
+  }> {
+    const { endpoint, priority, requestId, expectedCost } = params;
+
+    // Check zero-credit endpoints first
+    if (isUnmeteredEndpoint('the-odds-api', endpoint) || endpoint === 'sports' || endpoint === 'events' || endpoint === 'health') {
+      return { allowed: true, state: this.loadState() };
+    }
+
+    // First check synchronous guard
+    const auth = this.authorizeRequest(endpoint, priority, expectedCost);
+    if (!auth.allowed) {
+      return { allowed: false, reason: auth.reason, state: auth.state };
+    }
+
+    // Try atomic DB reservation
+    try {
+      const receipt: AcquireReceipt = await reserveQuota(
+        'the-odds-api',
+        endpoint,
+        priority,
+        requestId,
+        expectedCost
+      );
+
+      if (!receipt.ok) {
+        return {
+          allowed: false,
+          reason: receipt.reason || 'DB_RESERVATION_BLOCKED',
+          state: this.loadState(),
+        };
+      }
+
+      return {
+        allowed: true,
+        reservationId: receipt.reservationId,
+        state: this.loadState(),
+      };
+    } catch (dbErr) {
+      console.warn('[TheOddsApiQuotaManager] DB reservation failed, evaluating local guard:', dbErr);
+      return {
+        allowed: auth.allowed,
+        reason: auth.reason,
+        state: auth.state,
+      };
+    }
+  }
+
+  /**
+   * Confirms an executed call, reconciles database quota state,
+   * and updates local state based on reported response headers.
+   */
+  public static async confirmAtomic(params: {
+    reservationId?: string;
+    requestId: string;
+    endpoint: string;
+    method: string;
+    actualCost: number;
+    httpStatus: number | null;
+    success: boolean;
+    latencyMs: number;
+    headers?: Headers | Record<string, string | null>;
+    error?: string | null;
+  }): Promise<TheOddsApiQuotaState> {
+    const state = this.loadState();
+    const remainingBefore = state.remaining;
+
+    let headersRemaining: number | null = null;
+    let headersUsed: number | null = null;
+
+    if (params.headers) {
+      const getH = (key: string): string | null => {
+        if ('get' in params.headers! && typeof params.headers.get === 'function') {
+          return params.headers.get(key);
+        }
+        return (params.headers as Record<string, string | null>)[key] || null;
+      };
+
+      const remStr = getH('x-requests-remaining');
+      const usedStr = getH('x-requests-used');
+      if (remStr !== null && !isNaN(Number(remStr))) headersRemaining = Number(remStr);
+      if (usedStr !== null && !isNaN(Number(usedStr))) headersUsed = Number(usedStr);
+    }
+
+    // Confirm DB reservation atomically
+    if (params.reservationId) {
+      try {
+        await confirmQuota(
+          params.reservationId,
+          params.actualCost,
+          state.totalMonthlyBudget,
+          headersRemaining ?? undefined
+        );
+      } catch (err) {
+        console.warn('[TheOddsApiQuotaManager] confirmQuota DB error:', err);
+      }
+    }
+
+    // Update state based on authoritative headers or cost
+    if (headersRemaining !== null) {
+      state.remaining = headersRemaining;
+      state.used = headersUsed !== null ? headersUsed : state.totalMonthlyBudget - headersRemaining;
+    } else if (params.success && params.actualCost > 0) {
+      state.used += params.actualCost;
+      state.remaining = Math.max(0, state.totalMonthlyBudget - state.used);
+    }
+
+    state.usableRemaining = Math.max(0, state.remaining - state.reserveFloor);
+
+    // Compute status with 150 reserve floor and 300 warning threshold
+    if (state.remaining <= 0) {
+      state.status = 'EXHAUSTED';
+    } else if (state.remaining <= 5) {
+      state.status = 'HARD_STOP';
+    } else if (state.remaining <= state.reserveFloor) {
+      state.status = 'CRITICAL_QUOTA'; // Under 150 reserve floor
+    } else if (state.used >= WARNING_THRESHOLD) {
+      state.status = 'ECONOMY'; // Over 300 consumed
+    } else {
+      state.status = 'NORMAL';
+    }
+
+    state.lastSyncedAt = new Date().toISOString();
+    this.saveState(state);
+
+    // Append to JSONL audit log
+    const auditRecord: TheOddsApiCallRecord = {
+      requestId: params.requestId,
+      provider: 'the-odds-api',
+      endpoint: params.endpoint,
+      method: params.method,
+      timestampUtc: new Date().toISOString(),
+      cost: params.actualCost,
+      httpStatus: params.httpStatus,
+      success: params.success,
+      remainingBefore,
+      remainingAfter: state.remaining,
+      creditsUsedReported: headersUsed ?? undefined,
+      latencyMs: params.latencyMs,
+      error: params.error ?? null,
+    };
+
+    try {
+      const logPath = getAuditLogPath();
+      const dir = path.dirname(logPath);
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+      fs.appendFileSync(logPath, JSON.stringify(auditRecord) + '\n', 'utf8');
+    } catch {
+      // Non-blocking log failure
+    }
+
+    return state;
+  }
+
+  /**
+   * Safely rolls back a reservation when an error or rejection occurs before execution.
+   */
+  public static async rollbackAtomic(reservationId?: string): Promise<void> {
+    if (!reservationId) return;
+    try {
+      await rollbackQuota(reservationId);
+    } catch (err) {
+      console.warn('[TheOddsApiQuotaManager] rollbackQuota error:', err);
+    }
+  }
+
+  /**
+   * Synchronous recording backwards compatibility.
    */
   public static recordExecution(params: {
     requestId: string;
@@ -194,7 +400,6 @@ export class TheOddsApiQuotaManager {
       if (usedStr !== null && !isNaN(Number(usedStr))) headersUsed = Number(usedStr);
     }
 
-    // Update state based on authoritative headers or estimated consumption
     if (headersRemaining !== null) {
       state.remaining = headersRemaining;
       state.used = headersUsed !== null ? headersUsed : state.totalMonthlyBudget - headersRemaining;
@@ -205,14 +410,13 @@ export class TheOddsApiQuotaManager {
 
     state.usableRemaining = Math.max(0, state.remaining - state.reserveFloor);
 
-    // Compute status
     if (state.remaining <= 0) {
       state.status = 'EXHAUSTED';
     } else if (state.remaining <= 5) {
       state.status = 'HARD_STOP';
-    } else if (state.remaining <= 20) {
-      state.status = 'CRITICAL_QUOTA';
     } else if (state.remaining <= state.reserveFloor) {
+      state.status = 'CRITICAL_QUOTA';
+    } else if (state.used >= WARNING_THRESHOLD) {
       state.status = 'ECONOMY';
     } else {
       state.status = 'NORMAL';
@@ -220,33 +424,6 @@ export class TheOddsApiQuotaManager {
 
     state.lastSyncedAt = new Date().toISOString();
     this.saveState(state);
-
-    // Append to JSONL audit log
-    const auditRecord: TheOddsApiCallRecord = {
-      requestId: params.requestId,
-      provider: 'the-odds-api',
-      endpoint: params.endpoint,
-      method: params.method,
-      timestampUtc: new Date().toISOString(),
-      cost: params.cost,
-      httpStatus: params.httpStatus,
-      success: params.success,
-      remainingBefore,
-      remainingAfter: state.remaining,
-      creditsUsedReported: headersUsed ?? undefined,
-      latencyMs: params.latencyMs,
-      error: params.error ?? null,
-    };
-
-    try {
-      const logPath = getAuditLogPath();
-      const dir = path.dirname(logPath);
-      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-      fs.appendFileSync(logPath, JSON.stringify(auditRecord) + '\n', 'utf8');
-    } catch (e) {
-      // Non-blocking log failure
-    }
-
     return state;
   }
 

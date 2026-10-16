@@ -81,7 +81,7 @@ export const UNMETERED_ENDPOINTS: Record<Provider, readonly string[]> = {
   oddspapi: ['historical-odds', 'account'],
   thestatsapi: [],
   dribble360: [],
-  'the-odds-api': ['sports'],
+  'the-odds-api': ['sports', 'events', 'health'],
 };
 
 export function isUnmeteredEndpoint(provider: Provider, endpoint: string): boolean {
@@ -140,8 +140,8 @@ const DEFAULT_POLICIES: Record<Provider, Omit<ProviderQuotaPolicy, 'provider'>> 
   'the-odds-api': {
     period: 'MONTHLY',
     hardLimit: 500,
-    softLimit: 400,
-    economyAtPctOfSoft: 80,
+    softLimit: 350,
+    economyAtPctOfSoft: 85.71, // Soft warning at 300 consumed (300/350 = 85.71%)
   },
 };
 

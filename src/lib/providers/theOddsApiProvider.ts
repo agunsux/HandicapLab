@@ -24,6 +24,7 @@ import {
   type CanonicalTheOddsApiRecord,
 } from '@/lib/data/providers/odds/theOddsApiNormalizer';
 import type { OddsSnapshot } from '@/lib/data/providers/types';
+import { DailyPicksEngine } from '@/lib/daily-picks/engine';
 
 export interface TheOddsApiHistoricalResponse {
   success: boolean;
@@ -156,6 +157,7 @@ export class TheOddsApiProvider {
 
   /**
    * Fetches active fixtures/events for a given sport without odds.
+   * Documented as 0-credit unmetered endpoint.
    */
   public static async getFixtures(sportKey: string = 'soccer_epl'): Promise<{
     success: boolean;
@@ -170,7 +172,7 @@ export class TheOddsApiProvider {
       return { success: true, events: [] };
     }
 
-    const auth = TheOddsApiQuotaManager.authorizeRequest('events', 50);
+    const auth = TheOddsApiQuotaManager.authorizeRequest('events', 50, 0);
     if (!auth.allowed) {
       return { success: false, events: [], error: auth.reason };
     }
@@ -191,7 +193,7 @@ export class TheOddsApiProvider {
         requestId: `hl_evt_${Date.now()}`,
         endpoint: 'events',
         method: 'GET',
-        cost: 1,
+        cost: 0, // Confirmed 0-credit unmetered endpoint
         httpStatus: res.status,
         success: res.ok,
         latencyMs,
@@ -212,6 +214,7 @@ export class TheOddsApiProvider {
   /**
    * Fetches market odds for a sport and converts into canonical odds records.
    * Supported markets: spreads (AH), totals (OU), btts.
+   * Enforces atomic quota reservation before dispatch.
    */
   public static async getOdds(
     sportKey: string = 'soccer_epl',
@@ -226,6 +229,7 @@ export class TheOddsApiProvider {
     snapshots: OddsSnapshot[];
     eventsCount: number;
     error?: string;
+    quotaReservationId?: string;
   }> {
     if (!hasOddsApiKey()) {
       return { success: false, records: [], snapshots: [], eventsCount: 0, error: 'API_KEY_MISSING' };
@@ -235,16 +239,35 @@ export class TheOddsApiProvider {
       return { success: true, records: [], snapshots: [], eventsCount: 0 };
     }
 
-    const priority = options.priority ?? 70;
-    const auth = TheOddsApiQuotaManager.authorizeRequest('odds', priority);
-    if (!auth.allowed) {
-      return { success: false, records: [], snapshots: [], eventsCount: 0, error: auth.reason };
+    const priority = options.priority ?? 90; // Default P0 for daily predictions
+    const regions = options.regions || 'eu';
+    const markets = options.markets || 'spreads,totals';
+
+    // Calculate conservative expected cost: (regions count) * (markets count)
+    const { calculateTheOddsApiCost } = await import('./quotaManagerV4');
+    const expectedCost = calculateTheOddsApiCost(regions, markets);
+    const requestId = `hl_odds_${sportKey}_${Date.now()}`;
+
+    // 1. Atomic reservation before dispatch
+    const reserveResult = await TheOddsApiQuotaManager.reserveAtomic({
+      endpoint: 'odds',
+      priority,
+      requestId,
+      expectedCost,
+    });
+
+    if (!reserveResult.allowed) {
+      return {
+        success: false,
+        records: [],
+        snapshots: [],
+        eventsCount: 0,
+        error: reserveResult.reason || 'QUOTA_RESERVATION_REJECTED',
+      };
     }
 
+    const reservationId = reserveResult.reservationId;
     const key = getOddsApiKey();
-    const regions = options.regions || 'eu';
-    const markets = options.markets || 'spreads,totals,btts';
-
     const url = `${this.BASE_URL}/sports/${encodeURIComponent(sportKey)}/odds?apiKey=${encodeURIComponent(
       key
     )}&regions=${encodeURIComponent(regions)}&markets=${encodeURIComponent(
@@ -261,11 +284,18 @@ export class TheOddsApiProvider {
       });
 
       const latencyMs = Date.now() - start;
-      TheOddsApiQuotaManager.recordExecution({
-        requestId: `hl_odds_${Date.now()}`,
+
+      // Determine actual cost from response header if available, otherwise expected cost
+      const lastHeader = res.headers.get('x-requests-last');
+      const actualCost = lastHeader !== null && !isNaN(Number(lastHeader)) ? Number(lastHeader) : expectedCost;
+
+      // 2. Confirm reservation with authoritative provider headers
+      await TheOddsApiQuotaManager.confirmAtomic({
+        reservationId,
+        requestId,
         endpoint: 'odds',
         method: 'GET',
-        cost: 1,
+        actualCost,
         httpStatus: res.status,
         success: res.ok,
         latencyMs,
@@ -279,6 +309,7 @@ export class TheOddsApiProvider {
           snapshots: [],
           eventsCount: 0,
           error: `HTTP ${res.status}: ${res.statusText}`,
+          quotaReservationId: reservationId,
         };
       }
 
@@ -297,8 +328,11 @@ export class TheOddsApiProvider {
         records: allRecords,
         snapshots,
         eventsCount: events.length,
+        quotaReservationId: reservationId,
       };
     } catch (err: any) {
+      // Rollback reservation if HTTP request failed before executing
+      await TheOddsApiQuotaManager.rollbackAtomic(reservationId);
       return {
         success: false,
         records: [],
@@ -307,6 +341,116 @@ export class TheOddsApiProvider {
         error: err.message || String(err),
       };
     }
+  }
+
+  /**
+   * Reconciles normalized The Odds API records with CanonicalFixture objects,
+   * cleanly mapping Asian Handicap, Over/Under, and BTTS markets into fixture.markets.
+   */
+  public static reconcileOddsWithFixtures(
+    fixtures: any[],
+    oddsRecords: CanonicalTheOddsApiRecord[]
+  ): { fixtures: any[]; matchedCount: number } {
+    if (!fixtures || fixtures.length === 0 || !oddsRecords || oddsRecords.length === 0) {
+      return { fixtures: fixtures || [], matchedCount: 0 };
+    }
+
+    let matchedCount = 0;
+
+    for (const fixture of fixtures) {
+      const fKickMs = new Date(fixture.kickoffUtc).getTime();
+      const homeNorm = (fixture.homeTeam || '').toLowerCase();
+      const awayNorm = (fixture.awayTeam || '').toLowerCase();
+
+      // Find all records matching this fixture
+      const fixtureRecords = oddsRecords.filter((rec) => {
+        // Direct canonical ID match if resolved
+        if (rec.canonicalMatchId && rec.canonicalMatchId === fixture.fixtureId) {
+          return true;
+        }
+
+        // Time window match (+/- 3 hours)
+        const rKickMs = new Date(rec.kickoffUtc).getTime();
+        if (isNaN(fKickMs) || isNaN(rKickMs) || Math.abs(fKickMs - rKickMs) > 3 * 3600 * 1000) {
+          return false;
+        }
+
+        // Team names match
+        return (
+          DailyPicksEngine.matchTeams(homeNorm, (rec.homeTeam || '').toLowerCase()) &&
+          DailyPicksEngine.matchTeams(awayNorm, (rec.awayTeam || '').toLowerCase())
+        );
+      });
+
+      if (fixtureRecords.length === 0) continue;
+
+      matchedCount++;
+      if (!fixture.markets) {
+        fixture.markets = {
+          asianHandicap: { available: false, line: null, homeOdds: null, awayOdds: null },
+          overUnder: { available: false, line: null, overOdds: null, underOdds: null },
+          btts: { available: false, line: null, yesOdds: null, noOdds: null },
+        };
+      }
+
+      // Prioritize Pinnacle records where available, otherwise first sharp bookmaker
+      const pinnacleRecords = fixtureRecords.filter((r) => r.bookmaker.toLowerCase() === 'pinnacle');
+      const candidateRecords = pinnacleRecords.length > 0 ? pinnacleRecords : fixtureRecords;
+
+      // 1. Asian Handicap (AH)
+      const ahRecords = candidateRecords.filter((r) => r.market === 'AH');
+      if (ahRecords.length > 0) {
+        // Find main line closest to zero or preferred quarter line
+        const mainAh = ahRecords.find((r) => r.selection === 'HOME') || ahRecords[0];
+        const awayAh = ahRecords.find((r) => r.selection === 'AWAY' && r.line === (mainAh.line !== null ? -mainAh.line : 0));
+
+        if (mainAh && mainAh.oddsDecimal > 1.0) {
+          fixture.markets.asianHandicap = {
+            available: true,
+            line: mainAh.line ?? -0.25,
+            homeOdds: mainAh.homeOdds ?? mainAh.oddsDecimal,
+            awayOdds: awayAh?.awayOdds ?? awayAh?.oddsDecimal ?? (mainAh.awayOdds || null),
+          };
+          fixture.hasPinnacleOdds = mainAh.bookmaker.toLowerCase() === 'pinnacle';
+        }
+      }
+
+      // 2. Over / Under (OU)
+      const ouRecords = candidateRecords.filter((r) => r.market === 'OU');
+      if (ouRecords.length > 0) {
+        // Default to 2.5 or 2.75/2.25 quarter lines
+        const line25 = ouRecords.find((r) => r.line === 2.5) || ouRecords[0];
+        const overRecord = ouRecords.find((r) => r.line === line25.line && r.selection.toLowerCase().includes('over'));
+        const underRecord = ouRecords.find((r) => r.line === line25.line && r.selection.toLowerCase().includes('under'));
+
+        if ((overRecord || line25) && (overRecord?.oddsDecimal || line25.oddsDecimal) > 1.0) {
+          fixture.markets.overUnder = {
+            available: true,
+            line: line25.line ?? 2.5,
+            overOdds: overRecord?.overOdds ?? overRecord?.oddsDecimal ?? (line25.overOdds || null),
+            underOdds: underRecord?.underOdds ?? underRecord?.oddsDecimal ?? (line25.underOdds || null),
+          };
+        }
+      }
+
+      // 3. Both Teams To Score (BTTS)
+      const bttsRecords = candidateRecords.filter((r) => r.market === 'BTTS');
+      if (bttsRecords.length > 0) {
+        const yesRecord = bttsRecords.find((r) => r.selection.toLowerCase() === 'yes') || bttsRecords[0];
+        const noRecord = bttsRecords.find((r) => r.selection.toLowerCase() === 'no');
+
+        if (yesRecord && yesRecord.oddsDecimal > 1.0) {
+          fixture.markets.btts = {
+            available: true,
+            line: 0,
+            yesOdds: yesRecord.yesOdds ?? yesRecord.oddsDecimal,
+            noOdds: noRecord?.noOdds ?? noRecord?.oddsDecimal ?? (yesRecord.noOdds || null),
+          };
+        }
+      }
+    }
+
+    return { fixtures, matchedCount };
   }
 
   /**

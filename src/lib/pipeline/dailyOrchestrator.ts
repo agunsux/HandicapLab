@@ -259,45 +259,174 @@ export class DailyPipelineOrchestrator {
       });
 
       // ────────────────────────────────────────────────────────────────────────
-      // PHASE 4: Retrieve Required Odds from OddsPAPI
+      // PHASE 4: Retrieve Required Odds from OddsPAPI (or The Odds API Fallback)
       // ────────────────────────────────────────────────────────────────────────
       RunIdentityService.updateStage(runId, 'phase_04_retrieve_odds', {
-        name: 'Retrieve Required Odds from OddsPAPI (Pinnacle Sharp)',
+        name: 'Retrieve Required Odds from OddsPAPI (Pinnacle Sharp) / Fallback',
         status: 'RUNNING',
       });
       let rawOdds: any[] = [];
-      // Freshness truth for this run (Phase 4). The odds stage — and the final
-      // run status — may only be SUCCESS when fresh odds were actually retrieved.
+      let oddsSource: 'oddspapi' | 'the-odds-api' | 'custom' = 'oddspapi';
+
       if (options.customOdds) {
         rawOdds = options.customOdds;
+        oddsSource = 'custom';
       } else {
-        const { DailyPicksEngine } = await import('@/lib/daily-picks/engine');
-        // Target fixtures are passed so the OddsPapi tournament ids are derived
-        // from our own fixtures instead of the invalid legacy default '17'.
-        const oddsResult = await DailyPicksEngine.retrieveOddsPapiPinnacle(fixtures);
-        rawOdds = oddsResult.fixtures;
-        oddsRetrieval = {
-          ok: oddsResult.ok,
-          count: oddsResult.fixtures.length,
-          meteredCalls: oddsResult.meteredCalls,
-          tournamentIds: oddsResult.tournamentIds,
-          bookmakersWithData: oddsResult.bookmakersWithData,
-          error: oddsResult.error,
-          errorCode: oddsResult.errorCode,
+        const isOddsPapiPaused = process.env.ODDSPAPI_PAUSED === 'true';
+        let oddsResult: any = {
+          ok: false,
+          fixtures: [],
+          meteredCalls: 0,
+          tournamentIds: [],
+          bookmakersWithData: [],
+          error: isOddsPapiPaused ? 'ODDSPAPI_PAUSED' : 'ODDSPAPI_UNINITIALIZED',
+          errorCode: isOddsPapiPaused ? 'PAUSED' : 'UNINITIALIZED',
         };
-        if (!oddsResult.ok) {
-          // FAIL CLOSED — observable, never swallowed as a successful stage.
-          console.error(
-            `[DailyPipeline] PHASE 4 FAILED — OddsPapi retrieval error: ` +
-              `${oddsResult.error ?? 'unknown'} (${oddsResult.errorCode ?? 'n/a'}) ` +
-              `tournaments=${oddsResult.tournamentIds.length} meteredCalls=${oddsResult.meteredCalls}`
-          );
+
+        // Try primary OddsPapi if NOT paused
+        if (!isOddsPapiPaused) {
+          try {
+            const { DailyPicksEngine } = await import('@/lib/daily-picks/engine');
+            oddsResult = await DailyPicksEngine.retrieveOddsPapiPinnacle(fixtures);
+          } catch (err: any) {
+            oddsResult = {
+              ok: false,
+              fixtures: [],
+              meteredCalls: 0,
+              tournamentIds: [],
+              bookmakersWithData: [],
+              error: err?.message || String(err),
+              errorCode: 'ODDSPAPI_EXCEPTION',
+            };
+          }
+        } else {
+          console.log('[DailyPipeline] OddsPAPI is explicitly PAUSED (ODDSPAPI_PAUSED=true); skipping primary OddsPAPI call.');
+        }
+
+        // Check if primary OddsPAPI succeeded
+        if (oddsResult.ok && oddsResult.fixtures && oddsResult.fixtures.length > 0) {
+          rawOdds = oddsResult.fixtures;
+          oddsSource = 'oddspapi';
+          oddsRetrieval = {
+            ok: true,
+            count: oddsResult.fixtures.length,
+            meteredCalls: oddsResult.meteredCalls,
+            tournamentIds: oddsResult.tournamentIds,
+            bookmakersWithData: oddsResult.bookmakersWithData,
+            error: undefined,
+            errorCode: undefined,
+          };
+
+          // Reconcile OddsPapi odds to fixture.markets
+          const { DailyPicksEngine } = await import('@/lib/daily-picks/engine');
+          const participantMap = DailyPicksEngine.getOddsPapiParticipantMap();
+          for (const fixture of fixtures) {
+            const kickMs = new Date(fixture.kickoffUtc).getTime();
+            const opFixture = rawOdds.find((o: any) => {
+              const oTime = new Date(o.startTime).getTime();
+              if (Math.abs(oTime - kickMs) > 3 * 3600 * 1000) return false;
+              const p1 = o.participant1Name || participantMap.get(o.participant1Id) || '';
+              const p2 = o.participant2Name || participantMap.get(o.participant2Id) || '';
+              return DailyPicksEngine.matchTeams(fixture.homeTeam, p1) && DailyPicksEngine.matchTeams(fixture.awayTeam, p2);
+            });
+
+            if (opFixture?.bookmakerOdds?.pinnacle?.markets) {
+              const pinMarkets = opFixture.bookmakerOdds.pinnacle.markets;
+              let ahHome = pinMarkets['1070']?.outcomes?.['1070']?.players?.['0']?.price;
+              let ahAway = pinMarkets['1070']?.outcomes?.['1071']?.players?.['0']?.price;
+              let ahLine = -0.25;
+              if (!ahHome && pinMarkets['1072']) {
+                ahHome = pinMarkets['1072']?.outcomes?.['1072']?.players?.['0']?.price;
+                ahAway = pinMarkets['1072']?.outcomes?.['1073']?.players?.['0']?.price;
+                ahLine = 0.0;
+              }
+              const ouOver = pinMarkets['1010']?.outcomes?.['1010']?.players?.['0']?.price;
+              const ouUnder = pinMarkets['1010']?.outcomes?.['1012']?.players?.['0']?.price;
+              const bttsYes = pinMarkets['1050']?.outcomes?.['1050']?.players?.['0']?.price;
+              const bttsNo = pinMarkets['1050']?.outcomes?.['1052']?.players?.['0']?.price;
+
+              fixture.markets = {
+                asianHandicap: ahHome && ahAway ? { available: true, line: ahLine, homeOdds: ahHome, awayOdds: ahAway } : fixture.markets?.asianHandicap,
+                overUnder: ouOver && ouUnder ? { available: true, line: 2.5, overOdds: ouOver, underOdds: ouUnder } : fixture.markets?.overUnder,
+                btts: bttsYes && bttsNo ? { available: true, line: 0.5, yesOdds: bttsYes, noOdds: bttsNo } : fixture.markets?.btts,
+              };
+              if (ahHome) fixture.hasPinnacleOdds = true;
+            }
+          }
+        } else {
+          // Primary failed or paused: evaluate The Odds API fallback
+          const fallbackReason = isOddsPapiPaused ? 'ODDSPAPI_PAUSED' : (oddsResult.error ?? 'ODDSPAPI_EMPTY');
+          console.warn(`[DailyPipeline] OddsPAPI unavailable (${fallbackReason}); evaluating The Odds API fallback.`);
+
+          const { hasOddsApiKey } = await import('@/lib/providers/providerKey');
+          if (hasOddsApiKey()) {
+            try {
+              const { TheOddsApiProvider } = await import('@/lib/providers/theOddsApiProvider');
+              console.log('[DailyPipeline] Fallback engaged: Requesting EPL odds from The Odds API.');
+
+              const toaResult = await TheOddsApiProvider.getOdds('soccer_epl', {
+                regions: 'eu',
+                markets: 'spreads,totals',
+                priority: 90, // P0 prediction priority
+              });
+
+              if (toaResult.success && toaResult.records && toaResult.records.length > 0) {
+                const reconciled = TheOddsApiProvider.reconcileOddsWithFixtures(fixtures, toaResult.records);
+                fixtures = reconciled.fixtures;
+                rawOdds = toaResult.records;
+                oddsSource = 'the-odds-api';
+
+                const sharpBookmakers = [...new Set(toaResult.records.map((r) => r.bookmaker))];
+                oddsRetrieval = {
+                  ok: true,
+                  count: reconciled.matchedCount,
+                  meteredCalls: 1,
+                  tournamentIds: [39],
+                  bookmakersWithData: sharpBookmakers,
+                  error: undefined,
+                  errorCode: undefined,
+                };
+                console.log(`[DailyPipeline] Fallback SUCCESS: ${reconciled.matchedCount} fixtures reconciled with The Odds API.`);
+              } else {
+                console.error(`[DailyPipeline] Fallback FAILED: The Odds API returned 0 records or error: ${toaResult.error}`);
+                oddsRetrieval = {
+                  ok: false,
+                  count: 0,
+                  meteredCalls: 0,
+                  tournamentIds: [],
+                  bookmakersWithData: [],
+                  error: toaResult.error ?? 'THE_ODDS_API_EMPTY',
+                  errorCode: 'FALLBACK_EMPTY',
+                };
+              }
+            } catch (fallbackErr: any) {
+              console.error('[DailyPipeline] Fallback Exception:', fallbackErr);
+              oddsRetrieval = {
+                ok: false,
+                count: 0,
+                meteredCalls: 0,
+                tournamentIds: [],
+                bookmakersWithData: [],
+                error: fallbackErr?.message || String(fallbackErr),
+                errorCode: 'FALLBACK_EXCEPTION',
+              };
+            }
+          } else {
+            console.warn('[DailyPipeline] The Odds API is not configured; failing closed.');
+            oddsRetrieval = {
+              ok: false,
+              count: 0,
+              meteredCalls: 0,
+              tournamentIds: [],
+              bookmakersWithData: [],
+              error: 'BOTH_PROVIDERS_UNAVAILABLE',
+              errorCode: 'NO_FALLBACK_CREDENTIALS',
+            };
+          }
         }
       }
 
-      // The stage is SUCCESS only when fresh odds exist. A degraded/empty
-      // retrieval is reported as FAILED — the previous behaviour reported
-      // SUCCESS with recordsCount:0, which is how the freshness incident hid.
+      // The stage is SUCCESS only when fresh odds exist from primary or fallback.
       const oddsStageOk = rawOdds.length > 0;
       RunIdentityService.updateStage(runId, 'phase_04_retrieve_odds', {
         status: oddsStageOk ? 'SUCCESS' : 'FAILED',
@@ -308,6 +437,7 @@ export class DailyPipelineOrchestrator {
           bookmakersWithData: oddsRetrieval.bookmakersWithData ?? [],
           error: oddsRetrieval.error ?? null,
           errorCode: oddsRetrieval.errorCode ?? null,
+          providerSource: oddsSource,
         },
         finishedAt: new Date().toISOString(),
       });

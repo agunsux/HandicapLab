@@ -1,0 +1,192 @@
+{
+  "timestamp": "2026-10-16T17:37:29.065Z",
+  "preFlight": {
+    "status": 200,
+    "requestsRemaining": 496,
+    "requestsUsed": 4,
+    "requestsLast": 0,
+    "eventsDiscovered": 20
+  },
+  "atomicQuota": {
+    "reservationId": "eab7f5c4-e3c4-49c6-93ff-40af73483011",
+    "expectedCost": 2,
+    "actualCost": 2,
+    "reservedOk": true,
+    "confirmedOk": true
+  },
+  "liveOddsRequest": {
+    "status": 200,
+    "requestsRemaining": 494,
+    "requestsUsed": 6,
+    "requestsLast": 2,
+    "oddsRecordsCount": 848,
+    "sharpBookmakers": [
+      "marathonbet",
+      "codere_it",
+      "onexbet",
+      "mybookieag",
+      "williamhill",
+      "tipico_de",
+      "pinnacle",
+      "leovegas_se",
+      "unibet_nl",
+      "unibet_se",
+      "pmu_fr",
+      "nordicbet",
+      "betsson",
+      "betonlineag",
+      "matchbook",
+      "gtbets",
+      "coolbet",
+      "betanysports"
+    ]
+  },
+  "predictions": {
+    "runId": "daily-2026-10-16T17:00Z",
+    "fixturesEvaluated": 20,
+    "totalPredictions": 120,
+    "ahPredictions": 20,
+    "ouPredictions": 100,
+    "qualifiedCount": 6,
+    "highConfidenceCount": 3,
+    "durablePersistStatus": "SUCCESS",
+    "durableWritten": 120
+  },
+  "readback": {
+    "supabaseDailyPicksCount": 10,
+    "supabasePicksSample": [
+      {
+        "id": "f7505fa1-1d38-4217-8599-175c129ef2f7",
+        "fixture_id": "3fe2b1c3-34c4-5fea-bfd8-fa5399ec658e",
+        "league": "Premier League",
+        "home_team": "Liverpool",
+        "away_team": "Brighton and Hove Albion",
+        "market_type": "OVER_UNDER",
+        "prediction": "Over 1.5",
+        "market_odds": null,
+        "verdict": "LEWATI",
+        "confidence": 0,
+        "created_at": "2026-10-16T17:37:31.617+00:00"
+      },
+      {
+        "id": "45b5c6e2-7b88-448d-9868-5bde77595915",
+        "fixture_id": "df6672b7-8f47-5886-ab3b-c09201f09df9",
+        "league": "Premier League",
+        "home_team": "Crystal Palace",
+        "away_team": "Newcastle United",
+        "market_type": "ASIAN_HANDICAP",
+        "prediction": "Crystal Palace +0",
+        "market_odds": 1.99,
+        "verdict": "LEWATI",
+        "confidence": 0,
+        "created_at": "2026-10-16T17:37:31.617+00:00"
+      },
+      {
+        "id": "1d4269ac-fb1f-493c-be2d-20cd8d8be17f",
+        "fixture_id": "df6672b7-8f47-5886-ab3b-c09201f09df9",
+        "league": "Premier League",
+        "home_team": "Crystal Palace",
+        "away_team": "Newcastle United",
+        "market_type": "OVER_UNDER",
+        "prediction": "Over 1.5",
+        "market_odds": null,
+        "verdict": "LEWATI",
+        "confidence": 0,
+        "created_at": "2026-10-16T17:37:31.617+00:00"
+      },
+      {
+        "id": "671b750b-aa61-44bd-b68b-7662aa62db76",
+        "fixture_id": "7245fabc-cfa2-5af3-b888-5f389f7eb7e5",
+        "league": "Premier League",
+        "home_team": "Sunderland",
+        "away_team": "Leeds United",
+        "market_type": "ASIAN_HANDICAP",
+        "prediction": "Sunderland +0",
+        "market_odds": 2,
+        "verdict": "LEWATI",
+        "confidence": 0,
+        "created_at": "2026-10-16T17:37:31.617+00:00"
+      },
+      {
+        "id": "5ca901b9-2e3d-4242-bc29-e46a3928e380",
+        "fixture_id": "7245fabc-cfa2-5af3-b888-5f389f7eb7e5",
+        "league": "Premier League",
+        "home_team": "Sunderland",
+        "away_team": "Leeds United",
+        "market_type": "OVER_UNDER",
+        "prediction": "Over 1.5",
+        "market_odds": null,
+        "verdict": "LEWATI",
+        "confidence": 0,
+        "created_at": "2026-10-16T17:37:31.617+00:00"
+      },
+      {
+        "id": "bf545003-2369-4c1d-8bc0-27994c5502d0",
+        "fixture_id": "90c990f5-e77d-5a85-8a29-d619d7839c0b",
+        "league": "Premier League",
+        "home_team": "Everton",
+        "away_team": "Chelsea",
+        "market_type": "ASIAN_HANDICAP",
+        "prediction": "Everton +0.25",
+        "market_odds": 2,
+        "verdict": "PANTAU",
+        "confidence": 50,
+        "created_at": "2026-10-16T17:37:31.617+00:00"
+      },
+      {
+        "id": "be3562b8-b4a2-471c-92cb-61aac862511e",
+        "fixture_id": "90c990f5-e77d-5a85-8a29-d619d7839c0b",
+        "league": "Premier League",
+        "home_team": "Everton",
+        "away_team": "Chelsea",
+        "market_type": "OVER_UNDER",
+        "prediction": "Over 1.5",
+        "market_odds": null,
+        "verdict": "LEWATI",
+        "confidence": 0,
+        "created_at": "2026-10-16T17:37:31.617+00:00"
+      },
+      {
+        "id": "74411e36-5e09-4eb9-a1b6-05acb4d4b78a",
+        "fixture_id": "59d7f9a6-5f5e-5758-830d-5c77ce9adf26",
+        "league": "Premier League",
+        "home_team": "Brentford",
+        "away_team": "Liverpool",
+        "market_type": "ASIAN_HANDICAP",
+        "prediction": "Brentford -0.25",
+        "market_odds": 2.13,
+        "verdict": "LEWATI",
+        "confidence": 0,
+        "created_at": "2026-10-16T17:37:31.617+00:00"
+      },
+      {
+        "id": "c6b755a8-5f83-4797-826a-9b6eb4d6184f",
+        "fixture_id": "59d7f9a6-5f5e-5758-830d-5c77ce9adf26",
+        "league": "Premier League",
+        "home_team": "Brentford",
+        "away_team": "Liverpool",
+        "market_type": "OVER_UNDER",
+        "prediction": "Over 1.5",
+        "market_odds": null,
+        "verdict": "LEWATI",
+        "confidence": 0,
+        "created_at": "2026-10-16T17:37:31.617+00:00"
+      },
+      {
+        "id": "a2d34cd7-dbe7-4004-be01-c85869141914",
+        "fixture_id": "8d1f99ff-eb24-51ca-85cb-2aa8d14a2917",
+        "league": "Premier League",
+        "home_team": "Fulham",
+        "away_team": "Hull City",
+        "market_type": "ASIAN_HANDICAP",
+        "prediction": "Fulham -0.75",
+        "market_odds": 1.94,
+        "verdict": "LEWATI",
+        "confidence": 0,
+        "created_at": "2026-10-16T17:37:31.617+00:00"
+      }
+    ],
+    "salmoEndpointStatus": 200,
+    "salmoEndpointSummary": {}
+  }
+}

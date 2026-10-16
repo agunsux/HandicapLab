@@ -72,11 +72,23 @@ export class TheOddsApiAdapter implements OddsProvider {
     }));
   }
 
-  public async getOdds(fixtureId: string): Promise<CanonicalOdds[]> {
-    const res = await TheOddsApiProvider.getOdds('soccer_epl');
-    if (!res.success || !res.records) return [];
+  private cachedOdds: { records: any[]; timestamp: number } | null = null;
+  private readonly CACHE_TTL_MS = 60_000;
 
-    const matched = res.records.filter(
+  public async getOdds(fixtureId: string): Promise<CanonicalOdds[]> {
+    const now = Date.now();
+    let records: any[] = [];
+
+    if (this.cachedOdds && now - this.cachedOdds.timestamp < this.CACHE_TTL_MS) {
+      records = this.cachedOdds.records;
+    } else {
+      const res = await TheOddsApiProvider.getOdds('soccer_epl');
+      if (!res.success || !res.records) return [];
+      records = res.records;
+      this.cachedOdds = { records, timestamp: now };
+    }
+
+    const matched = records.filter(
       (r) => r.canonicalMatchId === fixtureId || r.providerMatchId === fixtureId
     );
 
