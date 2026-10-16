@@ -68,26 +68,79 @@ export class Dribble360Adapter {
   }
 
   /**
+   * Authoritative mapping of Dribble360 season IDs to SALMO canonical league IDs.
+   */
+  public static readonly SEASON_MAP: Record<string, string> = {
+    // 2026/2027 Active European & Domestic Seasons
+    '6pdwluctev9iebv00r4qqukno': 'ENG-PL',
+    '830epggffy1nfkfyrtpqdwhlg': 'ESP-LALIGA',
+    '8h5xijv2u4mlf5028gso6kw7o': 'DEU-BUNDESLIGA',
+    '60cryos85i4bp5ul34tt0brx0': 'ITA-SERIEA',
+    'bqnc4ccgnrp6pb3bktqet0yz8': 'FRA-LIGUE1',
+    '56cvval3nf96u0bf9rzs9h6vo': 'NED-ERE',
+    'a8xa8yfi2tlljxrwyxcst51xw': 'POR-PRIMEIRA',
+    '5ysazl26p4ksxbonjpbamevpw': 'BEL-PRO',
+    '4vs6oaojacz5bwo1320rkk844': 'SAU-PRO',
+    '6i6n0jkbh9zzij6s8htfjh2j8': 'USA-MLS',
+    '99jev9kv55deht65t6myggxlg': 'UEFA-CL',
+    '1rpi0q64a7kut2wiuvecmgbv8': 'UEFA-EL',
+    'acatl9aedc5l4im3r8l890y6s': 'UEFA-ECL',
+    '752zalnunu0zkdfbbm915kys4': 'BRA-SERIEA',
+    'e00dq6lfzgc7vo631cz8ktc0k': 'TUR-SUPERLIG',
+    // 2025/2026 Historical
+    '51r6ph2woavlbbpk8f29nynf8': 'ENG-PL',
+    '80zg2v1cuqcfhphn56u4qpyqc': 'ESP-LALIGA',
+    '2bchmrj23l9u42d68ntcekob8': 'DEU-BUNDESLIGA',
+    'emdmtfr1v8rey2qru3xzfwges': 'ITA-SERIEA',
+    'dbxs75cag7zyip5re0ppsanmc': 'FRA-LIGUE1',
+    'aouykkl1rt7zo06sg0kbzkbh0': 'NED-ERE',
+    '7l4z25o4hc0fmj9rdspcisdn8': 'POR-PRIMEIRA',
+    '16lkdpoccbh056r0v0bordo2c': 'BEL-PRO',
+    '6ru2ri6bqeg9l7av4ppdpdx5g': 'SAU-PRO',
+    '2mr0u0l78k2gdsm79q56tb2fo': 'UEFA-CL',
+    '7ttpe5jzya3vjhjadiemjy7mc': 'UEFA-EL',
+    '7x2zp2hm4p6wuijwdw3h7a8t0': 'UEFA-ECL',
+    '97zghcaoec1isvvdkh9ud50d0': 'TUR-SUPERLIG',
+  };
+
+  /**
    * Resolves competition ID from Dribble description / season / league.
    */
   public static resolveCompetitionId(match: Dribble360Match): string {
+    const seasonId = String(match.season_id || match.season || '');
+    if (seasonId && this.SEASON_MAP[seasonId]) {
+      return this.SEASON_MAP[seasonId];
+    }
+
     if (match.league_name) {
       const ln = match.league_name.toLowerCase();
       if (ln.includes('premier league') || ln.includes('epl')) return 'ENG-PL';
       if (ln.includes('championship')) return 'ENG-CH';
-      if (ln.includes('la liga') || ln.includes('primera')) return 'ESP-L1';
-      if (ln.includes('bundesliga')) return 'GER-BL';
-      if (ln.includes('serie a')) return 'ITA-SA';
-      if (ln.includes('ligue 1')) return 'FRA-L1';
-      if (ln.includes('eredivisie')) return 'NED-ED';
+      if (ln.includes('la liga') || ln.includes('primera')) return 'ESP-LALIGA';
+      if (ln.includes('bundesliga')) return 'DEU-BUNDESLIGA';
+      if (ln.includes('serie a')) return 'ITA-SERIEA';
+      if (ln.includes('ligue 1')) return 'FRA-LIGUE1';
+      if (ln.includes('eredivisie')) return 'NED-ERE';
+      if (ln.includes('primeira') || ln.includes('portugal')) return 'POR-PRIMEIRA';
+      if (ln.includes('jupiler') || ln.includes('pro league')) return 'BEL-PRO';
+      if (ln.includes('champions league') || ln.includes('ucl')) return 'UEFA-CL';
+      if (ln.includes('europa league')) return 'UEFA-EL';
+      if (ln.includes('conference league')) return 'UEFA-ECL';
       if (ln.includes('j1')) return 'JPN-J1';
-      if (ln.includes('k league')) return 'KOR-KL1';
+      if (ln.includes('k league')) return 'KOR-K1';
       if (ln.includes('liga 1')) return 'IDN-L1';
+      if (ln.includes('mls')) return 'USA-MLS';
+      if (ln.includes('saudi')) return 'SAU-PRO';
     }
 
     // Fallback based on match description or slug
     const desc = (match.description || match.slug || '').toLowerCase();
-    // Default to international or general if unmapped
+    if (desc.includes('premier league') || desc.includes('epl')) return 'ENG-PL';
+    if (desc.includes('championship')) return 'ENG-CH';
+    if (desc.includes('champions league') || desc.includes('ucl')) return 'UEFA-CL';
+    if (desc.includes('europa league')) return 'UEFA-EL';
+
+    // Default to provider league ID or general if unmapped
     return match.league_id ? `DRIBBLE-${match.league_id}` : 'WORLD-GEN';
   }
 
