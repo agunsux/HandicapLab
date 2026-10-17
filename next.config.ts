@@ -137,13 +137,17 @@ const nextConfig: NextConfig = {
     ];
 
     if (isVercel || process.env.PROXY_TO_CLOUD_RUN === 'true') {
-      return [
-        ...internalRewrites,
-        {
-          source: '/api/:path*',
-          destination: `${backendUrl}/api/:path*`,
-        },
-      ];
+      return {
+        beforeFiles: [
+          ...internalRewrites,
+          {
+            source: '/api/:path*',
+            destination: `${backendUrl}/api/:path*`,
+          },
+        ],
+        afterFiles: [],
+        fallback: [],
+      };
     }
 
     return internalRewrites;
