@@ -50,6 +50,7 @@ export const memoryCache: CacheStore = {
 export interface GatewayOptions extends RequestInit {
   quotaPriority?: number; // 0-100
   cacheTtlMs?: number; // 0 disables cache
+  reservationId?: string; // Pre-acquired reservation ID to prevent double reservation
 }
 
 // In-flight request deduplication registry
@@ -290,19 +291,30 @@ export class ProviderGateway {
     }
 
     // 3. ATOMIC QUOTA RESERVATION (Provider Manager stays authoritative)
-    const reqId = crypto.randomUUID();
-    const receipt = await reserveQuota(provider, endpoint, quotaPriority, reqId);
-    if (!receipt.ok) {
-      record({ statusCode: null, classification: 'QUOTA_BLOCKED', errorClass: receipt.reason });
-      throw new QuotaExhaustionError(`Quota exhausted or blocked for ${provider}`, {
+    let receipt: any;
+    if (options.reservationId) {
+      receipt = {
+        ok: true,
+        reservationId: options.reservationId,
+        cost: 0,
         provider,
         endpoint,
-        reason: receipt.reason,
-        mode: receipt.mode,
-      });
-    }
-    if (!receipt.reservationId) {
-      throw new Error(`Reservation ID missing for ${provider}`);
+      };
+    } else {
+      const reqId = crypto.randomUUID();
+      receipt = await reserveQuota(provider, endpoint, quotaPriority, reqId);
+      if (!receipt.ok) {
+        record({ statusCode: null, classification: 'QUOTA_BLOCKED', errorClass: receipt.reason });
+        throw new QuotaExhaustionError(`Quota exhausted or blocked for ${provider}`, {
+          provider,
+          endpoint,
+          reason: receipt.reason,
+          mode: receipt.mode,
+        });
+      }
+      if (!receipt.reservationId && receipt.cost > 0) {
+        throw new Error(`Reservation ID missing for ${provider}`);
+      }
     }
 
     // 4. RATE LIMIT + CONCURRENCY (bounded; never an unbounded retry loop)
@@ -310,7 +322,7 @@ export class ProviderGateway {
     const limiter = this.getRateLimiter(provider);
     const gotToken = await limiter.acquire(acquireTimeoutMs);
     if (!gotToken) {
-      await rollbackQuota(receipt.reservationId);
+      if (receipt.reservationId) await rollbackQuota(receipt.reservationId);
       record({ statusCode: null, classification: 'RATE_LIMITED', errorClass: 'LOCAL_RATE_LIMIT_TIMEOUT' });
       throw new ProviderRateLimitedError(provider, 'local rate limiter timeout');
     }
@@ -318,7 +330,7 @@ export class ProviderGateway {
     const semaphore = this.getSemaphore(provider);
     const gotSlot = await semaphore.acquire(acquireTimeoutMs);
     if (!gotSlot) {
-      await rollbackQuota(receipt.reservationId);
+      if (receipt.reservationId) await rollbackQuota(receipt.reservationId);
       record({ statusCode: null, classification: 'RATE_LIMITED', errorClass: 'CONCURRENCY_LIMIT_TIMEOUT' });
       throw new ProviderRateLimitedError(provider, 'concurrency limit timeout');
     }
@@ -328,7 +340,7 @@ export class ProviderGateway {
       // 5. EXTERNAL HTTP REQUEST
       response = await fetch(url, fetchOptions);
     } catch (error: any) {
-      await rollbackQuota(receipt.reservationId);
+      if (receipt.reservationId) await rollbackQuota(receipt.reservationId);
       health.onFailure();
       record({ statusCode: null, classification: 'NETWORK_ERROR', errorClass: error?.name || 'Error', quotaReservationId: receipt.reservationId });
       throw error;
@@ -344,6 +356,13 @@ export class ProviderGateway {
       const hRem = response.headers.get('x-ratelimit-requests-remaining') || response.headers.get('x-ratelimit-remaining');
       if (hTotal) limitTotal = parseInt(hTotal, 10);
       if (hRem) limitRemaining = parseInt(hRem, 10);
+    } else if (provider === 'the-odds-api') {
+      const hRem = response.headers.get('x-requests-remaining');
+      const hUsed = response.headers.get('x-requests-used');
+      if (hRem && !isNaN(Number(hRem))) limitRemaining = parseInt(hRem, 10);
+      if (hRem && hUsed && !isNaN(Number(hRem)) && !isNaN(Number(hUsed))) {
+        limitTotal = parseInt(hRem, 10) + parseInt(hUsed, 10);
+      }
     }
 
     const classification = classifyHttpStatus(response.status);
@@ -359,11 +378,13 @@ export class ProviderGateway {
     }
 
     // Conservative accounting: a completed HTTP cycle consumed quota.
-    await confirmQuota(receipt.reservationId, receipt.cost, limitTotal, limitRemaining);
+    if (receipt.reservationId && receipt.cost > 0) {
+      await confirmQuota(receipt.reservationId, receipt.cost, limitTotal, limitRemaining);
+    }
     record({
       statusCode: response.status,
       classification,
-      quotaReservationId: receipt.reservationId,
+      quotaReservationId: receipt.reservationId ?? null,
       errorClass: response.ok ? null : `HTTP_${response.status}`,
     });
 

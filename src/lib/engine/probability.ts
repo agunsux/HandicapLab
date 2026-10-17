@@ -92,6 +92,108 @@ export function calculateOverUnderProbability(
   return { over, under };
 }
 
+export interface AsianTotalProbabilities {
+  win: number;
+  halfWin: number;
+  push: number;
+  halfLoss: number;
+  loss: number;
+  cover: number; // Combined probability equivalent (win + 0.5 * halfWin)
+}
+
+/**
+ * Calculates exact Asian Total (Over / Under) probabilities across any line
+ * (whole e.g. 2.0, 3.0; half e.g. 1.5, 2.5; quarter e.g. 2.25, 2.75).
+ * Resolves full win, half win, push, half loss, full loss based on exact split stake rules.
+ */
+export function calculateAsianTotalProbability(
+  homeXG: number,
+  awayXG: number,
+  line: number,
+  isOver: boolean,
+  rho: number
+): AsianTotalProbabilities {
+  const grid = buildScoreGrid(homeXG, awayXG, rho);
+  const frac = Math.round((line - Math.floor(line)) * 100) / 100;
+
+  let win = 0;
+  let halfWin = 0;
+  let push = 0;
+  let halfLoss = 0;
+  let loss = 0;
+
+  for (let x = 0; x <= 10; x++) {
+    for (let y = 0; y <= 10; y++) {
+      const prob = grid[x][y];
+      const totalGoals = x + y;
+
+      if (frac === 0.0) {
+        // 1. Whole line (e.g. 1.0, 2.0, 3.0)
+        if (totalGoals === line) {
+          push += prob;
+        } else if (isOver) {
+          if (totalGoals > line) win += prob;
+          else loss += prob;
+        } else {
+          if (totalGoals < line) win += prob;
+          else loss += prob;
+        }
+      } else if (frac === 0.5) {
+        // 2. Half line (e.g. 0.5, 1.5, 2.5, 3.5)
+        if (isOver) {
+          if (totalGoals > line) win += prob;
+          else loss += prob;
+        } else {
+          if (totalGoals < line) win += prob;
+          else loss += prob;
+        }
+      } else if (frac === 0.25) {
+        // 3. Quarter line .25 (e.g. 2.25) -> split whole (line - 0.25) and half (line + 0.25)
+        const wholeLine = line - 0.25;
+        if (isOver) {
+          if (totalGoals >= line + 0.75) win += prob;
+          else if (totalGoals === wholeLine) halfLoss += prob;
+          else loss += prob;
+        } else {
+          if (totalGoals <= line - 1.25) win += prob;
+          else if (totalGoals === wholeLine) halfWin += prob;
+          else loss += prob;
+        }
+      } else if (frac === 0.75) {
+        // 4. Quarter line .75 (e.g. 2.75) -> split half (line - 0.25) and whole (line + 0.25)
+        const wholeLine = line + 0.25;
+        if (isOver) {
+          if (totalGoals >= line + 1.25) win += prob;
+          else if (totalGoals === wholeLine) halfWin += prob;
+          else loss += prob;
+        } else {
+          if (totalGoals <= line - 0.75) win += prob;
+          else if (totalGoals === wholeLine) halfLoss += prob;
+          else loss += prob;
+        }
+      } else {
+        // Fallback for non-standard line
+        if (isOver) {
+          if (totalGoals > line) win += prob;
+          else loss += prob;
+        } else {
+          if (totalGoals < line) win += prob;
+          else loss += prob;
+        }
+      }
+    }
+  }
+
+  return {
+    win: Number(win.toFixed(5)),
+    halfWin: Number(halfWin.toFixed(5)),
+    push: Number(push.toFixed(5)),
+    halfLoss: Number(halfLoss.toFixed(5)),
+    loss: Number(loss.toFixed(5)),
+    cover: Number((win + 0.5 * halfWin).toFixed(5)),
+  };
+}
+
 export interface AsianHandicapProbabilities {
   win: number;
   halfWin: number;
@@ -126,13 +228,13 @@ export function calculateAsianHandicapProbability(
       // Goal difference (x - y) + HandicapLine
       const dAdj = (x - y) + handicapLine;
 
-      if (dAdj >= 0.5) {
+      if (dAdj >= 0.4999) {
         win += prob;
-      } else if (dAdj === 0.25) {
+      } else if (Math.abs(dAdj - 0.25) < 1e-4) {
         halfWin += prob;
-      } else if (dAdj === 0.0) {
+      } else if (Math.abs(dAdj) < 1e-4) {
         push += prob;
-      } else if (dAdj === -0.25) {
+      } else if (Math.abs(dAdj - (-0.25)) < 1e-4) {
         halfLoss += prob;
       } else {
         loss += prob;
@@ -141,12 +243,12 @@ export function calculateAsianHandicapProbability(
   }
 
   return {
-    win,
-    halfWin,
-    push,
-    halfLoss,
-    loss,
-    cover: win + 0.5 * halfWin,
+    win: Number(win.toFixed(5)),
+    halfWin: Number(halfWin.toFixed(5)),
+    push: Number(push.toFixed(5)),
+    halfLoss: Number(halfLoss.toFixed(5)),
+    loss: Number(loss.toFixed(5)),
+    cover: Number((win + 0.5 * halfWin).toFixed(5)),
   };
 }
 

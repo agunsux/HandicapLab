@@ -56,7 +56,7 @@ export function getOddsApiKey(): string {
   if (legacy && legacy.trim() && !legacy.includes('[SENSITIVE]')) return legacy.trim();
 
   // CLI/Local development fallback: retrieve from GCP Secret Manager if available
-  if (typeof window === 'undefined' && !process.env.K_SERVICE) {
+  if (typeof window === 'undefined' && !process.env.K_SERVICE && process.env.NODE_ENV !== 'test') {
     try {
       const { execSync } = require('child_process');
       const val = execSync('gcloud secrets versions access latest --secret=ODDS_API_KEY --project=handicap-salmo', {

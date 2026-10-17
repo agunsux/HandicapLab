@@ -580,9 +580,9 @@ export class ProductionPublishingEngine {
       let homeXg = 1.45;
       let awayXg = 1.15;
       let rho = -0.05;
-      let sampleSizeHome = 10;
-      let sampleSizeAway = 10;
-      let isModelSufficient = true;
+      let sampleSizeHome = 0;
+      let sampleSizeAway = 0;
+      let isModelSufficient = false;
 
       try {
         const ratings = await CanonicalOrchestrator.resolveTeamRatings(
@@ -591,7 +591,13 @@ export class ProductionPublishingEngine {
           competitionName,
           predictionTimestampUtc
         );
-        if (ratings.isSufficient && ratings.homeRating && ratings.awayRating) {
+        if (
+          ratings.isSufficient &&
+          ratings.homeRating &&
+          ratings.awayRating &&
+          (ratings.homeRating.matches_played || 0) >= 5 &&
+          (ratings.awayRating.matches_played || 0) >= 5
+        ) {
           const profile = CompetitionProfileEngine.getProfileForLeague(competitionName);
           const leagueAvgGoals = profile.goalEnvironment || 2.65;
           const homeBase = leagueAvgGoals * 0.55;
@@ -603,7 +609,7 @@ export class ProductionPublishingEngine {
           isModelSufficient = true;
         }
       } catch {
-        // Safe baseline parameters
+        // Safe baseline parameters; isModelSufficient remains false
       }
 
       for (const cand of candidateMarkets) {
@@ -673,8 +679,8 @@ export class ProductionPublishingEngine {
             odds: 'oddspapi-pinnacle',
             statistics: 'apifootball-baseline',
           },
-          sampleSizeHome: 10,
-          sampleSizeAway: 10,
+          sampleSizeHome,
+          sampleSizeAway,
           quotaAllowed: true,
         });
 

@@ -113,7 +113,9 @@ export async function getTerminalPredictions(): Promise<TerminalPredictionRow[]>
       return [];
     }
 
-    return data.map((r: any) => {
+    return data
+      .filter((r: any) => !r.rejection_reason && r.verdict !== 'LEWATI')
+      .map((r: any) => {
       let side: 'home' | 'away' = 'home';
       let line = 0;
       if (r.prediction) {

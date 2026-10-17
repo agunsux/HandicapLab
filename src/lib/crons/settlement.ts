@@ -175,6 +175,9 @@ export async function runSettlementCron(): Promise<any> {
 
     if (dailyPicks && dailyPicks.length > 0) {
       for (const pick of dailyPicks) {
+        // Do not settle rejected, quarantined, or uncalibrated picks
+        if (pick.rejection_reason || pick.verdict === 'LEWATI') continue;
+
         // Evaluate Win/Loss based on actual scores
         let pickResult: 'WON' | 'LOST' | 'PUSH' = 'LOST';
         const hGoals = homeGoals;

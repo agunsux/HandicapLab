@@ -16,6 +16,8 @@
 // 7. No Qualified Pick is a successful and expected pipeline result when no match qualifies.
 // ============================================================================
 
+import { ExpectedValueCalculator } from '../research/settlement/evCalculator';
+
 export type SupportedPipelineMarket = 'AH' | 'OU' | 'BTTS';
 export type ConfidenceTier = 'HIGH' | 'MEDIUM' | 'LOW' | 'PASS';
 
@@ -28,7 +30,8 @@ export type PredictionLedgerStatus =
   | 'SETTLED_LOSS'
   | 'VOID'
   | 'INVALID'
-  | 'AWAITING_ODDS';
+  | 'AWAITING_ODDS'
+  | 'INSUFFICIENT_MODEL';
 
 export interface ConfidenceGateInput {
   canonicalMatchId: string;
@@ -50,8 +53,16 @@ export interface ConfidenceGateInput {
   sampleSizeHome: number;
   sampleSizeAway: number;
   modelValidated?: boolean;
+  isStaticFallback?: boolean;
   dataWarnings?: string[];
   runId?: string;
+  outcomeProbabilities?: {
+    win: number;
+    halfWin: number;
+    push: number;
+    halfLoss: number;
+    loss: number;
+  };
 }
 
 export interface ConfidenceGateResult {
@@ -150,7 +161,21 @@ export class ConfidenceGateSystem {
     const odds = input.odds!;
     const impliedProb = Number((1 / odds).toFixed(4));
     const edge = Number((calibratedProb - impliedProb).toFixed(4));
-    const expectedValue = Number(((calibratedProb * odds) - 1).toFixed(4));
+    
+    let expectedValue: number;
+    if (input.outcomeProbabilities) {
+      const evResult = ExpectedValueCalculator.computeQuarterLineEv(
+        input.outcomeProbabilities.win,
+        input.outcomeProbabilities.halfWin,
+        input.outcomeProbabilities.push,
+        input.outcomeProbabilities.halfLoss,
+        input.outcomeProbabilities.loss,
+        odds
+      );
+      expectedValue = evResult.expectedValue;
+    } else {
+      expectedValue = Number(((calibratedProb * odds) - 1).toFixed(4));
+    }
 
     // 3. Temporal Sanity
     const kickMs = new Date(input.kickoffUtc).getTime();
@@ -159,6 +184,45 @@ export class ConfidenceGateSystem {
     const temporalSanity = !isNaN(kickMs) && !isNaN(predMs) && predMs < kickMs && oddsMs <= predMs;
     if (!temporalSanity) {
       reasons.push('TEMPORAL_LEAKAGE: prediction >= kickoff or odds > prediction');
+    }
+
+    // 3b. Competition Integrity (e.g. EPL official 20-club validation)
+    const compLower = (input.competition || '').toLowerCase();
+    const isEpl = compLower.includes('premier league') || compLower.includes('epl') || compLower === '39';
+    if (isEpl) {
+      const isHullCity = (name: string) => name.toLowerCase().includes('hull');
+      if (isHullCity(input.homeTeam) || isHullCity(input.awayTeam)) {
+        reasons.push('COMPETITION_MISMATCH: Hull City is an EFL Championship club');
+      }
+    }
+
+    const hasCompetitionMismatch = reasons.some((r) => r.startsWith('COMPETITION_MISMATCH'));
+    if (hasCompetitionMismatch) {
+      return {
+        qualified: false,
+        isHighConfidence: false,
+        status: 'INVALID',
+        confidenceTier: 'PASS',
+        confidenceScore: 0,
+        modelProbability: modelProb,
+        calibratedProbability: calibratedProb,
+        marketImpliedProbability: impliedProb,
+        edge,
+        expectedValue,
+        verdict: 'LEWATI',
+        rejectionReasons: reasons,
+        passes: {
+          marketSupported: isMarketSupported,
+          oddsThreshold: false,
+          probabilityThreshold: false,
+          positiveEdge: false,
+          positiveEv: false,
+          sufficientSample: false,
+          modelValidated: false,
+          temporalSanity,
+          bttsResearchGated: market === 'BTTS',
+        },
+      };
     }
 
     // 4. Threshold Checks
@@ -199,6 +263,54 @@ export class ConfidenceGateSystem {
     const warnings = input.dataWarnings || [];
     if (warnings.length > 0) {
       reasons.push(`DATA_WARNINGS: ${warnings.join(', ')}`);
+    }
+
+    // 4b. Fail-Closed Model Eligibility Circuit Breaker
+    // Static fallback xG or insufficient team-rating history MUST NEVER produce an actionable / public-eligible signal.
+    // If the model is using static fallback parameters, or the model is not validated, or sample size is below minimum (5 matches),
+    // the prediction MUST immediately fail-closed to:
+    //   status: 'INSUFFICIENT_MODEL'
+    //   confidenceTier: 'PASS'
+    //   confidenceScore: 0
+    //   verdict: 'LEWATI'
+    //   qualified: false
+    //   isHighConfidence: false
+    // Positive EV, high raw edge, or high probability CANNOT bypass this invariant under any circumstance.
+    const isStaticFallback = input.isStaticFallback === true;
+    if (isStaticFallback || !modelValidated || !samplePass) {
+      if (isStaticFallback) {
+        reasons.push('INSUFFICIENT_MODEL: Static fallback xG active (uncalibrated parameters cannot produce actionable signal)');
+      } else if (!modelValidated) {
+        reasons.push('INSUFFICIENT_MODEL: Model failed validation gate');
+      } else if (!samplePass) {
+        reasons.push(`INSUFFICIENT_MODEL: Insufficient sample size (home=${homeSample}, away=${awaySample}, min=${this.MIN_SAMPLE_SIZE})`);
+      }
+
+      return {
+        qualified: false,
+        isHighConfidence: false,
+        status: 'INSUFFICIENT_MODEL',
+        confidenceTier: 'PASS',
+        confidenceScore: 0,
+        modelProbability: modelProb,
+        calibratedProbability: calibratedProb,
+        marketImpliedProbability: impliedProb,
+        edge,
+        expectedValue,
+        verdict: 'LEWATI',
+        rejectionReasons: reasons,
+        passes: {
+          marketSupported: isMarketSupported,
+          oddsThreshold: oddsPass,
+          probabilityThreshold: probPass,
+          positiveEdge: edgePass,
+          positiveEv: evPass,
+          sufficientSample: samplePass,
+          modelValidated: modelValidated && !isStaticFallback,
+          temporalSanity,
+          bttsResearchGated: market === 'BTTS',
+        },
+      };
     }
 
     // 5. Invariant Check: BTTS Research Control

@@ -214,8 +214,14 @@ CREATE TABLE IF NOT EXISTS matches (
   etl_version VARCHAR(32) NOT NULL DEFAULT '1.0.0',
   ingested_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   last_verified TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  license VARCHAR(64) DEFAULT 'Open'
 );
+
+-- Guarantee columns exist if matches table was previously created by earlier migration
+ALTER TABLE matches ADD COLUMN IF NOT EXISTS competition_code VARCHAR(32);
+ALTER TABLE matches ADD COLUMN IF NOT EXISTS season_code VARCHAR(16);
+ALTER TABLE matches ADD COLUMN IF NOT EXISTS natural_key VARCHAR(128);
+ALTER TABLE matches ADD COLUMN IF NOT EXISTS home_score INT;
+ALTER TABLE matches ADD COLUMN IF NOT EXISTS away_score INT;
 
 CREATE TABLE IF NOT EXISTS match_events (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

@@ -281,6 +281,7 @@ export class TheOddsApiProvider {
         headers: { 'Accept': 'application/json' },
         cacheTtlMs: 30_000,
         quotaPriority: priority,
+        reservationId,
       });
 
       const latencyMs = Date.now() - start;
@@ -385,6 +386,13 @@ export class TheOddsApiProvider {
       if (fixtureRecords.length === 0) continue;
 
       matchedCount++;
+      for (const rec of fixtureRecords) {
+        if (!rec.canonicalMatchId) {
+          rec.canonicalMatchId = fixture.fixtureId;
+          rec.isResolvedMatch = true;
+        }
+      }
+
       if (!fixture.markets) {
         fixture.markets = {
           asianHandicap: { available: false, line: null, homeOdds: null, awayOdds: null },
@@ -418,7 +426,23 @@ export class TheOddsApiProvider {
       // 2. Over / Under (OU)
       const ouRecords = candidateRecords.filter((r) => r.market === 'OU');
       if (ouRecords.length > 0) {
-        // Default to 2.5 or 2.75/2.25 quarter lines
+        // Build complete overUnderFamily dictionary across all quoted lines
+        const ouFamily: Record<number, { available: boolean; line: number; overOdds?: number | null; underOdds?: number | null }> = {};
+        for (const r of ouRecords) {
+          if (typeof r.line === 'number') {
+            if (!ouFamily[r.line]) {
+              ouFamily[r.line] = { available: true, line: r.line, overOdds: null, underOdds: null };
+            }
+            if (r.selection.toLowerCase().includes('over')) {
+              ouFamily[r.line].overOdds = r.overOdds ?? r.oddsDecimal;
+            } else if (r.selection.toLowerCase().includes('under')) {
+              ouFamily[r.line].underOdds = r.underOdds ?? r.oddsDecimal;
+            }
+          }
+        }
+        (fixture.markets as any).overUnderFamily = ouFamily;
+
+        // Default primary to 2.5 or first quoted line
         const line25 = ouRecords.find((r) => r.line === 2.5) || ouRecords[0];
         const overRecord = ouRecords.find((r) => r.line === line25.line && r.selection.toLowerCase().includes('over'));
         const underRecord = ouRecords.find((r) => r.line === line25.line && r.selection.toLowerCase().includes('under'));

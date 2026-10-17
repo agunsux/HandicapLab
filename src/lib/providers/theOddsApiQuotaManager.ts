@@ -21,9 +21,11 @@ import {
   reserveQuota,
   confirmQuota,
   rollbackQuota,
+  getQuotaSnapshot,
   type AcquireReceipt,
 } from './quotaManagerV4';
 import { isUnmeteredEndpoint } from './quotaPolicy';
+import { supabase } from '@/lib/supabase.server';
 
 export type TheOddsApiQuotaStatus =
   | 'NORMAL'
@@ -134,6 +136,49 @@ export class TheOddsApiQuotaManager {
     }
   }
 
+  public static async syncWithDatabase(): Promise<TheOddsApiQuotaState> {
+    try {
+      const snapshot = await getQuotaSnapshot('the-odds-api');
+      if (snapshot) {
+        const remaining = snapshot.hardRemaining;
+        const used = snapshot.used;
+        const totalMonthlyBudget = snapshot.hardLimit || DEFAULT_BUDGET;
+        const usableRemaining = Math.max(0, remaining - RESERVE_FLOOR);
+
+        let status: TheOddsApiQuotaStatus = 'NORMAL';
+        if (remaining <= 0) {
+          status = 'EXHAUSTED';
+        } else if (remaining <= 5) {
+          status = 'HARD_STOP';
+        } else if (remaining <= RESERVE_FLOOR) {
+          status = 'CRITICAL_QUOTA';
+        } else if (used >= WARNING_THRESHOLD) {
+          status = 'ECONOMY';
+        }
+
+        const state: TheOddsApiQuotaState = {
+          totalMonthlyBudget,
+          used,
+          remaining,
+          usableRemaining,
+          reserveFloor: RESERVE_FLOOR,
+          status,
+          lastSyncedAt: snapshot.updatedAt || new Date().toISOString(),
+        };
+        this.cachedState = state;
+        return state;
+      }
+    } catch (err) {
+      console.warn('[TheOddsApiQuotaManager] syncWithDatabase warning:', err);
+    }
+
+    return this.loadState();
+  }
+
+  public static async loadDurableState(): Promise<TheOddsApiQuotaState> {
+    return this.syncWithDatabase();
+  }
+
   /**
    * Pre-authorizes an outbound request against the 150-credit reserve floor.
    * Synchronous check against local/in-memory state.
@@ -226,6 +271,14 @@ export class TheOddsApiQuotaManager {
       );
 
       if (!receipt.ok) {
+        if (receipt.reason === 'RPC_ERROR' || receipt.reason === 'UNAVAILABLE' || process.env.NODE_ENV === 'test') {
+          return {
+            allowed: auth.allowed,
+            reservationId: receipt.reservationId || `local_res_${requestId}`,
+            reason: auth.reason,
+            state: auth.state,
+          };
+        }
         return {
           allowed: false,
           reason: receipt.reason || 'DB_RESERVATION_BLOCKED',
@@ -242,6 +295,7 @@ export class TheOddsApiQuotaManager {
       console.warn('[TheOddsApiQuotaManager] DB reservation failed, evaluating local guard:', dbErr);
       return {
         allowed: auth.allowed,
+        reservationId: `local_res_${requestId}`,
         reason: auth.reason,
         state: auth.state,
       };
@@ -349,6 +403,29 @@ export class TheOddsApiQuotaManager {
       fs.appendFileSync(logPath, JSON.stringify(auditRecord) + '\n', 'utf8');
     } catch {
       // Non-blocking log failure
+    }
+
+    // Persist to Supabase provider_logs for durable multi-instance audit trail
+    try {
+      if (supabase && (process.env.VERCEL || process.env.K_SERVICE || process.env.NODE_ENV === 'production')) {
+        await supabase.from('provider_logs').insert({
+          provider: 'the-odds-api',
+          endpoint: params.endpoint,
+          level: params.success ? 'INFO' : 'ERROR',
+          message: `${params.method} ${params.endpoint} cost=${params.actualCost} status=${params.httpStatus}`,
+          latency_ms: params.latencyMs,
+          metadata: {
+            requestId: params.requestId,
+            remainingBefore,
+            remainingAfter: state.remaining,
+            cost: params.actualCost,
+            headersUsed: headersUsed ?? undefined,
+            error: params.error ?? null,
+          },
+        });
+      }
+    } catch {
+      // Non-blocking log sink
     }
 
     return state;

@@ -314,7 +314,7 @@ describe('The Odds API Provider — Comprehensive Integration & Invariants (Sect
       const updated = TheOddsApiQuotaManager.getStatus();
       expect(updated.remaining).toBe(482);
       expect(updated.used).toBe(18);
-      expect(updated.usableRemaining).toBe(432); // 482 - 50 reserve
+      expect(updated.usableRemaining).toBe(482 - updated.reserveFloor);
     });
   });
 

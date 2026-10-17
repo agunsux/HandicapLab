@@ -177,13 +177,30 @@ export class CanonicalOrchestrator {
 
       if (error || !allRatings || allRatings.length === 0) {
         // Fallback: Query matches table for finished matches prior to prediction timestamp
-        const { data: dbMatches } = await supabase
-          .from('matches')
-          .select('home_team, away_team, home_goals, away_goals, league, kickoff')
-          .eq('status', 'finished')
-          .lt('kickoff', predictionTimestampUtc)
-          .order('kickoff', { ascending: false })
-          .limit(100);
+        let dbMatches: any[] | null = null;
+        if (league) {
+          const { data: leagueMatches } = await supabase
+            .from('matches')
+            .select('home_team, away_team, home_goals, away_goals, league, kickoff')
+            .eq('status', 'finished')
+            .or(`league.ilike.%${league}%,league.eq.39`)
+            .lt('kickoff', predictionTimestampUtc)
+            .order('kickoff', { ascending: false })
+            .limit(500);
+          if (leagueMatches && leagueMatches.length >= 20) {
+            dbMatches = leagueMatches;
+          }
+        }
+        if (!dbMatches || dbMatches.length === 0) {
+          const { data: generalMatches } = await supabase
+            .from('matches')
+            .select('home_team, away_team, home_goals, away_goals, league, kickoff')
+            .eq('status', 'finished')
+            .lt('kickoff', predictionTimestampUtc)
+            .order('kickoff', { ascending: false })
+            .limit(500);
+          dbMatches = generalMatches;
+        }
 
         if (dbMatches && dbMatches.length > 0) {
           const computed = calculateTeamRatings(dbMatches as MatchData[]);

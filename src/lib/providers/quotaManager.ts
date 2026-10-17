@@ -48,6 +48,11 @@ export const API_COST_REGISTRY: EndpointCost[] = [
   { provider: 'thestatsapi', endpoint: 'fixtures',        cost: 1 },
   { provider: 'thestatsapi', endpoint: 'standings',       cost: 1 },
   { provider: 'thestatsapi', endpoint: 'health',          cost: 1 },
+  // The Odds API v4 (verified: sports, events, health = 0 credits, odds = 2 credits)
+  { provider: 'the-odds-api', endpoint: 'sports',         cost: 0 },
+  { provider: 'the-odds-api', endpoint: 'events',         cost: 0 },
+  { provider: 'the-odds-api', endpoint: 'health',         cost: 0 },
+  { provider: 'the-odds-api', endpoint: 'odds',           cost: 2 },
 ];
 
 function getCost(provider: Provider, endpoint: string): number {

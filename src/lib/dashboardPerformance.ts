@@ -82,7 +82,7 @@ export async function getDashboardPerformance(): Promise<UserDashboardPerformanc
 
     if (!error && dbSettled && dbSettled.length > 0) {
       for (const row of dbSettled) {
-        if (allSettled.some((s) => s.id === row.id)) continue;
+        if (row.rejection_reason || allSettled.some((s) => s.id === row.id)) continue;
 
         const mType = (row.market_type || '').toUpperCase();
         if (mType === 'ASIAN_HANDICAP' || mType === 'OVER_UNDER' || mType === 'BTTS') {

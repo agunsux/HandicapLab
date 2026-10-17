@@ -44,7 +44,9 @@ export async function GET(request: Request) {
     const { data, error } = await query;
     if (error) throw error;
 
-    const rows = (data || []).map((row: any, index: number) => {
+    const validRows = (data || []).filter((row: any) => !row.rejection_reason && row.verdict !== 'LEWATI');
+
+    const rows = validRows.map((row: any, index: number) => {
       const isLocked = !isPro && index >= FREE_VISIBLE_SIGNALS;
       const p = row.model_probability !== null && row.model_probability !== undefined ? Number(row.model_probability) : 0.5;
       const odds = row.market_odds !== null && row.market_odds !== undefined ? Number(row.market_odds) : null;

@@ -72,7 +72,9 @@ export async function GET() {
       .limit(100);
 
     if (!error && data && data.length > 0) {
-      predictions = data.map((p) => ({
+      predictions = data
+        .filter((p) => !p.rejection_reason && p.verdict !== 'LEWATI')
+        .map((p) => ({
         id: p.id,
         fixture_id: p.fixture_id,
         league_id: p.league_id,

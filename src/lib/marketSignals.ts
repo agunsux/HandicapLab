@@ -56,6 +56,7 @@ export async function getMarketSignals(
 
     if (!error && dbPicks && dbPicks.length > 0) {
       for (const p of dbPicks) {
+        if (p.rejection_reason || p.verdict === 'LEWATI') continue;
         if (signals.some((s) => s.id === p.id || s.fixtureId === p.fixture_id)) continue;
 
         // Gate validation: Reject expired or invalid predictions

@@ -359,6 +359,12 @@ export class DailyPicksEngine {
   ): Promise<OddsRetrievalResult> {
     const bookmakersRequested = [...CONSUMED_BOOKMAKERS];
 
+    const isOddsPapiPaused = process.env.ODDSPAPI_PAUSED === 'true';
+    if (isOddsPapiPaused) {
+      console.log('[DailyPicksEngine] OddsPAPI is explicitly PAUSED (ODDSPAPI_PAUSED=true); engaging The Odds API fallback.');
+      return await DailyPicksEngine.fallbackToTheOddsApi(targetFixtures);
+    }
+
     try {
       let tournamentIds: number[] = [];
       let discoveredFixtures = 0;
@@ -376,6 +382,10 @@ export class DailyPicksEngine {
         discoveryCalls = index.meteredCalls;
 
         if (index.status !== 'READY') {
+          console.warn('[DailyPicksEngine] OddsPapi fixture discovery failed; attempting The Odds API fallback.');
+          const fallback = await DailyPicksEngine.fallbackToTheOddsApi(targetFixtures);
+          if (fallback.ok) return fallback;
+
           return {
             ok: false,
             fixtures: [],
@@ -394,6 +404,10 @@ export class DailyPicksEngine {
       }
 
       if (tournamentIds.length === 0) {
+        console.warn('[DailyPicksEngine] No OddsPapi tournament IDs resolvable; attempting The Odds API fallback.');
+        const fallback = await DailyPicksEngine.fallbackToTheOddsApi(targetFixtures);
+        if (fallback.ok) return fallback;
+
         return {
           ok: false,
           fixtures: [],
@@ -412,6 +426,10 @@ export class DailyPicksEngine {
       const fixtures = getBatchedFixtures();
 
       if (batch.status !== 'READY' || fixtures.length === 0) {
+        console.warn('[DailyPicksEngine] OddsPapi batch failed or returned 0 fixtures; attempting The Odds API fallback.');
+        const fallback = await DailyPicksEngine.fallbackToTheOddsApi(targetFixtures);
+        if (fallback.ok) return fallback;
+
         return {
           ok: false,
           fixtures,
@@ -436,7 +454,10 @@ export class DailyPicksEngine {
       };
     } catch (err: any) {
       const message = err?.message || String(err);
-      console.error('[DailyPicksEngine] OddsPapi retrieval error:', message);
+      console.error('[DailyPicksEngine] OddsPapi retrieval error:', message, '; attempting The Odds API fallback.');
+      const fallback = await DailyPicksEngine.fallbackToTheOddsApi(targetFixtures);
+      if (fallback.ok) return fallback;
+
       return {
         ok: false,
         fixtures: [],
@@ -447,6 +468,153 @@ export class DailyPicksEngine {
         meteredCalls: 0,
         error: message,
         errorCode: err?.name ?? 'RETRIEVAL_ERROR',
+      };
+    }
+  }
+
+  /**
+   * Safe Fallback: Retrieves EPL odds from The Odds API and transforms into the
+   * canonical batch fixture structure consumed by DailyPicksEngine and callers.
+   */
+  public static async fallbackToTheOddsApi(
+    targetFixtures?: Array<Pick<CanonicalFixture, 'homeTeam' | 'awayTeam' | 'kickoffUtc'>>
+  ): Promise<OddsRetrievalResult> {
+    const { hasOddsApiKey } = await import('@/lib/providers/providerKey');
+    if (!hasOddsApiKey()) {
+      return {
+        ok: false,
+        fixtures: [],
+        tournamentIds: [],
+        bookmakersRequested: ['pinnacle'],
+        bookmakersWithData: [],
+        discoveredFixtures: 0,
+        meteredCalls: 0,
+        error: 'The Odds API key is not configured in environment',
+        errorCode: 'ODDS_API_KEY_MISSING',
+      };
+    }
+
+    try {
+      const { TheOddsApiProvider } = await import('@/lib/providers/theOddsApiProvider');
+      const toaResult = await TheOddsApiProvider.getOdds('soccer_epl', {
+        regions: 'eu',
+        markets: 'spreads,totals',
+        priority: 90,
+      });
+
+      if (!toaResult.success || !toaResult.records || toaResult.records.length === 0) {
+        return {
+          ok: false,
+          fixtures: [],
+          tournamentIds: [],
+          bookmakersRequested: ['pinnacle'],
+          bookmakersWithData: [],
+          discoveredFixtures: 0,
+          meteredCalls: 0,
+          error: toaResult.error ?? 'The Odds API returned 0 records',
+          errorCode: 'FALLBACK_EMPTY',
+        };
+      }
+
+      // Group records into synthetic OddsPapi-shaped fixtures
+      const eventMap = new Map<string, any>();
+      for (const rec of toaResult.records) {
+        const evtKey = rec.providerMatchId || `${rec.homeTeam}_${rec.awayTeam}`;
+        if (!eventMap.has(evtKey)) {
+          eventMap.set(evtKey, {
+            fixtureId: rec.canonicalMatchId || rec.providerMatchId,
+            startTime: rec.kickoffUtc,
+            participant1Name: rec.homeTeam,
+            participant2Name: rec.awayTeam,
+            participant1Id: rec.homeTeam,
+            participant2Id: rec.awayTeam,
+            bookmakerOdds: {
+              pinnacle: {
+                markets: {},
+              },
+            },
+          });
+        }
+
+        const fixObj = eventMap.get(evtKey)!;
+        const pinMarkets = fixObj.bookmakerOdds.pinnacle.markets;
+
+        // Asian Handicap (AH)
+        if (rec.market === 'AH' && rec.bookmaker.toLowerCase() === 'pinnacle') {
+          const mktKey = rec.line === 0 ? '1072' : '1070';
+          const outHome = rec.line === 0 ? '1072' : '1070';
+          const outAway = rec.line === 0 ? '1073' : '1071';
+          if (!pinMarkets[mktKey]) pinMarkets[mktKey] = { outcomes: {} };
+          if (rec.selection === 'HOME') {
+            pinMarkets[mktKey].outcomes[outHome] = { players: { '0': { price: rec.oddsDecimal, changedAt: rec.providerTimestamp } } };
+          } else if (rec.selection === 'AWAY') {
+            pinMarkets[mktKey].outcomes[outAway] = { players: { '0': { price: rec.oddsDecimal, changedAt: rec.providerTimestamp } } };
+          }
+        }
+
+        // Over / Under (OU)
+        if (rec.market === 'OU' && rec.bookmaker.toLowerCase() === 'pinnacle' && rec.line === 2.5) {
+          if (!pinMarkets['1010']) pinMarkets['1010'] = { outcomes: {} };
+          if (rec.selection.toLowerCase().includes('over')) {
+            pinMarkets['1010'].outcomes['1010'] = { players: { '0': { price: rec.oddsDecimal, changedAt: rec.providerTimestamp } } };
+          } else if (rec.selection.toLowerCase().includes('under')) {
+            pinMarkets['1010'].outcomes['1012'] = { players: { '0': { price: rec.oddsDecimal, changedAt: rec.providerTimestamp } } };
+          }
+        }
+      }
+
+      // Fallback to other sharp books if Pinnacle not quoted
+      for (const rec of toaResult.records) {
+        const evtKey = rec.providerMatchId || `${rec.homeTeam}_${rec.awayTeam}`;
+        const fixObj = eventMap.get(evtKey);
+        if (!fixObj) continue;
+        const pinMarkets = fixObj.bookmakerOdds.pinnacle.markets;
+
+        if (rec.market === 'AH' && !pinMarkets['1070']?.outcomes?.['1070'] && !pinMarkets['1072']?.outcomes?.['1072']) {
+          const mktKey = rec.line === 0 ? '1072' : '1070';
+          const outHome = rec.line === 0 ? '1072' : '1070';
+          const outAway = rec.line === 0 ? '1073' : '1071';
+          if (!pinMarkets[mktKey]) pinMarkets[mktKey] = { outcomes: {} };
+          if (rec.selection === 'HOME') {
+            pinMarkets[mktKey].outcomes[outHome] = { players: { '0': { price: rec.oddsDecimal, changedAt: rec.providerTimestamp } } };
+          } else if (rec.selection === 'AWAY') {
+            pinMarkets[mktKey].outcomes[outAway] = { players: { '0': { price: rec.oddsDecimal, changedAt: rec.providerTimestamp } } };
+          }
+        }
+
+        if (rec.market === 'OU' && rec.line === 2.5 && !pinMarkets['1010']?.outcomes?.['1010']) {
+          if (!pinMarkets['1010']) pinMarkets['1010'] = { outcomes: {} };
+          if (rec.selection.toLowerCase().includes('over')) {
+            pinMarkets['1010'].outcomes['1010'] = { players: { '0': { price: rec.oddsDecimal, changedAt: rec.providerTimestamp } } };
+          } else if (rec.selection.toLowerCase().includes('under')) {
+            pinMarkets['1010'].outcomes['1012'] = { players: { '0': { price: rec.oddsDecimal, changedAt: rec.providerTimestamp } } };
+          }
+        }
+      }
+
+      const fixtures = Array.from(eventMap.values());
+      const sharpBooks = [...new Set(toaResult.records.map((r) => r.bookmaker))];
+
+      return {
+        ok: fixtures.length > 0,
+        fixtures,
+        tournamentIds: [39],
+        bookmakersRequested: ['pinnacle'],
+        bookmakersWithData: sharpBooks,
+        discoveredFixtures: fixtures.length,
+        meteredCalls: 1,
+      };
+    } catch (err: any) {
+      return {
+        ok: false,
+        fixtures: [],
+        tournamentIds: [],
+        bookmakersRequested: ['pinnacle'],
+        bookmakersWithData: [],
+        discoveredFixtures: 0,
+        meteredCalls: 0,
+        error: err.message || String(err),
+        errorCode: 'FALLBACK_EXCEPTION',
       };
     }
   }

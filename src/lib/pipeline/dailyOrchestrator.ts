@@ -41,6 +41,7 @@ import {
   buildScoreGrid,
   calculateAsianHandicapProbability,
   calculateOverUnderProbability,
+  calculateAsianTotalProbability,
 } from '@/lib/engine/probability';
 import { calculateBttsFromGrid } from '@/lib/research/bttsEngine';
 import { VALID_ASIAN_TOTAL_LINES } from '@/lib/engine/asianTotalEngine';
@@ -271,6 +272,26 @@ export class DailyPipelineOrchestrator {
       if (options.customOdds) {
         rawOdds = options.customOdds;
         oddsSource = 'custom';
+      } else if (
+        options.customFixtures &&
+        options.customFixtures.some(
+          (f) =>
+            f.markets?.asianHandicap?.available ||
+            f.markets?.overUnder?.available ||
+            (f.markets as any)?.overUnderFamily
+        )
+      ) {
+        rawOdds = options.customFixtures;
+        oddsSource = 'custom';
+        oddsRetrieval = {
+          ok: true,
+          count: options.customFixtures.length,
+          meteredCalls: 0,
+          tournamentIds: [39],
+          bookmakersWithData: ['pinnacle'],
+          error: undefined,
+          errorCode: undefined,
+        };
       } else {
         const isOddsPapiPaused = process.env.ODDSPAPI_PAUSED === 'true';
         let oddsResult: any = {
@@ -463,9 +484,10 @@ export class DailyPipelineOrchestrator {
         let homeXg = 1.45;
         let awayXg = 1.15;
         let rho = -0.05;
-        let sampleSizeHome = 10;
-        let sampleSizeAway = 10;
-        let isModelSufficient = true;
+        let sampleSizeHome = 0;
+        let sampleSizeAway = 0;
+        let isModelSufficient = false;
+        let isStaticFallback = true;
 
         try {
           const ratings = await CanonicalOrchestrator.resolveTeamRatings(
@@ -474,7 +496,13 @@ export class DailyPipelineOrchestrator {
             competitionName,
             predictionTimestampUtc
           );
-          if (ratings.isSufficient && ratings.homeRating && ratings.awayRating) {
+          if (
+            ratings.isSufficient &&
+            ratings.homeRating &&
+            ratings.awayRating &&
+            (ratings.homeRating.matches_played || 0) >= ConfidenceGateSystem.MIN_SAMPLE_SIZE &&
+            (ratings.awayRating.matches_played || 0) >= ConfidenceGateSystem.MIN_SAMPLE_SIZE
+          ) {
             const profile = CompetitionProfileEngine.getProfileForLeague(competitionName);
             const leagueAvgGoals = profile.goalEnvironment || 2.65;
             const homeBase = leagueAvgGoals * 0.55;
@@ -494,9 +522,10 @@ export class DailyPipelineOrchestrator {
             sampleSizeHome = ratings.homeRating.matches_played;
             sampleSizeAway = ratings.awayRating.matches_played;
             isModelSufficient = true;
+            isStaticFallback = false;
           }
         } catch {
-          // Use safe default parameters
+          // Dynamic ratings failed or suspended; static fallback remains active with isStaticFallback = true, isModelSufficient = false
         }
 
         const scoreGrid = buildScoreGrid(homeXg, awayXg, rho);
@@ -533,7 +562,16 @@ export class DailyPipelineOrchestrator {
             sampleSizeHome,
             sampleSizeAway,
             modelValidated: isModelSufficient,
+            isStaticFallback,
+            dataWarnings: isStaticFallback ? ['STATIC_FALLBACK_XG_ACTIVE', 'INSUFFICIENT_TEAM_RATINGS'] : undefined,
             runId,
+            outcomeProbabilities: {
+              win: ahProb.win,
+              halfWin: ahProb.halfWin,
+              push: ahProb.push,
+              halfLoss: ahProb.halfLoss,
+              loss: ahProb.loss,
+            },
           });
 
           countAh++;
@@ -605,6 +643,8 @@ export class DailyPipelineOrchestrator {
             sampleSizeHome,
             sampleSizeAway,
             modelValidated: false, // Underperforming Pinnacle benchmark!
+            isStaticFallback,
+            dataWarnings: isStaticFallback ? ['STATIC_FALLBACK_XG_ACTIVE', 'INSUFFICIENT_TEAM_RATINGS'] : undefined,
             runId,
           });
 
@@ -649,19 +689,34 @@ export class DailyPipelineOrchestrator {
         }
 
         // ─── 8. OVER / UNDER (OU) MULTI-LINE FAMILY PREDICTIONS ───
-        // Invariant: OU is a line family: 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0.
+        // Invariant: OU is a dynamic line family (whole e.g. 2.0, 3.0; half e.g. 1.5, 2.5; quarter e.g. 2.25, 2.75).
         const ouMarket = fixture.markets?.overUnder;
-        const eligibleOuLines = [1.5, 2.0, 2.5, 3.0, 3.5];
+        const familyMap = (fixture.markets as any)?.overUnderFamily || {};
+        const familyLines = Object.keys(familyMap).map(Number).filter((n) => !isNaN(n));
+
+        const lineSet = new Set<number>();
+        for (const l of familyLines) {
+          lineSet.add(l);
+        }
+        if (typeof ouMarket?.line === 'number') {
+          lineSet.add(ouMarket.line);
+        }
+        for (const bl of [1.5, 2.0, 2.5, 3.0, 3.5]) {
+          lineSet.add(bl);
+        }
+        const eligibleOuLines = Array.from(lineSet).sort((a, b) => a - b);
 
         for (const line of eligibleOuLines) {
-          const ouProb = calculateOverUnderProbability(homeXg, awayXg, line, rho);
+          const totalProb = calculateAsianTotalProbability(homeXg, awayXg, line, true, rho);
           const selection = `Over ${line}`;
+          const familyQuote = familyMap[line];
+          const primaryQuote = ouMarket?.line === line ? ouMarket : null;
+          const lineQuote = familyQuote || primaryQuote;
           const hasQuote =
-            Boolean(ouMarket?.available) &&
-            ouMarket?.line === line &&
-            typeof ouMarket?.overOdds === 'number' &&
-            ouMarket.overOdds > 1.0;
-          const currentOdds: number | null = hasQuote ? ouMarket!.overOdds! : null;
+            Boolean(lineQuote?.available) &&
+            typeof lineQuote?.overOdds === 'number' &&
+            lineQuote.overOdds > 1.0;
+          const currentOdds: number | null = hasQuote ? lineQuote!.overOdds! : null;
 
           const gateResult = ConfidenceGateSystem.evaluate({
             canonicalMatchId: fixtureId,
@@ -675,15 +730,24 @@ export class DailyPipelineOrchestrator {
             selection,
             line,
             odds: currentOdds,
-            modelProbability: ouProb.over,
-            calibratedProbability: ouProb.over,
+            modelProbability: totalProb.cover,
+            calibratedProbability: totalProb.cover,
             predictionTimestampUtc,
             oddsTimestampUtc,
             modelVersion: 'dixon-coles-v1.0',
             sampleSizeHome,
             sampleSizeAway,
             modelValidated: isModelSufficient,
+            isStaticFallback,
+            dataWarnings: isStaticFallback ? ['STATIC_FALLBACK_XG_ACTIVE', 'INSUFFICIENT_TEAM_RATINGS'] : undefined,
             runId,
+            outcomeProbabilities: {
+              win: totalProb.win,
+              halfWin: totalProb.halfWin,
+              push: totalProb.push,
+              halfLoss: totalProb.halfLoss,
+              loss: totalProb.loss,
+            },
           });
 
           countOu++;

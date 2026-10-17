@@ -80,6 +80,21 @@ export class DistributedCronLease {
   public static readonly DEFAULT_TTL_MS = 5 * 60 * 1000; // 5 minutes default TTL
   private static readonly BUCKET_NAME = process.env.GCS_LEDGER_BUCKET || 'handicap-salmo-ledger';
 
+  public static clearForTesting(): void {
+    const dir = getLeaseDir();
+    if (fs.existsSync(dir)) {
+      try {
+        fs.rmSync(dir, { recursive: true, force: true });
+      } catch {}
+    }
+    const fallbackDir = path.join(os.tmpdir(), 'cron_leases');
+    if (fs.existsSync(fallbackDir)) {
+      try {
+        fs.rmSync(fallbackDir, { recursive: true, force: true });
+      } catch {}
+    }
+  }
+
   public static getLeaseDirectory(): string {
     return getLeaseDir();
   }

@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
     // Filter valid fixtures through the League Registry to ensure they belong to active/supported leagues
     const validLeagues = LEAGUE_REGISTRY.filter(l => l.status === 'ACTIVE' || l.status === 'BETA').map(l => l.name.toLowerCase());
     
-    let filteredPicks = picks.filter(p => validLeagues.includes((p.league || '').toLowerCase()));
+    let filteredPicks = picks.filter(p => !p.rejection_reason && p.verdict !== 'LEWATI' && validLeagues.includes((p.league || '').toLowerCase()));
 
     // Map daily_picks back to ValueRecommendationRecord interface
     let recommendations = filteredPicks.map(p => {

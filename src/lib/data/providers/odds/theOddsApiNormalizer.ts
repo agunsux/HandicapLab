@@ -147,56 +147,60 @@ export class TheOddsApiNormalizer {
             (o) => o.name === event.away_team || o.name.toLowerCase() === 'away'
           );
 
-          if (homeOutcome && homeOutcome.price > 1.0) {
+          if (homeOutcome && typeof homeOutcome.price === 'number' && Number.isFinite(homeOutcome.price) && homeOutcome.price > 1.0) {
             const line = homeOutcome.point !== undefined ? Number(homeOutcome.point) : 0;
-            const lineType = classifyLineType(line);
-            results.push({
-              recordId: `toa_ah_${event.id}_${bookmaker.key}_H_${line}`,
-              canonicalMatchId,
-              providerMatchId: event.id,
-              provider: 'the-odds-api',
-              sportKey: event.sport_key,
-              homeTeam: event.home_team,
-              awayTeam: event.away_team,
-              kickoffUtc: event.commence_time,
-              bookmaker: bookmaker.key,
-              market: 'AH',
-              line,
-              lineType,
-              selection: 'HOME',
-              oddsDecimal: homeOutcome.price,
-              homeOdds: homeOutcome.price,
-              awayOdds: awayOutcome?.price,
-              providerTimestamp: marketTime,
-              capturedAtUtc,
-              isResolvedMatch: isResolved,
-            });
+            if (Number.isFinite(line)) {
+              const lineType = classifyLineType(line);
+              results.push({
+                recordId: `toa_ah_${event.id}_${bookmaker.key}_H_${line}`,
+                canonicalMatchId,
+                providerMatchId: event.id,
+                provider: 'the-odds-api',
+                sportKey: event.sport_key,
+                homeTeam: event.home_team,
+                awayTeam: event.away_team,
+                kickoffUtc: event.commence_time,
+                bookmaker: bookmaker.key,
+                market: 'AH',
+                line,
+                lineType,
+                selection: 'HOME',
+                oddsDecimal: homeOutcome.price,
+                homeOdds: homeOutcome.price,
+                awayOdds: (awayOutcome && Number.isFinite(awayOutcome.price) && awayOutcome.price > 1.0) ? awayOutcome.price : undefined,
+                providerTimestamp: marketTime,
+                capturedAtUtc,
+                isResolvedMatch: isResolved,
+              });
+            }
           }
 
-          if (awayOutcome && awayOutcome.price > 1.0) {
+          if (awayOutcome && typeof awayOutcome.price === 'number' && Number.isFinite(awayOutcome.price) && awayOutcome.price > 1.0) {
             const line = awayOutcome.point !== undefined ? Number(awayOutcome.point) : 0;
-            const lineType = classifyLineType(line);
-            results.push({
-              recordId: `toa_ah_${event.id}_${bookmaker.key}_A_${line}`,
-              canonicalMatchId,
-              providerMatchId: event.id,
-              provider: 'the-odds-api',
-              sportKey: event.sport_key,
-              homeTeam: event.home_team,
-              awayTeam: event.away_team,
-              kickoffUtc: event.commence_time,
-              bookmaker: bookmaker.key,
-              market: 'AH',
-              line,
-              lineType,
-              selection: 'AWAY',
-              oddsDecimal: awayOutcome.price,
-              homeOdds: homeOutcome?.price,
-              awayOdds: awayOutcome.price,
-              providerTimestamp: marketTime,
-              capturedAtUtc,
-              isResolvedMatch: isResolved,
-            });
+            if (Number.isFinite(line)) {
+              const lineType = classifyLineType(line);
+              results.push({
+                recordId: `toa_ah_${event.id}_${bookmaker.key}_A_${line}`,
+                canonicalMatchId,
+                providerMatchId: event.id,
+                provider: 'the-odds-api',
+                sportKey: event.sport_key,
+                homeTeam: event.home_team,
+                awayTeam: event.away_team,
+                kickoffUtc: event.commence_time,
+                bookmaker: bookmaker.key,
+                market: 'AH',
+                line,
+                lineType,
+                selection: 'AWAY',
+                oddsDecimal: awayOutcome.price,
+                homeOdds: (homeOutcome && Number.isFinite(homeOutcome.price) && homeOutcome.price > 1.0) ? homeOutcome.price : undefined,
+                awayOdds: awayOutcome.price,
+                providerTimestamp: marketTime,
+                capturedAtUtc,
+                isResolvedMatch: isResolved,
+              });
+            }
           }
         }
 
@@ -208,15 +212,19 @@ export class TheOddsApiNormalizer {
 
           for (const outcome of market.outcomes) {
             const point = outcome.point !== undefined ? Number(outcome.point) : 2.5;
+            if (!Number.isFinite(point)) continue;
             if (!outcomesByPoint.has(point)) {
               outcomesByPoint.set(point, {});
             }
             const group = outcomesByPoint.get(point)!;
-            const nameLower = outcome.name.toLowerCase();
-            if (nameLower.includes('over')) {
-              group.over = outcome.price;
-            } else if (nameLower.includes('under')) {
-              group.under = outcome.price;
+            const nameLower = (outcome.name || '').toLowerCase();
+            const price = typeof outcome.price === 'number' && Number.isFinite(outcome.price) && outcome.price > 1.0 ? outcome.price : undefined;
+            if (price !== undefined) {
+              if (nameLower.includes('over')) {
+                group.over = price;
+              } else if (nameLower.includes('under')) {
+                group.under = price;
+              }
             }
           }
 
@@ -276,13 +284,16 @@ export class TheOddsApiNormalizer {
         // 3. Both Teams To Score (BTTS)
         else if (marketKey === 'btts') {
           const yesOutcome = market.outcomes.find(
-            (o) => o.name.toLowerCase() === 'yes'
+            (o) => (o.name || '').toLowerCase() === 'yes'
           );
           const noOutcome = market.outcomes.find(
-            (o) => o.name.toLowerCase() === 'no'
+            (o) => (o.name || '').toLowerCase() === 'no'
           );
 
-          if (yesOutcome && yesOutcome.price > 1.0) {
+          const yesPrice = yesOutcome && typeof yesOutcome.price === 'number' && Number.isFinite(yesOutcome.price) && yesOutcome.price > 1.0 ? yesOutcome.price : undefined;
+          const noPrice = noOutcome && typeof noOutcome.price === 'number' && Number.isFinite(noOutcome.price) && noOutcome.price > 1.0 ? noOutcome.price : undefined;
+
+          if (yesPrice !== undefined) {
             results.push({
               recordId: `toa_btts_${event.id}_${bookmaker.key}_yes`,
               canonicalMatchId,
@@ -297,16 +308,16 @@ export class TheOddsApiNormalizer {
               line: null,
               lineType: 'NONE',
               selection: 'Yes',
-              oddsDecimal: yesOutcome.price,
-              yesOdds: yesOutcome.price,
-              noOdds: noOutcome?.price,
+              oddsDecimal: yesPrice,
+              yesOdds: yesPrice,
+              noOdds: noPrice,
               providerTimestamp: marketTime,
               capturedAtUtc,
               isResolvedMatch: isResolved,
             });
           }
 
-          if (noOutcome && noOutcome.price > 1.0) {
+          if (noPrice !== undefined) {
             results.push({
               recordId: `toa_btts_${event.id}_${bookmaker.key}_no`,
               canonicalMatchId,
@@ -321,9 +332,9 @@ export class TheOddsApiNormalizer {
               line: null,
               lineType: 'NONE',
               selection: 'No',
-              oddsDecimal: noOutcome.price,
-              yesOdds: yesOutcome?.price,
-              noOdds: noOutcome.price,
+              oddsDecimal: noPrice,
+              yesOdds: yesPrice,
+              noOdds: noPrice,
               providerTimestamp: marketTime,
               capturedAtUtc,
               isResolvedMatch: isResolved,

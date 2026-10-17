@@ -412,6 +412,17 @@ export function toDailyPicksRow(
     status: rec.status,
   });
 
+  let rejectionReason: string | null = null;
+  if (rec.status === 'INSUFFICIENT_MODEL') {
+    rejectionReason = 'INSUFFICIENT_MODEL: Static fallback xG or insufficient sample';
+  } else if (rec.status === 'AWAITING_ODDS') {
+    rejectionReason = 'AWAITING_ODDS: Missing market odds quote';
+  } else if (rec.status === 'RESEARCH_ONLY') {
+    rejectionReason = 'RESEARCH_ONLY: Market benchmark gated';
+  } else if (rec.confidence === 'PASS') {
+    rejectionReason = 'UNQUALIFIED: Gate thresholds not met';
+  }
+
   return {
     fixture_id: fixtureId,
     league: rec.competition ?? null,
@@ -429,6 +440,7 @@ export function toDailyPicksRow(
     verdict: toDailyPicksVerdict(rec.confidence),
     reasoning,
     status: DURABLE_INITIAL_STATUS,
+    rejection_reason: rejectionReason,
     clv: null,
     source: DURABLE_DAILY_PICKS_SOURCE,
     data_age_ms: dataAgeMs,
