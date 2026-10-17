@@ -2,7 +2,7 @@ import React from 'react';
 import * as fs from 'fs';
 import * as path from 'path';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
 
 interface DiscoverySummary {
   discoveryTimestamp: string;

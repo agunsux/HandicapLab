@@ -1,8 +1,8 @@
 import React from 'react';
-import { getDashboardPerformance } from '@/lib/dashboardPerformance';
+import { getDashboardPerformance, EMPTY_DASHBOARD_PERFORMANCE } from '@/lib/dashboardPerformance';
 import { UserDashboardView } from '@/components/dashboard/UserDashboardView';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
 
 export const metadata = {
   title: 'Personal Performance Dashboard — HandicapLab',
@@ -10,7 +10,7 @@ export const metadata = {
 };
 
 export default async function MarketingDashboardPage() {
-  const perf = await getDashboardPerformance();
+  const perf = await getDashboardPerformance().catch(() => EMPTY_DASHBOARD_PERFORMANCE);
 
   return (
     <div className="flex flex-col min-h-screen bg-[#0B0F0E]">

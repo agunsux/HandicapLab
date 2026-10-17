@@ -4,7 +4,7 @@ import { ArrowLeft, Database, ShieldCheck, Clock } from 'lucide-react';
 import { BttsHistoryService } from '@/lib/services/bttsHistoryService';
 import { BttsHistoricalExplorer } from '@/components/btts/BttsHistoricalExplorer';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
 
 export const metadata = {
   title: 'BTTS Historical Odds Explorer (2026) — HandicapLab',

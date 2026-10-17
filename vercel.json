@@ -1,4 +1,10 @@
 {
   "framework": "nextjs",
-  "crons": []
+  "buildCommand": "npm run vercel-build",
+  "crons": [
+    {
+      "path": "/api/cron/rescue-pipeline",
+      "schedule": "0 7 * * *"
+    }
+  ]
 }

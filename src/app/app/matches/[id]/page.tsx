@@ -1,6 +1,12 @@
 import { MatchDetailView } from '@/components/terminal/MatchDetailView';
 import { DEMO_VALUE_BETS } from '@/app/app/_data/terminal';
 
+export const dynamic = 'force-static';
+
+export async function generateStaticParams() {
+  return DEMO_VALUE_BETS.map((b) => ({ id: b.id }));
+}
+
 interface PageProps {
   params: Promise<{ id: string }>;
 }

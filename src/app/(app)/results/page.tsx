@@ -1,4 +1,5 @@
 import { fetchSettledResults } from '@/lib/queries/results';
+import { ResultsFilter } from './ResultsFilter';
 
 function resultColor(r: string) {
   const low = r.toLowerCase();
@@ -8,6 +9,8 @@ function resultColor(r: string) {
   return 'text-slate-400';
 }
 
+export const dynamic = 'force-static';
+
 export default async function ResultsPage({
   searchParams,
 }: {
@@ -16,7 +19,7 @@ export default async function ResultsPage({
   const params = await (searchParams ?? Promise.resolve<{ league?: string; market?: string }>({}));
   const { league, market } = params;
 
-  const results = await fetchSettledResults({ league, market });
+  const results = await fetchSettledResults({ league, market }).catch(() => []);
 
   return (
     <div className="max-w-5xl mx-auto space-y-8">
@@ -25,33 +28,7 @@ export default async function ResultsPage({
           <h1 className="text-lg font-bold text-white font-mono uppercase tracking-widest">Results</h1>
           <p className="text-xs text-slate-500 font-mono mt-1">Settled predictions with verified outcomes</p>
         </div>
-        <form className="flex items-center gap-3">
-          <select
-            name="league"
-            className="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs font-mono text-slate-300"
-            defaultValue={league || ''}
-            onChange={(e) => e.target.form?.submit()}
-          >
-            <option value="">All Leagues</option>
-            <option value="English Premier League">EPL</option>
-            <option value="La Liga">La Liga</option>
-            <option value="Bundesliga">Bundesliga</option>
-            <option value="Serie A">Serie A</option>
-            <option value="Ligue 1">Ligue 1</option>
-          </select>
-          <select
-            name="market"
-            className="bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs font-mono text-slate-300"
-            defaultValue={market || ''}
-            onChange={(e) => e.target.form?.submit()}
-          >
-            <option value="">All Markets</option>
-            <option value="moneyline">Moneyline</option>
-            <option value="handicap">Asian Handicap</option>
-            <option value="over_under">Over/Under</option>
-            <option value="btts">BTTS</option>
-          </select>
-        </form>
+        <ResultsFilter defaultLeague={league} defaultMarket={market} />
       </div>
 
       {results.length === 0 ? (

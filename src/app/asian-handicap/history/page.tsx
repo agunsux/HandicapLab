@@ -4,7 +4,7 @@ import { ArrowLeft, Target, ShieldCheck, Database } from 'lucide-react';
 import { AhHistoryService } from '@/lib/services/ahHistoryService';
 import { AhHistoricalExplorer } from '@/components/ah/AhHistoricalExplorer';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
 
 export const metadata = {
   title: 'Historical Asian Handicap Explorer — HandicapLab / Salmo',

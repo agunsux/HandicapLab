@@ -44,68 +44,109 @@ const nextConfig: NextConfig = {
     ];
   },
   async rewrites() {
-    return [
+    const isVercel = Boolean(process.env.VERCEL);
+    const backendUrl =
+      process.env.CLOUD_RUN_BACKEND_URL ||
+      'https://handicaplab-production-129269713730.asia-southeast2.run.app';
+
+    const internalRewrites = [
       {
         source: '/api/cron/publishing-reconcile',
-        destination: '/api/cron/pipeline?mode=reconcile',
+        destination: isVercel
+          ? `${backendUrl}/api/cron/pipeline?mode=reconcile`
+          : '/api/cron/pipeline?mode=reconcile',
       },
       {
         source: '/api/cron/settle-predictions',
-        destination: '/api/cron/pipeline?mode=settle',
+        destination: isVercel
+          ? `${backendUrl}/api/cron/pipeline?mode=settle`
+          : '/api/cron/pipeline?mode=settle',
       },
       {
         source: '/api/performance/daily',
-        destination: '/api/performance?view=daily',
-      },
-      {
-        source: '/api/ledger/high-confidence',
-        destination: '/api/ledger/high-confidence',
-      },
-      {
-        source: '/api/cron/worldwide-scheduler',
-        destination: '/api/cron/pipeline',
-      },
-      {
-        source: '/api/ops/dashboard',
-        destination: '/api/cron/pipeline?mode=ops',
+        destination: isVercel
+          ? `${backendUrl}/api/performance?view=daily`
+          : '/api/performance?view=daily',
       },
       {
         source: '/api/quota',
-        destination: '/api/providers?view=quota',
+        destination: isVercel
+          ? `${backendUrl}/api/providers?view=quota`
+          : '/api/providers?view=quota',
       },
       {
         source: '/api/settlements',
-        destination: '/api/performance?view=settlements',
+        destination: isVercel
+          ? `${backendUrl}/api/performance?view=settlements`
+          : '/api/performance?view=settlements',
       },
       {
         source: '/api/performance/bookmakers',
-        destination: '/api/performance?view=bookmakers',
+        destination: isVercel
+          ? `${backendUrl}/api/performance?view=bookmakers`
+          : '/api/performance?view=bookmakers',
       },
       {
         source: '/api/performance/calibration',
-        destination: '/api/performance?view=calibration',
+        destination: isVercel
+          ? `${backendUrl}/api/performance?view=calibration`
+          : '/api/performance?view=calibration',
       },
       {
         source: '/api/performance/timeseries',
-        destination: '/api/performance?view=timeseries',
+        destination: isVercel
+          ? `${backendUrl}/api/performance?view=timeseries`
+          : '/api/performance?view=timeseries',
       },
       {
         source: '/api/performance/markets',
-        destination: '/api/performance?view=markets',
+        destination: isVercel
+          ? `${backendUrl}/api/performance?view=markets`
+          : '/api/performance?view=markets',
       },
       {
         source: '/api/performance/clv',
-        destination: '/api/performance?view=clv',
+        destination: isVercel
+          ? `${backendUrl}/api/performance?view=clv`
+          : '/api/performance?view=clv',
       },
       {
         source: '/api/performance/leagues',
-        destination: '/api/performance?view=leagues',
+        destination: isVercel
+          ? `${backendUrl}/api/performance?view=leagues`
+          : '/api/performance?view=leagues',
       },
       {
         source: '/api/performance/summary',
-        destination: '/api/performance?view=summary',
+        destination: isVercel
+          ? `${backendUrl}/api/performance?view=summary`
+          : '/api/performance?view=summary',
+      },
+      {
+        source: '/api/cron/worldwide-scheduler',
+        destination: isVercel
+          ? `${backendUrl}/api/cron/pipeline`
+          : '/api/cron/pipeline',
+      },
+      {
+        source: '/api/ops/dashboard',
+        destination: isVercel
+          ? `${backendUrl}/api/cron/pipeline?mode=ops`
+          : '/api/cron/pipeline?mode=ops',
       },
     ];
+
+    if (isVercel || process.env.PROXY_TO_CLOUD_RUN === 'true') {
+      return [
+        ...internalRewrites,
+        {
+          source: '/api/:path*',
+          destination: `${backendUrl}/api/:path*`,
+        },
+      ];
+    }
+
+    return internalRewrites;
   },
   async headers() {
     return [

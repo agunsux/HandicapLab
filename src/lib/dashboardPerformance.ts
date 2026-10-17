@@ -39,6 +39,53 @@ export interface UserDashboardPerformance {
   }>;
 }
 
+export const EMPTY_DASHBOARD_PERFORMANCE: UserDashboardPerformance = {
+  hasData: false,
+  totalBets: 0,
+  won: 0,
+  lost: 0,
+  pushes: 0,
+  winRate: 0,
+  yieldRoi: 0,
+  totalProfit: 0,
+  byMarket: {
+    asianHandicap: {
+      market: 'ASIAN_HANDICAP',
+      name: 'Asian Handicap',
+      bets: 0,
+      won: 0,
+      lost: 0,
+      pushes: 0,
+      winRate: 0,
+      yieldPct: 0,
+      totalProfit: 0,
+    },
+    overUnder: {
+      market: 'OVER_UNDER',
+      name: 'Over / Under',
+      bets: 0,
+      won: 0,
+      lost: 0,
+      pushes: 0,
+      winRate: 0,
+      yieldPct: 0,
+      totalProfit: 0,
+    },
+    btts: {
+      market: 'BTTS',
+      name: 'Both Teams To Score',
+      bets: 0,
+      won: 0,
+      lost: 0,
+      pushes: 0,
+      winRate: 0,
+      yieldPct: 0,
+      totalProfit: 0,
+    },
+  },
+  recentSettled: [],
+};
+
 export async function getDashboardPerformance(): Promise<UserDashboardPerformance> {
   const allSettled: Array<{
     id: string;

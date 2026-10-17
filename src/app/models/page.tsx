@@ -4,7 +4,7 @@ import { getTerminalModels } from '@/lib/terminalData';
 import { ResearchBanner } from '@/components/terminal/ResearchBanner';
 import { Cpu, ArrowRight, ShieldAlert, CheckCircle2 } from 'lucide-react';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
 
 export const metadata = {
   title: 'Model Registry & Calibration Tournament — HandicapLab',
@@ -12,7 +12,7 @@ export const metadata = {
 };
 
 export default async function ModelsPage() {
-  const models = await getTerminalModels();
+  const models = getTerminalModels();
 
   return (
     <div className="flex flex-col min-h-screen bg-[#0B0F0E] font-sans text-[#F0FDF4]">

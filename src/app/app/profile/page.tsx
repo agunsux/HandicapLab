@@ -1,11 +1,11 @@
 import React from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase.server';
-import { getDashboardPerformance } from '@/lib/dashboardPerformance';
+import { getDashboardPerformance, EMPTY_DASHBOARD_PERFORMANCE } from '@/lib/dashboardPerformance';
 import { User, CreditCard, BarChart3, Bell, Shield, ArrowRight, ShieldCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
 
 export const metadata = {
   title: 'Profile & Account — HandicapLab',
@@ -65,7 +65,7 @@ export default async function ProfilePage() {
   }
 
   // 2. Fetch real personal performance
-  const perf = await getDashboardPerformance();
+  const perf = await getDashboardPerformance().catch(() => EMPTY_DASHBOARD_PERFORMANCE);
 
   const trialProgressPct = Math.min(100, Math.round((trialDay / 14) * 100));
 

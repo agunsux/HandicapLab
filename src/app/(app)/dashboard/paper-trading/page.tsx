@@ -1,4 +1,4 @@
 import PaperTradingPage from '../../../paper-trading/page';
 
-export const revalidate = 0;
+export const dynamic = 'force-static';
 export default PaperTradingPage;

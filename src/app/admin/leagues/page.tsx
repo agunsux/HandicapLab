@@ -3,7 +3,7 @@ import { CANONICAL_15_LEAGUES } from '@/lib/config/multiLeagueRegistry';
 import { OddsPapiQuotaAllocator } from '@/lib/providers/oddspapiQuotaAllocator';
 import AdminLeaguesClient from './AdminLeaguesClient';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
 
 export default async function AdminLeaguesPage() {
   const leagues = CANONICAL_15_LEAGUES;

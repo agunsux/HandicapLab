@@ -2,7 +2,7 @@ import React from 'react';
 import { getTerminalPredictions } from '@/lib/terminalData';
 import { PredictionsView } from '@/components/terminal/PredictionsView';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
 
 export const metadata = {
   title: 'Predictions Registry — HandicapLab',
@@ -10,7 +10,7 @@ export const metadata = {
 };
 
 export default async function PredictionsPage() {
-  const predictions = await getTerminalPredictions();
+  const predictions = await getTerminalPredictions().catch(() => []);
 
   return (
     <div className="flex flex-col min-h-screen bg-[#0B0F0E] font-sans text-[#F0FDF4]">

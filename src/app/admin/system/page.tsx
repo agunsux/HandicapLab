@@ -1,10 +1,10 @@
 import { getProviderHealth } from '@/lib/providers/quotaManager';
 import React from 'react';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
 
 export default async function AdminSystemPage() {
-  const healthData = await getProviderHealth();
+  const healthData = await getProviderHealth().catch(() => []);
 
   return (
     <div className="p-8 max-w-6xl mx-auto space-y-8">

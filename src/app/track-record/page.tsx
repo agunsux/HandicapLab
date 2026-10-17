@@ -4,7 +4,7 @@ import { ResearchBanner } from '@/components/terminal/ResearchBanner';
 import { AhValueEngine } from '@/lib/research/ah-solo/ahValueEngine';
 import { BarChart3, TrendingUp, ShieldCheck, Target, AlertCircle } from 'lucide-react';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
 
 export const metadata = {
   title: 'Track Record & Out-of-Sample Validation — HandicapLab',
@@ -12,7 +12,7 @@ export const metadata = {
 };
 
 export default async function TrackRecordPage() {
-  const predictions = await getTerminalPredictions();
+  const predictions = await getTerminalPredictions().catch(() => []);
   const settled = predictions.filter((p) => p.settlement_status === 'SETTLED');
 
   const targetGate = 175;

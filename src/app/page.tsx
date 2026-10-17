@@ -9,7 +9,7 @@ import { UpcomingFixturesSection } from '@/components/home/UpcomingFixturesSecti
 import { MarketIntelligenceSection } from '@/components/home/MarketIntelligenceSection';
 import { HistoricalDataSection } from '@/components/home/HistoricalDataSection';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
 
 export const metadata = {
   title: 'HandicapLab — Football Data & Statistics | Asian Handicap, Over/Under, BTTS',

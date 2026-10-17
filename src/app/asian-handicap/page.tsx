@@ -6,7 +6,7 @@ import { MarketIntelligenceService } from '@/lib/services/marketIntelligenceServ
 import { getMarketSignals } from '@/lib/marketSignals';
 import { MarketSignalsFeed } from '@/components/terminal/MarketSignalsFeed';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
 
 export const metadata = {
   title: 'Asian Handicap Intelligence — HandicapLab',

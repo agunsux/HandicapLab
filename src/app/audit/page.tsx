@@ -6,7 +6,7 @@ import HistoricalCharts from '@/components/audit/HistoricalCharts';
 import { supabase } from '@/lib/supabase.server';
 import { Metadata } from 'next';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
 
 export const metadata: Metadata = {
   title: 'Prediction Audit Center | HandicapLab',

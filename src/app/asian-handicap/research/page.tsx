@@ -3,7 +3,7 @@ import { Target, ShieldCheck, Database, FileWarning } from 'lucide-react';
 import { loadAhResearchViewModel } from '@/lib/research/ah-yield/ahViewModel';
 import { AhResearchDashboard } from './AhResearchDashboard';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
 
 export const metadata = {
   title: 'Asian Handicap Yield Research — HandicapLab',

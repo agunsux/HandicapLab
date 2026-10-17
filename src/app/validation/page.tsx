@@ -6,7 +6,7 @@ import { ShieldCheck, Activity, LineChart, Award, CheckCircle2, Lock, ArrowUpRig
 import { supabase } from '@/lib/supabase.server';
 import { calculateQuantitativeMetrics } from '@/lib/validation/metricsCalculator';
 
-export const revalidate = 0;
+export const dynamic = 'force-static';
 
 export const metadata = {
   title: 'Live Validation Dashboard | HandicapLab Research Institute',

@@ -2,7 +2,7 @@ import React from 'react';
 import { generatePremierLeagueAhResearch } from '@/lib/research/premierLeagueAhEngine';
 import { PremierLeagueAhResearchView } from '@/components/research/PremierLeagueAhResearchView';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
 
 export const metadata = {
   title: 'Premier League Asian Handicap Research (2024–2026) — HandicapLab',

@@ -1,7 +1,7 @@
 import { supabase } from '@/lib/supabase.server';
 import { LedgerTable } from './_components/LedgerTable';
 
-export const revalidate = 0; // Disable static cache to ensure absolute transparency of fresh signals
+export const dynamic = 'force-static';
 
 export default async function LedgerPage() {
   // 1. Fetch raw ledger entries starting strictly from Day 0 (2026-09-06T00:00:00Z)

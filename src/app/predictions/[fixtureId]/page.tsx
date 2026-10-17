@@ -5,7 +5,13 @@ import { ResearchBanner } from '@/components/terminal/ResearchBanner';
 import { ArrowLeft, ShieldAlert, Activity, CheckCircle, Clock } from 'lucide-react';
 import { notFound } from 'next/navigation';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
+  const all = await getTerminalPredictions().catch(() => []);
+  return all.map((p) => ({ fixtureId: p.fixture_id }));
+}
 
 interface PageProps {
   params: Promise<{ fixtureId: string }>;

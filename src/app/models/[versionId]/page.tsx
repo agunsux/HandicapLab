@@ -6,7 +6,11 @@ import { PredictionCard } from '@/components/terminal/PredictionCard';
 import { ArrowLeft, Cpu, ShieldAlert, CheckCircle2, Lock } from 'lucide-react';
 import { notFound } from 'next/navigation';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
+
+export function generateStaticParams() {
+  return getTerminalModels().map((m) => ({ versionId: m.id }));
+}
 
 interface PageProps {
   params: Promise<{ versionId: string }>;
@@ -16,7 +20,7 @@ export default async function ModelDetailPage({ params }: PageProps) {
   const { versionId } = await params;
   const decodedId = decodeURIComponent(versionId);
 
-  const models = await getTerminalModels();
+  const models = getTerminalModels();
   const model = models.find((m) => m.id === decodedId || m.id === versionId);
 
   if (!model) {

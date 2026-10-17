@@ -1,7 +1,7 @@
 import { supabase } from '@/lib/supabase.server';
 import { PaperTradingDashboard } from './_components/PaperTradingDashboard';
 
-export const revalidate = 0; // Disable static cache to ensure real-time model verification
+export const dynamic = 'force-static';
 
 export default async function PaperTradingPage() {
   // 1. Fetch paper trades

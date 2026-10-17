@@ -5,7 +5,12 @@ import Footer from '@/app/(marketing)/_components/Footer';
 import { ShieldCheck, Lock, ArrowLeft, CheckCircle2, FileText, Database, Award, LineChart } from 'lucide-react';
 import { notFound } from 'next/navigation';
 
-export const revalidate = 0;
+export const dynamic = 'force-static';
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
+  return [];
+}
 
 interface PredictionPageProps {
   params: {
