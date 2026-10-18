@@ -24,13 +24,78 @@ import { StaleDataKillSwitch } from '@/lib/ledger/staleDataKillSwitch';
 import { CanonicalFixtureFreshnessGate } from '@/lib/services/canonicalFixtureFreshnessGate';
 import { GcsLedgerStorage } from '@/lib/pipeline/rescue/gcsLedgerStorage';
 
+export interface SalmoUpcomingFixtureDTO {
+  canonicalFixtureId: string;
+  providerMatchId: string;
+  competition: string;
+  season: string;
+  homeTeam: string;
+  awayTeam: string;
+  kickoffUtc: string;
+  status: string;
+  targetWindow: 'TODAY' | 'TOMORROW' | 'NEXT_7_DAYS';
+  marketsAvailable: ('AH' | 'OU' | 'BTTS')[];
+  venue?: string;
+  sourceProvider: string;
+  sourceVersion: string;
+}
+
+export interface SalmoVerifiedResultDTO {
+  canonicalFixtureId: string;
+  providerMatchId: string;
+  competition: string;
+  season: string;
+  homeTeam: string;
+  awayTeam: string;
+  kickoffUtc: string;
+  status: string;
+  homeGoals: number;
+  awayGoals: number;
+  totalGoals: number;
+  sourceProvider: string;
+  verifiedAt: string;
+}
+
+export interface SalmoProviderStatusReport {
+  apiFootball: {
+    name: string;
+    status: 'AVAILABLE' | 'PARTIAL' | 'UNAVAILABLE' | 'AUTH_FAILED' | 'QUOTA_BLOCKED' | 'NOT_VERIFIED';
+    plan: string;
+    reason: string;
+    authenticated: boolean;
+    liveIngestion: 'BLOCKED' | 'ALLOWED';
+  };
+  footyStats: {
+    name: string;
+    status: 'AVAILABLE' | 'PARTIAL' | 'UNAVAILABLE' | 'AUTH_FAILED' | 'QUOTA_BLOCKED' | 'NOT_VERIFIED';
+    plan: string;
+    reason: string;
+    authenticated: boolean;
+    liveIngestion: 'BLOCKED' | 'ALLOWED';
+  };
+  oddsPapi: {
+    name: string;
+    status: 'AVAILABLE' | 'PARTIAL' | 'UNAVAILABLE' | 'AUTH_FAILED' | 'QUOTA_BLOCKED' | 'NOT_VERIFIED';
+    plan: string;
+    reason: string;
+    authenticated: boolean;
+    quotaLimit: number;
+    quotaUsed: number;
+    quotaRemaining: number;
+    reserveFloor: number;
+    liveIngestion: 'BLOCKED' | 'ALLOWED';
+  };
+}
+
 export interface SalmoProductionSyncOptions {
   nowMs?: number;
   since?: string;
-  view?: 'all' | 'daily_picks' | 'history' | 'performance';
+  view?: 'all' | 'daily_picks' | 'history' | 'performance' | 'fixtures' | 'results';
   horizon?: 'TODAY' | 'TOMORROW' | 'NEXT_7_DAYS' | 'ALL';
   market?: 'AH' | 'OU' | 'BTTS';
   modelVersion?: string;
+  page?: number;
+  limit?: number;
 }
 
 export interface SalmoDailyPickDTO {
@@ -66,16 +131,36 @@ export interface SalmoProductionSyncPayload {
   success: boolean;
   timestampUtc: string;
   syncChecksum: string;
-  dataState: 'REAL' | 'NO_QUALIFIED_PICKS' | 'DATA_TEMPORARILY_UNAVAILABLE';
+  dataState:
+    | 'REAL'
+    | 'NO_QUALIFIED_PICKS'
+    | 'DATA_TEMPORARILY_UNAVAILABLE'
+    | 'DATA_UNAVAILABLE'
+    | 'INSUFFICIENT_DATA'
+    | 'NO_MARKET_AVAILABLE'
+    | 'PROVIDER_UNAVAILABLE'
+    | 'QUOTA_BLOCKED';
   counts: {
     totalArchived: number;
     dailyPicks: number;
     settled: number;
     pending: number;
+    upcomingFixtures?: number;
+    verifiedResults?: number;
   };
   dailyPicks: SalmoDailyPickDTO[];
+  upcomingFixtures?: SalmoUpcomingFixtureDTO[];
+  verifiedResults?: SalmoVerifiedResultDTO[];
   settledHistory: any[];
   performance: any;
+  providerStatus?: SalmoProviderStatusReport;
+  missingDataReasons?: string[];
+  pagination?: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
   freshness: {
     fixtureFreshnessSlaSeconds: number;
     oddsFreshnessSlaSeconds: number;
@@ -149,10 +234,59 @@ export class SalmoProductionSyncService {
     return { rows: [], source: 'none', error: 'LEDGER_UNAVAILABLE' };
   }
 
-  public static buildUnavailablePayload(timestampUtc: string): SalmoProductionSyncPayload {
-    const counts = { totalArchived: 0, dailyPicks: 0, settled: 0, pending: 0 };
+  public static getStaticProviderStatus(): SalmoProviderStatusReport {
+    return {
+      apiFootball: {
+        name: 'API-Football Pro',
+        status: 'AUTH_FAILED',
+        plan: 'Pro',
+        reason: 'Account suspended on api-sports.io dashboard (verified live)',
+        authenticated: false,
+        liveIngestion: 'BLOCKED',
+      },
+      footyStats: {
+        name: 'FootyStats',
+        status: 'AUTH_FAILED',
+        plan: 'Free',
+        reason: 'Demo key (test85g57) quarantined; live access rejected; Asian Handicap not provided by FootyStats API',
+        authenticated: false,
+        liveIngestion: 'BLOCKED',
+      },
+      oddsPapi: {
+        name: 'OddsPapi',
+        status: 'QUOTA_BLOCKED',
+        plan: 'Free',
+        reason: 'Monthly free quota exhausted (260/250 used). Reserve floor (50) protected. Paused.',
+        authenticated: false,
+        quotaLimit: 250,
+        quotaUsed: 260,
+        quotaRemaining: 0,
+        reserveFloor: 50,
+        liveIngestion: 'BLOCKED',
+      },
+    };
+  }
+
+  public static getMissingDataReasons(): string[] {
+    return [
+      'Live odds ingestion paused: OddsPapi monthly quota exhausted (260/250 requests used).',
+      'Live fixture refresh paused: API-Football account suspended on api-sports.io dashboard.',
+      'FootyStats live ingestion quarantined: Unauthenticated demo key (test85g57); Asian Handicap lines not available.',
+    ];
+  }
+
+  public static buildUnavailablePayload(
+    timestampUtc: string,
+    reasonState:
+      | 'DATA_TEMPORARILY_UNAVAILABLE'
+      | 'DATA_UNAVAILABLE'
+      | 'PROVIDER_UNAVAILABLE'
+      | 'QUOTA_BLOCKED' = 'DATA_TEMPORARILY_UNAVAILABLE',
+    missingReasons: string[] = []
+  ): SalmoProductionSyncPayload {
+    const counts = { totalArchived: 0, dailyPicks: 0, settled: 0, pending: 0, upcomingFixtures: 0, verifiedResults: 0 };
     const checksumSource = JSON.stringify({
-      dataState: 'DATA_TEMPORARILY_UNAVAILABLE',
+      dataState: reasonState,
       pickIds: [],
       counts,
       nowBucket: Math.floor(Date.now() / 60000),
@@ -163,10 +297,14 @@ export class SalmoProductionSyncService {
       success: false,
       timestampUtc,
       syncChecksum,
-      dataState: 'DATA_TEMPORARILY_UNAVAILABLE',
+      dataState: reasonState,
       counts,
       dailyPicks: [],
+      upcomingFixtures: [],
+      verifiedResults: [],
       settledHistory: [],
+      providerStatus: this.getStaticProviderStatus(),
+      missingDataReasons: missingReasons.length > 0 ? missingReasons : this.getMissingDataReasons(),
       performance: {
         modelVersion: 'poisson_v1_rescue',
         totalPredictions: 0,
@@ -275,22 +413,78 @@ export class SalmoProductionSyncService {
       });
     }
 
-    const upcomingFixtures = Array.from(
-      new Set(
-        filteredRescue
-          .filter((r) => new Date(r.kickoff_utc).getTime() > nowMs)
-          .map((r) => r.fixture_id)
-      )
+    const fixtureRegistry = CanonicalFixtureFreshnessGate.loadRegistry();
+    let { upcomingFixturesList, verifiedResultsList } = this.extractFixturesAndResults(
+      fixtureRegistry,
+      nowMs,
+      timestampUtc
     );
 
-    const dataState: 'REAL' | 'NO_QUALIFIED_PICKS' | 'DATA_TEMPORARILY_UNAVAILABLE' =
-      activeDailyPicks.length > 0 ? 'REAL' : 'NO_QUALIFIED_PICKS';
+    // If fixture registry has no upcoming fixtures, derive from rescue ledger records
+    if (upcomingFixturesList.length === 0) {
+      const rescueUpcomingRows = filteredRescue.filter(
+        (r) => new Date(r.kickoff_utc).getTime() > nowMs
+      );
+      const seen = new Set<string>();
+      for (const r of rescueUpcomingRows) {
+        const id = String(r.fixture_id);
+        if (seen.has(id)) continue;
+        seen.add(id);
+        const kickMs = new Date(r.kickoff_utc).getTime();
+        const diffHours = (kickMs - nowMs) / (1000 * 3600);
+        let targetWindow: 'TODAY' | 'TOMORROW' | 'NEXT_7_DAYS' = 'NEXT_7_DAYS';
+        if (diffHours <= 24) targetWindow = 'TODAY';
+        else if (diffHours <= 48) targetWindow = 'TOMORROW';
+
+        upcomingFixturesList.push({
+          canonicalFixtureId: id,
+          providerMatchId: id,
+          competition: r.competition || 'Top League',
+          season: '2026',
+          homeTeam: r.home_team,
+          awayTeam: r.away_team,
+          kickoffUtc: r.kickoff_utc,
+          status: 'SCHEDULED',
+          targetWindow,
+          marketsAvailable: ['AH', 'OU', 'BTTS'],
+          sourceProvider: 'rescue_ledger',
+          sourceVersion: r.model_version || 'poisson_v1_rescue',
+        });
+      }
+    }
+
+    const dataState:
+      | 'REAL'
+      | 'NO_QUALIFIED_PICKS'
+      | 'DATA_TEMPORARILY_UNAVAILABLE'
+      | 'DATA_UNAVAILABLE'
+      | 'INSUFFICIENT_DATA'
+      | 'NO_MARKET_AVAILABLE'
+      | 'PROVIDER_UNAVAILABLE'
+      | 'QUOTA_BLOCKED' = activeDailyPicks.length > 0 ? 'REAL' : 'NO_QUALIFIED_PICKS';
+
+    let pagedDailyPicks = activeDailyPicks;
+    let pagination;
+    if (options.limit && options.limit > 0) {
+      const page = Math.max(1, options.page || 1);
+      const limit = options.limit;
+      const start = (page - 1) * limit;
+      pagedDailyPicks = activeDailyPicks.slice(start, start + limit);
+      pagination = {
+        page,
+        limit,
+        total: activeDailyPicks.length,
+        totalPages: Math.ceil(activeDailyPicks.length / limit) || 1,
+      };
+    }
 
     const counts = {
       totalArchived: filteredRescue.length,
       dailyPicks: activeDailyPicks.length,
       settled: settledRecords.length,
       pending: pendingRecords.length,
+      upcomingFixtures: upcomingFixturesList.length,
+      verifiedResults: verifiedResultsList.length,
     };
 
     const checksumSource = JSON.stringify({
@@ -310,8 +504,13 @@ export class SalmoProductionSyncService {
       syncChecksum,
       dataState,
       counts,
-      dailyPicks: activeDailyPicks,
+      dailyPicks: pagedDailyPicks,
+      upcomingFixtures: upcomingFixturesList,
+      verifiedResults: verifiedResultsList,
       settledHistory: settledRecords,
+      providerStatus: this.getStaticProviderStatus(),
+      missingDataReasons: this.getMissingDataReasons(),
+      ...(pagination ? { pagination } : {}),
       performance: {
         modelVersion: 'poisson_v1_rescue',
         totalPredictions: filteredRescue.length,
@@ -323,15 +522,90 @@ export class SalmoProductionSyncService {
         fixtureFreshnessSlaSeconds: 3600,
         oddsFreshnessSlaSeconds: 3600,
         lastSyncTimestampUtc: timestampUtc,
-        upcomingFixturesCount: upcomingFixtures.length,
+        upcomingFixturesCount: upcomingFixturesList.length,
         activeDailyPicksCount: activeDailyPicks.length,
         status:
-          upcomingFixtures.length > 0 || filteredRescue.length > 0
+          upcomingFixturesList.length > 0 || filteredRescue.length > 0
             ? 'FRESH'
             : 'STALE',
       },
       predictions: filteredRescue,
     };
+  }
+
+  private static extractFixturesAndResults(
+    fixtureRegistry: Record<string, any>,
+    nowMs: number,
+    timestampUtc: string
+  ): {
+    upcomingFixturesList: SalmoUpcomingFixtureDTO[];
+    verifiedResultsList: SalmoVerifiedResultDTO[];
+  } {
+    const upcomingFixturesList: SalmoUpcomingFixtureDTO[] = Object.values(fixtureRegistry)
+      .filter((f) => {
+        if (!f?.kickoffUtc) return false;
+        const kickMs = new Date(f.kickoffUtc).getTime();
+        return (
+          kickMs > nowMs &&
+          f.status !== 'FINISHED' &&
+          f.status !== 'CANCELLED' &&
+          f.status !== 'ABANDONED' &&
+          f.status !== 'POSTPONED'
+        );
+      })
+      .sort((a, b) => new Date(a.kickoffUtc).getTime() - new Date(b.kickoffUtc).getTime())
+      .map((f) => {
+        const kickMs = new Date(f.kickoffUtc).getTime();
+        const diffHours = (kickMs - nowMs) / (1000 * 3600);
+        let targetWindow: 'TODAY' | 'TOMORROW' | 'NEXT_7_DAYS' = 'NEXT_7_DAYS';
+        if (diffHours <= 24) targetWindow = 'TODAY';
+        else if (diffHours <= 48) targetWindow = 'TOMORROW';
+
+        return {
+          canonicalFixtureId: f.canonicalMatchId,
+          providerMatchId: f.providerMatchId,
+          competition: f.competition,
+          season: f.season,
+          homeTeam: f.homeTeam,
+          awayTeam: f.awayTeam,
+          kickoffUtc: f.kickoffUtc,
+          status: f.status,
+          targetWindow,
+          marketsAvailable: ['AH', 'OU', 'BTTS'] as ('AH' | 'OU' | 'BTTS')[],
+          venue: f.venue,
+          sourceProvider: f.provider,
+          sourceVersion: f.sourceVersion || 'v1.0.0-canonical',
+        };
+      });
+
+    const verifiedResultsList: SalmoVerifiedResultDTO[] = Object.values(fixtureRegistry)
+      .filter((f) => {
+        return (
+          f?.status === 'FINISHED' &&
+          f.homeGoals !== null &&
+          f.awayGoals !== null &&
+          !isNaN(Number(f.homeGoals)) &&
+          !isNaN(Number(f.awayGoals))
+        );
+      })
+      .sort((a, b) => new Date(b.kickoffUtc).getTime() - new Date(a.kickoffUtc).getTime())
+      .map((f) => ({
+        canonicalFixtureId: f.canonicalMatchId,
+        providerMatchId: f.providerMatchId,
+        competition: f.competition,
+        season: f.season,
+        homeTeam: f.homeTeam,
+        awayTeam: f.awayTeam,
+        kickoffUtc: f.kickoffUtc,
+        status: f.status,
+        homeGoals: Number(f.homeGoals),
+        awayGoals: Number(f.awayGoals),
+        totalGoals: Number(f.homeGoals) + Number(f.awayGoals),
+        sourceProvider: f.provider,
+        verifiedAt: f.canonicalUpdatedAtUtc || f.providerFetchedAtUtc || timestampUtc,
+      }));
+
+    return { upcomingFixturesList, verifiedResultsList };
   }
 
   /**
@@ -460,16 +734,39 @@ export class SalmoProductionSyncService {
         });
       }
 
-      // Count upcoming fixtures in registry
-      const upcomingFixtures = Object.values(fixtureRegistry).filter((fix) => {
-        if (!fix?.kickoffUtc) return false;
-        return new Date(fix.kickoffUtc).getTime() > nowMs;
-      });
+      const { upcomingFixturesList, verifiedResultsList } = this.extractFixturesAndResults(
+        fixtureRegistry,
+        nowMs,
+        timestampUtc
+      );
 
       // Determine Data State (Section A, M)
-      let dataState: 'REAL' | 'NO_QUALIFIED_PICKS' | 'DATA_TEMPORARILY_UNAVAILABLE' = 'REAL';
+      let dataState:
+        | 'REAL'
+        | 'NO_QUALIFIED_PICKS'
+        | 'DATA_TEMPORARILY_UNAVAILABLE'
+        | 'DATA_UNAVAILABLE'
+        | 'INSUFFICIENT_DATA'
+        | 'NO_MARKET_AVAILABLE'
+        | 'PROVIDER_UNAVAILABLE'
+        | 'QUOTA_BLOCKED' = 'REAL';
       if (activeDailyPicks.length === 0) {
         dataState = 'NO_QUALIFIED_PICKS';
+      }
+
+      let pagedDailyPicks = activeDailyPicks;
+      let pagination;
+      if (options.limit && options.limit > 0) {
+        const page = Math.max(1, options.page || 1);
+        const limit = options.limit;
+        const start = (page - 1) * limit;
+        pagedDailyPicks = activeDailyPicks.slice(start, start + limit);
+        pagination = {
+          page,
+          limit,
+          total: activeDailyPicks.length,
+          totalPages: Math.ceil(activeDailyPicks.length / limit) || 1,
+        };
       }
 
       // Performance Report
@@ -480,6 +777,8 @@ export class SalmoProductionSyncService {
         dailyPicks: activeDailyPicks.length,
         settled: settledRecords.length,
         pending: pendingRecords.length,
+        upcomingFixtures: upcomingFixturesList.length,
+        verifiedResults: verifiedResultsList.length,
       };
 
       const checksumSource = JSON.stringify({
@@ -496,39 +795,30 @@ export class SalmoProductionSyncService {
         syncChecksum,
         dataState,
         counts,
-        dailyPicks: activeDailyPicks,
+        dailyPicks: pagedDailyPicks,
+        upcomingFixtures: upcomingFixturesList,
+        verifiedResults: verifiedResultsList,
         settledHistory: settledRecords,
         performance,
+        providerStatus: this.getStaticProviderStatus(),
+        missingDataReasons: this.getMissingDataReasons(),
+        ...(pagination ? { pagination } : {}),
         freshness: {
           fixtureFreshnessSlaSeconds: 3600,
           oddsFreshnessSlaSeconds: 3600,
           lastSyncTimestampUtc: timestampUtc,
-          upcomingFixturesCount: upcomingFixtures.length,
+          upcomingFixturesCount: upcomingFixturesList.length,
           activeDailyPicksCount: activeDailyPicks.length,
-          status: upcomingFixtures.length > 0 || allPredictions.length > 0 ? 'FRESH' : 'STALE',
+          status: upcomingFixturesList.length > 0 || allPredictions.length > 0 ? 'FRESH' : 'STALE',
         },
       };
     } catch (err: any) {
       console.error('[SalmoProductionSyncService] Error:', err);
-      const errChecksum = crypto.createHash('sha256').update(timestampUtc).digest('hex');
-      return {
-        success: false,
+      return this.buildUnavailablePayload(
         timestampUtc,
-        syncChecksum: errChecksum,
-        dataState: 'DATA_TEMPORARILY_UNAVAILABLE',
-        counts: { totalArchived: 0, dailyPicks: 0, settled: 0, pending: 0 },
-        dailyPicks: [],
-        settledHistory: [],
-        performance: {},
-        freshness: {
-          fixtureFreshnessSlaSeconds: 3600,
-          oddsFreshnessSlaSeconds: 3600,
-          lastSyncTimestampUtc: timestampUtc,
-          upcomingFixturesCount: 0,
-          activeDailyPicksCount: 0,
-          status: 'STALE',
-        },
-      };
+        'DATA_TEMPORARILY_UNAVAILABLE',
+        [err?.message || 'Failed to generate canonical SALMO sync payload.']
+      );
     }
   }
 }

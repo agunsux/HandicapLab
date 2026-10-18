@@ -20,6 +20,17 @@ export class ApiFootballProvider extends BaseProvider {
     };
   }
 
+  private assertNoErrors(data: any, endpoint: string): void {
+    if (!data) return;
+    if (Array.isArray(data.errors) && data.errors.length > 0) {
+      throw new Error(`[API-Football] Error on /${endpoint}: ${JSON.stringify(data.errors)}`);
+    }
+    if (data.errors && typeof data.errors === 'object' && !Array.isArray(data.errors) && Object.keys(data.errors).length > 0) {
+      const msg = data.errors.access || data.errors.token || JSON.stringify(data.errors);
+      throw new Error(`[API-Football] Provider error on /${endpoint}: ${msg}`);
+    }
+  }
+
   /**
    * Universal fetch for API-Football ensuring we only enrich important fixtures.
    */
@@ -37,6 +48,7 @@ export class ApiFootballProvider extends BaseProvider {
     });
 
     const data = await response.json();
+    this.assertNoErrors(data, endpoint);
     return data;
   }
 
@@ -60,7 +72,9 @@ export class ApiFootballProvider extends BaseProvider {
       headers: this.defaultHeaders
     });
 
-    return await response.json();
+    const data = await response.json();
+    this.assertNoErrors(data, 'fixtures/headtohead');
+    return data;
   }
 
   async getFixturesByDate(dateStr: string): Promise<any> {
@@ -68,7 +82,9 @@ export class ApiFootballProvider extends BaseProvider {
     const response = await this.fetchWithQuota('fixtures', url, 100, {
       headers: this.defaultHeaders
     });
-    return await response.json();
+    const data = await response.json();
+    this.assertNoErrors(data, 'fixtures');
+    return data;
   }
 
   /**
@@ -80,7 +96,12 @@ export class ApiFootballProvider extends BaseProvider {
       const response = await this.fetchWithQuota('health', url, 100, {
         headers: this.defaultHeaders
       });
-      return response.ok;
+      if (!response.ok) return false;
+      const data = await response.json();
+      if (data?.errors && (Array.isArray(data.errors) ? data.errors.length > 0 : Object.keys(data.errors).length > 0)) {
+        return false;
+      }
+      return data?.response?.account?.active === true;
     } catch {
       return false;
     }

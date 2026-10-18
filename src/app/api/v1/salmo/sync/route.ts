@@ -50,6 +50,10 @@ export async function GET(request: NextRequest) {
     const marketParam = searchParams.get('market')?.toUpperCase() as any;
     const modelVersionParam =
       searchParams.get('modelVersion') || searchParams.get('model_version') || undefined;
+    const pageRaw = searchParams.get('page');
+    const limitRaw = searchParams.get('limit');
+    const pageParam = pageRaw ? parseInt(pageRaw, 10) : undefined;
+    const limitParam = limitRaw ? parseInt(limitRaw, 10) : undefined;
 
     const nowMs = Date.now();
 
@@ -60,9 +64,17 @@ export async function GET(request: NextRequest) {
       horizon: horizonParam,
       market: ['AH', 'OU', 'BTTS'].includes(marketParam) ? marketParam : undefined,
       modelVersion: modelVersionParam,
+      page: pageParam,
+      limit: limitParam,
     });
 
-    const httpStatus = payload.dataState === 'DATA_TEMPORARILY_UNAVAILABLE' ? 503 : 200;
+    const isUnavailableState =
+      payload.dataState === 'DATA_TEMPORARILY_UNAVAILABLE' ||
+      payload.dataState === 'DATA_UNAVAILABLE' ||
+      payload.dataState === 'PROVIDER_UNAVAILABLE' ||
+      payload.dataState === 'QUOTA_BLOCKED';
+
+    const httpStatus = isUnavailableState ? 503 : 200;
 
     return NextResponse.json(payload, {
       status: httpStatus,

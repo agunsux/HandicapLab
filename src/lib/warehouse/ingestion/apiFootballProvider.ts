@@ -197,6 +197,15 @@ export class ApiFootballProvider implements IDataProvider {
         schema
       });
 
+      const raw = response.data as any;
+      if (raw?.errors && (Array.isArray(raw.errors) ? raw.errors.length > 0 : Object.keys(raw.errors).length > 0)) {
+        const errStr = JSON.stringify(raw.errors);
+        if (raw.errors?.access || errStr.toLowerCase().includes('suspended') || errStr.toLowerCase().includes('api key')) {
+          throw new AuthenticationError(this.getProviderName());
+        }
+        throw new ProviderUnavailableError(this.getProviderName(), errStr);
+      }
+
       return response.data;
     } catch (err: any) {
       if (err instanceof IngestionError) throw err;

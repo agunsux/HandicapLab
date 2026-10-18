@@ -48,8 +48,15 @@ export class FootyStatsAPI {
   }
 
   private async fetchWithRetry(url: string, retries = 0): Promise<any> {
-    if (!this.apiKey || this.apiKey === 'mock') {
-      throw new Error('[FootyStatsAPI] FOOTYSTATS_API_KEY missing or invalid. Fail closed.');
+    const isInvalidOrDemoKey =
+      !this.apiKey ||
+      this.apiKey === 'mock' ||
+      this.apiKey.toLowerCase() === 'test85g57' ||
+      this.apiKey.toLowerCase().startsWith('test');
+    if (isInvalidOrDemoKey) {
+      throw new Error(
+        '[FootyStatsAPI] FOOTYSTATS_API_KEY missing, unauthorized, or demo key (test85g57). Live production ingestion rejected.'
+      );
     }
 
     const controller = new AbortController();
@@ -106,7 +113,7 @@ export class FootyStatsAPI {
       return [];
     } catch (error) {
       console.error('Error in getMatchesForTomorrow:', error);
-      return [];
+      throw error;
     }
   }
 
@@ -123,7 +130,7 @@ export class FootyStatsAPI {
       return [];
     } catch (error) {
       console.error('Error in getMatchesForToday:', error);
-      return [];
+      throw error;
     }
   }
 }
