@@ -660,7 +660,8 @@ export class CanonicalPerformanceEngine {
   private static buildBookmakerBreakdown(all: CanonicalPredictionRecord[]): Record<string, DimensionMetricRow> {
     const books: Record<string, CanonicalPredictionRecord[]> = {};
     for (const p of all) {
-      const b = p.bookmaker || 'Pinnacle';
+      const raw = (p.bookmaker || 'Pinnacle').trim();
+      const b = raw.toLowerCase() === 'pinnacle' ? 'Pinnacle' : raw.toLowerCase() === 'sbobet' ? 'SBOBET' : raw;
       if (!books[b]) books[b] = [];
       books[b].push(p);
     }

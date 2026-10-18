@@ -387,7 +387,7 @@ export class CanonicalBetLedgerService {
             line,
             lineType,
             provider: 'OddsPapi',
-            bookmaker: p.market_bookmaker || 'Pinnacle',
+            bookmaker: (p.market_bookmaker && p.market_bookmaker.toLowerCase() === 'pinnacle') ? 'Pinnacle' : (p.market_bookmaker || 'Pinnacle'),
             marketOdds: Number(p.market_odds) || 1.95,
             oddsTimestamp: oddsTs,
             modelProbability: Number(p.model_probability) || 0.5,
