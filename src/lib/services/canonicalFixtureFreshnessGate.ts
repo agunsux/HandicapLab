@@ -353,6 +353,74 @@ export class CanonicalFixtureFreshnessGate {
   }
 
   /**
+   * Synchronizes fixtures and verified match results from Supabase `matches` table.
+   */
+  public static async syncFromDatabase(): Promise<number> {
+    if (process.env.NODE_ENV === 'test') return 0;
+    try {
+      const { supabase } = await import('@/lib/supabase.server');
+      const { data: dbMatches, error } = await supabase
+        .from('matches')
+        .select('*')
+        .order('kickoff', { ascending: true })
+        .limit(500);
+
+      if (error || !dbMatches || dbMatches.length === 0) return 0;
+
+      const registry = this.loadRegistry();
+      let added = 0;
+
+      for (const m of dbMatches) {
+        if (!m.kickoff || !m.home_team || !m.away_team) continue;
+        const canonicalId = this.computeCanonicalMatchId(
+          m.league || 'Premier League',
+          '2026',
+          m.home_team,
+          m.away_team,
+          m.kickoff
+        );
+        const normStatus = this.normalizeStatus(m.status === 'upcoming' ? 'SCHEDULED' : m.status);
+        const isFinished = normStatus === 'FINISHED';
+        const homeGoals = m.home_score !== null && m.home_score !== undefined ? Number(m.home_score) : null;
+        const awayGoals = m.away_score !== null && m.away_score !== undefined ? Number(m.away_score) : null;
+
+        if (!registry[canonicalId]) {
+          registry[canonicalId] = {
+            canonicalMatchId: canonicalId,
+            providerMatchId: String(m.id),
+            homeTeam: m.home_team,
+            awayTeam: m.away_team,
+            competition: m.league || 'Premier League',
+            season: '2026',
+            kickoffUtc: m.kickoff,
+            status: normStatus,
+            provider: 'api-football',
+            providerFetchedAtUtc: m.created_at || new Date().toISOString(),
+            canonicalUpdatedAtUtc: m.updated_at || new Date().toISOString(),
+            sourceVersion: 'v1.0.0-canonical',
+            homeGoals,
+            awayGoals,
+          };
+          added++;
+        } else if (isFinished && registry[canonicalId].status !== 'FINISHED') {
+          registry[canonicalId].status = 'FINISHED';
+          if (homeGoals !== null) registry[canonicalId].homeGoals = homeGoals;
+          if (awayGoals !== null) registry[canonicalId].awayGoals = awayGoals;
+          added++;
+        }
+      }
+
+      if (added > 0) {
+        this.saveRegistry(registry);
+      }
+      return added;
+    } catch (e) {
+      console.warn('[CanonicalFixtureFreshnessGate] syncFromDatabase error:', e);
+      return 0;
+    }
+  }
+
+  /**
    * Clears registry for testing.
    */
   public static clearForTesting(): void {
@@ -363,3 +431,4 @@ export class CanonicalFixtureFreshnessGate {
     }
   }
 }
+

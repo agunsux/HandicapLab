@@ -609,13 +609,25 @@ export class SalmoProductionSyncService {
   }
 
   /**
-   * Asynchronous version of generateSyncPayload that supports reading the durable rescue ledger from GCS.
+   * Asynchronous version of generateSyncPayload that supports reading durable state and the rescue ledger from GCS.
    */
   public static async generateSyncPayloadAsync(
     options: SalmoProductionSyncOptions = {}
   ): Promise<SalmoProductionSyncPayload> {
     const nowMs = options.nowMs ?? Date.now();
     const timestampUtc = new Date(nowMs).toISOString();
+
+    // Synchronize durable Supabase database state into in-memory caches
+    if (process.env.NODE_ENV !== 'test') {
+      try {
+        await Promise.allSettled([
+          CanonicalBetLedgerService.syncFromDatabase(),
+          CanonicalFixtureFreshnessGate.syncFromDatabase(),
+        ]);
+      } catch (err: any) {
+        console.warn('[SalmoProductionSyncService] Database sync caught error:', err?.message);
+      }
+    }
 
     if (
       options.modelVersion === 'poisson_v1_rescue' ||
@@ -739,6 +751,42 @@ export class SalmoProductionSyncService {
         nowMs,
         timestampUtc
       );
+
+      // If fixture registry has no upcoming fixtures, derive from ledger predictions
+      if (upcomingFixturesList.length === 0) {
+        const upcomingPreds = allPredictions.filter((p) => {
+          const kStr = p.kickoffTimestamp || (p as any).kickoffUtc;
+          return kStr && new Date(kStr).getTime() > nowMs;
+        });
+        const seen = new Set<string>();
+        for (const p of upcomingPreds) {
+          const kStr = p.kickoffTimestamp || (p as any).kickoffUtc;
+          const matchKey = `${p.homeTeam}|${p.awayTeam}|${kStr.slice(0, 10)}`;
+          if (seen.has(matchKey)) continue;
+          seen.add(matchKey);
+          const id = String(p.canonicalFixtureId || (p as any).fixtureId);
+          const kickMs = new Date(kStr).getTime();
+          const diffHours = (kickMs - nowMs) / (1000 * 3600);
+          let targetWindow: 'TODAY' | 'TOMORROW' | 'NEXT_7_DAYS' = 'NEXT_7_DAYS';
+          if (diffHours <= 24) targetWindow = 'TODAY';
+          else if (diffHours <= 48) targetWindow = 'TOMORROW';
+
+          upcomingFixturesList.push({
+            canonicalFixtureId: id,
+            providerMatchId: id,
+            competition: p.competition || p.league || 'Top League',
+            season: '2026',
+            homeTeam: p.homeTeam,
+            awayTeam: p.awayTeam,
+            kickoffUtc: kStr,
+            status: 'SCHEDULED',
+            targetWindow,
+            marketsAvailable: ['AH', 'OU', 'BTTS'],
+            sourceProvider: p.provider || 'canonical_ledger',
+            sourceVersion: p.modelVersion || 'dixon-coles-v1.0',
+          });
+        }
+      }
 
       // Determine Data State (Section A, M)
       let dataState:

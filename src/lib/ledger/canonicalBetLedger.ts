@@ -24,6 +24,7 @@ import {
   PredictionConfidence,
   ValueStatus,
   PredictionStatus,
+  SettlementOutcome,
 } from './predictionLedgerTypes';
 import { BUNDLED_CANONICAL_LEDGER } from './canonicalLedgerData';
 
@@ -322,7 +323,7 @@ export class CanonicalBetLedgerService {
         .from('daily_picks')
         .select('*')
         .order('created_at', { ascending: false })
-        .limit(100);
+        .limit(1000);
 
       if (error || !picks || picks.length === 0) return 0;
 
@@ -330,84 +331,124 @@ export class CanonicalBetLedgerService {
       let added = 0;
 
       for (const p of picks) {
-        const predId = p.prediction_id || `pred_${p.fixture_id}_${p.market_type}`;
+        let predId = p.prediction_id || `pred_${p.fixture_id}_${p.market_type}`;
+        let line: number | null = null;
+        let lineType: LineType = 'NONE';
+        let oddsTs = p.created_at;
+        let modelVer = 'dixon-coles-v1.0';
+        let canonicalFixtureId = p.fixture_id;
+
+        if (p.reasoning) {
+          try {
+            const parsed = typeof p.reasoning === 'string' ? JSON.parse(p.reasoning) : p.reasoning;
+            if (parsed.predictionId) predId = parsed.predictionId;
+            if (parsed.line !== undefined && parsed.line !== null) line = Number(parsed.line);
+            if (parsed.oddsTimestamp) oddsTs = parsed.oddsTimestamp;
+            if (parsed.modelVersion) modelVer = parsed.modelVersion;
+            if (parsed.canonicalMatchId) canonicalFixtureId = parsed.canonicalMatchId;
+          } catch {}
+        }
+
+        if (line === null && p.prediction) {
+          const m = String(p.prediction).match(/([+-]?\d+(?:\.\d+)?)/);
+          if (m) line = parseFloat(m[1]);
+        }
+        lineType = classifyLineType(line);
+
+        const isSettled = ['SETTLED', 'WON', 'LOST', 'PUSH'].includes(p.status) || Boolean(p.actual_score);
+        const outcome: SettlementOutcome =
+          p.status === 'WON'
+            ? 'WIN'
+            : p.status === 'LOST'
+            ? 'LOSS'
+            : p.status === 'PUSH'
+            ? 'PUSH'
+            : Number(p.profit_loss) > 0
+            ? 'WIN'
+            : Number(p.profit_loss) < 0
+            ? 'LOSS'
+            : 'PUSH';
+
+        const homeGoals = p.actual_score ? Number(p.actual_score.split('-')[0]) || 0 : 0;
+        const awayGoals = p.actual_score ? Number(p.actual_score.split('-')[1]) || 0 : 0;
+
         if (!ledger[predId]) {
           const rec: CanonicalPredictionRecord = {
             predictionId: predId,
-            canonicalFixtureId: p.fixture_id,
+            canonicalFixtureId,
             fixture: `${p.home_team} vs ${p.away_team}`,
-            competition: p.league,
-            league: p.league,
+            competition: p.league || 'Premier League',
+            league: p.league || 'Premier League',
             homeTeam: p.home_team,
             awayTeam: p.away_team,
             kickoffTimestamp: p.kickoff_utc,
             market: p.market_type === 'ASIAN_HANDICAP' ? 'AH' : p.market_type === 'OVER_UNDER' ? 'OU' : 'BTTS',
             selection: p.prediction,
-            line: null,
-            lineType: 'NONE',
+            line,
+            lineType,
             provider: 'OddsPapi',
             bookmaker: p.market_bookmaker || 'Pinnacle',
             marketOdds: Number(p.market_odds) || 1.95,
-            oddsTimestamp: p.created_at,
+            oddsTimestamp: oddsTs,
             modelProbability: Number(p.model_probability) || 0.5,
             calibratedProbability: Number(p.model_probability) || 0.5,
             fairOdds: Number(p.fair_odds) || 2.0,
             edge: Number(p.edge_pct || 0) / 100,
-            expectedValue: 0.05,
+            expectedValue: Number(p.edge_pct || 0) / 100,
             confidence: p.verdict === 'LAYAK' ? 'HIGH' : p.verdict === 'PANTAU' ? 'MEDIUM' : 'LOW',
             confidenceScore: Number(p.confidence) || 75,
             valueStatus: 'VALUE',
-            status: p.status === 'SETTLED' ? 'SETTLED' : 'PENDING',
-            settlement: p.status === 'SETTLED' && p.actual_score ? {
-              settlementId: `stl_${predId}`,
-              predictionId: predId,
-              canonicalFixtureId: p.fixture_id,
-              homeGoals: Number(p.actual_score.split('-')[0]) || 0,
-              awayGoals: Number(p.actual_score.split('-')[1]) || 0,
-              totalGoals: 0,
-              matchStatus: 'FT',
-              outcome: p.profit_loss > 0 ? 'WIN' : p.profit_loss < 0 ? 'LOSS' : 'PUSH',
-              stakeUnits: 1.0,
-              profitUnits: Number(p.profit_loss) || 0,
-              returnUnits: (Number(p.profit_loss) || 0) + 1.0,
-              settledAt: p.settled_at || new Date().toISOString(),
-              resultProvider: 'api-football',
-              resultReceivedAt: p.settled_at || new Date().toISOString(),
-            } : null,
+            status: isSettled ? 'SETTLED' : 'PENDING',
+            settlement: isSettled
+              ? {
+                  settlementId: `stl_${predId}`,
+                  predictionId: predId,
+                  canonicalFixtureId,
+                  homeGoals,
+                  awayGoals,
+                  totalGoals: homeGoals + awayGoals,
+                  matchStatus: 'FT',
+                  outcome,
+                  stakeUnits: 1.0,
+                  profitUnits: Number(p.profit_loss) || 0,
+                  returnUnits: (Number(p.profit_loss) || 0) + 1.0,
+                  settledAt: p.settled_at || new Date().toISOString(),
+                  resultProvider: 'api-football',
+                  resultReceivedAt: p.settled_at || new Date().toISOString(),
+                }
+              : null,
             rawPredictionPayloadHash: 'db_synced',
             inputSnapshotHash: 'db_synced',
             clvRecord: null,
             revisions: [],
             predictionTimestamp: p.created_at,
             featureTimestamp: p.created_at,
-            modelVersion: 'dixon-coles-v1.0',
+            modelVersion: modelVer,
             pipelineVersion: 'production-v1.0',
             dataVersion: 'supabase-v1.0',
             createdAt: p.created_at,
-            updatedAt: p.created_at,
+            updatedAt: p.settled_at || p.created_at,
           };
           ledger[predId] = rec;
           added++;
-        } else if (p.status === 'SETTLED' && ledger[predId].status !== 'SETTLED') {
+        } else if (isSettled && ledger[predId].status !== 'SETTLED') {
           ledger[predId].status = 'SETTLED';
-          if (p.actual_score) {
-            ledger[predId].settlement = {
-              settlementId: `stl_${predId}`,
-              predictionId: predId,
-              canonicalFixtureId: p.fixture_id,
-              homeGoals: Number(p.actual_score.split('-')[0]) || 0,
-              awayGoals: Number(p.actual_score.split('-')[1]) || 0,
-              totalGoals: 0,
-              matchStatus: 'FT',
-              outcome: p.profit_loss > 0 ? 'WIN' : p.profit_loss < 0 ? 'LOSS' : 'PUSH',
-              stakeUnits: 1.0,
-              profitUnits: Number(p.profit_loss) || 0,
-              returnUnits: (Number(p.profit_loss) || 0) + 1.0,
-              settledAt: p.settled_at || new Date().toISOString(),
-              resultProvider: 'api-football',
-              resultReceivedAt: p.settled_at || new Date().toISOString(),
-            };
-          }
+          ledger[predId].settlement = {
+            settlementId: `stl_${predId}`,
+            predictionId: predId,
+            canonicalFixtureId,
+            homeGoals,
+            awayGoals,
+            totalGoals: homeGoals + awayGoals,
+            matchStatus: 'FT',
+            outcome,
+            stakeUnits: 1.0,
+            profitUnits: Number(p.profit_loss) || 0,
+            returnUnits: (Number(p.profit_loss) || 0) + 1.0,
+            settledAt: p.settled_at || new Date().toISOString(),
+            resultProvider: 'api-football',
+            resultReceivedAt: p.settled_at || new Date().toISOString(),
+          };
           added++;
         }
       }
