@@ -109,6 +109,18 @@ describe('HandicapLab Contract Sync Auth (/api/v1/salmo/sync)', () => {
     expect(result.identity).toBe('bearer_api_key');
   });
 
+  it('authorizes Bearer matching CRON_SECRET even when HANDICAPLAB_API_KEY is concurrently configured', async () => {
+    process.env.HANDICAPLAB_API_KEY = 'primary_key_aaa';
+    process.env.CRON_SECRET = 'secondary_key_bbb';
+
+    const req = new NextRequest('http://localhost:3000/api/v1/salmo/sync', {
+      headers: { Authorization: 'Bearer secondary_key_bbb' },
+    });
+    const result = await verifyContractSyncRequest(req);
+    expect(result.authorized).toBe(true);
+    expect(result.identity).toBe('bearer_api_key');
+  });
+
   it('authorizes valid Google Cloud OIDC ID token', async () => {
     delete process.env.HANDICAPLAB_API_KEY;
     delete process.env.CRON_SECRET;

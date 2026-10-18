@@ -131,9 +131,17 @@ export async function verifyCronRequest(
     }
 
     // B. Validate Audience
-    const audMatches =
-      payload.aud === expectedAudience ||
-      (Array.isArray(payload.aud) && payload.aud.includes(expectedAudience));
+    const validAudiences = [
+      expectedAudience,
+      CANONICAL_CLOUD_RUN_AUDIENCE,
+      'https://handicaplab-production-129269713730.asia-southeast2.run.app',
+      'https://handicaplab-production-2kboo7tbxa-et.a.run.app',
+      'https://handicaplab.dev',
+    ].filter(Boolean);
+
+    const audMatches = Array.isArray(payload.aud)
+      ? payload.aud.some((a: string) => validAudiences.includes(a))
+      : validAudiences.includes(payload.aud);
     if (!audMatches) {
       return {
         authorized: false,
@@ -222,12 +230,23 @@ export async function verifyContractSyncRequest(
   }
 
   // 1. Direct match with configured API keys (timing-safe)
-  const syncApiKey = (process.env.HANDICAPLAB_API_KEY || process.env.SALMO_SYNC_API_KEY || process.env.CRON_SECRET)?.trim();
-  if (syncApiKey && timingSafeCompare(token, syncApiKey)) {
-    return {
-      authorized: true,
-      identity: 'bearer_api_key',
-    };
+  const candidateKeys = [
+    process.env.HANDICAPLAB_API_KEY,
+    process.env.SALMO_SYNC_API_KEY,
+    process.env.SALMO_SYNC_TOKEN,
+    process.env.HANDICAPLAB_INTERNAL_API_KEY,
+    process.env.CRON_SECRET,
+  ]
+    .filter(Boolean)
+    .map((k) => k!.trim());
+
+  for (const candidate of candidateKeys) {
+    if (candidate && timingSafeCompare(token, candidate)) {
+      return {
+        authorized: true,
+        identity: 'bearer_api_key',
+      };
+    }
   }
 
   // 2. Fall back to OIDC verification for Cloud Scheduler / Service Accounts
