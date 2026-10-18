@@ -21,20 +21,31 @@ export default async function AuditCenterPage({
   const resolvedParams = await searchParams;
 
   // Query real predictions from prediction_ledger_v3
-  const { data: rows } = await supabase
-    .from('prediction_ledger_v3')
-    .select('*')
-    .order('prediction_timestamp', { ascending: false })
-    .limit(50);
+  let rows: any[] = [];
+  let settledCount: number = 0;
+  let totalPredictions: number = 0;
 
-  const { count: settledCount } = await supabase
-    .from('prediction_ledger_v3')
-    .select('*', { count: 'exact', head: true })
-    .not('actual_outcome', 'is', null);
+  try {
+    const { data: rowsData } = await supabase
+      .from('prediction_ledger_v3')
+      .select('*')
+      .order('prediction_timestamp', { ascending: false })
+      .limit(50);
+    rows = rowsData || [];
 
-  const { count: totalPredictions } = await supabase
-    .from('prediction_ledger_v3')
-    .select('*', { count: 'exact', head: true });
+    const { count: sCount } = await supabase
+      .from('prediction_ledger_v3')
+      .select('*', { count: 'exact', head: true })
+      .not('actual_outcome', 'is', null);
+    settledCount = sCount || 0;
+
+    const { count: tCount } = await supabase
+      .from('prediction_ledger_v3')
+      .select('*', { count: 'exact', head: true });
+    totalPredictions = tCount || 0;
+  } catch (err) {
+    console.warn('[AuditCenterPage] Data unavailable during static build/prerender:', (err as Error)?.message || err);
+  }
 
   const predictions: AuditPredictionRow[] = (rows || []).map((r: any) => ({
     id: r.id,

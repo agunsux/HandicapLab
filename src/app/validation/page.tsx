@@ -15,12 +15,19 @@ export const metadata = {
 
 export default async function LiveValidationPage() {
   // Fetch prediction ledger from Supabase
-  const { data: ledgerEntries } = await supabase
-    .from('prediction_ledger')
-    .select('*')
-    .order('published_at', { ascending: false });
+  let ledgerEntries: any[] = [];
 
-  const entries = ledgerEntries || [];
+  try {
+    const { data } = await supabase
+      .from('prediction_ledger')
+      .select('*')
+      .order('published_at', { ascending: false });
+    ledgerEntries = data || [];
+  } catch (err) {
+    console.warn('[LiveValidationPage] Data unavailable during static build/prerender:', (err as Error)?.message || err);
+  }
+
+  const entries = ledgerEntries;
   const metrics = calculateQuantitativeMetrics(entries);
 
   // Today's entries

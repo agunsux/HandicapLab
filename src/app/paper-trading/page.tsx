@@ -4,40 +4,48 @@ import { PaperTradingDashboard } from './_components/PaperTradingDashboard';
 export const dynamic = 'force-static';
 
 export default async function PaperTradingPage() {
-  // 1. Fetch paper trades
-  const { data: trades, error } = await supabase
-    .from('paper_trades')
-    .select('*')
-    .order('created_at', { ascending: false });
-
-  if (error) {
-    console.error('Failed to fetch paper trades:', error);
-  }
-
-  // 2. Fetch matches to resolve team names
-  const matchIds = Array.from(new Set((trades || []).map(t => t.match_id)));
+  let trades: any[] = [];
   let matches: any[] = [];
-  if (matchIds.length > 0) {
-    const { data: matchesData } = await supabase
-      .from('matches')
-      .select('*').eq('data_status', 'ACTIVE').in('source_type', ['PROVIDER', 'HISTORICAL', 'MANUAL'])
-      .in('id', matchIds);
-    matches = matchesData || [];
-  }
-
-  // Fetch competitions cache corresponding to the paper trades
-  const compIds = Array.from(new Set((trades || []).map(t => t.competition_id).filter(Boolean)));
   let competitions: any[] = [];
-  if (compIds.length > 0) {
-    const { data: compData } = await supabase
-      .from('leagues_cache')
+
+  try {
+    // 1. Fetch paper trades
+    const { data: tradesData, error } = await supabase
+      .from('paper_trades')
       .select('*')
-      .in('api_id', compIds.map(Number));
-    competitions = compData || [];
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Failed to fetch paper trades:', error);
+    } else {
+      trades = tradesData || [];
+    }
+
+    // 2. Fetch matches to resolve team names
+    const matchIds = Array.from(new Set(trades.map(t => t.match_id)));
+    if (matchIds.length > 0) {
+      const { data: matchesData } = await supabase
+        .from('matches')
+        .select('*').eq('data_status', 'ACTIVE').in('source_type', ['PROVIDER', 'HISTORICAL', 'MANUAL'])
+        .in('id', matchIds);
+      matches = matchesData || [];
+    }
+
+    // Fetch competitions cache corresponding to the paper trades
+    const compIds = Array.from(new Set(trades.map(t => t.competition_id).filter(Boolean)));
+    if (compIds.length > 0) {
+      const { data: compData } = await supabase
+        .from('leagues_cache')
+        .select('*')
+        .in('api_id', compIds.map(Number));
+      competitions = compData || [];
+    }
+  } catch (err) {
+    console.warn('[PaperTradingPage] Data unavailable during static build/prerender:', (err as Error)?.message || err);
   }
 
   // 3. Map items in memory
-  const items = (trades || []).map(trade => {
+  const items = trades.map(trade => {
     const match = matches.find(m => String(m.id) === String(trade.match_id) || String(m.external_match_id) === String(trade.match_id));
     const comp = competitions.find(c => String(c.api_id) === String(trade.competition_id));
     return {

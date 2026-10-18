@@ -4,43 +4,53 @@ import { LedgerTable } from './_components/LedgerTable';
 export const dynamic = 'force-static';
 
 export default async function LedgerPage() {
-  // 1. Fetch raw ledger entries starting strictly from Day 0 (2026-09-06T00:00:00Z)
-  const { data: ledgerEntries, error: ledgerErr } = await supabase
-    .from('prediction_ledger')
-    .select('*')
-    .gte('published_at', '2026-09-06T00:00:00Z')
-    .order('published_at', { ascending: false });
-
-  if (ledgerErr) {
-    console.error('Failed to fetch prediction ledger:', ledgerErr);
-  }
-
-  // 2. Fetch matches corresponding to the ledger
-  const matchIds = Array.from(new Set((ledgerEntries || []).map(e => e.match_id)));
+  let ledgerEntries: any[] = [];
   let matches: any[] = [];
-  if (matchIds.length > 0) {
-    const { data: matchesData } = await supabase
-      .from('matches')
-      .select('*')
-      .in('id', matchIds);
-    matches = matchesData || [];
-  }
-
-  // 3. Fetch competitions cache corresponding to the ledger
-  const compIds = Array.from(new Set((ledgerEntries || []).map(e => e.competition_id).filter(Boolean)));
   let competitions: any[] = [];
-  if (compIds.length > 0) {
-    const { data: compData } = await supabase
-      .from('leagues_cache')
-      .select('*')
-      .in('api_id', compIds);
-    competitions = compData || [];
-  }
+  let decisions: any[] = [];
 
-  // Fetch prediction decisions
-  const { data: decisions } = await supabase
-    .from('prediction_decisions')
-    .select('*');
+  try {
+    // 1. Fetch raw ledger entries starting strictly from Day 0 (2026-09-06T00:00:00Z)
+    const { data: entriesData, error: ledgerErr } = await supabase
+      .from('prediction_ledger')
+      .select('*')
+      .gte('published_at', '2026-09-06T00:00:00Z')
+      .order('published_at', { ascending: false });
+
+    if (ledgerErr) {
+      console.error('Failed to fetch prediction ledger:', ledgerErr);
+    } else {
+      ledgerEntries = entriesData || [];
+    }
+
+    // 2. Fetch matches corresponding to the ledger
+    const matchIds = Array.from(new Set(ledgerEntries.map(e => e.match_id)));
+    if (matchIds.length > 0) {
+      const { data: matchesData } = await supabase
+        .from('matches')
+        .select('*')
+        .in('id', matchIds);
+      matches = matchesData || [];
+    }
+
+    // 3. Fetch competitions cache corresponding to the ledger
+    const compIds = Array.from(new Set(ledgerEntries.map(e => e.competition_id).filter(Boolean)));
+    if (compIds.length > 0) {
+      const { data: compData } = await supabase
+        .from('leagues_cache')
+        .select('*')
+        .in('api_id', compIds);
+      competitions = compData || [];
+    }
+
+    // Fetch prediction decisions
+    const { data: decisionsData } = await supabase
+      .from('prediction_decisions')
+      .select('*');
+    decisions = decisionsData || [];
+  } catch (err) {
+    console.warn('[LedgerPage] Data unavailable during static build/prerender:', (err as Error)?.message || err);
+  }
 
   // 4. Combine data layers in memory
   const items = (ledgerEntries || []).map((entry) => {
