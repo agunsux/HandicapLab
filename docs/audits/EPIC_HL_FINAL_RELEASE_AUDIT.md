@@ -82,17 +82,65 @@ Empirical evidence verified against live provider endpoints:
 
 ---
 
-## 4. Predeploy Gate Verification
+## 4. Predeploy Gate & Deployment Verification
 
 - **Target Deployment Verified**: Cloud Run service `handicaplab-production` in region `asia-southeast2` and Vercel edge rewrite proxy at `https://handicaplab.dev`.
+- **Active Production Revision**: `handicaplab-production-00012-kx8` (Image: `asia-southeast2-docker.pkg.dev/handicap-salmo/handicaplab/handicaplab:533f07f`).
+- **Git Commit Provenance**:
+  - `fa58802`: `fix(salmo): harden canonical sync contract and provider integrity`
+  - `e5641f6`: `fix(build): add fail-closed try-catch guards to static pages during Docker export`
+  - `533f07f`: `fix(build): handle unbundled research dataset gracefully in premier-league ah-research page`
 - **Environment & Secrets**: Verified environment configuration via runtime checks. No raw secrets logged or exposed.
 - **Database & Ledger Compatibility**: Tested against canonical match registry and prediction ledgers. Zero destructive migrations.
-- **Fail-Closed Gate**: If upstream providers are unavailable, `/api/v1/salmo/sync` serves canonical historical predictions and cached fixtures with explicit status codes (HTTP 200 for real data/no picks, HTTP 503 for unavailable), never returning empty success arrays or fabricated odds.
-- **Rollback Path**: Fast git revert or Cloud Run rollback to prior revision (`handicaplab-production-00045-xxx` / commit `11e0e78`).
+- **Fail-Closed Gate**: If upstream providers are unavailable, `/api/v1/salmo/sync` serves canonical historical predictions and cached fixtures with explicit status codes, never returning empty success arrays or fabricated odds.
+- **Cloud Scheduler Verification**: Confirmed via `gcloud scheduler jobs list --location=asia-southeast2`:
+  - `handicaplab-rescue-daily`: `PAUSED`
+  - `handicaplab-pipeline-daily`: `PAUSED`
 
 ---
 
-## 5. Remaining Manual Blockers
+## 5. Live Production Smoke Test Evidence
+
+Executed on 2026-10-18T18:27:00+07:00 against live production infrastructure:
+
+### 5.1 Automated Production Verification Suite (`scripts/verify-production.js`)
+```
+[PASS] Vercel Frontend: Homepage (https://handicaplab.dev/) -> HTTP 200
+[PASS] Vercel Frontend: Models Registry (https://handicaplab.dev/models) -> HTTP 200
+[PASS] Vercel Frontend: Daily Picks UI (https://handicaplab.dev/daily-picks) -> HTTP 200
+[PASS] Vercel Frontend: Track Record (https://handicaplab.dev/track-record) -> HTTP 200
+[PASS] Vercel Edge Rewrite -> Cloud Run: Health Check (https://handicaplab.dev/api/v1/health) -> HTTP 200 (healthy)
+[PASS] Vercel Edge Rewrite -> Cloud Run: Public Predictions -> HTTP 200 (5 real predictions returned)
+[PASS] Cloud Run Direct: Health Check -> HTTP 200 (healthy)
+[PASS] Cloud Run Direct: Public Predictions -> HTTP 200 (5 real predictions returned)
+[PASS] SALMO Production: Homepage (https://salmo.dev/) -> HTTP 200
+[PASS] SALMO Production: Daily Picks Page (https://salmo.dev/daily-picks) -> HTTP 200
+SUMMARY: 10 PASSED, 0 FAILED
+```
+
+### 5.2 SALMO Contract Sync Endpoint Gate (`/api/v1/salmo/sync`)
+1. **Unauthenticated Access (Cloud Run Direct & Vercel Edge Rewrite)**:
+   - Request: `curl.exe -i "https://handicaplab-production-129269713730.asia-southeast2.run.app/api/v1/salmo/sync"`
+   - Output: `HTTP/1.1 401 Unauthorized`
+   - Payload: `{"success":false,"error":"UNAUTHORIZED","reason":"MISSING_OR_MALFORMED_AUTHORIZATION_HEADER"}`
+2. **Authenticated Access (Timing-Safe Bearer Verification)**:
+   - Request: `curl.exe -H "Authorization: Bearer [REDACTED_CRON_SECRET]" ...`
+   - Output: `HTTP/1.1 200 OK`
+   - Payload State:
+     - `success`: `true`
+     - `dataState`: `"NO_QUALIFIED_PICKS"`
+     - `counts`: `totalArchived: 566`, `dailyPicks: 0`, `settled: 1`, `pending: 565`, `upcomingFixtures: 0`, `verifiedResults: 1`
+     - `freshness`: `status: "FRESH"`, `fixtureFreshnessSlaSeconds: 3600`, `oddsFreshnessSlaSeconds: 3600`
+     - `providerStatus`:
+       - `apiFootball`: `AUTH_FAILED` (`liveIngestion: BLOCKED`, Account suspended on api-sports.io)
+       - `footyStats`: `AUTH_FAILED` (`liveIngestion: BLOCKED`, Demo key quarantined)
+       - `oddsPapi`: `QUOTA_BLOCKED` (`liveIngestion: BLOCKED`, 260/250 used, reserve floor 50 protected)
+     - `missingDataReasons`: Detailed audit reasons for all 3 providers.
+     - `pagination`: `page: 1`, `limit: 2`, `total: 0`, `totalPages: 1`
+
+---
+
+## 6. Remaining Upstream Operations (Manual Billing / Account Actions)
 
 1. **API-Football Pro**: Un-suspend subscription on `https://dashboard.api-football.com`.
 2. **OddsPapi**: Renew or upgrade quota on `https://oddspapi.io` (current usage: 260/250).
@@ -100,9 +148,12 @@ Empirical evidence verified against live provider endpoints:
 
 ---
 
-## 6. Final Verdict
+## 7. Final Verdict
 
-### **CONDITIONAL GO**
+### **DEPLOYMENT COMPLETE / PRODUCTION CONTRACT OPERATIONAL**
 
-- **GO**: For code commit, push, and contract deployment. The SALMO sync contract (`/api/v1/salmo/sync`) is fully hardened, verified, and safe to deploy.
-- **NO-GO**: For automated live provider polling and Cloud Scheduler activation. Polling remains paused to honor upstream account limits and protect system integrity.
+- **CONTRACT DEPLOYMENT: GO & DEPLOYED**
+  - Contract endpoint `/api/v1/salmo/sync` is fully deployed on Cloud Run revision `handicaplab-production-00012-kx8` and proxied via Vercel at `https://handicaplab.dev/api/v1/salmo/sync`.
+  - Zero synthetic data, zero mock fallback, and fail-closed authentication are verified in production.
+- **LIVE POLLING & CRON SCHEDULER: NO-GO (REMAINS PAUSED)**
+  - Automated ingestion remains strictly disabled to protect upstream quota limits and adhere to data governance invariants until account credentials/quotas are renewed.
