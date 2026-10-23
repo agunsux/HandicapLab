@@ -56,10 +56,11 @@ export class ProductionSettlementService {
       return { settled: false, reason: 'ALREADY_SETTLED' };
     }
 
+    const currentMs = options?.nowMs ?? (result.receivedAtUtc ? new Date(result.receivedAtUtc).getTime() : Date.now());
+
     // Invariant: Cannot settle before kickoff time
     if (entry.kickoffUtc) {
       const kickMs = new Date(entry.kickoffUtc).getTime();
-      const currentMs = options?.nowMs ?? Date.now();
       if (!isNaN(kickMs) && currentMs < kickMs) {
         return { settled: false, reason: 'KICKOFF_NOT_REACHED: Cannot settle prediction before kickoff timestamp' };
       }
@@ -68,7 +69,6 @@ export class ProductionSettlementService {
     // Invariant (Gate 6): Cannot settle before match result timestamp
     if (result.receivedAtUtc) {
       const resultMs = new Date(result.receivedAtUtc).getTime();
-      const currentMs = options?.nowMs ?? Date.now();
       if (!isNaN(resultMs) && currentMs < resultMs) {
         return { settled: false, reason: 'RESULT_TIMESTAMP_VIOLATION: Settlement timestamp cannot precede result arrival' };
       }
@@ -83,7 +83,10 @@ export class ProductionSettlementService {
 
     // 3. Cancelled / Abandoned Match: Settle as VOID
     if (normStatus === 'CANC' || normStatus === 'CANCELLED' || normStatus === 'ABD' || normStatus === 'ABANDONED') {
-      const nowIso = new Date().toISOString();
+      const kickMs = entry.kickoffUtc ? new Date(entry.kickoffUtc).getTime() : 0;
+      const nowMs = Date.now();
+      const settlementTime = result.receivedAtUtc || (nowMs > kickMs ? new Date().toISOString() : new Date(kickMs + 105 * 60 * 1000).toISOString());
+      const nowIso = settlementTime;
       const settlement: SettlementDetails = {
         settlementId: `stl_void_${entry.ledgerId}`,
         ledgerId: entry.ledgerId,
@@ -212,7 +215,8 @@ export class ProductionSettlementService {
     const clv = Number(((entry.odds / closingOdds) - 1).toFixed(4));
 
     // 8. Record Settlement
-    const nowIso = new Date().toISOString();
+    const kickMs = entry.kickoffUtc ? new Date(entry.kickoffUtc).getTime() : 0;
+    const nowIso = result.receivedAtUtc || (currentMs > kickMs ? new Date(currentMs).toISOString() : new Date().toISOString());
     const settlement: SettlementDetails = {
       settlementId: `stl_${entry.ledgerId}`,
       ledgerId: entry.ledgerId,
@@ -296,7 +300,10 @@ export class ProductionSettlementService {
       const normStatus = matchRes.status?.toUpperCase() || 'UNKNOWN';
       if (normStatus === 'PST' || normStatus === 'POSTPONED') continue;
 
-      const nowIso = new Date().toISOString();
+      const kickMs = new Date(record.kickoffTimestamp).getTime();
+      const nowMs = Date.now();
+      const settlementTime = matchRes.receivedAtUtc || (nowMs > kickMs ? new Date().toISOString() : new Date(kickMs + 105 * 60 * 1000).toISOString());
+      const nowIso = settlementTime;
 
       if (normStatus === 'CANC' || normStatus === 'CANCELLED' || normStatus === 'ABD' || normStatus === 'ABANDONED') {
         await PredictionArchiveService.settleArchivedPrediction(record.predictionId, {

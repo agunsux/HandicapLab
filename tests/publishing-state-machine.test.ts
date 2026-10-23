@@ -1,10 +1,14 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterAll } from 'vitest';
 import { ProductionPublishingEngine } from '@/lib/publishing/productionPublishingEngine';
 import { PublishTransitionEvent } from '@/lib/publishing/types';
 
 describe('Publishing State Machine Specification', () => {
   beforeEach(() => {
     // Reset store before each test
+    ProductionPublishingEngine.saveStore({});
+  });
+
+  afterAll(() => {
     ProductionPublishingEngine.saveStore({});
   });
 

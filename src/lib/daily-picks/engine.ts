@@ -1441,7 +1441,12 @@ export class DailyPicksEngine {
         const published = ProductionPublishingEngine.getPublishedSignals();
 
         if (published && published.length > 0) {
-          const picks: DailyPickRecord[] = published.map((s) => ({
+          const fallbackNow = new Date().toISOString();
+          const picks: DailyPickRecord[] = published.map((s) => {
+            const oddsTs = s.oddsTimestampUtc || s.lastReconciledUtc || fallbackNow;
+            const rawPredTs = s.predictionTimestampUtc || s.lastReconciledUtc || fallbackNow;
+            const predTs = new Date(rawPredTs).getTime() < new Date(oddsTs).getTime() ? oddsTs : rawPredTs;
+            return {
             predictionId: s.signalId,
             fixtureId: s.fixtureId,
             homeTeam: s.homeTeam,
@@ -1451,8 +1456,8 @@ export class DailyPicksEngine {
             market: s.market as CanonicalMarket,
             selection: s.selection,
             line: s.line ?? 0,
-            predictionTimestampUtc: s.predictionTimestampUtc || s.lastReconciledUtc || new Date().toISOString(),
-            oddsTimestampUtc: s.oddsTimestampUtc || s.lastReconciledUtc || new Date().toISOString(),
+            predictionTimestampUtc: predTs,
+            oddsTimestampUtc: oddsTs,
             modelVersion: s.providerProvenance?.modelVersion || 'dixon-coles-v1.0',
             dataVersion: 'canonical-published',
             providerSources: s.providerProvenance || { fixtures: 'api-football-pro', odds: 'oddspapi-pinnacle', statistics: 'apifootball' },
@@ -1472,9 +1477,10 @@ export class DailyPicksEngine {
             dataQuality: 95,
             providerHealth: 'HEALTHY',
             status: 'ACTIVE',
-            apiFootballFixtureTimestamp: s.lastReconciledUtc || new Date().toISOString(),
-            oddsPapiSnapshotTimestamp: s.oddsTimestampUtc || s.lastReconciledUtc || new Date().toISOString(),
-          }));
+            apiFootballFixtureTimestamp: s.lastReconciledUtc || fallbackNow,
+            oddsPapiSnapshotTimestamp: oddsTs,
+          };
+        });
 
           return {
             success: true,
@@ -1539,6 +1545,7 @@ export class DailyPicksEngine {
         });
 
         if (validPicks.length > 0) {
+          const fallbackNow = new Date().toISOString();
           const mapped: DailyPickRecord[] = validPicks.map((p: any) => ({
             predictionId: `db_${p.fixture_id}_${p.market_type}`,
             fixtureId: p.fixture_id,
@@ -1549,8 +1556,8 @@ export class DailyPicksEngine {
             market: p.market_type as CanonicalMarket,
             selection: p.prediction,
             line: 0,
-            predictionTimestampUtc: new Date().toISOString(),
-            oddsTimestampUtc: new Date().toISOString(),
+            predictionTimestampUtc: p.created_at || fallbackNow,
+            oddsTimestampUtc: p.created_at || fallbackNow,
             modelVersion: 'dixon-coles-v1.0',
             dataVersion: 'supabase-persisted',
             providerSources: {

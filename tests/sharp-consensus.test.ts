@@ -255,7 +255,7 @@ describe('SharpReferenceProvider — provider abstraction', () => {
       snapshot('pinnacle', 'asian_handicap', -0.5, 1.91, 1.91),
       snapshot('sbobet', 'asian_handicap', -0.5, 1.91, 1.91),
       snapshot('pinnacle', 'asian_handicap', -0.75, 1.85, 1.95),
-    ]);
+    ], { now: NOW });
 
     expect(results).toHaveLength(2);
     const half = results.find((r) => r.line === -0.5)!;

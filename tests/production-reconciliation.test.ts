@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll } from 'vitest';
+import { describe, it, expect, beforeAll, vi } from 'vitest';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 
@@ -11,21 +11,167 @@ import { UpcomingFixturesService } from '@/lib/services/upcomingFixturesService'
 import { DailyPicksEngine } from '@/lib/daily-picks/engine';
 import { globalGateway } from '@/lib/providers/providerGateway';
 import { supabase } from '@/lib/supabase.server';
+import { apiFootballClient } from '@/lib/apis/apifootball';
+import { ProductionPublishingEngine } from '@/lib/publishing/productionPublishingEngine';
 
 describe('Epic 2 — Production Realtime & Daily Picks Reconciliation', () => {
   let canonicalResult: any;
   let picksResult: any;
 
   beforeAll(async () => {
+    ProductionPublishingEngine.saveStore({});
+    vi.spyOn(apiFootballClient, 'getFixturesRange').mockImplementation(async (from, to, leagueId) => {
+      if (leagueId === 39) {
+        return {
+          response: [
+            {
+              fixture: {
+                id: '0caff924-d9f7-5391-96be-2670e4e28eae',
+                date: '2026-10-23T19:00:00+00:00',
+                status: { short: 'NS' },
+                venue: { name: 'Portman Road', city: 'Ipswich' },
+              },
+              league: { id: 39, name: 'Premier League', season: 2026 },
+              teams: {
+                home: { id: 57, name: 'Ipswich Town' },
+                away: { id: 65, name: 'Nottingham Forest' },
+              },
+            },
+            {
+              fixture: {
+                id: 'e0b4f059-29ee-5bad-a002-b9014909812e',
+                date: '2026-10-24T11:30:00+00:00',
+                status: { short: 'NS' },
+                venue: { name: 'Villa Park', city: 'Birmingham' },
+              },
+              league: { id: 39, name: 'Premier League', season: 2026 },
+              teams: {
+                home: { id: 66, name: 'Aston Villa' },
+                away: { id: 50, name: 'Manchester City' },
+              },
+            },
+            {
+              fixture: {
+                id: '1d5cd0e1-5e7e-5ed4-9321-35bbaf68e759',
+                date: '2026-10-24T14:00:00+00:00',
+                status: { short: 'NS' },
+                venue: { name: 'Emirates Stadium', city: 'London' },
+              },
+              league: { id: 39, name: 'Premier League', season: 2026 },
+              teams: {
+                home: { id: 42, name: 'Arsenal' },
+                away: { id: 45, name: 'Everton' },
+              },
+            },
+            {
+              fixture: {
+                id: '78a4c602-d967-50ec-906b-799875981669',
+                date: '2026-10-24T14:00:00+00:00',
+                status: { short: 'NS' },
+                venue: { name: 'Coventry Building Society Arena', city: 'Coventry' },
+              },
+              league: { id: 39, name: 'Premier League', season: 2026 },
+              teams: {
+                home: { id: 1076, name: 'Coventry City' },
+                away: { id: 36, name: 'Fulham' },
+              },
+            },
+            {
+              fixture: {
+                id: '902f6460-b8d2-573e-a543-1b4f72f5b1cf',
+                date: '2026-10-24T16:30:00+00:00',
+                status: { short: 'NS' },
+                venue: { name: 'Stamford Bridge', city: 'London' },
+              },
+              league: { id: 39, name: 'Premier League', season: 2026 },
+              teams: {
+                home: { id: 49, name: 'Chelsea' },
+                away: { id: 47, name: 'Tottenham Hotspur' },
+              },
+            },
+            {
+              fixture: {
+                id: '80121cf8-9d8d-5ab1-8f89-097b6f91667e',
+                date: '2026-10-25T14:00:00+00:00',
+                status: { short: 'NS' },
+                venue: { name: 'Old Trafford', city: 'Manchester' },
+              },
+              league: { id: 39, name: 'Premier League', season: 2026 },
+              teams: {
+                home: { id: 33, name: 'Manchester United' },
+                away: { id: 35, name: 'Bournemouth' },
+              },
+            },
+            {
+              fixture: {
+                id: '3daafae4-1292-5f57-bcea-8988f43fc53d',
+                date: '2026-10-25T14:00:00+00:00',
+                status: { short: 'NS' },
+                venue: { name: 'MKM Stadium', city: 'Hull' },
+              },
+              league: { id: 39, name: 'Premier League', season: 2026 },
+              teams: {
+                home: { id: 64, name: 'Hull City' },
+                away: { id: 55, name: 'Brentford' },
+              },
+            },
+            {
+              fixture: {
+                id: '3fe2b1c3-34c4-5fea-bfd8-fa5399ec658e',
+                date: '2026-10-25T14:00:00+00:00',
+                status: { short: 'NS' },
+                venue: { name: 'Anfield', city: 'Liverpool' },
+              },
+              league: { id: 39, name: 'Premier League', season: 2026 },
+              teams: {
+                home: { id: 40, name: 'Liverpool' },
+                away: { id: 51, name: 'Brighton and Hove Albion' },
+              },
+            },
+            {
+              fixture: {
+                id: 'df6672b7-8f47-5886-ab3b-c09201f09df9',
+                date: '2026-10-25T14:00:00+00:00',
+                status: { short: 'NS' },
+                venue: { name: 'Selhurst Park', city: 'London' },
+              },
+              league: { id: 39, name: 'Premier League', season: 2026 },
+              teams: {
+                home: { id: 52, name: 'Crystal Palace' },
+                away: { id: 34, name: 'Newcastle United' },
+              },
+            },
+            {
+              fixture: {
+                id: '7245fabc-cfa2-5af3-b888-5f389f7eb7e5',
+                date: '2026-10-25T16:30:00+00:00',
+                status: { short: 'NS' },
+                venue: { name: 'Stadium of Light', city: 'Sunderland' },
+              },
+              league: { id: 39, name: 'Premier League', season: 2026 },
+              teams: {
+                home: { id: 71, name: 'Sunderland' },
+                away: { id: 63, name: 'Leeds United' },
+              },
+            },
+          ],
+        } as any;
+      }
+      return { response: [] } as any;
+    });
+
+    delete process.env.VERCEL;
+
     // 1. Fetch Canonical Fixtures (7-day horizon)
     canonicalResult = await CanonicalFixtureRegistry.getUpcomingFixtures({
       horizon: 'NEXT_7_DAYS',
       limit: 50,
-      forceRefresh: false,
+      forceRefresh: true,
+      readOnly: false,
     });
 
     // 2. Fetch Daily Picks
-    picksResult = await DailyPicksEngine.getDailyPicks({ forceRefresh: false });
+    picksResult = await DailyPicksEngine.getDailyPicks({ forceRefresh: true });
   }, 30000);
 
   it('Invariant 1: Provider Health Monitor is ACTIVE on cold start (no paused trap)', () => {
@@ -68,7 +214,7 @@ describe('Epic 2 — Production Realtime & Daily Picks Reconciliation', () => {
   });
 
   it('Invariant 6: UpcomingFixturesService delegates directly to CanonicalFixtureRegistry (No Disconnection)', async () => {
-    const serviceRes = await UpcomingFixturesService.getUpcomingFixtures({ daysAhead: 7 });
+    const serviceRes = await UpcomingFixturesService.getUpcomingFixtures({ daysAhead: 7, forceRefresh: true, readOnly: false });
     expect(serviceRes.fixtures.length).toBe(canonicalResult.fixtures.length);
     expect(serviceRes.dataState).toBe(canonicalResult.dataState);
   });

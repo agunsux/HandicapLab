@@ -189,8 +189,8 @@ describe('Signal Delivery Layer (Phase 32)', () => {
   describe('GET /api/signals/feed', () => {
     it('should return only published signals with status OPEN or LOCKED', async () => {
       mockSignalsData = [
-        { id: 'sig_1', home_team: 'Chelsea', away_team: 'Arsenal', market_category: 'asian_handicap', status: 'OPEN', confidence: 0.8 },
-        { id: 'sig_2', home_team: 'Man City', away_team: 'Spurs', market_category: 'asian_handicap', status: 'LOCKED', confidence: 0.6 }
+        { id: 'sig_1', home_team: 'Chelsea', away_team: 'Arsenal', market_category: 'asian_handicap', status: 'OPEN', confidence: 0.8, league: 'Premier League' },
+        { id: 'sig_2', home_team: 'Man City', away_team: 'Spurs', market_category: 'asian_handicap', status: 'LOCKED', confidence: 0.6, league: 'Premier League' }
       ];
 
       const request = new Request('http://localhost/api/signals/feed');
@@ -205,7 +205,7 @@ describe('Signal Delivery Layer (Phase 32)', () => {
 
     it('should filter signals by market parameter (OU)', async () => {
       mockSignalsData = [
-        { id: 'sig_ou_1', home_team: 'Man United', away_team: 'Liverpool', market_category: 'over_under', status: 'OPEN', confidence: 0.75 }
+        { id: 'sig_ou_1', home_team: 'Man United', away_team: 'Liverpool', market_category: 'over_under', status: 'OPEN', confidence: 0.75, league: 'Premier League' }
       ];
 
       const request = new Request('http://localhost/api/signals/feed?market=OU');
@@ -219,9 +219,9 @@ describe('Signal Delivery Layer (Phase 32)', () => {
 
     it('should enforce pagination limit parameter', async () => {
       mockSignalsData = [
-        { id: 'sig_1', status: 'OPEN' },
-        { id: 'sig_2', status: 'OPEN' },
-        { id: 'sig_3', status: 'OPEN' }
+        { id: 'sig_1', status: 'OPEN', league: 'Premier League' },
+        { id: 'sig_2', status: 'OPEN', league: 'Premier League' },
+        { id: 'sig_3', status: 'OPEN', league: 'Premier League' }
       ];
       // For premium user (mocked as premium to avoid free user slice of 3)
       mockEntitlement.active = true;
@@ -237,10 +237,10 @@ describe('Signal Delivery Layer (Phase 32)', () => {
 
     it('should hide/mask premium fields and slice feed count to 3 for free users', async () => {
       mockSignalsData = [
-        { id: 'sig_1', status: 'OPEN', edge_pct: 12.5, closing_odds: 1.85, clv_percentage: 4.5 },
-        { id: 'sig_2', status: 'OPEN' },
-        { id: 'sig_3', status: 'OPEN' },
-        { id: 'sig_4', status: 'OPEN' }
+        { id: 'sig_1', status: 'OPEN', edge_pct: 12.5, closing_odds: 1.85, clv_percentage: 4.5, league: 'Premier League' },
+        { id: 'sig_2', status: 'OPEN', league: 'Premier League' },
+        { id: 'sig_3', status: 'OPEN', league: 'Premier League' },
+        { id: 'sig_4', status: 'OPEN', league: 'Premier League' }
       ];
       mockEntitlement.active = false; // Free User
 

@@ -16,7 +16,7 @@
 // quality, and are reported explicitly.
 
 import type { OddsSnapshot, MarketType } from '@/lib/data/providers/types';
-import { getSharpBookConfig, getSharpBooksByTier, type SharpTier } from '@/lib/config/sharpBooks';
+import { SHARP_BOOKS, getSharpBookConfig, getSharpBooksByTier, type SharpTier } from '@/lib/config/sharpBooks';
 import {
   SharpConsensusEngine,
   type SharpConsensusOptions,
@@ -48,8 +48,8 @@ function countTier(present: Set<string>, tier: SharpTier): number {
 }
 
 export class SharpReferenceProvider {
-  static readonly s1Total: number = getSharpBooksByTier('S1').length;
-  static readonly s2Total: number = getSharpBooksByTier('S2').length;
+  static readonly s1Total: number = SHARP_BOOKS.filter((b) => b.tier === 'S1').length;
+  static readonly s2Total: number = SHARP_BOOKS.filter((b) => b.tier === 'S2').length;
 
   /**
    * Convert normalized odds snapshots into per-source quotes. A quote is only

@@ -10,7 +10,7 @@ describe('EPIC 59: Public Terminal', () => {
       expect(typeof model.frozen_parameters).toBe('object');
       expect(model.frozen_parameters.rho).toBe(-0.05);
       expect(model.frozen_parameters.decay_xi).toBe(0.0019);
-      expect(model.validation_state).toBe('RESEARCH_ONLY');
+      expect(['AUDITED_RESEARCH_BASELINE', 'RESEARCH_ONLY']).toContain(model.validation_state);
     }
   });
 

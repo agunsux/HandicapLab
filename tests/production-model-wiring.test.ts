@@ -390,26 +390,37 @@ describe('Q3 — Production Model Wiring Gate Verification Suite', () => {
   // GATE 5: SCHEDULER ALIGNMENT & CRON SEQUENCE
   // ==========================================================================
   describe('Gate 5: Scheduler Alignment in vercel.json', () => {
-    it('verifies that update-ratings runs before predict in vercel.json cron schedule', async () => {
+    it('verifies scheduler alignment in vercel.json (consolidated Cloud Run or discrete crons)', async () => {
       const fs = await import('fs');
       const path = await import('path');
       const vercelJsonPath = path.resolve(process.cwd(), 'vercel.json');
       const vercelConfig = JSON.parse(fs.readFileSync(vercelJsonPath, 'utf-8'));
 
-      const crons = vercelConfig.crons as Array<{ path: string; schedule: string }>;
+      const crons = (vercelConfig.crons || []) as Array<{ path: string; schedule: string }>;
 
-      const oddsCron = crons.find((c) => c.path === '/api/cron/odds');
-      const updateRatingsCron = crons.find((c) => c.path === '/api/cron/update-ratings');
-      const predictCron = crons.find((c) => c.path === '/api/cron/predict');
+      // In decoupled Cloud Run architecture (commits d95bb808 & 990023cd),
+      // crons are consolidated and proxied to Cloud Run backend.
+      // If legacy discrete crons are present in vercel.json, enforce their ordering.
+      // Otherwise, verify the consolidated cron and Cloud Run proxy route.
+      const hasConsolidatedCron = crons.some((c) => c.path === '/api/cron/pipeline' || c.path === '/api/cron/rescue-pipeline');
+      if (hasConsolidatedCron) {
+        expect(hasConsolidatedCron).toBe(true);
+        expect(vercelConfig.rewrites).toBeDefined();
+        expect(vercelConfig.rewrites[0].destination).toContain('run.app');
+      } else {
+        const oddsCron = crons.find((c) => c.path === '/api/cron/odds');
+        const updateRatingsCron = crons.find((c) => c.path === '/api/cron/update-ratings');
+        const predictCron = crons.find((c) => c.path === '/api/cron/predict');
 
-      expect(oddsCron).toBeDefined();
-      expect(updateRatingsCron).toBeDefined();
-      expect(predictCron).toBeDefined();
+        expect(oddsCron).toBeDefined();
+        expect(updateRatingsCron).toBeDefined();
+        expect(predictCron).toBeDefined();
 
-      // Verify schedule times (in UTC format: "M H * * *")
-      expect(oddsCron?.schedule).toBe('20 0 * * *');         // 00:20 UTC
-      expect(updateRatingsCron?.schedule).toBe('30 0 * * *'); // 00:30 UTC
-      expect(predictCron?.schedule).toBe('50 0 * * *');       // 00:50 UTC
+        // Verify schedule times (in UTC format: "M H * * *")
+        expect(oddsCron?.schedule).toBe('20 0 * * *');         // 00:20 UTC
+        expect(updateRatingsCron?.schedule).toBe('30 0 * * *'); // 00:30 UTC
+        expect(predictCron?.schedule).toBe('50 0 * * *');       // 00:50 UTC
+      }
     });
   });
 });

@@ -45,6 +45,8 @@ afterAll(() => {
   try {
     const cacheFile = path.resolve('data/cache/upcoming_fixtures.json');
     if (fs.existsSync(cacheFile)) fs.unlinkSync(cacheFile);
+    const testCache = path.resolve('data/test_cache/canonical_fixtures.json');
+    if (fs.existsSync(testCache)) fs.unlinkSync(testCache);
   } catch {
     // best-effort cleanup
   }

@@ -231,14 +231,18 @@ describe('Phase 32.7 — Competition Intelligence Layer Tests', () => {
     ];
 
     // Filter by country
-    const reqCountry = new Request('http://localhost/api/signals/feed?market=AH&country=France');
+    const reqCountry = new Request('http://localhost/api/signals/feed?market=AH&country=France', {
+      headers: { 'x-user-id': 'test-user' }
+    });
     const resCountry = await feedGET(reqCountry);
     const payCountry = await resCountry.json();
     expect(payCountry.feed).toHaveLength(1);
     expect(payCountry.feed[0].id).toBe('2');
 
     // Filter by confidence
-    const reqConfidence = new Request('http://localhost/api/signals/feed?market=AH&confidence=HIGH');
+    const reqConfidence = new Request('http://localhost/api/signals/feed?market=AH&confidence=HIGH', {
+      headers: { 'x-user-id': 'test-user' }
+    });
     const resConfidence = await feedGET(reqConfidence);
     const payConfidence = await resConfidence.json();
     expect(payConfidence.feed).toHaveLength(1);

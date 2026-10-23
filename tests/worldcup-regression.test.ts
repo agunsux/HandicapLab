@@ -13,6 +13,9 @@ vi.mock('../src/lib/supabase.server', () => {
           order: vi.fn().mockReturnThis(),
           limit: vi.fn().mockReturnThis(),
           range: vi.fn().mockReturnThis(),
+          gt: vi.fn().mockReturnThis(),
+          lte: vi.fn().mockReturnThis(),
+          eq: vi.fn().mockReturnThis(),
           then: (resolve: any) => {
             if (table === 'matches') {
               resolve({

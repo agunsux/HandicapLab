@@ -8,14 +8,19 @@ import { ProductionPublishingEngine } from '@/lib/publishing/productionPublishin
 import { HighConfidenceLedgerService } from '@/lib/ledger/highConfidenceLedgerService';
 
 describe('Route Consolidation Verification (Gate 1 & Gate 2)', () => {
+  const secret = 'test-cron-secret-123';
+
   beforeEach(() => {
+    process.env.CRON_SECRET = secret;
     DurableLedgerStore.clearStoreForTesting();
     ProductionPublishingEngine.saveStore({});
   });
 
   describe('/api/cron/pipeline consolidation', () => {
     it('executes publishing reconciliation when mode=reconcile', async () => {
-      const req = new NextRequest('http://localhost:3000/api/cron/pipeline?mode=reconcile');
+      const req = new NextRequest('http://localhost:3000/api/cron/pipeline?mode=reconcile', {
+        headers: { authorization: `Bearer ${secret}` },
+      });
       const res = await getCronPipeline(req);
       expect(res.status).toBe(200);
       const data = await res.json();
@@ -25,7 +30,10 @@ describe('Route Consolidation Verification (Gate 1 & Gate 2)', () => {
     });
 
     it('executes publishing reconciliation via POST', async () => {
-      const req = new NextRequest('http://localhost:3000/api/cron/pipeline?mode=reconcile', { method: 'POST' });
+      const req = new NextRequest('http://localhost:3000/api/cron/pipeline?mode=reconcile', {
+        method: 'POST',
+        headers: { authorization: `Bearer ${secret}` },
+      });
       const res = await postCronPipeline(req);
       expect(res.status).toBe(200);
       const data = await res.json();
@@ -33,7 +41,9 @@ describe('Route Consolidation Verification (Gate 1 & Gate 2)', () => {
     });
 
     it('executes bet settlement when mode=settle', async () => {
-      const req = new NextRequest('http://localhost:3000/api/cron/pipeline?mode=settle');
+      const req = new NextRequest('http://localhost:3000/api/cron/pipeline?mode=settle', {
+        headers: { authorization: `Bearer ${secret}` },
+      });
       const res = await getCronPipeline(req);
       expect(res.status).toBe(200);
       const data = await res.json();
@@ -44,7 +54,9 @@ describe('Route Consolidation Verification (Gate 1 & Gate 2)', () => {
     });
 
     it('returns ops dashboard when mode=ops', async () => {
-      const req = new NextRequest('http://localhost:3000/api/cron/pipeline?mode=ops');
+      const req = new NextRequest('http://localhost:3000/api/cron/pipeline?mode=ops', {
+        headers: { authorization: `Bearer ${secret}` },
+      });
       const res = await getCronPipeline(req);
       expect(res.status).toBe(200);
       const data = await res.json();

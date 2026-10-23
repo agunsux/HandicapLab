@@ -1,11 +1,32 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ProductionPublishingEngine } from '@/lib/publishing/productionPublishingEngine';
 import { CanonicalFixture } from '@/lib/services/canonicalFixtureRegistry';
+import { CanonicalOrchestrator } from '@/lib/pipeline/canonicalOrchestrator';
 
 describe('P0 Acceptance Test: Real End-to-End Publishing Propagation', () => {
   beforeEach(() => {
     // Reset store before test
     ProductionPublishingEngine.saveStore({});
+    vi.spyOn(CanonicalOrchestrator, 'resolveTeamRatings').mockResolvedValue({
+      homeRating: {
+        team_id: 'Arsenal',
+        team_name: 'Arsenal',
+        league_id: 'Premier League',
+        attack_strength: 1.25,
+        defense_strength: 0.85,
+        matches_played: 10,
+      },
+      awayRating: {
+        team_id: 'Chelsea',
+        team_name: 'Chelsea',
+        league_id: 'Premier League',
+        attack_strength: 1.10,
+        defense_strength: 0.95,
+        matches_played: 10,
+      },
+      isSufficient: true,
+      reason: null,
+    });
   });
 
   it('executes full automated lifecycle: discovery -> publish -> update -> removal', async () => {

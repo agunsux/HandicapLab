@@ -5,12 +5,14 @@ import { DailyPerformanceService } from '@/lib/ledger/dailyPerformanceService';
 import { DurableLedgerStore } from '@/lib/ledger/durableLedgerStore';
 import { ProductionPublishingEngine } from '@/lib/publishing/productionPublishingEngine';
 import { ProductionValidityGate } from '@/lib/publishing/productionValidityGate';
+import { PredictionArchiveService } from '@/lib/archive/predictionArchiveService';
 import { MarketSignalInput } from '@/lib/publishing/types';
 
 describe('High-Confidence Prediction Ledger End-to-End Acceptance Pipeline', () => {
   beforeEach(() => {
     DurableLedgerStore.clearStoreForTesting();
     ProductionPublishingEngine.saveStore({});
+    PredictionArchiveService.clearStoreForTesting();
   });
 
   it('executes the full lifecycle: Publication -> 1U Ledger Bet -> Kickoff Lock -> FT Result -> Settlement -> Daily Realized Yield', async () => {

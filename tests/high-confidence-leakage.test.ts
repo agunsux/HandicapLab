@@ -23,7 +23,7 @@ describe('High-Confidence Prediction Ledger & Settlement Leakage Invariants', ()
     competitionId: 'ENG-PL',
     leagueKey: 'ENG-PL',
     leagueTier: 'A',
-    kickoffUtc: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(), // 2 hours future
+    kickoffUtc: new Date(Date.now() - 60 * 60 * 1000).toISOString(), // 1 hour ago (completed kickoff)
     market: 'AH',
     selection: 'Arsenal -0.25',
     line: -0.25,
@@ -43,8 +43,8 @@ describe('High-Confidence Prediction Ledger & Settlement Leakage Invariants', ()
     dataFreshnessSeconds: 60,
     freshnessText: '1m ago',
     recommendation: 'VALUE_CANDIDATE',
-    oddsTimestampUtc: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
-    predictionTimestampUtc: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
+    oddsTimestampUtc: new Date(Date.now() - 150 * 60 * 1000).toISOString(),
+    predictionTimestampUtc: new Date(Date.now() - 120 * 60 * 1000).toISOString(),
     lastReconciledUtc: new Date().toISOString(),
     modelVersion: 'dixon-coles-v1.0',
     payloadHash: 'hash_abc123',

@@ -3,11 +3,15 @@ import { validateCredential } from './auth/credentialValidator';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, '') || 'https://rgkrfzxipkrwqccfuqfq.supabase.co';
 
+let cachedKey: string | null = null;
 let cachedClient: SupabaseClient | null = null;
 
-function getClient(): SupabaseClient {
-  if (cachedClient) return cachedClient;
+export function resetSupabaseClient(): void {
+  cachedClient = null;
+  cachedKey = null;
+}
 
+function getClient(): SupabaseClient {
   let rawKey = (process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY || '').replace(/['`"]/g, '').trim();
   if (!rawKey && typeof window === 'undefined') {
     try {
@@ -27,6 +31,8 @@ function getClient(): SupabaseClient {
     throw new Error('[FAIL CLOSED] Authentication failed: SUPABASE_SERVICE_ROLE_KEY is missing, empty, or malformed. No Supabase connection was established.');
   }
 
+  if (cachedClient && cachedKey === rawKey) return cachedClient;
+
   const clientOptions = {
     global: {
       fetch: (url: any, init?: any) => {
@@ -42,21 +48,43 @@ function getClient(): SupabaseClient {
   try {
     const supabaseServiceKey = validateCredential('SUPABASE_SERVICE_ROLE_KEY', rawKey, 'jwt');
     cachedClient = createClient(supabaseUrl, supabaseServiceKey, clientOptions);
+    cachedKey = rawKey;
     return cachedClient;
   } catch {
     cachedClient = createClient(supabaseUrl, rawKey, clientOptions);
+    cachedKey = rawKey;
     return cachedClient;
   }
 }
 
-export const supabase: SupabaseClient = new Proxy({
-  from: () => {},
-  rpc: () => {},
-  auth: {},
-} as unknown as SupabaseClient, {
-  get(_target, prop: string | symbol) {
+export const supabase: SupabaseClient = new Proxy({} as unknown as SupabaseClient, {
+  has(target, prop: string | symbol) {
+    if (prop in target) return true;
+    try {
+      const client = getClient();
+      return prop in client;
+    } catch {
+      return false;
+    }
+  },
+  get(target, prop: string | symbol) {
+    if (prop in target) {
+      return (target as any)[prop];
+    }
     const client = getClient();
     const value = (client as any)[prop];
     return typeof value === 'function' ? value.bind(client) : value;
+  },
+  set(target, prop: string | symbol, value: any) {
+    (target as any)[prop] = value;
+    return true;
+  },
+  defineProperty(target, prop: string | symbol, descriptor: PropertyDescriptor) {
+    Object.defineProperty(target, prop, descriptor);
+    return true;
+  },
+  deleteProperty(target, prop: string | symbol) {
+    delete (target as any)[prop];
+    return true;
   }
 });
