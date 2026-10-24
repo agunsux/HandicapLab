@@ -12,8 +12,14 @@ import { LEAGUE_REGISTRY } from '@/lib/crons/leagueRegistry';
 import { CLVCalculator } from '@/lib/settlement/clv-calculator';
 import { createSignalEvent } from '@/lib/alerts/events';
 import { PerformanceAttribution } from '@/lib/intelligence/attribution';
+import { FreeResultsAdapter } from '@/lib/results/freeResultsAdapter';
 
 function isTeamMatch(name1: string, name2: string): boolean {
+  if (!name1 || !name2) return false;
+  const c1 = FreeResultsAdapter.normalizeTeamName(name1);
+  const c2 = FreeResultsAdapter.normalizeTeamName(name2);
+  if (c1 === c2 || c1.includes(c2) || c2.includes(c1)) return true;
+
   const n1 = name1.toLowerCase().replace(/[\s-_]/g, '');
   const n2 = name2.toLowerCase().replace(/[\s-_]/g, '');
   return n1.includes(n2) || n2.includes(n1);
@@ -162,13 +168,31 @@ async function runSignalsSettlement(logId: string | null) {
         // Fetch and cache fixtures for this league and season
         const cacheKey = `${leagueConfig.apiFootballId}-${season}`;
         let fixtures = fixturesCache.get(cacheKey);
-        if (!fixtures) {
+        if (!fixtures || fixtures.length === 0) {
           try {
             const fixturesResponse = await apiFootballClient.getFixtures(leagueConfig.apiFootballId, season);
             fixtures = fixturesResponse?.response || [];
+          } catch (err: any) {
+            console.warn(`[Settlement Cron] API-Football unavailable for league ${leagueName} season ${season}: ${err.message}. Engaging FreeResultsAdapter fallback.`);
+          }
+
+          // Fallback to FreeResultsAdapter (EPIC 89 - Free Football Results Provider)
+          if (!fixtures || fixtures.length === 0) {
+            try {
+              const freeResults = await FreeResultsAdapter.getResultsForLeague(leagueName, season);
+              if (freeResults && freeResults.length > 0) {
+                fixtures = FreeResultsAdapter.toApiFootballFixtures(freeResults, leagueConfig.apiFootballId);
+                console.log(`[Settlement Cron] Sourced ${fixtures.length} verified results for ${leagueName} via FreeResultsAdapter.`);
+              }
+            } catch (freeErr: any) {
+              console.error(`[Settlement Cron] FreeResultsAdapter fallback failed for league ${leagueName}:`, freeErr.message);
+            }
+          }
+
+          if (fixtures && fixtures.length > 0) {
             fixturesCache.set(cacheKey, fixtures);
-          } catch (err) {
-            console.error(`[Settlement Cron] Failed to fetch fixtures for league ${leagueName} season ${season}:`, err);
+          } else {
+            console.error(`[Settlement Cron] Failed to fetch fixtures for league ${leagueName} season ${season} from all providers.`);
             signalsFailed++;
             continue;
           }
@@ -183,11 +207,11 @@ async function runSignalsSettlement(logId: string | null) {
           const fKickoff = new Date(f.fixture.date).getTime();
           const sKickoff = kickoffDate.getTime();
           const diffHours = Math.abs(fKickoff - sKickoff) / (1000 * 60 * 60);
-          return diffHours < 24;
+          return diffHours < 36;
         });
 
         if (!fixture) {
-          console.warn(`[Settlement Cron] Match not found in API-Football for signal ${signal.id}: ${signal.home_team} vs ${signal.away_team} on ${signal.kickoff_utc}`);
+          console.warn(`[Settlement Cron] Match not found in results provider for signal ${signal.id}: ${signal.home_team} vs ${signal.away_team} on ${signal.kickoff_utc}`);
           // Let it remain pending to retry next time
           continue;
         }
@@ -259,12 +283,13 @@ async function runSignalsSettlement(logId: string | null) {
                 away: fixture.score?.fulltime?.away
               }
             };
+            const isFreeSource = String(fixture.fixture?.id || '').startsWith('fd_');
             await supabase
               .from('match_results')
               .upsert({
                 match_id: String(signal.match_id),
                 final_score: finalScore,
-                verified_source: 'api-football',
+                verified_source: isFreeSource ? 'football-data.co.uk' : 'api-football',
                 verified_at: new Date().toISOString()
               }, { onConflict: 'match_id' });
 

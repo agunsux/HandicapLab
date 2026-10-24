@@ -453,6 +453,34 @@ export class SalmoProductionSyncService {
       }
     }
 
+    // If fixture registry has no verified results, derive from settled rescue ledger records
+    if (verifiedResultsList.length === 0) {
+      const rescueSettledRows = filteredRescue.filter(
+        (r) => r.settlement && r.settlement.status && r.settlement.status !== 'PENDING'
+      );
+      const seen = new Set<string>();
+      for (const r of rescueSettledRows) {
+        const id = String(r.fixture_id);
+        if (seen.has(id)) continue;
+        seen.add(id);
+        verifiedResultsList.push({
+          canonicalFixtureId: id,
+          providerMatchId: id,
+          competition: r.competition || 'Top League',
+          season: '2026',
+          homeTeam: r.home_team,
+          awayTeam: r.away_team,
+          kickoffUtc: r.kickoff_utc,
+          status: 'FINISHED',
+          homeGoals: Number(r.settlement.home_goals ?? 0),
+          awayGoals: Number(r.settlement.away_goals ?? 0),
+          totalGoals: Number(r.settlement.home_goals ?? 0) + Number(r.settlement.away_goals ?? 0),
+          sourceProvider: 'rescue_ledger',
+          verifiedAt: r.settlement.settled_at || timestampUtc,
+        });
+      }
+    }
+
     const dataState:
       | 'REAL'
       | 'NO_QUALIFIED_PICKS'
@@ -784,6 +812,36 @@ export class SalmoProductionSyncService {
             marketsAvailable: ['AH', 'OU', 'BTTS'],
             sourceProvider: p.provider || 'canonical_ledger',
             sourceVersion: p.modelVersion || 'dixon-coles-v1.0',
+          });
+        }
+      }
+
+      // If fixture registry has no verified results, derive from settled ledger predictions
+      if (verifiedResultsList.length === 0) {
+        const settledPreds = allPredictions.filter((p) => p.status === 'SETTLED');
+        const seen = new Set<string>();
+        for (const p of settledPreds) {
+          const kStr = p.kickoffTimestamp || (p as any).kickoffUtc;
+          const matchKey = `${p.homeTeam}|${p.awayTeam}|${kStr ? kStr.slice(0, 10) : ''}`;
+          if (seen.has(matchKey)) continue;
+          seen.add(matchKey);
+          const id = String(p.canonicalFixtureId || (p as any).fixtureId || matchKey);
+          const hGoals = Number(p.settlement?.homeGoals ?? (p as any).homeGoals ?? 0);
+          const aGoals = Number(p.settlement?.awayGoals ?? (p as any).awayGoals ?? 0);
+          verifiedResultsList.push({
+            canonicalFixtureId: id,
+            providerMatchId: id,
+            competition: p.competition || 'Top League',
+            season: '2026',
+            homeTeam: p.homeTeam,
+            awayTeam: p.awayTeam,
+            kickoffUtc: kStr || timestampUtc,
+            status: 'FINISHED',
+            homeGoals: hGoals,
+            awayGoals: aGoals,
+            totalGoals: hGoals + aGoals,
+            sourceProvider: p.provider || 'canonical_ledger',
+            verifiedAt: p.settlement?.settledAt || p.updatedAt || timestampUtc,
           });
         }
       }
